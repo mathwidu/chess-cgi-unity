@@ -8,3 +8,9 @@
 - Inspector: painel de componentes do GameObject selecionado.
 - Project: arquivos do projeto dentro de `Assets`.
 - Transform: componente que controla posicao, rotacao e escala.
+
+## Marco 2: Bibliotecas externas
+
+- `Assets/Plugins` permite colocar DLLs que scripts C# da Unity podem referenciar.
+- A biblioteca `ChessDotNet` guarda a regra do xadrez fora da apresentacao 3D.
+- Separar regra e visual reduz retrabalho quando a cena, modelos ou WebGL mudarem.
