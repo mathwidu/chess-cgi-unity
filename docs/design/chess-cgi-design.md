@@ -26,7 +26,7 @@ O jogo mostrara turno atual, xeque, xeque-mate, empate e promocao. A cena tera t
 
 ## Escopo Do MVP
 
-- Projeto Unity na pasta `chess-cgi-unity`.
+- Repositorio do projeto na pasta `chess-cgi-unity`, com o projeto Unity em `chess-cgi-unity/game`.
 - Jogo local completo para dois jogadores.
 - Regras completas via biblioteca/motor de xadrez em C#.
 - Tabuleiro 3D classico, apresentavel e legivel.
