@@ -38,10 +38,11 @@ Resultado esperado nesta fase: `17` testes passando.
 
 Para gerar uma versao jogavel fora do Editor:
 
-1. Abra `File > Build Profiles`.
-2. Selecione o alvo desejado, como macOS ou WebGL.
-3. Garanta que `Assets/Scenes/Main.unity` esteja na lista de cenas.
-4. Clique em `Build`.
+1. Abra a cena `Assets/Scenes/Main.unity`.
+2. No menu superior, clique em `Chess CGI > Build > macOS`.
+3. A build sera gerada em `Builds/macOS/XadrezCGI.app`.
+
+Tambem e possivel usar `File > Build Profiles`, desde que `Assets/Scenes/Main.unity` esteja na lista de cenas.
 
 ## Entregaveis
 
