@@ -88,7 +88,7 @@ public class PieceFactoryTests
     }
 
     [Test]
-    public void CreatePiece_CustomVisualFacesOwningSide()
+    public void CreatePiece_CustomVisualFacesForwardTowardOpponent()
     {
         GameObject rig = new GameObject("Piece Factory Test Rig");
         GameObject pawnPrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -107,8 +107,8 @@ public class PieceFactoryTests
                 Vector3.zero,
                 rig.transform);
 
-            Assert.AreEqual(180f, whitePiece.transform.Find("CustomVisual").localEulerAngles.y, 0.01f);
-            Assert.AreEqual(0f, blackPiece.transform.Find("CustomVisual").localEulerAngles.y, 0.01f);
+            Assert.AreEqual(0f, whitePiece.transform.Find("CustomVisual").localEulerAngles.y, 0.01f);
+            Assert.AreEqual(180f, blackPiece.transform.Find("CustomVisual").localEulerAngles.y, 0.01f);
         }
         finally
         {

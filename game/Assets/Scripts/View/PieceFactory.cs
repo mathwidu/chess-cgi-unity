@@ -82,7 +82,7 @@ public sealed class PieceFactory : MonoBehaviour
         GameObject visual = Object.Instantiate(prefab, parent);
         visual.name = "CustomVisual";
         visual.transform.localPosition = Vector3.zero;
-        visual.transform.localRotation = Quaternion.Euler(0f, side == ChessSide.White ? 180f : 0f, 0f);
+        visual.transform.localRotation = Quaternion.Euler(0f, side == ChessSide.Black ? 180f : 0f, 0f);
         visual.transform.localScale = Vector3.one;
         FitCustomVisual(visual.transform);
         return true;
