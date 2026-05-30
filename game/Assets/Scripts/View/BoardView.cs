@@ -19,6 +19,7 @@ public sealed class BoardView : MonoBehaviour
     public float PieceBaseHeight => pieceBaseHeight;
     public IReadOnlyList<SquareView> Squares => squares;
     public IReadOnlyList<PieceView> Pieces => pieces;
+    public int HighlightCount => highlightsRoot == null ? 0 : highlightsRoot.childCount;
 
     public void Configure(
         Transform squaresParent,
