@@ -12,6 +12,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
     private readonly List<BoardSquare> legalDestinations = new List<BoardSquare>();
+    private readonly List<string> moveHistory = new List<string>();
 
     private PieceView selectedPiece;
     private bool inputBlocked;
@@ -23,6 +24,7 @@ public sealed class ChessGameController : MonoBehaviour
     public bool IsInputBlocked => inputBlocked || awaitingPromotion;
     public bool IsAwaitingPromotion => awaitingPromotion;
     public ChessSide CurrentTurn => rules.CurrentTurn;
+    public IReadOnlyList<string> MoveHistory => moveHistory;
     public string StatusMessage { get; private set; } = "Turno: Brancas";
 
     public void Configure(BoardView board, PieceFactory factory, GameHud gameHud, CameraController camera = null)
@@ -79,6 +81,7 @@ public sealed class ChessGameController : MonoBehaviour
         awaitingPromotion = false;
         selectedPiece = null;
         legalDestinations.Clear();
+        moveHistory.Clear();
 
         boardView.BuildBoard();
         boardView.SyncPieces(rules.GetPieces(), pieceFactory);
@@ -193,6 +196,8 @@ public sealed class ChessGameController : MonoBehaviour
             return;
         }
 
+        string moveNotation = BuildMoveNotation(movingPiece, origin, destination, moveResult, promotion);
+        moveHistory.Add(moveNotation);
         ClearSelection();
 
         if (Application.isPlaying && moveDuration > 0f)
@@ -275,6 +280,19 @@ public sealed class ChessGameController : MonoBehaviour
         return piece.Kind == ChessPieceKind.Pawn &&
             ((piece.Side == ChessSide.White && destination.Rank == 8) ||
              (piece.Side == ChessSide.Black && destination.Rank == 1));
+    }
+
+    private static string BuildMoveNotation(
+        PieceView movingPiece,
+        BoardSquare origin,
+        BoardSquare destination,
+        MoveResult moveResult,
+        char? promotion)
+    {
+        string separator = moveResult.IsCapture ? "x" : "-";
+        string promotionSuffix = promotion.HasValue ? $"={char.ToUpperInvariant(promotion.Value)}" : string.Empty;
+        string stateSuffix = moveResult.IsCheckmate ? "#" : moveResult.IsCheck ? "+" : string.Empty;
+        return $"{SideName(movingPiece.Side)}: {origin.ToAlgebraic()}{separator}{destination.ToAlgebraic()}{promotionSuffix}{stateSuffix}";
     }
 
     private static string SideName(ChessSide side)

@@ -17909,6 +17909,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: ChessCgi.Runtime::GameHud
   gameController: {fileID: 1738091631}
+  visibleMoveCount: 6
 --- !u!223 &1964109918
 Canvas:
   m_ObjectHideFlags: 0
