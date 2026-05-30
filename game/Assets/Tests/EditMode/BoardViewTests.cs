@@ -29,4 +29,28 @@ public class BoardViewTests
 
         Object.DestroyImmediate(gameObject);
     }
+
+    [Test]
+    public void BuildBoard_CreatesDecorativeFrameWithoutAddingSquares()
+    {
+        GameObject gameObject = new GameObject("BoardView Test");
+        try
+        {
+            BoardView boardView = gameObject.AddComponent<BoardView>();
+
+            boardView.BuildBoard();
+
+            Transform boardFrame = gameObject.transform.Find("BoardFrame");
+            Assert.IsNotNull(boardFrame);
+            Assert.IsNotNull(boardFrame.Find("BoardBase"));
+            Assert.IsNotNull(boardFrame.Find("OuterRim"));
+            Assert.AreEqual(64, boardView.Squares.Count);
+            Assert.AreEqual(64, gameObject.GetComponentsInChildren<SquareView>().Length);
+            Assert.AreEqual(0, boardFrame.GetComponentsInChildren<Collider>().Length);
+        }
+        finally
+        {
+            Object.DestroyImmediate(gameObject);
+        }
+    }
 }

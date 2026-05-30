@@ -70,6 +70,11 @@ public sealed class ChessGameController : MonoBehaviour
 
     private void Start()
     {
+        StartLocalGame();
+    }
+
+    public void StartLocalGame()
+    {
         NewGame();
     }
 

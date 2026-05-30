@@ -6,13 +6,13 @@ public sealed class CameraController : MonoBehaviour
 {
     [SerializeField] private float orbitSpeed = 80f;
     [SerializeField] private float zoomSpeed = 6f;
-    [SerializeField] private float minDistance = 8f;
-    [SerializeField] private float maxDistance = 18f;
-    [SerializeField] private float turnPerspectiveDistance = 13.5f;
-    [SerializeField] private float turnPerspectiveHeight = 10.5f;
+    [SerializeField] private float minDistance = 7f;
+    [SerializeField] private float maxDistance = 15f;
+    [SerializeField] private float turnPerspectiveDistance = 11.2f;
+    [SerializeField] private float turnPerspectiveHeight = 8.4f;
     [SerializeField] private float transitionSpeed = 5f;
+    [SerializeField] private Vector3 target = new Vector3(0f, 0f, 0.35f);
 
-    private readonly Vector3 target = new Vector3(0f, 0f, 0.25f);
     private Coroutine perspectiveTransition;
 
     public ChessSide CurrentPerspective { get; private set; } = ChessSide.White;

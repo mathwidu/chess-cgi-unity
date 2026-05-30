@@ -92,6 +92,27 @@ public class ChessGameControllerTests
     }
 
     [Test]
+    public void StartLocalGame_ResetsMoveHistoryAndWhiteTurn()
+    {
+        GameObject rig = CreatePlayableRig(out BoardView boardView, out ChessGameController controller, out _);
+        try
+        {
+            Move(controller, boardView, "e2", "e4");
+
+            controller.StartLocalGame();
+
+            Assert.AreEqual(0, controller.MoveHistory.Count);
+            Assert.AreEqual(ChessSide.White, controller.CurrentTurn);
+            Assert.AreEqual("Turno: Brancas", controller.StatusMessage);
+            Assert.AreEqual(32, boardView.Pieces.Count);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+        }
+    }
+
+    [Test]
     public void ChoosePromotion_FromPendingPromotion_ReplacesPieceAndRecordsMove()
     {
         GameObject rig = CreatePlayableRig(out BoardView boardView, out ChessGameController controller, out _);

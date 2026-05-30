@@ -6,10 +6,11 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 
 - Jogo 3D local para duas pessoas alternando turnos.
 - Regras completas delegadas para `ChessDotNet`: movimentos legais, xeque, xeque-mate, empate, roque, en passant e promocao.
-- Tabuleiro e pecas classicas montados com primitivas 3D.
+- Tabuleiro com moldura, mesa e ambientacao simples de sala/aula.
+- Pecas classicas montadas com primitivas 3D quando nao ha personagem customizado.
 - Peao e bispo personalizados gerados como prefabs 3D e integrados ao tabuleiro.
-- Camera alterna automaticamente para o lado do jogador da vez.
-- HUD mostra estado da partida, escolha de promocao, historico recente e nova partida.
+- Camera alterna automaticamente para o lado do jogador da vez, com enquadramento mais proximo.
+- HUD mostra tela inicial, instrucoes, estado da partida, escolha de promocao, historico recente e nova partida.
 
 ## Como abrir
 
@@ -33,7 +34,13 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 No Unity, abra `Window > General > Test Runner`, selecione `EditMode` e clique em `Run All`.
 A suite atual cobre dominio, regras especiais de xadrez, montagem do tabuleiro, fluxo do controller, promocao, camera por turno e suporte a pecas personalizadas.
 
-Resultado esperado nesta fase: `22` testes passando.
+Resultado esperado nesta fase: `27` testes passando.
+
+## Tema visual
+
+O jogo usa uma ambientacao sutil de faculdade/CGI: tabuleiro sobre mesa, fundo de sala, quadro e props simples feitos com primitivas. A ideia e valorizar os personagens da turma sem deixar o visual pesado ou poluido.
+
+Regra de assets: antes de regenerar um personagem, tente melhorar iluminacao, camera, escala e materiais. Os meshes gerados devem ser recriados apenas quando a silhueta ou identidade estiverem erradas.
 
 ## Pecas personalizadas
 

@@ -21,6 +21,8 @@ public class CameraControllerTests
             Assert.Greater(blackPosition.z, 0f);
             Assert.AreEqual(whitePosition.y, blackPosition.y, 0.001f);
             Assert.AreEqual(Mathf.Abs(whitePosition.z), Mathf.Abs(blackPosition.z), 0.001f);
+            Assert.AreEqual(8.4f, whitePosition.y, 0.001f);
+            Assert.AreEqual(11.2f, Mathf.Abs(whitePosition.z), 0.001f);
         }
         finally
         {

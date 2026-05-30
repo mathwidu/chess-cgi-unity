@@ -5,6 +5,7 @@ public sealed class BoardView : MonoBehaviour
 {
     [SerializeField] private float squareSize = 1.25f;
     [SerializeField] private float pieceBaseHeight = 0.08f;
+    [SerializeField] private Transform boardFrameRoot;
     [SerializeField] private Transform squaresRoot;
     [SerializeField] private Transform piecesRoot;
     [SerializeField] private Transform highlightsRoot;
@@ -20,6 +21,7 @@ public sealed class BoardView : MonoBehaviour
     public IReadOnlyList<SquareView> Squares => squares;
     public IReadOnlyList<PieceView> Pieces => pieces;
     public int HighlightCount => highlightsRoot == null ? 0 : highlightsRoot.childCount;
+    public Transform BoardFrameRoot => boardFrameRoot;
 
     public void Configure(
         Transform squaresParent,
@@ -54,9 +56,12 @@ public sealed class BoardView : MonoBehaviour
     public void BuildBoard()
     {
         EnsureRoots();
+        ClearChildren(boardFrameRoot);
         ClearChildren(squaresRoot);
         ClearChildren(highlightsRoot);
         squares.Clear();
+
+        BuildBoardFrame();
 
         for (int rank = 1; rank <= 8; rank++)
         {
@@ -130,9 +135,57 @@ public sealed class BoardView : MonoBehaviour
 
     private void EnsureRoots()
     {
+        boardFrameRoot = EnsureChildRoot(boardFrameRoot, "BoardFrame");
         squaresRoot = EnsureChildRoot(squaresRoot, "Squares");
         piecesRoot = EnsureChildRoot(piecesRoot, "Pieces");
         highlightsRoot = EnsureChildRoot(highlightsRoot, "Highlights");
+    }
+
+    private void BuildBoardFrame()
+    {
+        float boardWidth = squareSize * 8f;
+        Material rimMaterial = darkSquareMaterial != null ? darkSquareMaterial : lightSquareMaterial;
+        Material baseMaterial = lightSquareMaterial != null ? lightSquareMaterial : darkSquareMaterial;
+
+        GameObject baseObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        ConfigureDecorativePart(
+            baseObject,
+            "BoardBase",
+            new Vector3(0f, -0.08f, 0f),
+            new Vector3(boardWidth + 0.5f, 0.12f, boardWidth + 0.5f),
+            baseMaterial);
+
+        GameObject rimObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        ConfigureDecorativePart(
+            rimObject,
+            "OuterRim",
+            new Vector3(0f, -0.015f, 0f),
+            new Vector3(boardWidth + 0.85f, 0.08f, boardWidth + 0.85f),
+            rimMaterial);
+    }
+
+    private void ConfigureDecorativePart(GameObject part, string name, Vector3 localPosition, Vector3 localScale, Material material)
+    {
+        part.name = name;
+        part.transform.SetParent(boardFrameRoot);
+        part.transform.localPosition = localPosition;
+        part.transform.localRotation = Quaternion.identity;
+        part.transform.localScale = localScale;
+
+        if (material != null)
+        {
+            part.GetComponent<Renderer>().sharedMaterial = material;
+        }
+
+        Collider collider = part.GetComponent<Collider>();
+        if (Application.isPlaying)
+        {
+            Object.Destroy(collider);
+        }
+        else
+        {
+            Object.DestroyImmediate(collider);
+        }
     }
 
     private Transform EnsureChildRoot(Transform current, string rootName)
