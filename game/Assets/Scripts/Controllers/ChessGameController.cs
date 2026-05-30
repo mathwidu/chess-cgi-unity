@@ -7,6 +7,7 @@ public sealed class ChessGameController : MonoBehaviour
     [SerializeField] private BoardView boardView;
     [SerializeField] private PieceFactory pieceFactory;
     [SerializeField] private GameHud hud;
+    [SerializeField] private CameraController cameraController;
     [SerializeField] private float moveDuration = 0.28f;
 
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
@@ -24,11 +25,12 @@ public sealed class ChessGameController : MonoBehaviour
     public ChessSide CurrentTurn => rules.CurrentTurn;
     public string StatusMessage { get; private set; } = "Turno: Brancas";
 
-    public void Configure(BoardView board, PieceFactory factory, GameHud gameHud)
+    public void Configure(BoardView board, PieceFactory factory, GameHud gameHud, CameraController camera = null)
     {
         boardView = board;
         pieceFactory = factory;
         hud = gameHud;
+        cameraController = camera;
 
         if (hud != null)
         {
@@ -51,6 +53,11 @@ public sealed class ChessGameController : MonoBehaviour
         if (hud == null)
         {
             hud = Object.FindFirstObjectByType<GameHud>();
+        }
+
+        if (cameraController == null)
+        {
+            cameraController = Object.FindFirstObjectByType<CameraController>();
         }
 
         if (hud != null)
@@ -76,6 +83,7 @@ public sealed class ChessGameController : MonoBehaviour
         boardView.BuildBoard();
         boardView.SyncPieces(rules.GetPieces(), pieceFactory);
         SetStatusForTurn();
+        UpdateCameraForTurn(true);
     }
 
     public void SelectPiece(PieceView piece)
@@ -214,6 +222,7 @@ public sealed class ChessGameController : MonoBehaviour
             gameOver = true;
             ChessSide winner = CurrentTurn == ChessSide.White ? ChessSide.Black : ChessSide.White;
             StatusMessage = $"Xeque-mate. {SideName(winner)} vencem.";
+            UpdateCameraForTurn(false);
             return;
         }
 
@@ -221,16 +230,19 @@ public sealed class ChessGameController : MonoBehaviour
         {
             gameOver = true;
             StatusMessage = "Empate.";
+            UpdateCameraForTurn(false);
             return;
         }
 
         if (moveResult.IsCheck)
         {
             StatusMessage = $"Xeque. Turno: {SideName(CurrentTurn)}";
+            UpdateCameraForTurn(false);
             return;
         }
 
         SetStatusForTurn();
+        UpdateCameraForTurn(false);
     }
 
     private void ClearSelection()
@@ -248,6 +260,14 @@ public sealed class ChessGameController : MonoBehaviour
     private void SetStatusForTurn()
     {
         StatusMessage = $"Turno: {SideName(CurrentTurn)}";
+    }
+
+    private void UpdateCameraForTurn(bool instant)
+    {
+        if (cameraController != null)
+        {
+            cameraController.SetPerspective(CurrentTurn, instant);
+        }
     }
 
     private static bool RequiresPromotion(PieceView piece, BoardSquare destination)

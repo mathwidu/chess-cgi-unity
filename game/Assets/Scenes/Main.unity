@@ -3189,6 +3189,9 @@ MonoBehaviour:
   zoomSpeed: 6
   minDistance: 8
   maxDistance: 18
+  turnPerspectiveDistance: 13.5
+  turnPerspectiveHeight: 10.5
+  transitionSpeed: 5
 --- !u!1 &356526551
 GameObject:
   m_ObjectHideFlags: 0
@@ -16051,6 +16054,7 @@ MonoBehaviour:
   boardView: {fileID: 628463085}
   pieceFactory: {fileID: 1738091629}
   hud: {fileID: 1964109917}
+  cameraController: {fileID: 330585548}
   moveDuration: 0.28
 --- !u!114 &1738091632
 MonoBehaviour:

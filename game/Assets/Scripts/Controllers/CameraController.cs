@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,16 +8,14 @@ public sealed class CameraController : MonoBehaviour
     [SerializeField] private float zoomSpeed = 6f;
     [SerializeField] private float minDistance = 8f;
     [SerializeField] private float maxDistance = 18f;
+    [SerializeField] private float turnPerspectiveDistance = 13.5f;
+    [SerializeField] private float turnPerspectiveHeight = 10.5f;
+    [SerializeField] private float transitionSpeed = 5f;
 
     private readonly Vector3 target = new Vector3(0f, 0f, 0.25f);
-    private Vector3 defaultPosition;
-    private Quaternion defaultRotation;
+    private Coroutine perspectiveTransition;
 
-    private void Awake()
-    {
-        defaultPosition = transform.position;
-        defaultRotation = transform.rotation;
-    }
+    public ChessSide CurrentPerspective { get; private set; } = ChessSide.White;
 
     private void Update()
     {
@@ -47,8 +46,55 @@ public sealed class CameraController : MonoBehaviour
 
         if (keyboard != null && keyboard.rKey.wasPressedThisFrame)
         {
-            transform.position = defaultPosition;
-            transform.rotation = defaultRotation;
+            SetPerspective(CurrentPerspective, true);
         }
+    }
+
+    public void SetPerspective(ChessSide side, bool instant)
+    {
+        CurrentPerspective = side;
+        Vector3 targetPosition = GetPerspectivePosition(side);
+        Quaternion targetRotation = Quaternion.LookRotation(target - targetPosition, Vector3.up);
+
+        if (perspectiveTransition != null)
+        {
+            StopCoroutine(perspectiveTransition);
+            perspectiveTransition = null;
+        }
+
+        if (!Application.isPlaying || instant)
+        {
+            transform.position = targetPosition;
+            transform.rotation = targetRotation;
+            return;
+        }
+
+        perspectiveTransition = StartCoroutine(TransitionTo(targetPosition, targetRotation));
+    }
+
+    private IEnumerator TransitionTo(Vector3 targetPosition, Quaternion targetRotation)
+    {
+        Vector3 startPosition = transform.position;
+        Quaternion startRotation = transform.rotation;
+        float elapsed = 0f;
+
+        while (elapsed < 1f)
+        {
+            elapsed += Time.deltaTime * transitionSpeed;
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed));
+            transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+            transform.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
+            yield return null;
+        }
+
+        transform.position = targetPosition;
+        transform.rotation = targetRotation;
+        perspectiveTransition = null;
+    }
+
+    private Vector3 GetPerspectivePosition(ChessSide side)
+    {
+        float z = side == ChessSide.White ? -turnPerspectiveDistance : turnPerspectiveDistance;
+        return new Vector3(0f, turnPerspectiveHeight, z);
     }
 }
