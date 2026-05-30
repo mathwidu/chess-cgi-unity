@@ -84,7 +84,7 @@ public sealed class PieceFactory : MonoBehaviour
         visual.transform.localPosition = Vector3.zero;
         visual.transform.localRotation = Quaternion.Euler(0f, side == ChessSide.Black ? 180f : 0f, 0f);
         visual.transform.localScale = Vector3.one;
-        FitCustomVisual(visual.transform);
+        FitCustomVisual(visual.transform, GetCustomVisualHeight(kind));
         return true;
     }
 
@@ -109,7 +109,23 @@ public sealed class PieceFactory : MonoBehaviour
         }
     }
 
-    private void FitCustomVisual(Transform visual)
+    private float GetCustomVisualHeight(ChessPieceKind kind)
+    {
+        switch (kind)
+        {
+            case ChessPieceKind.Rook:
+            case ChessPieceKind.Knight:
+            case ChessPieceKind.Bishop:
+                return customVisualHeight + 0.16f;
+            case ChessPieceKind.Queen:
+            case ChessPieceKind.King:
+                return customVisualHeight + 0.28f;
+            default:
+                return customVisualHeight;
+        }
+    }
+
+    private void FitCustomVisual(Transform visual, float targetHeight)
     {
         Renderer[] renderers = visual.GetComponentsInChildren<Renderer>();
         if (renderers.Length == 0)
@@ -121,7 +137,7 @@ public sealed class PieceFactory : MonoBehaviour
         Bounds bounds = CalculateBounds(renderers);
         if (bounds.size.y > 0.001f)
         {
-            float scale = customVisualHeight / bounds.size.y;
+            float scale = targetHeight / bounds.size.y;
             visual.localScale *= scale;
         }
 

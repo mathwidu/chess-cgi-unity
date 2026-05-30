@@ -88,6 +88,36 @@ public class PieceFactoryTests
     }
 
     [Test]
+    public void CreatePiece_CustomBishopVisualIsTallerThanCustomPawn()
+    {
+        GameObject rig = new GameObject("Piece Factory Test Rig");
+        GameObject bishopPrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        bishopPrefab.transform.localScale = new Vector3(1f, 3f, 1f);
+
+        try
+        {
+            PieceFactory factory = rig.AddComponent<PieceFactory>();
+            factory.ConfigureCustomPrefab(ChessPieceKind.Bishop, bishopPrefab);
+
+            PieceView piece = factory.CreatePiece(
+                new VisualPieceState(BoardSquare.FromAlgebraic("c1"), ChessSide.White, ChessPieceKind.Bishop),
+                Vector3.zero,
+                rig.transform);
+
+            Transform customVisual = piece.transform.Find("CustomVisual");
+            Renderer renderer = customVisual.GetComponentInChildren<Renderer>();
+
+            Assert.AreEqual(1.31f, renderer.bounds.size.y, 0.02f);
+            Assert.GreaterOrEqual(renderer.bounds.min.y, 0.13f);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+            Object.DestroyImmediate(bishopPrefab);
+        }
+    }
+
+    [Test]
     public void CreatePiece_CustomVisualFacesForwardTowardOpponent()
     {
         GameObject rig = new GameObject("Piece Factory Test Rig");
