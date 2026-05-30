@@ -16024,6 +16024,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: ChessCgi.Runtime::PieceFactory
   whiteMaterial: {fileID: 2100000, guid: 9194f5b3b3af04346a21dbd468dea342, type: 2}
   blackMaterial: {fileID: 2100000, guid: de6d58df33b3d4441ae2113c62f85f85, type: 2}
+  pawnPrefab: {fileID: 5052759481951278753, guid: d3895ba4b5fb847b0aaff3c8156458ad, type: 3}
+  rookPrefab: {fileID: 0}
+  knightPrefab: {fileID: 0}
+  bishopPrefab: {fileID: 0}
+  queenPrefab: {fileID: 0}
+  kingPrefab: {fileID: 0}
+  customVisualHeight: 1.15
+  customVisualBaseOffset: 0.14
 --- !u!4 &1738091630
 Transform:
   m_ObjectHideFlags: 0

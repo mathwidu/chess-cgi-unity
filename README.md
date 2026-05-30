@@ -7,6 +7,7 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 - Jogo 3D local para duas pessoas alternando turnos.
 - Regras completas delegadas para `ChessDotNet`: movimentos legais, xeque, xeque-mate, empate, roque, en passant e promocao.
 - Tabuleiro e pecas classicas montados com primitivas 3D.
+- Peao personalizado gerado como prefab 3D e integrado ao tabuleiro.
 - Camera alterna automaticamente para o lado do jogador da vez.
 - HUD mostra estado da partida, escolha de promocao, historico recente e nova partida.
 
@@ -30,9 +31,15 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 ## Testes automatizados
 
 No Unity, abra `Window > General > Test Runner`, selecione `EditMode` e clique em `Run All`.
-A suite atual cobre dominio, regras especiais de xadrez, montagem do tabuleiro, fluxo do controller, promocao e camera por turno.
+A suite atual cobre dominio, regras especiais de xadrez, montagem do tabuleiro, fluxo do controller, promocao, camera por turno e suporte a pecas personalizadas.
 
-Resultado esperado nesta fase: `17` testes passando.
+Resultado esperado nesta fase: `21` testes passando.
+
+## Pecas personalizadas
+
+O jogo suporta prefabs customizados por tipo de peca no `PieceFactory`. Se um prefab estiver configurado, ele e usado como visual da peca; se nao houver prefab, o jogo volta para a forma classica criada com primitivas.
+
+O primeiro prefab personalizado esta em `Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead.prefab`. As fotos usadas como referencia ficam apenas localmente em `Assets/Art/PrivateReferences/` e sao ignoradas pelo git.
 
 ## Build jogavel
 

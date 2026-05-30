@@ -33,3 +33,9 @@ sysinfo.txt
 
 # Test/build outputs
 TestResults/
+
+# Private photo references used only for local asset generation
+game/Assets/Art.meta
+game/Assets/Art/PrivateReferences.meta
+game/Assets/Art/PrivateReferences/
+game/GeneratedAssets/

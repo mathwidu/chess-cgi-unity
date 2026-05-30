@@ -4,11 +4,44 @@ public sealed class PieceFactory : MonoBehaviour
 {
     [SerializeField] private Material whiteMaterial;
     [SerializeField] private Material blackMaterial;
+    [SerializeField] private GameObject pawnPrefab;
+    [SerializeField] private GameObject rookPrefab;
+    [SerializeField] private GameObject knightPrefab;
+    [SerializeField] private GameObject bishopPrefab;
+    [SerializeField] private GameObject queenPrefab;
+    [SerializeField] private GameObject kingPrefab;
+    [SerializeField] private float customVisualHeight = 1.15f;
+    [SerializeField] private float customVisualBaseOffset = 0.14f;
 
     public void Configure(Material white, Material black)
     {
         whiteMaterial = white;
         blackMaterial = black;
+    }
+
+    public void ConfigureCustomPrefab(ChessPieceKind kind, GameObject prefab)
+    {
+        switch (kind)
+        {
+            case ChessPieceKind.Pawn:
+                pawnPrefab = prefab;
+                break;
+            case ChessPieceKind.Rook:
+                rookPrefab = prefab;
+                break;
+            case ChessPieceKind.Knight:
+                knightPrefab = prefab;
+                break;
+            case ChessPieceKind.Bishop:
+                bishopPrefab = prefab;
+                break;
+            case ChessPieceKind.Queen:
+                queenPrefab = prefab;
+                break;
+            case ChessPieceKind.King:
+                kingPrefab = prefab;
+                break;
+        }
     }
 
     public PieceView CreatePiece(VisualPieceState state, Vector3 position, Transform parent)
@@ -19,7 +52,11 @@ public sealed class PieceFactory : MonoBehaviour
 
         PieceView pieceView = root.AddComponent<PieceView>();
         AddCollider(root);
-        BuildPrimitiveShape(root.transform, state.Kind, state.Side == ChessSide.White ? whiteMaterial : blackMaterial);
+        Material sideMaterial = state.Side == ChessSide.White ? whiteMaterial : blackMaterial;
+        if (!BuildCustomShape(root.transform, state.Kind, state.Side, sideMaterial))
+        {
+            BuildPrimitiveShape(root.transform, state.Kind, sideMaterial);
+        }
         pieceView.Initialize(state);
         return pieceView;
     }
@@ -30,6 +67,77 @@ public sealed class PieceFactory : MonoBehaviour
         collider.height = 1.4f;
         collider.radius = 0.35f;
         collider.center = new Vector3(0f, 0.7f, 0f);
+    }
+
+    private bool BuildCustomShape(Transform parent, ChessPieceKind kind, ChessSide side, Material sideMaterial)
+    {
+        GameObject prefab = GetCustomPrefab(kind);
+        if (prefab == null)
+        {
+            return false;
+        }
+
+        AddCylinder(parent, "TeamBase", new Vector3(0f, 0.06f, 0f), new Vector3(0.74f, 0.12f, 0.74f), sideMaterial);
+
+        GameObject visual = Object.Instantiate(prefab, parent);
+        visual.name = "CustomVisual";
+        visual.transform.localPosition = Vector3.zero;
+        visual.transform.localRotation = Quaternion.Euler(0f, side == ChessSide.White ? 180f : 0f, 0f);
+        visual.transform.localScale = Vector3.one;
+        FitCustomVisual(visual.transform);
+        return true;
+    }
+
+    private GameObject GetCustomPrefab(ChessPieceKind kind)
+    {
+        switch (kind)
+        {
+            case ChessPieceKind.Pawn:
+                return pawnPrefab;
+            case ChessPieceKind.Rook:
+                return rookPrefab;
+            case ChessPieceKind.Knight:
+                return knightPrefab;
+            case ChessPieceKind.Bishop:
+                return bishopPrefab;
+            case ChessPieceKind.Queen:
+                return queenPrefab;
+            case ChessPieceKind.King:
+                return kingPrefab;
+            default:
+                return null;
+        }
+    }
+
+    private void FitCustomVisual(Transform visual)
+    {
+        Renderer[] renderers = visual.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            visual.localPosition = new Vector3(0f, customVisualBaseOffset, 0f);
+            return;
+        }
+
+        Bounds bounds = CalculateBounds(renderers);
+        if (bounds.size.y > 0.001f)
+        {
+            float scale = customVisualHeight / bounds.size.y;
+            visual.localScale *= scale;
+        }
+
+        bounds = CalculateBounds(renderers);
+        visual.position += new Vector3(0f, customVisualBaseOffset - bounds.min.y, 0f);
+    }
+
+    private static Bounds CalculateBounds(Renderer[] renderers)
+    {
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        return bounds;
     }
 
     private static void BuildPrimitiveShape(Transform parent, ChessPieceKind kind, Material material)
