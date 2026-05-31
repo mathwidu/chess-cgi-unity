@@ -107,9 +107,9 @@ public sealed class BoardView : MonoBehaviour
             GameObject highlight = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             highlight.name = $"Highlight {square.ToAlgebraic()}";
             highlight.transform.SetParent(highlightsRoot);
-            highlight.transform.position = GetWorldPosition(square) + new Vector3(0f, 0.08f, 0f);
+            highlight.transform.position = GetWorldPosition(square) + new Vector3(0f, 0.095f, 0f);
             highlight.transform.localRotation = Quaternion.identity;
-            highlight.transform.localScale = new Vector3(squareSize * 0.35f, 0.02f, squareSize * 0.35f);
+            highlight.transform.localScale = new Vector3(squareSize * 0.28f, 0.014f, squareSize * 0.28f);
 
             Collider collider = highlight.GetComponent<Collider>();
             if (Application.isPlaying)

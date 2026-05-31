@@ -3,6 +3,9 @@ using UnityEngine;
 
 public sealed class PieceView : MonoBehaviour
 {
+    private const float SelectedScaleMultiplier = 1.07f;
+    private const float MoveArcHeight = 0.18f;
+
     private Vector3 baseScale;
 
     public BoardSquare Square { get; private set; }
@@ -26,7 +29,7 @@ public sealed class PieceView : MonoBehaviour
 
     public void SetSelected(bool selected)
     {
-        transform.localScale = selected ? baseScale * 1.15f : baseScale;
+        transform.localScale = selected ? baseScale * SelectedScaleMultiplier : baseScale;
     }
 
     public IEnumerator MoveTo(Vector3 target, float duration)
@@ -39,7 +42,8 @@ public sealed class PieceView : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
             float eased = Mathf.SmoothStep(0f, 1f, t);
-            transform.position = Vector3.Lerp(start, target, eased);
+            Vector3 arc = Vector3.up * (Mathf.Sin(t * Mathf.PI) * MoveArcHeight);
+            transform.position = Vector3.Lerp(start, target, eased) + arc;
             yield return null;
         }
 

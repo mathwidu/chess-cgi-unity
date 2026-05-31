@@ -34,7 +34,7 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 No Unity, abra `Window > General > Test Runner`, selecione `EditMode` e clique em `Run All`.
 A suite atual cobre dominio, regras especiais de xadrez, montagem do tabuleiro, fluxo do controller, promocao, camera por turno e suporte a pecas personalizadas.
 
-Resultado esperado nesta fase: `27` testes passando.
+Resultado esperado nesta fase: `29` testes passando.
 
 ## Tema visual
 
