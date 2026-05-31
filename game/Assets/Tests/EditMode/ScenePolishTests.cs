@@ -56,13 +56,42 @@ public class ScenePolishTests
             polish.ApplyPolish();
 
             Transform collegeTheme = rig.transform.Find("CollegeTheme");
+            Assert.IsNotNull(collegeTheme.Find("Floor"));
             Assert.IsNotNull(collegeTheme.Find("Table"));
-            Assert.IsNotNull(collegeTheme.Find("BackWall"));
-            Assert.IsNotNull(collegeTheme.Find("Whiteboard"));
+            Assert.IsNotNull(collegeTheme.Find("NorthWall"));
+            Assert.IsNotNull(collegeTheme.Find("SouthWall"));
+            Assert.IsNotNull(collegeTheme.Find("LeftWall"));
+            Assert.IsNotNull(collegeTheme.Find("RightWall"));
+            Assert.IsNotNull(collegeTheme.Find("NorthWhiteboard"));
+            Assert.IsNotNull(collegeTheme.Find("SouthWhiteboard"));
             Assert.IsNotNull(collegeTheme.Find("Notebook"));
             Assert.IsNotNull(collegeTheme.Find("Books"));
-            Assert.IsNotNull(collegeTheme.Find("CGIWhiteboardMark"));
+            Assert.IsNotNull(collegeTheme.Find("CGIWhiteboardMarkNorth"));
+            Assert.IsNotNull(collegeTheme.Find("CGIWhiteboardMarkSouth"));
             Assert.AreEqual(0, collegeTheme.GetComponentsInChildren<Collider>().Length);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+        }
+    }
+
+    [Test]
+    public void ApplyPolish_KeepsWallsOutsideTurnCameraPath()
+    {
+        GameObject rig = new GameObject("Scene Polish Test Rig");
+        try
+        {
+            ScenePolish polish = rig.AddComponent<ScenePolish>();
+
+            polish.ApplyPolish();
+
+            Transform collegeTheme = rig.transform.Find("CollegeTheme");
+            Assert.IsNull(collegeTheme.Find("BackWall"));
+            Assert.Greater(collegeTheme.Find("NorthWall").localPosition.z, 12f);
+            Assert.Less(collegeTheme.Find("SouthWall").localPosition.z, -12f);
+            Assert.Greater(Mathf.Abs(collegeTheme.Find("LeftWall").localPosition.x), 7f);
+            Assert.Greater(Mathf.Abs(collegeTheme.Find("RightWall").localPosition.x), 7f);
         }
         finally
         {

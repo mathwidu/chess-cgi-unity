@@ -66,10 +66,16 @@ public sealed class ScenePolish : MonoBehaviour
         Material bookRed = CreateMaterial("Runtime_Book_Red", new Color(0.45f, 0.12f, 0.11f), 0f, 0.45f);
         Material bookBlue = CreateMaterial("Runtime_Book_Blue", new Color(0.1f, 0.2f, 0.42f), 0f, 0.45f);
 
+        CreateCube(collegeTheme, "Floor", new Vector3(0f, -0.42f, 0f), new Vector3(15.5f, 0.08f, 27.5f), wallMaterial, false);
         CreateCube(collegeTheme, "Table", new Vector3(0f, -0.22f, 0f), new Vector3(13.2f, 0.28f, 13.2f), tableMaterial, false);
-        CreateCube(collegeTheme, "BackWall", new Vector3(0f, 2.6f, 6.35f), new Vector3(13.2f, 5.2f, 0.18f), wallMaterial, false);
-        CreateCube(collegeTheme, "Whiteboard", new Vector3(0f, 3.2f, 6.23f), new Vector3(4.6f, 1.65f, 0.08f), boardMaterial, false);
-        CreateCube(collegeTheme, "CGIWhiteboardMark", new Vector3(-1.55f, 3.35f, 6.17f), new Vector3(1.05f, 0.08f, 0.04f), accentMaterial, false);
+        CreateCube(collegeTheme, "NorthWall", new Vector3(0f, 2.4f, 12.85f), new Vector3(15.5f, 5.3f, 0.18f), wallMaterial, false);
+        CreateCube(collegeTheme, "SouthWall", new Vector3(0f, 2.4f, -12.85f), new Vector3(15.5f, 5.3f, 0.18f), wallMaterial, false);
+        CreateCube(collegeTheme, "LeftWall", new Vector3(-7.65f, 2.4f, 0f), new Vector3(0.18f, 5.3f, 25.8f), wallMaterial, false);
+        CreateCube(collegeTheme, "RightWall", new Vector3(7.65f, 2.4f, 0f), new Vector3(0.18f, 5.3f, 25.8f), wallMaterial, false);
+        CreateCube(collegeTheme, "NorthWhiteboard", new Vector3(0f, 3.15f, 12.72f), new Vector3(4.4f, 1.5f, 0.08f), boardMaterial, false);
+        CreateCube(collegeTheme, "SouthWhiteboard", new Vector3(0f, 3.15f, -12.72f), new Vector3(4.4f, 1.5f, 0.08f), boardMaterial, false);
+        CreateCube(collegeTheme, "CGIWhiteboardMarkNorth", new Vector3(-1.45f, 3.35f, 12.66f), new Vector3(1f, 0.08f, 0.04f), accentMaterial, false);
+        CreateCube(collegeTheme, "CGIWhiteboardMarkSouth", new Vector3(1.45f, 3.35f, -12.66f), new Vector3(1f, 0.08f, 0.04f), accentMaterial, false);
         CreateCube(collegeTheme, "Notebook", new Vector3(-5.35f, 0.05f, -2.25f), new Vector3(1.05f, 0.08f, 0.75f), darkMaterial, false);
 
         Transform books = EnsureChild(collegeTheme, "Books");

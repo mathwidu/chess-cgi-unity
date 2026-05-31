@@ -16,6 +16,10 @@ public sealed class GameHud : MonoBehaviour
     private GUIStyle panelStyle;
     private GUIStyle buttonStyle;
     private GUIStyle badgeStyle;
+    private Texture2D panelTexture;
+    private Texture2D buttonTexture;
+    private Texture2D buttonHoverTexture;
+    private Texture2D buttonActiveTexture;
 
     public void Configure(ChessGameController controller)
     {
@@ -55,25 +59,20 @@ public sealed class GameHud : MonoBehaviour
 
     private void DrawTopBar()
     {
-        GUILayout.BeginArea(new Rect(16f, 14f, Screen.width - 32f, 76f), panelStyle);
-        GUILayout.BeginHorizontal();
-        GUILayout.BeginVertical(GUILayout.Width(260f));
+        GUILayout.BeginArea(new Rect(16f, 14f, 314f, 76f), panelStyle);
         GUILayout.Label("Xadrez CGI", titleStyle);
         GUILayout.Label("Computacao Grafica I", smallLabelStyle);
-        GUILayout.EndVertical();
+        GUILayout.EndArea();
 
-        GUILayout.FlexibleSpace();
-        GUILayout.BeginVertical(GUILayout.Width(360f));
-        GUILayout.Label(gameController.CurrentTurn == ChessSide.White ? "Turno: Brancas" : "Turno: Pretas", badgeStyle);
-        GUILayout.Label(gameController.StatusMessage, statusStyle);
-        GUILayout.EndVertical();
-        GUILayout.EndHorizontal();
+        GUILayout.BeginArea(new Rect(Screen.width - 306f, 14f, 290f, 70f), panelStyle);
+        GUILayout.Label(gameController.CurrentTurn == ChessSide.White ? "Brancas jogam" : "Pretas jogam", badgeStyle);
+        GUILayout.Label(CompactStatus(gameController.StatusMessage), statusStyle);
         GUILayout.EndArea();
     }
 
     private void DrawMoveHistoryPanel(IReadOnlyList<string> moveHistory)
     {
-        Rect rect = new Rect(Screen.width - 290f, 106f, 274f, 260f);
+        Rect rect = new Rect(Screen.width - 306f, 96f, 290f, 230f);
         GUILayout.BeginArea(rect, panelStyle);
         GUILayout.Label("Historico", subtitleStyle);
 
@@ -95,20 +94,20 @@ public sealed class GameHud : MonoBehaviour
 
     private void DrawActionBar()
     {
-        GUILayout.BeginArea(new Rect(16f, Screen.height - 82f, 470f, 66f), panelStyle);
+        GUILayout.BeginArea(new Rect(16f, Screen.height - 72f, 392f, 56f), panelStyle);
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Nova partida", buttonStyle, GUILayout.Width(145f), GUILayout.Height(42f)))
+        if (GUILayout.Button("Nova partida", buttonStyle, GUILayout.Width(118f), GUILayout.Height(34f)))
         {
             showStartScreen = false;
             gameController.StartLocalGame();
         }
 
-        if (GUILayout.Button("Cancelar", buttonStyle, GUILayout.Width(125f), GUILayout.Height(42f)))
+        if (GUILayout.Button("Cancelar", buttonStyle, GUILayout.Width(104f), GUILayout.Height(34f)))
         {
             gameController.CancelSelection();
         }
 
-        if (GUILayout.Button("Como jogar", buttonStyle, GUILayout.Width(145f), GUILayout.Height(42f)))
+        if (GUILayout.Button("Como jogar", buttonStyle, GUILayout.Width(118f), GUILayout.Height(34f)))
         {
             showHowToPlay = !showHowToPlay;
         }
@@ -199,16 +198,22 @@ public sealed class GameHud : MonoBehaviour
             return;
         }
 
-        panelStyle = new GUIStyle(GUI.skin.window)
+        panelTexture = MakeTexture(new Color(0.08f, 0.075f, 0.065f, 0.82f));
+        buttonTexture = MakeTexture(new Color(0.28f, 0.27f, 0.24f, 0.96f));
+        buttonHoverTexture = MakeTexture(new Color(0.36f, 0.34f, 0.29f, 0.98f));
+        buttonActiveTexture = MakeTexture(new Color(0.18f, 0.3f, 0.36f, 0.98f));
+
+        panelStyle = new GUIStyle(GUI.skin.box)
         {
-            padding = new RectOffset(16, 16, 14, 14)
+            padding = new RectOffset(14, 14, 12, 12),
+            normal = { background = panelTexture }
         };
 
         titleStyle = new GUIStyle(GUI.skin.label)
         {
-            fontSize = 28,
+            fontSize = 24,
             fontStyle = FontStyle.Bold,
-            normal = { textColor = new Color(0.97f, 0.94f, 0.86f) }
+            normal = { textColor = new Color(0.98f, 0.94f, 0.82f) }
         };
 
         subtitleStyle = new GUIStyle(GUI.skin.label)
@@ -221,12 +226,14 @@ public sealed class GameHud : MonoBehaviour
         statusStyle = new GUIStyle(GUI.skin.label)
         {
             fontSize = 15,
-            normal = { textColor = new Color(0.95f, 0.95f, 0.9f) }
+            wordWrap = true,
+            normal = { textColor = new Color(0.95f, 0.95f, 0.89f) }
         };
 
         labelStyle = new GUIStyle(GUI.skin.label)
         {
             fontSize = 14,
+            wordWrap = true,
             normal = { textColor = new Color(0.9f, 0.9f, 0.84f) }
         };
 
@@ -238,7 +245,7 @@ public sealed class GameHud : MonoBehaviour
 
         badgeStyle = new GUIStyle(GUI.skin.label)
         {
-            fontSize = 17,
+            fontSize = 16,
             fontStyle = FontStyle.Bold,
             alignment = TextAnchor.MiddleRight,
             normal = { textColor = new Color(0.97f, 0.84f, 0.52f) }
@@ -247,8 +254,46 @@ public sealed class GameHud : MonoBehaviour
         buttonStyle = new GUIStyle(GUI.skin.button)
         {
             fontSize = 14,
-            fontStyle = FontStyle.Bold
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.MiddleCenter,
+            padding = new RectOffset(10, 10, 6, 6),
+            normal =
+            {
+                background = buttonTexture,
+                textColor = new Color(0.96f, 0.93f, 0.86f)
+            },
+            hover =
+            {
+                background = buttonHoverTexture,
+                textColor = Color.white
+            },
+            active =
+            {
+                background = buttonActiveTexture,
+                textColor = Color.white
+            }
         };
+    }
+
+    private static string CompactStatus(string status)
+    {
+        if (status.StartsWith("Turno:"))
+        {
+            return "Escolha uma peca para mover.";
+        }
+
+        return status;
+    }
+
+    private static Texture2D MakeTexture(Color color)
+    {
+        Texture2D texture = new Texture2D(1, 1)
+        {
+            hideFlags = HideFlags.HideAndDontSave
+        };
+        texture.SetPixel(0, 0, color);
+        texture.Apply();
+        return texture;
     }
 
     private static Rect CenteredRect(float width, float height)
