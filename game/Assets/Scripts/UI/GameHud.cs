@@ -1,29 +1,43 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
 
 public sealed class GameHud : MonoBehaviour
 {
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
 
+    private readonly Color panelColor = new Color(0.075f, 0.07f, 0.06f, 0.88f);
+    private readonly Color panelStrongColor = new Color(0.055f, 0.052f, 0.048f, 0.94f);
+    private readonly Color overlayColor = new Color(0.02f, 0.018f, 0.016f, 0.66f);
+    private readonly Color textColor = new Color(0.94f, 0.91f, 0.84f, 1f);
+    private readonly Color mutedTextColor = new Color(0.72f, 0.72f, 0.66f, 1f);
+    private readonly Color accentColor = new Color(0.95f, 0.73f, 0.38f, 1f);
+    private readonly Color actionColor = new Color(0.2f, 0.32f, 0.38f, 0.96f);
+    private readonly Color actionHoverColor = new Color(0.27f, 0.42f, 0.49f, 1f);
+    private readonly Color neutralButtonColor = new Color(0.27f, 0.25f, 0.22f, 0.96f);
+
     private bool showStartScreen = true;
     private bool showHowToPlay;
-    private GUIStyle titleStyle;
-    private GUIStyle subtitleStyle;
-    private GUIStyle statusStyle;
-    private GUIStyle labelStyle;
-    private GUIStyle smallLabelStyle;
-    private GUIStyle panelStyle;
-    private GUIStyle buttonStyle;
-    private GUIStyle badgeStyle;
-    private Texture2D panelTexture;
-    private Texture2D buttonTexture;
-    private Texture2D buttonHoverTexture;
-    private Texture2D buttonActiveTexture;
+    private Font hudFont;
+    private RectTransform hudRoot;
+    private RectTransform startOverlay;
+    private RectTransform howToPlayPanel;
+    private RectTransform startHowToPlayText;
+    private RectTransform promotionPanel;
+    private Text turnText;
+    private Text statusText;
+    private Text moveHistoryText;
+    private Text howToPlayButtonText;
+    private Text startHowToPlayButtonText;
 
     public void Configure(ChessGameController controller)
     {
         gameController = controller;
+        RefreshInterface();
     }
 
     private void Awake()
@@ -32,247 +46,302 @@ public sealed class GameHud : MonoBehaviour
         {
             gameController = Object.FindFirstObjectByType<ChessGameController>();
         }
+
+        RebuildInterface();
     }
 
-    private void OnGUI()
+    private void Update()
     {
-        if (gameController == null)
+        RefreshInterface();
+    }
+
+    public void RebuildInterface()
+    {
+        EnsureCanvasInfrastructure();
+        ClearExistingRoot();
+
+        hudRoot = CreateRect("HudRoot", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero);
+
+        RectTransform topBar = CreateRect("TopBar", hudRoot, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -16f), new Vector2(0f, 88f));
+        RectTransform brandPanel = CreatePanel("BrandPanel", topBar, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -2f), new Vector2(320f, 74f), panelColor);
+        CreateText("TitleText", brandPanel, "Xadrez CGI", 25, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -10f), new Vector2(292f, 34f));
+        CreateText("SubtitleText", brandPanel, "Computacao Grafica I", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -45f), new Vector2(292f, 18f));
+
+        RectTransform turnPanel = CreatePanel("TurnPanel", topBar, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -2f), new Vector2(304f, 74f), panelColor);
+        turnText = CreateText("TurnText", turnPanel, "Brancas jogam", 17, FontStyle.Bold, accentColor, TextAnchor.UpperRight, new Vector2(14f, -10f), new Vector2(276f, 24f));
+        statusText = CreateText("StatusText", turnPanel, "Escolha uma peca para mover.", 13, FontStyle.Normal, textColor, TextAnchor.UpperRight, new Vector2(14f, -38f), new Vector2(276f, 26f));
+
+        RectTransform historyPanel = CreatePanel("MoveHistoryPanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -104f), new Vector2(304f, 238f), panelColor);
+        CreateText("MoveHistoryTitle", historyPanel, "Historico", 17, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -12f), new Vector2(276f, 24f));
+        moveHistoryText = CreateText("MoveHistoryText", historyPanel, "Nenhuma jogada ainda.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -42f), new Vector2(276f, 178f));
+
+        RectTransform actionBar = CreatePanel("ActionBar", hudRoot, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 16f), new Vector2(410f, 58f), panelColor);
+        CreateButton("NewGameButton", actionBar, "Nova partida", new Vector2(14f, 12f), new Vector2(122f, 34f), actionColor, StartGame);
+        CreateButton("CancelButton", actionBar, "Cancelar", new Vector2(144f, 12f), new Vector2(108f, 34f), neutralButtonColor, CancelSelection);
+        howToPlayButtonText = CreateButton("HowToPlayButton", actionBar, "Como jogar", new Vector2(260f, 12f), new Vector2(124f, 34f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
+
+        howToPlayPanel = CreatePanel("HowToPlayPanel", hudRoot, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -104f), new Vector2(380f, 210f), panelStrongColor);
+        CreateText("HowToPlayTitle", howToPlayPanel, "Como jogar", 18, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(348f, 26f));
+        CreateText("HowToPlayText", howToPlayPanel, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(16f, -48f), new Vector2(348f, 142f));
+
+        promotionPanel = CreatePanel("PromotionPanel", hudRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(500f, 150f), panelStrongColor);
+        CreateText("PromotionTitle", promotionPanel, "Promocao", 22, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(18f, -14f), new Vector2(464f, 30f));
+        CreateText("PromotionHelp", promotionPanel, "Escolha a nova peca do peao.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(18f, -48f), new Vector2(464f, 22f));
+        CreateButton("PromoteQueenButton", promotionPanel, "Rainha", new Vector2(22f, 92f), new Vector2(104f, 34f), actionColor, () => ChoosePromotion('Q'));
+        CreateButton("PromoteRookButton", promotionPanel, "Torre", new Vector2(142f, 92f), new Vector2(94f, 34f), neutralButtonColor, () => ChoosePromotion('R'));
+        CreateButton("PromoteBishopButton", promotionPanel, "Bispo", new Vector2(252f, 92f), new Vector2(94f, 34f), neutralButtonColor, () => ChoosePromotion('B'));
+        CreateButton("PromoteKnightButton", promotionPanel, "Cavalo", new Vector2(362f, 92f), new Vector2(104f, 34f), neutralButtonColor, () => ChoosePromotion('N'));
+
+        startOverlay = CreatePanel("StartOverlay", hudRoot, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero, overlayColor);
+        RectTransform startCard = CreatePanel("StartCard", startOverlay, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(560f, 390f), panelStrongColor);
+        CreateText("StartTitle", startCard, "Xadrez CGI", 34, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(24f, -28f), new Vector2(512f, 48f));
+        CreateText("StartSubtitle", startCard, "Xadrez 3D local com personagens da turma.", 15, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(42f, -82f), new Vector2(476f, 28f));
+        CreateButton("StartPlayButton", startCard, "Jogar", new Vector2(160f, 128f), new Vector2(240f, 42f), actionColor, StartGame);
+        startHowToPlayButtonText = CreateButton("StartHowToPlayButton", startCard, "Como jogar", new Vector2(180f, 182f), new Vector2(200f, 36f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
+        startHowToPlayText = CreateText("StartHowToPlayText", startCard, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(64f, -236f), new Vector2(432f, 118f)).rectTransform;
+
+        RefreshInterface();
+    }
+
+    public void RefreshInterface()
+    {
+        if (hudRoot == null)
         {
             return;
         }
 
-        EnsureStyles();
-        DrawTopBar();
-        DrawMoveHistoryPanel(gameController.MoveHistory);
-        DrawActionBar();
+        bool hasController = gameController != null;
+        bool awaitingPromotion = hasController && gameController.IsAwaitingPromotion;
 
-        if (gameController.IsAwaitingPromotion)
+        SetActive(startOverlay, showStartScreen);
+        SetActive(howToPlayPanel, showHowToPlay && !showStartScreen);
+        SetActive(startHowToPlayText, showHowToPlay && showStartScreen);
+        SetActive(promotionPanel, awaitingPromotion);
+
+        if (turnText != null)
         {
-            DrawPromotionPanel();
+            turnText.text = !hasController || gameController.CurrentTurn == ChessSide.White ? "Brancas jogam" : "Pretas jogam";
         }
 
-        if (showStartScreen)
+        if (statusText != null)
         {
-            DrawStartScreen();
+            string status = hasController ? CompactStatus(gameController.StatusMessage) : "Escolha uma peca para mover.";
+            statusText.text = status;
+            statusText.color = status.StartsWith("Movimento invalido") ? new Color(0.95f, 0.45f, 0.36f, 1f) : textColor;
+        }
+
+        if (moveHistoryText != null)
+        {
+            moveHistoryText.text = hasController ? FormatMoveHistory(gameController.MoveHistory) : "Nenhuma jogada ainda.";
+        }
+
+        if (howToPlayButtonText != null)
+        {
+            howToPlayButtonText.text = showHowToPlay && !showStartScreen ? "Ocultar" : "Como jogar";
+        }
+
+        if (startHowToPlayButtonText != null)
+        {
+            startHowToPlayButtonText.text = showHowToPlay ? "Ocultar como jogar" : "Como jogar";
         }
     }
 
-    private void DrawTopBar()
+    private void StartGame()
     {
-        GUILayout.BeginArea(new Rect(16f, 14f, 314f, 76f), panelStyle);
-        GUILayout.Label("Xadrez CGI", titleStyle);
-        GUILayout.Label("Computacao Grafica I", smallLabelStyle);
-        GUILayout.EndArea();
-
-        GUILayout.BeginArea(new Rect(Screen.width - 306f, 14f, 290f, 70f), panelStyle);
-        GUILayout.Label(gameController.CurrentTurn == ChessSide.White ? "Brancas jogam" : "Pretas jogam", badgeStyle);
-        GUILayout.Label(CompactStatus(gameController.StatusMessage), statusStyle);
-        GUILayout.EndArea();
-    }
-
-    private void DrawMoveHistoryPanel(IReadOnlyList<string> moveHistory)
-    {
-        Rect rect = new Rect(Screen.width - 306f, 96f, 290f, 230f);
-        GUILayout.BeginArea(rect, panelStyle);
-        GUILayout.Label("Historico", subtitleStyle);
-
-        if (moveHistory.Count == 0)
+        showStartScreen = false;
+        showHowToPlay = false;
+        if (gameController != null)
         {
-            GUILayout.Label("Nenhuma jogada ainda.", smallLabelStyle);
-        }
-        else
-        {
-            int startIndex = Mathf.Max(0, moveHistory.Count - visibleMoveCount);
-            for (int i = startIndex; i < moveHistory.Count; i++)
-            {
-                GUILayout.Label($"{i + 1}. {moveHistory[i]}", labelStyle);
-            }
-        }
-
-        GUILayout.EndArea();
-    }
-
-    private void DrawActionBar()
-    {
-        GUILayout.BeginArea(new Rect(16f, Screen.height - 72f, 392f, 56f), panelStyle);
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Nova partida", buttonStyle, GUILayout.Width(118f), GUILayout.Height(34f)))
-        {
-            showStartScreen = false;
             gameController.StartLocalGame();
         }
 
-        if (GUILayout.Button("Cancelar", buttonStyle, GUILayout.Width(104f), GUILayout.Height(34f)))
+        RefreshInterface();
+    }
+
+    private void CancelSelection()
+    {
+        if (gameController != null)
         {
             gameController.CancelSelection();
         }
 
-        if (GUILayout.Button("Como jogar", buttonStyle, GUILayout.Width(118f), GUILayout.Height(34f)))
-        {
-            showHowToPlay = !showHowToPlay;
-        }
-        GUILayout.EndHorizontal();
-        GUILayout.EndArea();
-
-        if (showHowToPlay)
-        {
-            DrawHowToPlayPanel();
-        }
+        RefreshInterface();
     }
 
-    private void DrawPromotionPanel()
+    private void ToggleHowToPlay()
     {
-        GUILayout.BeginArea(CenteredRect(440f, 130f), panelStyle);
-        GUILayout.Label("Promocao", subtitleStyle);
-        GUILayout.Label("Escolha a nova peca do peao.", labelStyle);
-        GUILayout.BeginHorizontal();
-        PromotionButton("Rainha", 'Q');
-        PromotionButton("Torre", 'R');
-        PromotionButton("Bispo", 'B');
-        PromotionButton("Cavalo", 'N');
-        GUILayout.EndHorizontal();
-        GUILayout.EndArea();
+        showHowToPlay = !showHowToPlay;
+        RefreshInterface();
     }
 
-    private void DrawStartScreen()
+    private void ChoosePromotion(char piece)
     {
-        Color previousColor = GUI.color;
-        GUI.color = new Color(0f, 0f, 0f, 0.52f);
-        GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
-        GUI.color = previousColor;
-
-        GUILayout.BeginArea(CenteredRect(520f, showHowToPlay ? 430f : 310f), panelStyle);
-        GUILayout.Label("Xadrez CGI", titleStyle);
-        GUILayout.Label("Xadrez 3D local com personagens da turma.", statusStyle);
-        GUILayout.Space(16f);
-
-        if (GUILayout.Button("Jogar", buttonStyle, GUILayout.Height(48f)))
-        {
-            showStartScreen = false;
-            showHowToPlay = false;
-            gameController.StartLocalGame();
-        }
-
-        if (GUILayout.Button(showHowToPlay ? "Ocultar como jogar" : "Como jogar", buttonStyle, GUILayout.Height(42f)))
-        {
-            showHowToPlay = !showHowToPlay;
-        }
-
-        if (showHowToPlay)
-        {
-            GUILayout.Space(12f);
-            DrawHowToPlayContent();
-        }
-
-        GUILayout.EndArea();
-    }
-
-    private void DrawHowToPlayPanel()
-    {
-        GUILayout.BeginArea(new Rect(16f, 98f, 360f, 210f), panelStyle);
-        DrawHowToPlayContent();
-        GUILayout.EndArea();
-    }
-
-    private void DrawHowToPlayContent()
-    {
-        GUILayout.Label("Como jogar", subtitleStyle);
-        GUILayout.Label("Clique em uma peca do turno atual.", labelStyle);
-        GUILayout.Label("Clique em uma casa destacada para mover.", labelStyle);
-        GUILayout.Label("Q/E giram a camera. Scroll aproxima.", labelStyle);
-        GUILayout.Label("Esc cancela selecao. N reinicia.", labelStyle);
-    }
-
-    private void PromotionButton(string label, char piece)
-    {
-        if (GUILayout.Button(label, buttonStyle, GUILayout.Height(38f)))
+        if (gameController != null)
         {
             gameController.ChoosePromotion(piece);
         }
+
+        RefreshInterface();
     }
 
-    private void EnsureStyles()
+    private void EnsureCanvasInfrastructure()
     {
-        if (titleStyle != null)
+        Canvas canvas = GetComponent<Canvas>();
+        if (canvas == null)
         {
-            return;
+            canvas = gameObject.AddComponent<Canvas>();
         }
 
-        panelTexture = MakeTexture(new Color(0.08f, 0.075f, 0.065f, 0.82f));
-        buttonTexture = MakeTexture(new Color(0.28f, 0.27f, 0.24f, 0.96f));
-        buttonHoverTexture = MakeTexture(new Color(0.36f, 0.34f, 0.29f, 0.98f));
-        buttonActiveTexture = MakeTexture(new Color(0.18f, 0.3f, 0.36f, 0.98f));
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 10;
 
-        panelStyle = new GUIStyle(GUI.skin.box)
+        CanvasScaler scaler = GetComponent<CanvasScaler>();
+        if (scaler == null)
         {
-            padding = new RectOffset(14, 14, 12, 12),
-            normal = { background = panelTexture }
+            scaler = gameObject.AddComponent<CanvasScaler>();
+        }
+
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.matchWidthOrHeight = 0.5f;
+
+        if (GetComponent<GraphicRaycaster>() == null)
+        {
+            gameObject.AddComponent<GraphicRaycaster>();
+        }
+
+        if (Object.FindFirstObjectByType<EventSystem>() == null)
+        {
+            GameObject eventSystemObject = new GameObject("EventSystem");
+            eventSystemObject.transform.SetParent(transform);
+            eventSystemObject.AddComponent<EventSystem>();
+            eventSystemObject.AddComponent<InputSystemUIInputModule>();
+        }
+    }
+
+    private void ClearExistingRoot()
+    {
+        Transform existing = transform.Find("HudRoot");
+        if (existing != null)
+        {
+            DestroyObject(existing.gameObject);
+        }
+    }
+
+    private RectTransform CreatePanel(
+        string name,
+        Transform parent,
+        Vector2 anchorMin,
+        Vector2 anchorMax,
+        Vector2 pivot,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta,
+        Color color)
+    {
+        RectTransform rect = CreateRect(name, parent, anchorMin, anchorMax, pivot, anchoredPosition, sizeDelta);
+        Image image = rect.gameObject.AddComponent<Image>();
+        image.color = color;
+        return rect;
+    }
+
+    private RectTransform CreateRect(
+        string name,
+        Transform parent,
+        Vector2 anchorMin,
+        Vector2 anchorMax,
+        Vector2 pivot,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta)
+    {
+        GameObject gameObject = new GameObject(name);
+        gameObject.transform.SetParent(parent, false);
+        RectTransform rect = gameObject.AddComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.pivot = pivot;
+        rect.anchoredPosition = anchoredPosition;
+        rect.sizeDelta = sizeDelta;
+        return rect;
+    }
+
+    private Text CreateText(
+        string name,
+        Transform parent,
+        string text,
+        int fontSize,
+        FontStyle fontStyle,
+        Color color,
+        TextAnchor alignment,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta)
+    {
+        RectTransform rect = CreateRect(name, parent, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), anchoredPosition, sizeDelta);
+        Text label = rect.gameObject.AddComponent<Text>();
+        label.font = GetHudFont();
+        label.fontSize = fontSize;
+        label.fontStyle = fontStyle;
+        label.color = color;
+        label.alignment = alignment;
+        label.horizontalOverflow = HorizontalWrapMode.Wrap;
+        label.verticalOverflow = VerticalWrapMode.Truncate;
+        label.text = text;
+        return label;
+    }
+
+    private Button CreateButton(
+        string name,
+        Transform parent,
+        string label,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta,
+        Color normalColor,
+        UnityEngine.Events.UnityAction action)
+    {
+        RectTransform rect = CreateRect(name, parent, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), anchoredPosition, sizeDelta);
+        Image image = rect.gameObject.AddComponent<Image>();
+        image.color = normalColor;
+
+        Button button = rect.gameObject.AddComponent<Button>();
+        button.targetGraphic = image;
+        button.colors = new ColorBlock
+        {
+            normalColor = normalColor,
+            highlightedColor = normalColor == actionColor ? actionHoverColor : new Color(0.36f, 0.33f, 0.28f, 1f),
+            pressedColor = new Color(0.14f, 0.22f, 0.26f, 1f),
+            selectedColor = normalColor,
+            disabledColor = new Color(0.16f, 0.15f, 0.14f, 0.65f),
+            colorMultiplier = 1f,
+            fadeDuration = 0.12f
         };
+        button.onClick.AddListener(action);
 
-        titleStyle = new GUIStyle(GUI.skin.label)
-        {
-            fontSize = 24,
-            fontStyle = FontStyle.Bold,
-            normal = { textColor = new Color(0.98f, 0.94f, 0.82f) }
-        };
+        Text buttonText = CreateText("Label", rect, label, 13, FontStyle.Bold, textColor, TextAnchor.MiddleCenter, Vector2.zero, sizeDelta);
+        buttonText.raycastTarget = false;
+        return button;
+    }
 
-        subtitleStyle = new GUIStyle(GUI.skin.label)
+    private string FormatMoveHistory(IReadOnlyList<string> moveHistory)
+    {
+        if (moveHistory.Count == 0)
         {
-            fontSize = 18,
-            fontStyle = FontStyle.Bold,
-            normal = { textColor = new Color(0.95f, 0.9f, 0.78f) }
-        };
+            return "Nenhuma jogada ainda.";
+        }
 
-        statusStyle = new GUIStyle(GUI.skin.label)
+        StringBuilder builder = new StringBuilder();
+        int startIndex = Mathf.Max(0, moveHistory.Count - visibleMoveCount);
+        for (int i = startIndex; i < moveHistory.Count; i++)
         {
-            fontSize = 15,
-            wordWrap = true,
-            normal = { textColor = new Color(0.95f, 0.95f, 0.89f) }
-        };
-
-        labelStyle = new GUIStyle(GUI.skin.label)
-        {
-            fontSize = 14,
-            wordWrap = true,
-            normal = { textColor = new Color(0.9f, 0.9f, 0.84f) }
-        };
-
-        smallLabelStyle = new GUIStyle(GUI.skin.label)
-        {
-            fontSize = 12,
-            normal = { textColor = new Color(0.75f, 0.76f, 0.72f) }
-        };
-
-        badgeStyle = new GUIStyle(GUI.skin.label)
-        {
-            fontSize = 16,
-            fontStyle = FontStyle.Bold,
-            alignment = TextAnchor.MiddleRight,
-            normal = { textColor = new Color(0.97f, 0.84f, 0.52f) }
-        };
-
-        buttonStyle = new GUIStyle(GUI.skin.button)
-        {
-            fontSize = 14,
-            fontStyle = FontStyle.Bold,
-            alignment = TextAnchor.MiddleCenter,
-            padding = new RectOffset(10, 10, 6, 6),
-            normal =
+            if (builder.Length > 0)
             {
-                background = buttonTexture,
-                textColor = new Color(0.96f, 0.93f, 0.86f)
-            },
-            hover =
-            {
-                background = buttonHoverTexture,
-                textColor = Color.white
-            },
-            active =
-            {
-                background = buttonActiveTexture,
-                textColor = Color.white
+                builder.AppendLine();
             }
-        };
+
+            builder.Append(i + 1);
+            builder.Append(". ");
+            builder.Append(moveHistory[i]);
+        }
+
+        return builder.ToString();
     }
 
     private static string CompactStatus(string status)
@@ -285,19 +354,47 @@ public sealed class GameHud : MonoBehaviour
         return status;
     }
 
-    private static Texture2D MakeTexture(Color color)
+    private static string BuildHowToPlayText()
     {
-        Texture2D texture = new Texture2D(1, 1)
-        {
-            hideFlags = HideFlags.HideAndDontSave
-        };
-        texture.SetPixel(0, 0, color);
-        texture.Apply();
-        return texture;
+        return "1. Clique em uma peca do turno atual.\n" +
+            "2. Clique em uma casa destacada para mover.\n" +
+            "3. Q/E giram a camera, scroll aproxima.\n" +
+            "4. Esc cancela selecao, N reinicia.";
     }
 
-    private static Rect CenteredRect(float width, float height)
+    private Font GetHudFont()
     {
-        return new Rect((Screen.width - width) * 0.5f, (Screen.height - height) * 0.5f, width, height);
+        if (hudFont != null)
+        {
+            return hudFont;
+        }
+
+        hudFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (hudFont == null)
+        {
+            hudFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        }
+
+        return hudFont;
+    }
+
+    private static void SetActive(Component component, bool active)
+    {
+        if (component != null)
+        {
+            component.gameObject.SetActive(active);
+        }
+    }
+
+    private static void DestroyObject(Object target)
+    {
+        if (Application.isPlaying)
+        {
+            Object.Destroy(target);
+        }
+        else
+        {
+            Object.DestroyImmediate(target);
+        }
     }
 }
