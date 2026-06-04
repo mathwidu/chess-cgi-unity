@@ -1,7 +1,8 @@
 fileFormatVersion: 2
-guid: 6b62a07c56a5f4cbb804bd21e99d66f6
-folderAsset: yes
-DefaultImporter:
+guid: f7d962559d6b6409d93f950cb7a6add2
+labels:
+- UnityAI
+PrefabImporter:
   externalObjects: {}
   userData:
   assetBundleName:

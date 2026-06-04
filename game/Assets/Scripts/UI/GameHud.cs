@@ -10,12 +10,13 @@ public sealed class GameHud : MonoBehaviour
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
 
-    private readonly Color panelColor = new Color(0.075f, 0.07f, 0.06f, 0.88f);
-    private readonly Color panelStrongColor = new Color(0.055f, 0.052f, 0.048f, 0.94f);
+    private readonly Color panelColor = new Color(0.085f, 0.082f, 0.074f, 0.94f);
+    private readonly Color panelStrongColor = new Color(0.048f, 0.046f, 0.043f, 0.98f);
+    private readonly Color previewSurfaceColor = new Color(0.12f, 0.13f, 0.13f, 1f);
     private readonly Color overlayColor = new Color(0.02f, 0.018f, 0.016f, 0.66f);
-    private readonly Color textColor = new Color(0.94f, 0.91f, 0.84f, 1f);
-    private readonly Color mutedTextColor = new Color(0.72f, 0.72f, 0.66f, 1f);
-    private readonly Color accentColor = new Color(0.95f, 0.73f, 0.38f, 1f);
+    private readonly Color textColor = new Color(0.97f, 0.94f, 0.87f, 1f);
+    private readonly Color mutedTextColor = new Color(0.78f, 0.76f, 0.68f, 1f);
+    private readonly Color accentColor = new Color(1f, 0.77f, 0.36f, 1f);
     private readonly Color actionColor = new Color(0.2f, 0.32f, 0.38f, 0.96f);
     private readonly Color actionHoverColor = new Color(0.27f, 0.42f, 0.49f, 1f);
     private readonly Color neutralButtonColor = new Color(0.27f, 0.25f, 0.22f, 0.96f);
@@ -28,11 +29,23 @@ public sealed class GameHud : MonoBehaviour
     private RectTransform howToPlayPanel;
     private RectTransform startHowToPlayText;
     private RectTransform promotionPanel;
+    private RectTransform selectedPiecePanel;
+    private RawImage selectedPiecePreviewImage;
     private Text turnText;
     private Text statusText;
     private Text moveHistoryText;
     private Text howToPlayButtonText;
     private Text startHowToPlayButtonText;
+    private Text selectedPieceNameText;
+    private Text selectedPieceKindText;
+    private Text selectedPieceSquareText;
+    private Text selectedPieceSideText;
+    private RenderTexture selectedPiecePreviewTexture;
+    private Camera selectedPiecePreviewCamera;
+    private Light selectedPiecePreviewLight;
+    private Transform selectedPiecePreviewStage;
+    private GameObject selectedPiecePreviewClone;
+    private PieceView previewedPiece;
 
     public void Configure(ChessGameController controller)
     {
@@ -74,6 +87,16 @@ public sealed class GameHud : MonoBehaviour
         RectTransform historyPanel = CreatePanel("MoveHistoryPanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -104f), new Vector2(304f, 238f), panelColor);
         CreateText("MoveHistoryTitle", historyPanel, "Historico", 17, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -12f), new Vector2(276f, 24f));
         moveHistoryText = CreateText("MoveHistoryText", historyPanel, "Nenhuma jogada ainda.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -42f), new Vector2(276f, 178f));
+
+        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -358f), new Vector2(304f, 348f), panelStrongColor);
+        CreateText("SelectedPieceEyebrowText", selectedPiecePanel, "PECA SELECIONADA", 11, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(272f, 18f));
+        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -44f), new Vector2(272f, 174f), Color.white);
+        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -232f), new Vector2(272f, 30f));
+        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -266f), new Vector2(272f, 24f));
+        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -294f), new Vector2(272f, 22f));
+        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -318f), new Vector2(272f, 22f));
+        EnsureSelectedPiecePreviewResources();
+        selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
 
         RectTransform actionBar = CreatePanel("ActionBar", hudRoot, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 16f), new Vector2(410f, 58f), panelColor);
         CreateButton("NewGameButton", actionBar, "Nova partida", new Vector2(14f, 12f), new Vector2(122f, 34f), actionColor, StartGame);
@@ -135,6 +158,8 @@ public sealed class GameHud : MonoBehaviour
             moveHistoryText.text = hasController ? FormatMoveHistory(gameController.MoveHistory) : "Nenhuma jogada ainda.";
         }
 
+        RefreshSelectedPiecePanel(hasController ? gameController.SelectedPiece : null);
+
         if (howToPlayButtonText != null)
         {
             howToPlayButtonText.text = showHowToPlay && !showStartScreen ? "Ocultar" : "Como jogar";
@@ -184,6 +209,192 @@ public sealed class GameHud : MonoBehaviour
         RefreshInterface();
     }
 
+    private void OnDestroy()
+    {
+        ClearSelectedPiecePreviewClone();
+
+        if (selectedPiecePreviewTexture != null)
+        {
+            selectedPiecePreviewTexture.Release();
+            DestroyUnityObject(selectedPiecePreviewTexture);
+            selectedPiecePreviewTexture = null;
+        }
+    }
+
+    private void RefreshSelectedPiecePanel(PieceView selectedPiece)
+    {
+        if (selectedPiecePanel == null)
+        {
+            return;
+        }
+
+        bool hasSelection = selectedPiece != null;
+        SetActive(selectedPiecePanel, hasSelection);
+        if (!hasSelection)
+        {
+            previewedPiece = null;
+            ClearSelectedPiecePreviewClone();
+            return;
+        }
+
+        if (selectedPieceNameText != null)
+        {
+            selectedPieceNameText.text = GetPieceModelName(selectedPiece);
+        }
+
+        if (selectedPieceKindText != null)
+        {
+            selectedPieceKindText.text = $"{PieceKindName(selectedPiece.Kind)} {SideAdjective(selectedPiece.Side)}";
+        }
+
+        if (selectedPieceSquareText != null)
+        {
+            selectedPieceSquareText.text = $"Casa {selectedPiece.Square.ToAlgebraic()}";
+        }
+
+        if (selectedPieceSideText != null)
+        {
+            selectedPieceSideText.text = $"Time: {SideName(selectedPiece.Side)}";
+        }
+
+        if (previewedPiece != selectedPiece || selectedPiecePreviewClone == null)
+        {
+            BuildSelectedPiecePreview(selectedPiece);
+            previewedPiece = selectedPiece;
+        }
+
+        if (selectedPiecePreviewCamera != null)
+        {
+            selectedPiecePreviewCamera.Render();
+        }
+    }
+
+    private void EnsureSelectedPiecePreviewResources()
+    {
+        if (selectedPiecePreviewTexture == null)
+        {
+            selectedPiecePreviewTexture = new RenderTexture(544, 348, 24)
+            {
+                name = "SelectedPiecePreviewTexture",
+                antiAliasing = 4,
+                useMipMap = false
+            };
+            selectedPiecePreviewTexture.Create();
+        }
+
+        if (selectedPiecePreviewStage == null)
+        {
+            GameObject stageObject = new GameObject("SelectedPiecePreviewStage");
+            stageObject.transform.SetParent(transform, false);
+            stageObject.transform.position = new Vector3(96f, 96f, 96f);
+            selectedPiecePreviewStage = stageObject.transform;
+        }
+
+        if (selectedPiecePreviewCamera == null)
+        {
+            GameObject cameraObject = new GameObject("SelectedPiecePreviewCamera");
+            cameraObject.transform.SetParent(selectedPiecePreviewStage, false);
+            selectedPiecePreviewCamera = cameraObject.AddComponent<Camera>();
+            selectedPiecePreviewCamera.clearFlags = CameraClearFlags.SolidColor;
+            selectedPiecePreviewCamera.backgroundColor = previewSurfaceColor;
+            selectedPiecePreviewCamera.fieldOfView = 26f;
+            selectedPiecePreviewCamera.nearClipPlane = 0.03f;
+            selectedPiecePreviewCamera.farClipPlane = 12f;
+            selectedPiecePreviewCamera.targetTexture = selectedPiecePreviewTexture;
+        }
+
+        selectedPiecePreviewCamera.transform.localPosition = new Vector3(0f, 0.9f, -3f);
+        selectedPiecePreviewCamera.transform.LookAt(selectedPiecePreviewStage.position + new Vector3(0f, 0.78f, 0f));
+
+        if (selectedPiecePreviewLight == null)
+        {
+            GameObject lightObject = new GameObject("SelectedPiecePreviewLight");
+            lightObject.transform.SetParent(selectedPiecePreviewStage, false);
+            selectedPiecePreviewLight = lightObject.AddComponent<Light>();
+            selectedPiecePreviewLight.type = LightType.Directional;
+            selectedPiecePreviewLight.intensity = 1.6f;
+            selectedPiecePreviewLight.color = new Color(1f, 0.95f, 0.86f, 1f);
+        }
+
+        selectedPiecePreviewLight.transform.localRotation = Quaternion.Euler(38f, -28f, 0f);
+    }
+
+    private void BuildSelectedPiecePreview(PieceView selectedPiece)
+    {
+        EnsureSelectedPiecePreviewResources();
+        ClearSelectedPiecePreviewClone();
+
+        selectedPiecePreviewClone = Object.Instantiate(selectedPiece.gameObject, selectedPiecePreviewStage);
+        selectedPiecePreviewClone.name = "SelectedPiecePreviewClone";
+        selectedPiecePreviewClone.transform.localPosition = Vector3.zero;
+        selectedPiecePreviewClone.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        selectedPiecePreviewClone.transform.localScale = Vector3.one;
+
+        DisablePreviewInteractionComponents(selectedPiecePreviewClone);
+        FitPreviewClone(selectedPiecePreviewClone.transform);
+    }
+
+    private void ClearSelectedPiecePreviewClone()
+    {
+        if (selectedPiecePreviewClone != null)
+        {
+            DestroyUnityObject(selectedPiecePreviewClone);
+            selectedPiecePreviewClone = null;
+        }
+    }
+
+    private static void DisablePreviewInteractionComponents(GameObject clone)
+    {
+        PieceView clonePieceView = clone.GetComponent<PieceView>();
+        if (clonePieceView != null)
+        {
+            clonePieceView.enabled = false;
+        }
+
+        Collider[] colliders = clone.GetComponentsInChildren<Collider>();
+        foreach (Collider collider in colliders)
+        {
+            collider.enabled = false;
+        }
+    }
+
+    private void FitPreviewClone(Transform clone)
+    {
+        Renderer[] renderers = clone.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            clone.localPosition = new Vector3(0f, 0.08f, 0f);
+            return;
+        }
+
+        Bounds bounds = CalculateBounds(renderers);
+        if (bounds.size.y > 0.001f)
+        {
+            float targetHeight = 1.58f;
+            float scale = targetHeight / bounds.size.y;
+            clone.localScale *= scale;
+        }
+
+        bounds = CalculateBounds(renderers);
+        Vector3 targetCenter = selectedPiecePreviewStage.position + new Vector3(0f, 0.78f, 0f);
+        clone.position += targetCenter - bounds.center;
+
+        bounds = CalculateBounds(renderers);
+        float targetFloor = selectedPiecePreviewStage.position.y + 0.07f;
+        clone.position += Vector3.up * (targetFloor - bounds.min.y);
+    }
+
+    private static Bounds CalculateBounds(Renderer[] renderers)
+    {
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        return bounds;
+    }
+
     private void EnsureCanvasInfrastructure()
     {
         Canvas canvas = GetComponent<Canvas>();
@@ -194,6 +405,7 @@ public sealed class GameHud : MonoBehaviour
 
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;
+        canvas.pixelPerfect = true;
 
         CanvasScaler scaler = GetComponent<CanvasScaler>();
         if (scaler == null)
@@ -204,6 +416,7 @@ public sealed class GameHud : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = 0.5f;
+        scaler.referencePixelsPerUnit = 100f;
 
         if (GetComponent<GraphicRaycaster>() == null)
         {
@@ -224,7 +437,7 @@ public sealed class GameHud : MonoBehaviour
         Transform existing = transform.Find("HudRoot");
         if (existing != null)
         {
-            DestroyObject(existing.gameObject);
+            DestroyUnityObject(existing.gameObject);
         }
     }
 
@@ -241,6 +454,13 @@ public sealed class GameHud : MonoBehaviour
         RectTransform rect = CreateRect(name, parent, anchorMin, anchorMax, pivot, anchoredPosition, sizeDelta);
         Image image = rect.gameObject.AddComponent<Image>();
         image.color = color;
+        if (color.a > 0.75f)
+        {
+            Outline outline = rect.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(0f, 0f, 0f, 0.45f);
+            outline.effectDistance = new Vector2(1f, -1f);
+        }
+
         return rect;
     }
 
@@ -285,7 +505,23 @@ public sealed class GameHud : MonoBehaviour
         label.horizontalOverflow = HorizontalWrapMode.Wrap;
         label.verticalOverflow = VerticalWrapMode.Truncate;
         label.text = text;
+        label.alignByGeometry = true;
+        label.raycastTarget = false;
         return label;
+    }
+
+    private RawImage CreateRawImage(
+        string name,
+        Transform parent,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta,
+        Color color)
+    {
+        RectTransform rect = CreateRect(name, parent, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), anchoredPosition, sizeDelta);
+        RawImage image = rect.gameObject.AddComponent<RawImage>();
+        image.color = color;
+        image.raycastTarget = false;
+        return image;
     }
 
     private Button CreateButton(
@@ -362,6 +598,58 @@ public sealed class GameHud : MonoBehaviour
             "4. Esc cancela selecao, N reinicia.";
     }
 
+    private static string GetPieceModelName(PieceView piece)
+    {
+        switch (piece.Kind)
+        {
+            case ChessPieceKind.Pawn:
+                return "Mathwidu";
+            case ChessPieceKind.Rook:
+                return "Alex";
+            case ChessPieceKind.Knight:
+                return "Gustavo";
+            case ChessPieceKind.Bishop:
+                return "Rafael";
+            case ChessPieceKind.Queen:
+                return "Marta";
+            case ChessPieceKind.King:
+                return "Ricardo Carioca";
+            default:
+                return "Peca classica";
+        }
+    }
+
+    private static string PieceKindName(ChessPieceKind kind)
+    {
+        switch (kind)
+        {
+            case ChessPieceKind.Pawn:
+                return "Peao";
+            case ChessPieceKind.Rook:
+                return "Torre";
+            case ChessPieceKind.Knight:
+                return "Cavalo";
+            case ChessPieceKind.Bishop:
+                return "Bispo";
+            case ChessPieceKind.Queen:
+                return "Rainha";
+            case ChessPieceKind.King:
+                return "Rei";
+            default:
+                return "Peca";
+        }
+    }
+
+    private static string SideName(ChessSide side)
+    {
+        return side == ChessSide.White ? "Brancas" : "Pretas";
+    }
+
+    private static string SideAdjective(ChessSide side)
+    {
+        return side == ChessSide.White ? "branco" : "preto";
+    }
+
     private Font GetHudFont()
     {
         if (hudFont != null)
@@ -386,7 +674,7 @@ public sealed class GameHud : MonoBehaviour
         }
     }
 
-    private static void DestroyObject(Object target)
+    private static void DestroyUnityObject(Object target)
     {
         if (Application.isPlaying)
         {
