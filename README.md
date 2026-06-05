@@ -71,6 +71,11 @@ Para gerar uma versao jogavel fora do Editor:
 
 Tambem e possivel usar `File > Build Profiles`, desde que `Assets/Scenes/Main.unity` esteja na lista de cenas.
 
+## Versao estavel
+
+A versao entregavel atual esta marcada com a tag `entrega-v1-estavel`.
+As melhorias de animacao, preview 3D e polimento visual devem ser feitas em branches separadas para manter a entrega segura.
+
 ## Entregaveis
 
 - Codigo-fonte Unity em `game/`.
