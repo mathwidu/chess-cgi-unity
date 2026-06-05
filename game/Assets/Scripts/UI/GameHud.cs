@@ -3,6 +3,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public sealed class GameHud : MonoBehaviour
@@ -237,14 +238,16 @@ public sealed class GameHud : MonoBehaviour
             return;
         }
 
+        CharacterProfile profile = CharacterProfileCatalog.GetProfile(selectedPiece.Kind);
+
         if (selectedPieceNameText != null)
         {
-            selectedPieceNameText.text = GetPieceModelName(selectedPiece);
+            selectedPieceNameText.text = profile.DisplayName;
         }
 
         if (selectedPieceKindText != null)
         {
-            selectedPieceKindText.text = $"{PieceKindName(selectedPiece.Kind)} {SideAdjective(selectedPiece.Side)}";
+            selectedPieceKindText.text = $"{profile.PieceName} {SideAdjective(selectedPiece.Side)}";
         }
 
         if (selectedPieceSquareText != null)
@@ -263,10 +266,17 @@ public sealed class GameHud : MonoBehaviour
             previewedPiece = selectedPiece;
         }
 
-        if (selectedPiecePreviewCamera != null)
+        if (selectedPiecePreviewCamera != null && CanRenderSelectedPiecePreview())
         {
             selectedPiecePreviewCamera.Render();
         }
+    }
+
+    private bool CanRenderSelectedPiecePreview()
+    {
+        return selectedPiecePreviewTexture != null &&
+            selectedPiecePreviewTexture.IsCreated() &&
+            SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null;
     }
 
     private void EnsureSelectedPiecePreviewResources()
@@ -596,48 +606,6 @@ public sealed class GameHud : MonoBehaviour
             "2. Clique em uma casa destacada para mover.\n" +
             "3. Q/E giram a camera, scroll aproxima.\n" +
             "4. Esc cancela selecao, N reinicia.";
-    }
-
-    private static string GetPieceModelName(PieceView piece)
-    {
-        switch (piece.Kind)
-        {
-            case ChessPieceKind.Pawn:
-                return "Mathwidu";
-            case ChessPieceKind.Rook:
-                return "Alex";
-            case ChessPieceKind.Knight:
-                return "Gustavo";
-            case ChessPieceKind.Bishop:
-                return "Rafael";
-            case ChessPieceKind.Queen:
-                return "Marta";
-            case ChessPieceKind.King:
-                return "Ricardo Carioca";
-            default:
-                return "Peca classica";
-        }
-    }
-
-    private static string PieceKindName(ChessPieceKind kind)
-    {
-        switch (kind)
-        {
-            case ChessPieceKind.Pawn:
-                return "Peao";
-            case ChessPieceKind.Rook:
-                return "Torre";
-            case ChessPieceKind.Knight:
-                return "Cavalo";
-            case ChessPieceKind.Bishop:
-                return "Bispo";
-            case ChessPieceKind.Queen:
-                return "Rainha";
-            case ChessPieceKind.King:
-                return "Rei";
-            default:
-                return "Peca";
-        }
     }
 
     private static string SideName(ChessSide side)
