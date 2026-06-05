@@ -25,9 +25,11 @@ A captura deve parecer teatral e estilizada, nao violenta demais. A leitura idea
 
 O jogo deve continuar sendo xadrez. As animacoes nao podem atrasar muito a jogada, confundir a casa final ou esconder informacoes importantes do HUD.
 
-## Fases Futuras
+## Fases
 
 ### Fase 1: Captura Generica Leve
+
+Status: implementada na camada procedural atual.
 
 Funciona com qualquer modelo, inclusive pecas classicas:
 
@@ -41,6 +43,8 @@ Essa fase e a melhor primeira evolucao porque nao exige rig humanoide nem animac
 
 ### Fase 2: Captura Por Tipo De Peca
 
+Status: implementada com estilos procedurais por tipo de peca.
+
 Mantem o mesmo sistema, mas adiciona variacao por peca:
 
 - peao: empurrao curto;
@@ -53,6 +57,8 @@ Mantem o mesmo sistema, mas adiciona variacao por peca:
 As animacoes continuam genericas, mas a identidade do xadrez aparece mais.
 
 ### Fase 3: Capturas Com Personagens Personalizados
+
+Status: planejada para a camada de rig/clipes opcionais.
 
 Quando os modelos definitivos estiverem escolhidos:
 

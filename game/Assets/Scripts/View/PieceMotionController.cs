@@ -34,9 +34,10 @@ public sealed class PieceMotionController : MonoBehaviour
         }
 
         Vector3 attackerStart = attacker.transform.position;
-        Vector3 lungeTarget = Vector3.Lerp(attackerStart, captured.transform.position, 0.72f);
+        CaptureAnimationStyle style = CaptureAnimationLibrary.GetStyle(attacker.Kind);
+        Vector3 lungeTarget = Vector3.Lerp(attackerStart, captured.transform.position, style.LungeDistance);
         float elapsed = 0f;
-        float duration = Mathf.Max(0.01f, Settings.CaptureDuration);
+        float duration = Mathf.Max(0.01f, style.Duration);
 
         attacker.FaceTowards(captured.transform.position);
 
@@ -50,7 +51,8 @@ public sealed class PieceMotionController : MonoBehaviour
             yield return null;
         }
 
-        ImpactEffect.CreateImpact(captured.transform.position + Vector3.up * 0.65f, Color.yellow);
+        GameObject impact = ImpactEffect.CreateImpact(captured.transform.position + Vector3.up * 0.65f, style.ImpactColor);
+        impact.transform.localScale *= style.ImpactScale;
         captured.gameObject.SetActive(false);
         yield return MovePiece(attacker, destination);
     }
