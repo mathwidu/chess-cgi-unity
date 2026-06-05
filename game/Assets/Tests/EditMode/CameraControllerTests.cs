@@ -29,4 +29,23 @@ public class CameraControllerTests
             Object.DestroyImmediate(cameraObject);
         }
     }
+
+    [Test]
+    public void Shake_DoesNotChangePerspectiveSide()
+    {
+        GameObject cameraObject = new GameObject("Camera Test");
+        try
+        {
+            CameraController cameraController = cameraObject.AddComponent<CameraController>();
+            cameraController.SetPerspective(ChessSide.Black, true);
+
+            cameraController.Shake(0.08f, 0.1f);
+
+            Assert.AreEqual(ChessSide.Black, cameraController.CurrentPerspective);
+        }
+        finally
+        {
+            Object.DestroyImmediate(cameraObject);
+        }
+    }
 }

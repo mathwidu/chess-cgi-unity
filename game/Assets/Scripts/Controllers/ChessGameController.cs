@@ -240,6 +240,11 @@ public sealed class ChessGameController : MonoBehaviour
             yield return movingPiece.MoveTo(targetPosition, moveDuration);
         }
 
+        if (moveResult.IsCapture && cameraController != null)
+        {
+            cameraController.Shake(0.07f, 0.16f);
+        }
+
         boardView.SyncPieces(rules.GetPieces(), pieceFactory);
         inputBlocked = false;
         ApplyMoveResult(moveResult);

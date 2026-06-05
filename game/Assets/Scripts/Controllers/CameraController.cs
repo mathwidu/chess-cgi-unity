@@ -14,6 +14,7 @@ public sealed class CameraController : MonoBehaviour
     [SerializeField] private Vector3 target = new Vector3(0f, 0f, 0.35f);
 
     private Coroutine perspectiveTransition;
+    private Coroutine shakeTransition;
 
     public ChessSide CurrentPerspective { get; private set; } = ChessSide.White;
 
@@ -72,6 +73,21 @@ public sealed class CameraController : MonoBehaviour
         perspectiveTransition = StartCoroutine(TransitionTo(targetPosition, targetRotation));
     }
 
+    public void Shake(float amplitude, float duration)
+    {
+        if (!Application.isPlaying || amplitude <= 0f || duration <= 0f)
+        {
+            return;
+        }
+
+        if (shakeTransition != null)
+        {
+            StopCoroutine(shakeTransition);
+        }
+
+        shakeTransition = StartCoroutine(ShakeRoutine(amplitude, duration));
+    }
+
     private IEnumerator TransitionTo(Vector3 targetPosition, Quaternion targetRotation)
     {
         Vector3 startPosition = transform.position;
@@ -90,6 +106,25 @@ public sealed class CameraController : MonoBehaviour
         transform.position = targetPosition;
         transform.rotation = targetRotation;
         perspectiveTransition = null;
+    }
+
+    private IEnumerator ShakeRoutine(float amplitude, float duration)
+    {
+        Vector3 basePosition = transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float frameDelta = Time.deltaTime > 0f ? Time.deltaTime : duration;
+            elapsed += frameDelta;
+            float fade = 1f - Mathf.Clamp01(elapsed / duration);
+            Vector3 offset = new Vector3(Mathf.Sin(elapsed * 80f), Mathf.Cos(elapsed * 63f), 0f) * amplitude * fade;
+            transform.position = basePosition + offset;
+            yield return null;
+        }
+
+        transform.position = basePosition;
+        shakeTransition = null;
     }
 
     private Vector3 GetPerspectivePosition(ChessSide side)
