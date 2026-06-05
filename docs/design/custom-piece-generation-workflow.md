@@ -193,6 +193,18 @@ Rejeitar e regenerar se:
 - A coroa ficar grande demais.
 - O resultado parecer pior que o peao e o bispo atuais.
 
+## Checklist de polimento dentro do Unity
+
+Antes de aceitar um novo prefab personalizado:
+
+- O prefab tem pelo menos um Renderer.
+- O modelo fica inteiro na sidebar com zoom padrao.
+- A altura normalizada no tabuleiro fica entre 1.15 e 1.45 unidades.
+- A peca olha para o adversario: brancas para frente, pretas rotacionadas 180 graus.
+- A base nao cobre pernas ou props importantes.
+- Materiais nao estouram em branco puro nem somem em preto puro.
+- O personagem continua legivel na camera de jogo padrao.
+
 ## Integracao no Unity
 
 1. Salvar o prefab aprovado em `Assets/Resources/CustomPieces/Queen_Marta.prefab`.
