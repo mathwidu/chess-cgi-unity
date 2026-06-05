@@ -104,3 +104,11 @@ Os modelos atuais funcionam sem rig usando movimento procedural. Se um prefab fu
 - O input fica bloqueado durante a animacao.
 - A animacao funciona com peca classica e com peca personalizada.
 - O efeito visual nao passa de 0.55s na versao padrao.
+
+## Validacao Atual
+
+- `CaptureResolverTests`: valida a resolucao da peca capturada antes da sincronizacao visual.
+- `ImpactEffectTests`: valida o efeito curto de impacto.
+- `CaptureAnimationLibraryTests`: valida estilos diferentes e duracoes seguras por tipo de peca.
+- `PieceMotionControllerTests`: valida movimento instantaneo para testes e captura procedural.
+- `MovementAndCaptureFlowTests` em PlayMode: valida jogada legal e captura com corrotinas reais.

@@ -10,7 +10,11 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 - Pecas classicas montadas com primitivas 3D quando nao ha personagem customizado.
 - Peao, torre, cavalo, bispo, rainha e rei personalizados gerados como prefabs 3D e integrados ao tabuleiro.
 - Camera alterna automaticamente para o lado do jogador da vez, com enquadramento mais proximo.
-- HUD mostra tela inicial, instrucoes, estado da partida, escolha de promocao, historico recente, nova partida e detalhe da peca selecionada com preview 3D.
+- HUD mostra tela inicial, instrucoes, estado da partida, escolha de promocao, historico recente, nova partida e detalhe da peca selecionada com preview 3D interativo.
+- Sidebar com detalhes do personagem selecionado, preview 3D interativo, zoom e rotacao.
+- Movimento visual com caminhada procedural ate a casa de destino.
+- Capturas com impacto visual curto, reacao da peca capturada, camera shake sutil e estilos diferentes por tipo de peca.
+- Personagens personalizados com auditoria automatizada de cobertura para garantir 32/32 pecas customizadas no tabuleiro inicial.
 
 ## Como abrir
 
@@ -29,12 +33,18 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 - `N`: nova partida.
 - `Esc`: cancelar selecao.
 
+Preview 3D da peca:
+
+- Arraste dentro do preview para girar o modelo.
+- Use scroll no preview para aproximar ou afastar.
+- Use o botao de reset do preview para voltar ao enquadramento padrao.
+
 ## Testes automatizados
 
 No Unity, abra `Window > General > Test Runner`, selecione `EditMode` e clique em `Run All`.
-A suite atual cobre dominio, regras especiais de xadrez, montagem do tabuleiro, fluxo do controller, promocao, camera por turno e suporte a pecas personalizadas.
+A suite atual cobre dominio, regras especiais de xadrez, montagem do tabuleiro, fluxo do controller, promocao, camera por turno, sidebar, preview 3D, movimento, captura, cena e suporte a pecas personalizadas.
 
-Resultado esperado nesta fase: `34` testes passando.
+Resultado esperado nesta fase: `61` testes EditMode passando e `2` testes PlayMode passando.
 
 ## Tema visual
 
@@ -71,10 +81,10 @@ Para gerar uma versao jogavel fora do Editor:
 
 Tambem e possivel usar `File > Build Profiles`, desde que `Assets/Scenes/Main.unity` esteja na lista de cenas.
 
-## Versao estavel
+## Versoes estaveis
 
-A versao entregavel atual esta marcada com a tag `entrega-v1-estavel`.
-As melhorias de animacao, preview 3D e polimento visual devem ser feitas em branches separadas para manter a entrega segura.
+- `entrega-v1-estavel`: primeira versao jogavel e segura para entrega.
+- `entrega-v2-polida`: versao polida com sidebar premium, movimento/captura animados, PlayMode smoke tests e build macOS validada.
 
 ## Entregaveis
 

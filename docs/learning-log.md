@@ -23,3 +23,13 @@
 - `GameHud` usa `OnGUI`, uma forma simples de desenhar interface no Editor sem criar ainda uma UI definitiva com Canvas.
 - Testes EditMode ajudam a validar regras e fluxos sem precisar jogar partidas completas manualmente.
 - Para promocao, o controller pausa a jogada em `IsAwaitingPromotion` ate o jogador escolher rainha, torre, bispo ou cavalo.
+
+## Marco 4: Polimento visual e animacoes
+
+- `PieceMotionController` executa movimento visual sem alterar a regra do xadrez.
+- `PieceView.MoveWithWalk` anima uma caminhada procedural simples ate a casa final.
+- `CaptureResolver` identifica a peca capturada antes de `BoardView.SyncPieces` recriar o tabuleiro visual.
+- `ImpactEffect` e `CaptureAnimationLibrary` criam uma captura curta com estilos por tipo de peca.
+- `CharacterAnimationDriver` prepara os modelos para futuros rigs/Animator, mantendo fallback procedural quando o prefab nao tem animacao.
+- Testes PlayMode sao uteis quando o comportamento depende de `Start`, corrotinas e tempo real.
+- A tag `entrega-v1-estavel` protege a primeira entrega; a tag `entrega-v2-polida` marca a versao com polimento profissional.
