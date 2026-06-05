@@ -185,6 +185,18 @@ Aceitar o modelo somente se:
 - A silhueta funciona em tamanho pequeno no tabuleiro.
 - O detalhe de Rainha e discreto e nao rouba a identidade da professora.
 
+## Checklist final dos personagens atuais
+
+| Personagem | Peca | Status | Ajustes finais |
+| --- | --- | --- | --- |
+| Mathwidu | Peao | Integrado | manter `Pawn_Mathwidu_Redhead_v2`, conferir cabelo ruivo, frente/costas e escala no HUD |
+| Alex | Torre | Integrado | conferir torre pequena, pose sentada e contraste do blusao escuro |
+| Gustavo | Cavalo | Integrado | conferir cavalo pequeno, oculos e proporcao adulta |
+| Rafael | Bispo | Integrado | conferir postura, contraste do casaco e altura relativa |
+| Marta | Rainha | Integrado | conferir scarf azul/branco, oculos, coroa discreta e leitura do rosto |
+| Ricardo Carioca | Rei | Integrado | conferir moletom azul, oculos, postura de professor e coroa discreta |
+| Todas as pecas | Cobertura runtime | Automatizado | `CustomPieceCoverageTests` valida 32/32 pecas com `CustomVisual` e contagem por tipo |
+
 Rejeitar e regenerar se:
 
 - O rosto ficar muito generico.
