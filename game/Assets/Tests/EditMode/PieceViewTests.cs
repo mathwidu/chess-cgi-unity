@@ -48,6 +48,24 @@ public class PieceViewTests
         }
     }
 
+    [Test]
+    public void EvaluateWalkPose_StartMiddleEndKeepsBoardDestinationStable()
+    {
+        Vector3 start = new Vector3(0f, 0.08f, 0f);
+        Vector3 target = new Vector3(2f, 0.08f, 0f);
+        PieceMotionSettings settings = PieceMotionSettings.Default;
+
+        PieceView.WalkPose startPose = PieceView.EvaluateWalkPose(start, target, 0f, settings);
+        PieceView.WalkPose middlePose = PieceView.EvaluateWalkPose(start, target, 0.5f, settings);
+        PieceView.WalkPose endPose = PieceView.EvaluateWalkPose(start, target, 1f, settings);
+
+        AssertVector(start, startPose.RootPosition);
+        Assert.AreEqual(1f, middlePose.RootPosition.x, 0.01f);
+        Assert.Greater(middlePose.VisualOffset.y, 0f);
+        AssertVector(target, endPose.RootPosition);
+        AssertVector(Vector3.zero, endPose.VisualOffset);
+    }
+
     private static void AssertVector(Vector3 expected, Vector3 actual)
     {
         Assert.AreEqual(expected.x, actual.x, 0.001f);

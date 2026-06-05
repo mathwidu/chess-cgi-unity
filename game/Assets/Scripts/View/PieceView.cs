@@ -13,6 +13,22 @@ public sealed class PieceView : MonoBehaviour
     public ChessPieceKind Kind { get; private set; }
     public Transform VisualRoot { get; private set; }
 
+    public readonly struct WalkPose
+    {
+        public WalkPose(Vector3 rootPosition, Vector3 visualOffset, Quaternion visualRotation)
+        {
+            RootPosition = rootPosition;
+            VisualOffset = visualOffset;
+            VisualRotation = visualRotation;
+        }
+
+        public Vector3 RootPosition { get; }
+
+        public Vector3 VisualOffset { get; }
+
+        public Quaternion VisualRotation { get; }
+    }
+
     public void Initialize(VisualPieceState state)
     {
         Square = state.Square;
@@ -54,5 +70,24 @@ public sealed class PieceView : MonoBehaviour
         }
 
         transform.position = target;
+    }
+
+    public static WalkPose EvaluateWalkPose(Vector3 start, Vector3 target, float normalizedTime, PieceMotionSettings settings)
+    {
+        float t = Mathf.Clamp01(normalizedTime);
+        float eased = Mathf.SmoothStep(0f, 1f, t);
+        Vector3 rootPosition = Vector3.Lerp(start, target, eased);
+        float step = Mathf.Sin(t * Mathf.PI);
+        Vector3 visualOffset = Vector3.up * Mathf.Abs(step) * settings.StepHeight;
+        float lean = Mathf.Sin(t * Mathf.PI * 2f) * settings.LeanAngle;
+        Quaternion visualRotation = Quaternion.Euler(lean, 0f, 0f);
+
+        if (t >= 1f)
+        {
+            visualOffset = Vector3.zero;
+            visualRotation = Quaternion.identity;
+        }
+
+        return new WalkPose(rootPosition, visualOffset, visualRotation);
     }
 }
