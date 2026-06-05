@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public sealed class PieceFactory : MonoBehaviour
 {
@@ -53,10 +54,14 @@ public sealed class PieceFactory : MonoBehaviour
         PieceView pieceView = root.AddComponent<PieceView>();
         AddCollider(root);
         Material sideMaterial = state.Side == ChessSide.White ? whiteMaterial : blackMaterial;
-        if (!BuildCustomShape(root.transform, state.Kind, state.Side, sideMaterial))
+        bool hasCustomShape = BuildCustomShape(root.transform, state.Kind, state.Side, sideMaterial);
+        if (!hasCustomShape)
         {
             BuildPrimitiveShape(root.transform, state.Kind, sideMaterial);
         }
+
+        pieceView.SetVisualRoot(hasCustomShape ? root.transform.Find("CustomVisual") : root.transform);
+        ConfigureRenderers(root.transform);
         pieceView.Initialize(state);
         return pieceView;
     }
@@ -154,6 +159,16 @@ public sealed class PieceFactory : MonoBehaviour
         }
 
         return bounds;
+    }
+
+    private static void ConfigureRenderers(Transform root)
+    {
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.shadowCastingMode = ShadowCastingMode.On;
+            renderer.receiveShadows = true;
+        }
     }
 
     private static void BuildPrimitiveShape(Transform parent, ChessPieceKind kind, Material material)

@@ -146,4 +146,31 @@ public class PieceFactoryTests
             Object.DestroyImmediate(pawnPrefab);
         }
     }
+
+    [Test]
+    public void CreatePiece_CustomVisualHasNamedVisualRootAndTeamBase()
+    {
+        GameObject rig = new GameObject("Piece Factory Test Rig");
+        GameObject prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        try
+        {
+            PieceFactory factory = rig.AddComponent<PieceFactory>();
+            factory.ConfigureCustomPrefab(ChessPieceKind.Rook, prefab);
+
+            PieceView piece = factory.CreatePiece(
+                new VisualPieceState(BoardSquare.FromAlgebraic("a1"), ChessSide.White, ChessPieceKind.Rook),
+                Vector3.zero,
+                rig.transform);
+
+            Assert.IsNotNull(piece.transform.Find("TeamBase"));
+            Assert.IsNotNull(piece.transform.Find("CustomVisual"));
+            Assert.IsNotNull(piece.VisualRoot);
+            Assert.AreEqual("CustomVisual", piece.VisualRoot.name);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+            Object.DestroyImmediate(prefab);
+        }
+    }
 }

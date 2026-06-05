@@ -11,6 +11,7 @@ public sealed class PieceView : MonoBehaviour
     public BoardSquare Square { get; private set; }
     public ChessSide Side { get; private set; }
     public ChessPieceKind Kind { get; private set; }
+    public Transform VisualRoot { get; private set; }
 
     public void Initialize(VisualPieceState state)
     {
@@ -30,6 +31,11 @@ public sealed class PieceView : MonoBehaviour
     public void SetSelected(bool selected)
     {
         transform.localScale = selected ? baseScale * SelectedScaleMultiplier : baseScale;
+    }
+
+    public void SetVisualRoot(Transform visualRoot)
+    {
+        VisualRoot = visualRoot;
     }
 
     public IEnumerator MoveTo(Vector3 target, float duration)
