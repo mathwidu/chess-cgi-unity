@@ -97,6 +97,25 @@ public sealed class BoardView : MonoBehaviour
         }
     }
 
+    public PieceView FindPieceAt(BoardSquare square)
+    {
+        foreach (PieceView piece in pieces)
+        {
+            if (piece != null && piece.Square.Equals(square))
+            {
+                return piece;
+            }
+        }
+
+        return null;
+    }
+
+    public bool TryGetPieceAt(BoardSquare square, out PieceView piece)
+    {
+        piece = FindPieceAt(square);
+        return piece != null;
+    }
+
     public void HighlightSquares(IEnumerable<BoardSquare> highlightedSquares)
     {
         EnsureRoots();
