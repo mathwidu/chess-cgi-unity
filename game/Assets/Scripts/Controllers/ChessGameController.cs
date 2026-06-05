@@ -8,6 +8,7 @@ public sealed class ChessGameController : MonoBehaviour
     [SerializeField] private PieceFactory pieceFactory;
     [SerializeField] private GameHud hud;
     [SerializeField] private CameraController cameraController;
+    [SerializeField] private PieceMotionController motionController;
     [SerializeField] private float moveDuration = 0.28f;
 
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
@@ -60,6 +61,11 @@ public sealed class ChessGameController : MonoBehaviour
         if (cameraController == null)
         {
             cameraController = Object.FindFirstObjectByType<CameraController>();
+        }
+
+        if (motionController == null)
+        {
+            motionController = Object.FindFirstObjectByType<PieceMotionController>();
         }
 
         if (hud != null)
@@ -219,7 +225,16 @@ public sealed class ChessGameController : MonoBehaviour
     private IEnumerator AnimateMoveThenSync(PieceView movingPiece, BoardSquare destination, MoveResult moveResult)
     {
         inputBlocked = true;
-        yield return movingPiece.MoveTo(boardView.GetPieceWorldPosition(destination), moveDuration);
+        Vector3 targetPosition = boardView.GetPieceWorldPosition(destination);
+        if (motionController != null)
+        {
+            yield return motionController.MovePiece(movingPiece, targetPosition);
+        }
+        else
+        {
+            yield return movingPiece.MoveTo(targetPosition, moveDuration);
+        }
+
         boardView.SyncPieces(rules.GetPieces(), pieceFactory);
         inputBlocked = false;
         ApplyMoveResult(moveResult);

@@ -2265,6 +2265,7 @@ GameObject:
   - component: {fileID: 1738091630}
   - component: {fileID: 1738091629}
   - component: {fileID: 1738091631}
+  - component: {fileID: 1738091633}
   - component: {fileID: 1738091632}
   m_Layer: 0
   m_Name: GameManager
@@ -2326,7 +2327,24 @@ MonoBehaviour:
   pieceFactory: {fileID: 1738091629}
   hud: {fileID: 1964109917}
   cameraController: {fileID: 330585548}
+  motionController: {fileID: 1738091633}
   moveDuration: 0.28
+--- !u!114 &1738091633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1738091628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccb0142dd91d243c3975ae3f506bc4fa, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: ChessCgi.Runtime::PieceMotionController
+  walkDuration: 0.55
+  stepHeight: 0.08
+  leanAngle: 4.5
+  captureDuration: 0.45
 --- !u!114 &1738091632
 MonoBehaviour:
   m_ObjectHideFlags: 0

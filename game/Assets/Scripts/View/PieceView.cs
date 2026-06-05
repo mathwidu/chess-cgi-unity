@@ -4,7 +4,6 @@ using UnityEngine;
 public sealed class PieceView : MonoBehaviour
 {
     private const float SelectedScaleMultiplier = 1.07f;
-    private const float MoveArcHeight = 0.18f;
 
     private Vector3 baseScale;
 
@@ -56,20 +55,64 @@ public sealed class PieceView : MonoBehaviour
 
     public IEnumerator MoveTo(Vector3 target, float duration)
     {
+        return MoveWithWalk(
+            target,
+            new PieceMotionSettings(
+                duration,
+                PieceMotionSettings.Default.StepHeight,
+                PieceMotionSettings.Default.LeanAngle,
+                PieceMotionSettings.Default.CaptureDuration));
+    }
+
+    public IEnumerator MoveWithWalk(Vector3 target, PieceMotionSettings settings)
+    {
         Vector3 start = transform.position;
+        float duration = settings.WalkDuration;
+        if (duration <= 0f)
+        {
+            transform.position = target;
+            ResetVisualPose();
+            yield break;
+        }
+
+        Vector3 visualStartLocalPosition = VisualRoot != null ? VisualRoot.localPosition : Vector3.zero;
+        Quaternion visualStartLocalRotation = VisualRoot != null ? VisualRoot.localRotation : Quaternion.identity;
         float elapsed = 0f;
+
+        FaceTowards(target);
 
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            float frameDelta = Time.deltaTime > 0f ? Time.deltaTime : duration;
+            elapsed += frameDelta;
             float t = Mathf.Clamp01(elapsed / duration);
-            float eased = Mathf.SmoothStep(0f, 1f, t);
-            Vector3 arc = Vector3.up * (Mathf.Sin(t * Mathf.PI) * MoveArcHeight);
-            transform.position = Vector3.Lerp(start, target, eased) + arc;
+            WalkPose pose = EvaluateWalkPose(start, target, t, settings);
+            transform.position = pose.RootPosition;
+            if (VisualRoot != null && VisualRoot != transform)
+            {
+                VisualRoot.localPosition = visualStartLocalPosition + pose.VisualOffset;
+                VisualRoot.localRotation = visualStartLocalRotation * pose.VisualRotation;
+            }
+
             yield return null;
         }
 
         transform.position = target;
+        if (VisualRoot != null && VisualRoot != transform)
+        {
+            VisualRoot.localPosition = visualStartLocalPosition;
+            VisualRoot.localRotation = visualStartLocalRotation;
+        }
+    }
+
+    public void FaceTowards(Vector3 worldTarget)
+    {
+        Vector3 direction = worldTarget - transform.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude > 0.001f)
+        {
+            transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+        }
     }
 
     public static WalkPose EvaluateWalkPose(Vector3 start, Vector3 target, float normalizedTime, PieceMotionSettings settings)
@@ -89,5 +132,14 @@ public sealed class PieceView : MonoBehaviour
         }
 
         return new WalkPose(rootPosition, visualOffset, visualRotation);
+    }
+
+    private void ResetVisualPose()
+    {
+        if (VisualRoot != null && VisualRoot != transform)
+        {
+            VisualRoot.localPosition = Vector3.zero;
+            VisualRoot.localRotation = Quaternion.identity;
+        }
     }
 }
