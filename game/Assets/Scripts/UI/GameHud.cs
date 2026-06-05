@@ -3,7 +3,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public sealed class GameHud : MonoBehaviour
@@ -13,7 +12,6 @@ public sealed class GameHud : MonoBehaviour
 
     private readonly Color panelColor = new Color(0.085f, 0.082f, 0.074f, 0.94f);
     private readonly Color panelStrongColor = new Color(0.048f, 0.046f, 0.043f, 0.98f);
-    private readonly Color previewSurfaceColor = new Color(0.12f, 0.13f, 0.13f, 1f);
     private readonly Color overlayColor = new Color(0.02f, 0.018f, 0.016f, 0.66f);
     private readonly Color textColor = new Color(0.97f, 0.94f, 0.87f, 1f);
     private readonly Color mutedTextColor = new Color(0.78f, 0.76f, 0.68f, 1f);
@@ -45,12 +43,7 @@ public sealed class GameHud : MonoBehaviour
     private Text selectedPieceRoleText;
     private Text selectedPieceRegistrationText;
     private Text selectedPieceDescriptionText;
-    private RenderTexture selectedPiecePreviewTexture;
-    private Camera selectedPiecePreviewCamera;
-    private Light selectedPiecePreviewLight;
-    private Transform selectedPiecePreviewStage;
-    private GameObject selectedPiecePreviewClone;
-    private PieceView previewedPiece;
+    private SelectedPiecePreviewController selectedPiecePreviewController;
 
     public void Configure(ChessGameController controller)
     {
@@ -104,8 +97,11 @@ public sealed class GameHud : MonoBehaviour
         selectedPieceRoleText = CreateText("SelectedPieceRoleText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -400f), new Vector2(328f, 22f));
         selectedPieceRegistrationText = CreateText("SelectedPieceRegistrationText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -426f), new Vector2(328f, 22f));
         selectedPieceDescriptionText = CreateText("SelectedPieceDescriptionText", selectedPiecePanel, "-", 12, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(16f, -458f), new Vector2(328f, 52f));
-        EnsureSelectedPiecePreviewResources();
-        selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
+        selectedPiecePreviewImage.raycastTarget = true;
+        selectedPiecePreviewController = selectedPiecePreviewImage.gameObject.AddComponent<SelectedPiecePreviewController>();
+        selectedPiecePreviewController.Configure(selectedPiecePreviewImage);
+        SelectedPiecePreviewInput previewInput = selectedPiecePreviewImage.gameObject.AddComponent<SelectedPiecePreviewInput>();
+        previewInput.Configure(selectedPiecePreviewController);
 
         RectTransform actionBar = CreatePanel("ActionBar", hudRoot, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 16f), new Vector2(410f, 58f), panelColor);
         CreateButton("NewGameButton", actionBar, "Nova partida", new Vector2(14f, 12f), new Vector2(122f, 34f), actionColor, StartGame);
@@ -220,13 +216,9 @@ public sealed class GameHud : MonoBehaviour
 
     private void OnDestroy()
     {
-        ClearSelectedPiecePreviewClone();
-
-        if (selectedPiecePreviewTexture != null)
+        if (selectedPiecePreviewController != null)
         {
-            selectedPiecePreviewTexture.Release();
-            DestroyUnityObject(selectedPiecePreviewTexture);
-            selectedPiecePreviewTexture = null;
+            selectedPiecePreviewController.Clear();
         }
     }
 
@@ -241,8 +233,11 @@ public sealed class GameHud : MonoBehaviour
         SetActive(selectedPiecePanel, hasSelection);
         if (!hasSelection)
         {
-            previewedPiece = null;
-            ClearSelectedPiecePreviewClone();
+            if (selectedPiecePreviewController != null)
+            {
+                selectedPiecePreviewController.Clear();
+            }
+
             return;
         }
 
@@ -288,149 +283,10 @@ public sealed class GameHud : MonoBehaviour
             selectedPieceDescriptionText.text = profile.Description;
         }
 
-        if (previewedPiece != selectedPiece || selectedPiecePreviewClone == null)
+        if (selectedPiecePreviewController != null)
         {
-            BuildSelectedPiecePreview(selectedPiece);
-            previewedPiece = selectedPiece;
+            selectedPiecePreviewController.ShowPiece(selectedPiece);
         }
-
-        if (selectedPiecePreviewCamera != null && CanRenderSelectedPiecePreview())
-        {
-            selectedPiecePreviewCamera.Render();
-        }
-    }
-
-    private bool CanRenderSelectedPiecePreview()
-    {
-        return selectedPiecePreviewTexture != null &&
-            selectedPiecePreviewTexture.IsCreated() &&
-            SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null;
-    }
-
-    private void EnsureSelectedPiecePreviewResources()
-    {
-        if (selectedPiecePreviewTexture == null)
-        {
-            selectedPiecePreviewTexture = new RenderTexture(544, 348, 24)
-            {
-                name = "SelectedPiecePreviewTexture",
-                antiAliasing = 4,
-                useMipMap = false
-            };
-            selectedPiecePreviewTexture.Create();
-        }
-
-        if (selectedPiecePreviewStage == null)
-        {
-            GameObject stageObject = new GameObject("SelectedPiecePreviewStage");
-            stageObject.transform.SetParent(transform, false);
-            stageObject.transform.position = new Vector3(96f, 96f, 96f);
-            selectedPiecePreviewStage = stageObject.transform;
-        }
-
-        if (selectedPiecePreviewCamera == null)
-        {
-            GameObject cameraObject = new GameObject("SelectedPiecePreviewCamera");
-            cameraObject.transform.SetParent(selectedPiecePreviewStage, false);
-            selectedPiecePreviewCamera = cameraObject.AddComponent<Camera>();
-            selectedPiecePreviewCamera.clearFlags = CameraClearFlags.SolidColor;
-            selectedPiecePreviewCamera.backgroundColor = previewSurfaceColor;
-            selectedPiecePreviewCamera.fieldOfView = 26f;
-            selectedPiecePreviewCamera.nearClipPlane = 0.03f;
-            selectedPiecePreviewCamera.farClipPlane = 12f;
-            selectedPiecePreviewCamera.targetTexture = selectedPiecePreviewTexture;
-        }
-
-        selectedPiecePreviewCamera.transform.localPosition = new Vector3(0f, 0.9f, -3f);
-        selectedPiecePreviewCamera.transform.LookAt(selectedPiecePreviewStage.position + new Vector3(0f, 0.78f, 0f));
-
-        if (selectedPiecePreviewLight == null)
-        {
-            GameObject lightObject = new GameObject("SelectedPiecePreviewLight");
-            lightObject.transform.SetParent(selectedPiecePreviewStage, false);
-            selectedPiecePreviewLight = lightObject.AddComponent<Light>();
-            selectedPiecePreviewLight.type = LightType.Directional;
-            selectedPiecePreviewLight.intensity = 1.6f;
-            selectedPiecePreviewLight.color = new Color(1f, 0.95f, 0.86f, 1f);
-        }
-
-        selectedPiecePreviewLight.transform.localRotation = Quaternion.Euler(38f, -28f, 0f);
-    }
-
-    private void BuildSelectedPiecePreview(PieceView selectedPiece)
-    {
-        EnsureSelectedPiecePreviewResources();
-        ClearSelectedPiecePreviewClone();
-
-        selectedPiecePreviewClone = Object.Instantiate(selectedPiece.gameObject, selectedPiecePreviewStage);
-        selectedPiecePreviewClone.name = "SelectedPiecePreviewClone";
-        selectedPiecePreviewClone.transform.localPosition = Vector3.zero;
-        selectedPiecePreviewClone.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
-        selectedPiecePreviewClone.transform.localScale = Vector3.one;
-
-        DisablePreviewInteractionComponents(selectedPiecePreviewClone);
-        FitPreviewClone(selectedPiecePreviewClone.transform);
-    }
-
-    private void ClearSelectedPiecePreviewClone()
-    {
-        if (selectedPiecePreviewClone != null)
-        {
-            DestroyUnityObject(selectedPiecePreviewClone);
-            selectedPiecePreviewClone = null;
-        }
-    }
-
-    private static void DisablePreviewInteractionComponents(GameObject clone)
-    {
-        PieceView clonePieceView = clone.GetComponent<PieceView>();
-        if (clonePieceView != null)
-        {
-            clonePieceView.enabled = false;
-        }
-
-        Collider[] colliders = clone.GetComponentsInChildren<Collider>();
-        foreach (Collider collider in colliders)
-        {
-            collider.enabled = false;
-        }
-    }
-
-    private void FitPreviewClone(Transform clone)
-    {
-        Renderer[] renderers = clone.GetComponentsInChildren<Renderer>();
-        if (renderers.Length == 0)
-        {
-            clone.localPosition = new Vector3(0f, 0.08f, 0f);
-            return;
-        }
-
-        Bounds bounds = CalculateBounds(renderers);
-        if (bounds.size.y > 0.001f)
-        {
-            float targetHeight = 1.58f;
-            float scale = targetHeight / bounds.size.y;
-            clone.localScale *= scale;
-        }
-
-        bounds = CalculateBounds(renderers);
-        Vector3 targetCenter = selectedPiecePreviewStage.position + new Vector3(0f, 0.78f, 0f);
-        clone.position += targetCenter - bounds.center;
-
-        bounds = CalculateBounds(renderers);
-        float targetFloor = selectedPiecePreviewStage.position.y + 0.07f;
-        clone.position += Vector3.up * (targetFloor - bounds.min.y);
-    }
-
-    private static Bounds CalculateBounds(Renderer[] renderers)
-    {
-        Bounds bounds = renderers[0].bounds;
-        for (int i = 1; i < renderers.Length; i++)
-        {
-            bounds.Encapsulate(renderers[i].bounds);
-        }
-
-        return bounds;
     }
 
     private void EnsureCanvasInfrastructure()
