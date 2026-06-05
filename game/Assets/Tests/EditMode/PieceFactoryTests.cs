@@ -173,4 +173,31 @@ public class PieceFactoryTests
             Object.DestroyImmediate(prefab);
         }
     }
+
+    [Test]
+    public void CreatePiece_CustomVisualHasAnimationDriverExtensionPoint()
+    {
+        GameObject rig = new GameObject("Piece Factory Test Rig");
+        GameObject prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        try
+        {
+            PieceFactory factory = rig.AddComponent<PieceFactory>();
+            factory.ConfigureCustomPrefab(ChessPieceKind.King, prefab);
+
+            PieceView piece = factory.CreatePiece(
+                new VisualPieceState(BoardSquare.FromAlgebraic("e1"), ChessSide.White, ChessPieceKind.King),
+                Vector3.zero,
+                rig.transform);
+
+            CharacterAnimationDriver driver = piece.VisualRoot.GetComponent<CharacterAnimationDriver>();
+
+            Assert.IsNotNull(driver);
+            Assert.IsFalse(driver.HasAnimator);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+            Object.DestroyImmediate(prefab);
+        }
+    }
 }

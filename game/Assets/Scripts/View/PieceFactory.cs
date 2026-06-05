@@ -90,7 +90,19 @@ public sealed class PieceFactory : MonoBehaviour
         visual.transform.localRotation = Quaternion.Euler(0f, side == ChessSide.Black ? 180f : 0f, 0f);
         visual.transform.localScale = Vector3.one;
         FitCustomVisual(visual.transform, GetCustomVisualHeight(kind));
+        ConfigureAnimationDriver(visual);
         return true;
+    }
+
+    private static void ConfigureAnimationDriver(GameObject visual)
+    {
+        CharacterAnimationDriver driver = visual.GetComponent<CharacterAnimationDriver>();
+        if (driver == null)
+        {
+            driver = visual.AddComponent<CharacterAnimationDriver>();
+        }
+
+        driver.Configure(visual.GetComponentInChildren<Animator>());
     }
 
     private GameObject GetCustomPrefab(ChessPieceKind kind)

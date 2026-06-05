@@ -92,6 +92,10 @@ move result
 
 O controlador visual executaria a vinheta e, no fim, chamaria a sincronizacao atual do tabuleiro.
 
+## Camada Opcional De Rig
+
+Os modelos atuais funcionam sem rig usando movimento procedural. Se um prefab futuro tiver `Animator`, o `CharacterAnimationDriver` pode tocar estados como `Walk`, `Attack`, `Hit` e `Idle`. O fallback procedural continua obrigatorio para qualquer modelo sem rig, porque os assets gerados por IA podem variar muito de estrutura.
+
 ## Criterios De Aceite
 
 - Capturas continuam respeitando as regras do xadrez.
