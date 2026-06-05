@@ -199,6 +199,7 @@ public sealed class ChessGameController : MonoBehaviour
     {
         PieceView movingPiece = selectedPiece;
         BoardSquare origin = selectedPiece.Square;
+        PieceView capturedPiece = CaptureResolver.Resolve(boardView, movingPiece, destination);
         MoveResult moveResult = rules.TryMove(origin, destination, promotion);
 
         if (!moveResult.Success)
@@ -213,7 +214,7 @@ public sealed class ChessGameController : MonoBehaviour
 
         if (Application.isPlaying && moveDuration > 0f)
         {
-            StartCoroutine(AnimateMoveThenSync(movingPiece, destination, moveResult));
+            StartCoroutine(AnimateMoveThenSync(movingPiece, capturedPiece, destination, moveResult));
         }
         else
         {
@@ -222,11 +223,15 @@ public sealed class ChessGameController : MonoBehaviour
         }
     }
 
-    private IEnumerator AnimateMoveThenSync(PieceView movingPiece, BoardSquare destination, MoveResult moveResult)
+    private IEnumerator AnimateMoveThenSync(PieceView movingPiece, PieceView capturedPiece, BoardSquare destination, MoveResult moveResult)
     {
         inputBlocked = true;
         Vector3 targetPosition = boardView.GetPieceWorldPosition(destination);
-        if (motionController != null)
+        if (motionController != null && moveResult.IsCapture)
+        {
+            yield return motionController.PlayCapture(movingPiece, capturedPiece, targetPosition);
+        }
+        else if (motionController != null)
         {
             yield return motionController.MovePiece(movingPiece, targetPosition);
         }

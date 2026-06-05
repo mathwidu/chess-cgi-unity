@@ -48,6 +48,17 @@ public sealed class PieceView : MonoBehaviour
         transform.localScale = selected ? baseScale * SelectedScaleMultiplier : baseScale;
     }
 
+    public void ApplyHitReaction(float intensity)
+    {
+        float clamped = Mathf.Clamp01(intensity);
+        transform.localScale = baseScale * Mathf.Lerp(1f, 0.82f, clamped);
+    }
+
+    public void RestoreBaseScale()
+    {
+        transform.localScale = baseScale;
+    }
+
     public void SetVisualRoot(Transform visualRoot)
     {
         VisualRoot = visualRoot;
