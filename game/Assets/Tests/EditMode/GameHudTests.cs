@@ -108,6 +108,32 @@ public class GameHudTests
         }
     }
 
+    [Test]
+    public void RefreshInterface_ShowsCharacterProfileMetadata()
+    {
+        GameObject rig = CreatePlayableRig(out BoardView boardView, out ChessGameController controller, out GameHud hud);
+        try
+        {
+            controller.NewGame();
+            PieceView queen = boardView.Pieces.First(piece =>
+                piece.Kind == ChessPieceKind.Queen &&
+                piece.Side == ChessSide.White &&
+                piece.Square.Equals(BoardSquare.FromAlgebraic("d1")));
+
+            controller.SelectPiece(queen);
+            hud.RefreshInterface();
+
+            StringAssert.Contains("Professora Marta", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceFullNameText").text);
+            StringAssert.Contains("Professor", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceRoleText").text);
+            StringAssert.Contains("Professor", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceRegistrationText").text);
+            StringAssert.Contains("cachecol", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceDescriptionText").text.ToLowerInvariant());
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+        }
+    }
+
     private static void AssertSelectedPieceHud(
         BoardView boardView,
         ChessGameController controller,

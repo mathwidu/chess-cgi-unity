@@ -41,6 +41,10 @@ public sealed class GameHud : MonoBehaviour
     private Text selectedPieceKindText;
     private Text selectedPieceSquareText;
     private Text selectedPieceSideText;
+    private Text selectedPieceFullNameText;
+    private Text selectedPieceRoleText;
+    private Text selectedPieceRegistrationText;
+    private Text selectedPieceDescriptionText;
     private RenderTexture selectedPiecePreviewTexture;
     private Camera selectedPiecePreviewCamera;
     private Light selectedPiecePreviewLight;
@@ -89,13 +93,17 @@ public sealed class GameHud : MonoBehaviour
         CreateText("MoveHistoryTitle", historyPanel, "Historico", 17, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -12f), new Vector2(276f, 24f));
         moveHistoryText = CreateText("MoveHistoryText", historyPanel, "Nenhuma jogada ainda.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -42f), new Vector2(276f, 178f));
 
-        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -358f), new Vector2(304f, 348f), panelStrongColor);
+        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -358f), new Vector2(360f, 520f), panelStrongColor);
         CreateText("SelectedPieceEyebrowText", selectedPiecePanel, "PECA SELECIONADA", 11, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(272f, 18f));
-        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -44f), new Vector2(272f, 174f), Color.white);
-        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -232f), new Vector2(272f, 30f));
-        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -266f), new Vector2(272f, 24f));
-        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -294f), new Vector2(272f, 22f));
-        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -318f), new Vector2(272f, 22f));
+        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -44f), new Vector2(328f, 230f), Color.white);
+        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -286f), new Vector2(328f, 30f));
+        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -318f), new Vector2(328f, 22f));
+        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -346f), new Vector2(156f, 22f));
+        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperRight, new Vector2(188f, -346f), new Vector2(156f, 22f));
+        selectedPieceFullNameText = CreateText("SelectedPieceFullNameText", selectedPiecePanel, "-", 13, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -374f), new Vector2(328f, 22f));
+        selectedPieceRoleText = CreateText("SelectedPieceRoleText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -400f), new Vector2(328f, 22f));
+        selectedPieceRegistrationText = CreateText("SelectedPieceRegistrationText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -426f), new Vector2(328f, 22f));
+        selectedPieceDescriptionText = CreateText("SelectedPieceDescriptionText", selectedPiecePanel, "-", 12, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(16f, -458f), new Vector2(328f, 52f));
         EnsureSelectedPiecePreviewResources();
         selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
 
@@ -258,6 +266,26 @@ public sealed class GameHud : MonoBehaviour
         if (selectedPieceSideText != null)
         {
             selectedPieceSideText.text = $"Time: {SideName(selectedPiece.Side)}";
+        }
+
+        if (selectedPieceFullNameText != null)
+        {
+            selectedPieceFullNameText.text = $"Nome: {profile.FullName}";
+        }
+
+        if (selectedPieceRoleText != null)
+        {
+            selectedPieceRoleText.text = $"Categoria: {profile.Category}";
+        }
+
+        if (selectedPieceRegistrationText != null)
+        {
+            selectedPieceRegistrationText.text = $"Registro: {profile.Registration}";
+        }
+
+        if (selectedPieceDescriptionText != null)
+        {
+            selectedPieceDescriptionText.text = profile.Description;
         }
 
         if (previewedPiece != selectedPiece || selectedPiecePreviewClone == null)
