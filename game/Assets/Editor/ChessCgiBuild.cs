@@ -2,7 +2,9 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class ChessCgiBuild
 {
@@ -40,5 +42,25 @@ public static class ChessCgiBuild
         {
             throw new InvalidOperationException($"macOS build failed with result {summary.result} and {summary.totalErrors} errors.");
         }
+    }
+
+    [MenuItem("Chess CGI/Scene/Apply Polish")]
+    public static void ApplyScenePolishToMainScene()
+    {
+        Scene scene = EditorSceneManager.OpenScene(MainScene, OpenSceneMode.Single);
+        ScenePolish polish = UnityEngine.Object.FindFirstObjectByType<ScenePolish>();
+        if (polish == null)
+        {
+            throw new InvalidOperationException($"Scene {MainScene} does not contain a ScenePolish component.");
+        }
+
+        polish.ApplyPolish();
+        EditorSceneManager.MarkSceneDirty(scene);
+        if (!EditorSceneManager.SaveScene(scene))
+        {
+            throw new InvalidOperationException($"Could not save scene {MainScene} after applying polish.");
+        }
+
+        Debug.Log($"CHESS_CGI_SCENE_POLISH_APPLIED scene={MainScene}");
     }
 }

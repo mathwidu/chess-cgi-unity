@@ -68,6 +68,7 @@ public sealed class ScenePolish : MonoBehaviour
 
         CreateCube(collegeTheme, "Floor", new Vector3(0f, -0.42f, 0f), new Vector3(15.5f, 0.08f, 27.5f), wallMaterial, false);
         CreateCube(collegeTheme, "Table", new Vector3(0f, -0.22f, 0f), new Vector3(13.2f, 0.28f, 13.2f), tableMaterial, false);
+        CreateCube(collegeTheme, "DeskTrim", new Vector3(0f, -0.02f, 0f), new Vector3(13.55f, 0.05f, 13.55f), darkMaterial, false);
         CreateCube(collegeTheme, "NorthWall", new Vector3(0f, 2.4f, 12.85f), new Vector3(15.5f, 5.3f, 0.18f), wallMaterial, false);
         CreateCube(collegeTheme, "SouthWall", new Vector3(0f, 2.4f, -12.85f), new Vector3(15.5f, 5.3f, 0.18f), wallMaterial, false);
         CreateCube(collegeTheme, "LeftWall", new Vector3(-7.65f, 2.4f, 0f), new Vector3(0.18f, 5.3f, 25.8f), wallMaterial, false);
@@ -76,6 +77,9 @@ public sealed class ScenePolish : MonoBehaviour
         CreateCube(collegeTheme, "SouthWhiteboard", new Vector3(0f, 3.15f, -12.72f), new Vector3(4.4f, 1.5f, 0.08f), boardMaterial, false);
         CreateCube(collegeTheme, "CGIWhiteboardMarkNorth", new Vector3(-1.45f, 3.35f, 12.66f), new Vector3(1f, 0.08f, 0.04f), accentMaterial, false);
         CreateCube(collegeTheme, "CGIWhiteboardMarkSouth", new Vector3(1.45f, 3.35f, -12.66f), new Vector3(1f, 0.08f, 0.04f), accentMaterial, false);
+        CreateCube(collegeTheme, "MarkerTrayNorth", new Vector3(0f, 2.42f, 12.6f), new Vector3(3.8f, 0.06f, 0.08f), darkMaterial, false);
+        CreateCube(collegeTheme, "MarkerTraySouth", new Vector3(0f, 2.42f, -12.6f), new Vector3(3.8f, 0.06f, 0.08f), darkMaterial, false);
+        CreateCube(collegeTheme, "SmallClock", new Vector3(-5.4f, 3.92f, 12.62f), new Vector3(0.46f, 0.46f, 0.06f), boardMaterial, false);
         CreateCube(collegeTheme, "Notebook", new Vector3(-5.35f, 0.05f, -2.25f), new Vector3(1.05f, 0.08f, 0.75f), darkMaterial, false);
 
         Transform books = EnsureChild(collegeTheme, "Books");

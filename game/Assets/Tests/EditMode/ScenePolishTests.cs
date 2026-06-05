@@ -68,6 +68,10 @@ public class ScenePolishTests
             Assert.IsNotNull(collegeTheme.Find("Books"));
             Assert.IsNotNull(collegeTheme.Find("CGIWhiteboardMarkNorth"));
             Assert.IsNotNull(collegeTheme.Find("CGIWhiteboardMarkSouth"));
+            Assert.IsNotNull(collegeTheme.Find("DeskTrim"));
+            Assert.IsNotNull(collegeTheme.Find("MarkerTrayNorth"));
+            Assert.IsNotNull(collegeTheme.Find("MarkerTraySouth"));
+            Assert.IsNotNull(collegeTheme.Find("SmallClock"));
             Assert.AreEqual(0, collegeTheme.GetComponentsInChildren<Collider>().Length);
         }
         finally
@@ -92,6 +96,29 @@ public class ScenePolishTests
             Assert.Less(collegeTheme.Find("SouthWall").localPosition.z, -12f);
             Assert.Greater(Mathf.Abs(collegeTheme.Find("LeftWall").localPosition.x), 7f);
             Assert.Greater(Mathf.Abs(collegeTheme.Find("RightWall").localPosition.x), 7f);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+        }
+    }
+
+    [Test]
+    public void ApplyPolish_CreatesClassroomDetailsWithoutBlockingBoard()
+    {
+        GameObject rig = new GameObject("Scene Polish Test Rig");
+        try
+        {
+            ScenePolish polish = rig.AddComponent<ScenePolish>();
+
+            polish.ApplyPolish();
+
+            Transform collegeTheme = rig.transform.Find("CollegeTheme");
+            Assert.IsNotNull(collegeTheme.Find("DeskTrim"));
+            Assert.IsNotNull(collegeTheme.Find("MarkerTrayNorth"));
+            Assert.IsNotNull(collegeTheme.Find("MarkerTraySouth"));
+            Assert.IsNotNull(collegeTheme.Find("SmallClock"));
+            Assert.AreEqual(0, collegeTheme.GetComponentsInChildren<Collider>().Length);
         }
         finally
         {
