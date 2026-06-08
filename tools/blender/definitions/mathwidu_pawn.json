@@ -1,0 +1,38 @@
+{
+  "id": "mathwidu_pawn",
+  "displayName": "Mathwidu",
+  "fullName": "Mathwidu",
+  "piece": "Pawn",
+  "category": "Aluno",
+  "scale": 1.0,
+  "proportions": {
+    "height": 1.82,
+    "shoulderWidth": 0.42,
+    "torsoHeight": 0.62,
+    "legLength": 0.78,
+    "armLength": 0.64,
+    "headRadius": 0.145
+  },
+  "palette": {
+    "skin": "#f2c7ab",
+    "hair": "#c76a2d",
+    "beard": "#b85c29",
+    "shirt": "#cfd5d8",
+    "pants": "#b89768",
+    "shoes": "#f2f0e8",
+    "sole": "#1d2328",
+    "eyes": "#654a32"
+  },
+  "outfit": {
+    "shirt": "light gray t-shirt",
+    "pants": "beige cargo pants",
+    "shoes": "white sneakers"
+  },
+  "features": {
+    "hairStyle": "short curly ginger",
+    "facialHair": "light ginger beard and mustache",
+    "expression": "friendly confident"
+  },
+  "animationProfile": "student_walk",
+  "outputName": "MathwiduPawn"
+}

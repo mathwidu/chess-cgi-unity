@@ -55,7 +55,7 @@ public class CustomPieceCoverageTests
     {
         return new Dictionary<ChessPieceKind, GameObject>
         {
-            { ChessPieceKind.Pawn, Load("Pawn_Mathwidu_Redhead_v2") },
+            { ChessPieceKind.Pawn, Load("Pawn_Mathwidu_v3b") },
             { ChessPieceKind.Rook, Load("Rook_Alex") },
             { ChessPieceKind.Knight, Load("Knight_Gustavo") },
             { ChessPieceKind.Bishop, Load("Bishop_Rafael") },

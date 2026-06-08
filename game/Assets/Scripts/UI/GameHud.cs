@@ -42,6 +42,8 @@ public sealed class GameHud : MonoBehaviour
     private Text selectedPieceFullNameText;
     private Text selectedPieceRoleText;
     private Text selectedPieceRegistrationText;
+    private Text selectedPieceMovementText;
+    private Text selectedPieceCaptureText;
     private Text selectedPieceDescriptionText;
     private SelectedPiecePreviewController selectedPiecePreviewController;
 
@@ -86,17 +88,19 @@ public sealed class GameHud : MonoBehaviour
         CreateText("MoveHistoryTitle", historyPanel, "Historico", 17, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -12f), new Vector2(276f, 24f));
         moveHistoryText = CreateText("MoveHistoryText", historyPanel, "Nenhuma jogada ainda.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -42f), new Vector2(276f, 178f));
 
-        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -358f), new Vector2(360f, 520f), panelStrongColor);
+        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -358f), new Vector2(390f, 700f), panelStrongColor);
         CreateText("SelectedPieceEyebrowText", selectedPiecePanel, "PECA SELECIONADA", 11, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(272f, 18f));
-        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -44f), new Vector2(328f, 230f), Color.white);
-        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -286f), new Vector2(328f, 30f));
-        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -318f), new Vector2(328f, 22f));
-        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -346f), new Vector2(156f, 22f));
-        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperRight, new Vector2(188f, -346f), new Vector2(156f, 22f));
-        selectedPieceFullNameText = CreateText("SelectedPieceFullNameText", selectedPiecePanel, "-", 13, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -374f), new Vector2(328f, 22f));
-        selectedPieceRoleText = CreateText("SelectedPieceRoleText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -400f), new Vector2(328f, 22f));
-        selectedPieceRegistrationText = CreateText("SelectedPieceRegistrationText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -426f), new Vector2(328f, 22f));
-        selectedPieceDescriptionText = CreateText("SelectedPieceDescriptionText", selectedPiecePanel, "-", 12, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(16f, -458f), new Vector2(328f, 52f));
+        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -44f), new Vector2(358f, 360f), Color.white);
+        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -420f), new Vector2(358f, 30f));
+        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -452f), new Vector2(358f, 22f));
+        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -480f), new Vector2(172f, 22f));
+        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperRight, new Vector2(202f, -480f), new Vector2(172f, 22f));
+        selectedPieceFullNameText = CreateText("SelectedPieceFullNameText", selectedPiecePanel, "-", 13, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -508f), new Vector2(358f, 22f));
+        selectedPieceRoleText = CreateText("SelectedPieceRoleText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -534f), new Vector2(358f, 22f));
+        selectedPieceRegistrationText = CreateText("SelectedPieceRegistrationText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -560f), new Vector2(358f, 22f));
+        selectedPieceMovementText = CreateText("SelectedPieceMovementText", selectedPiecePanel, "-", 12, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(16f, -588f), new Vector2(358f, 20f));
+        selectedPieceCaptureText = CreateText("SelectedPieceCaptureText", selectedPiecePanel, "-", 12, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(16f, -612f), new Vector2(358f, 34f));
+        selectedPieceDescriptionText = CreateText("SelectedPieceDescriptionText", selectedPiecePanel, "-", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -652f), new Vector2(358f, 38f));
         selectedPiecePreviewImage.raycastTarget = true;
         selectedPiecePreviewController = selectedPiecePreviewImage.gameObject.AddComponent<SelectedPiecePreviewController>();
         selectedPiecePreviewController.Configure(selectedPiecePreviewImage);
@@ -276,6 +280,16 @@ public sealed class GameHud : MonoBehaviour
         if (selectedPieceRegistrationText != null)
         {
             selectedPieceRegistrationText.text = $"Registro: {profile.Registration}";
+        }
+
+        if (selectedPieceMovementText != null)
+        {
+            selectedPieceMovementText.text = $"Movimento: {profile.MovementStyle}";
+        }
+
+        if (selectedPieceCaptureText != null)
+        {
+            selectedPieceCaptureText.text = $"Captura futura: {profile.CaptureConcept}";
         }
 
         if (selectedPieceDescriptionText != null)

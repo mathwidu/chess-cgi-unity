@@ -7,7 +7,9 @@ public sealed class CharacterProfile
         string fullName,
         string category,
         string registration,
-        string description)
+        string description,
+        string movementStyle,
+        string captureConcept)
     {
         Kind = kind;
         PieceName = pieceName;
@@ -16,6 +18,8 @@ public sealed class CharacterProfile
         Category = category;
         Registration = registration;
         Description = description;
+        MovementStyle = movementStyle;
+        CaptureConcept = captureConcept;
     }
 
     public ChessPieceKind Kind { get; }
@@ -31,4 +35,8 @@ public sealed class CharacterProfile
     public string Registration { get; }
 
     public string Description { get; }
+
+    public string MovementStyle { get; }
+
+    public string CaptureConcept { get; }
 }

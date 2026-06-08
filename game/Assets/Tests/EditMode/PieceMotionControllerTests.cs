@@ -8,10 +8,12 @@ public class PieceMotionControllerTests
     {
         PieceMotionSettings settings = PieceMotionSettings.Default;
 
-        Assert.Greater(settings.WalkDuration, 0.35f);
-        Assert.Less(settings.WalkDuration, 0.9f);
+        Assert.GreaterOrEqual(settings.WalkDuration, 1.05f);
+        Assert.LessOrEqual(settings.WalkDuration, 1.45f);
         Assert.Greater(settings.StepHeight, 0.02f);
-        Assert.Less(settings.StepHeight, 0.18f);
+        Assert.LessOrEqual(settings.StepHeight, 0.055f);
+        Assert.Greater(settings.StrideCycles, 1.2f);
+        Assert.Greater(settings.BodySway, 0.005f);
     }
 
     [Test]

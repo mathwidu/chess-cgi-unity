@@ -1,0 +1,35 @@
+{
+  "candidateId": "Pawn_Mathwidu_v3a",
+  "personName": "Mathwidu",
+  "pieceKind": "Pawn",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead_v2_Assets/selected.glb",
+  "activeFallbackPrefabPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead_v2.prefab",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3a/Pawn_Mathwidu_v3a.glb",
+  "visualStatus": "approved_current_visual_baseline",
+  "rigStatus": "rig_candidate",
+  "approvedForUnity": false,
+  "replacesActivePrefab": false,
+  "identityChecklist": [
+    "ginger curly short hair",
+    "light ginger beard and mustache",
+    "fair skin",
+    "light gray shirt",
+    "beige cargo pants",
+    "white sneakers",
+    "adult stylized proportions"
+  ],
+  "technicalChecklist": [
+    "not primitive-built",
+    "full body visible",
+    "feet visible",
+    "hands visible",
+    "front-facing",
+    "clean board-scale silhouette",
+    "rig candidate only after visual approval"
+  ],
+  "previewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3a/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3a/preview_three_quarter.png",
+    "boardScale": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3a/preview_board_scale.png"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "candidateId": "Knight_Gustavo_White",
+  "personName": "Gustavo",
+  "pieceKind": "Knight",
+  "side": "White",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/Knight_Gustavo_Assets/selected.glb",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/Knight_Gustavo/side_variants/White/Knight_Gustavo_White.glb",
+  "importedPrefabPath": "game/Assets/Resources/CustomPieces/Knight_Gustavo_White.prefab",
+  "visualStatus": "side_variant_candidate",
+  "rigStatus": "static_mesh_candidate",
+  "approvedForUnity": true,
+  "replacesActivePrefab": false,
+  "outfitIntent": "white-side texture recolor over existing clothing surfaces",
+  "textureRecolorOnly": true,
+  "textureRecolorStats": {
+    "shirtPixels": 421205,
+    "pantsPixels": 288539
+  },
+  "requiredSockets": [
+    "EffectsSocket",
+    "HitSocket",
+    "GroundSocket",
+    "WeaponSocket",
+    "RightHandSocket",
+    "LeftHandSocket",
+    "CastSocket"
+  ],
+  "combatPreparation": {
+    "futureCaptureClip": "Capture_Knight_HorseCharge",
+    "weaponConcept": "HitSocket and CastSocket for future horse neigh/charge"
+  },
+  "reviewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/Knight_Gustavo/side_variants/White/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/Knight_Gustavo/side_variants/White/preview_three_quarter.png"
+  }
+}

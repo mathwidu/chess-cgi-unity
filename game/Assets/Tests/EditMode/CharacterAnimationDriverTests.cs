@@ -37,4 +37,24 @@ public class CharacterAnimationDriverTests
             Object.DestroyImmediate(character);
         }
     }
+
+    [Test]
+    public void TryPlayCapture_WhenNoAnimatorControllerExists_ReturnsFalse()
+    {
+        GameObject character = new GameObject("Character");
+        try
+        {
+            Animator animator = character.AddComponent<Animator>();
+            CharacterAnimationDriver driver = character.AddComponent<CharacterAnimationDriver>();
+            driver.Configure(animator);
+
+            CaptureAnimationStyle style = CaptureAnimationStyleLibrary.GetStyle(ChessPieceKind.Pawn);
+
+            Assert.IsFalse(driver.TryPlayCapture(style));
+        }
+        finally
+        {
+            Object.DestroyImmediate(character);
+        }
+    }
 }

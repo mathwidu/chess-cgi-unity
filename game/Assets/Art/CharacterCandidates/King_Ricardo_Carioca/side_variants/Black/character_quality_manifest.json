@@ -1,0 +1,36 @@
+{
+  "candidateId": "King_Ricardo_Carioca_Black",
+  "personName": "Ricardo Carioca",
+  "pieceKind": "King",
+  "side": "Black",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/King_Ricardo_Carioca_Assets/selected.glb",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/King_Ricardo_Carioca/side_variants/Black/King_Ricardo_Carioca_Black.glb",
+  "importedPrefabPath": "game/Assets/Resources/CustomPieces/King_Ricardo_Carioca_Black.prefab",
+  "visualStatus": "side_variant_candidate",
+  "rigStatus": "static_mesh_candidate",
+  "approvedForUnity": true,
+  "replacesActivePrefab": false,
+  "outfitIntent": "black-side texture recolor over existing clothing surfaces",
+  "textureRecolorOnly": true,
+  "textureRecolorStats": {
+    "shirtPixels": 1514284,
+    "pantsPixels": 671350
+  },
+  "requiredSockets": [
+    "EffectsSocket",
+    "HitSocket",
+    "GroundSocket",
+    "WeaponSocket",
+    "RightHandSocket",
+    "LeftHandSocket",
+    "CastSocket"
+  ],
+  "combatPreparation": {
+    "futureCaptureClip": "Capture_King_OpenHandStrike",
+    "weaponConcept": "RightHandSocket for future open-hand strike"
+  },
+  "reviewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/King_Ricardo_Carioca/side_variants/Black/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/King_Ricardo_Carioca/side_variants/Black/preview_three_quarter.png"
+  }
+}

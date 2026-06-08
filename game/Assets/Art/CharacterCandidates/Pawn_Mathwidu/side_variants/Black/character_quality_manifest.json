@@ -1,0 +1,36 @@
+{
+  "candidateId": "Pawn_Mathwidu_Black",
+  "personName": "Mathwidu",
+  "pieceKind": "Pawn",
+  "side": "Black",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_v3b_Assets/selected.glb",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/side_variants/Black/Pawn_Mathwidu_Black.glb",
+  "importedPrefabPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Black.prefab",
+  "visualStatus": "side_variant_candidate",
+  "rigStatus": "rigged_candidate_initial",
+  "approvedForUnity": true,
+  "replacesActivePrefab": false,
+  "outfitIntent": "black-side texture recolor over existing clothing surfaces",
+  "textureRecolorOnly": true,
+  "textureRecolorStats": {
+    "shirtPixels": 256821,
+    "pantsPixels": 483006
+  },
+  "requiredSockets": [
+    "EffectsSocket",
+    "HitSocket",
+    "GroundSocket",
+    "WeaponSocket",
+    "RightHandSocket",
+    "LeftHandSocket",
+    "CastSocket"
+  ],
+  "combatPreparation": {
+    "futureCaptureClip": "Capture_Pawn_DaggerLunge",
+    "weaponConcept": "socket-only dagger concept; no visible idle weapon prop"
+  },
+  "reviewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/side_variants/Black/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/side_variants/Black/preview_three_quarter.png"
+  }
+}

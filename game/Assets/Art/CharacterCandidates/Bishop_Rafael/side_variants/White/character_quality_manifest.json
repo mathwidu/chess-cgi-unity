@@ -1,0 +1,36 @@
+{
+  "candidateId": "Bishop_Rafael_White",
+  "personName": "Rafael",
+  "pieceKind": "Bishop",
+  "side": "White",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/Bishop_Rafael_Assets/selected.glb",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/Bishop_Rafael/side_variants/White/Bishop_Rafael_White.glb",
+  "importedPrefabPath": "game/Assets/Resources/CustomPieces/Bishop_Rafael_White.prefab",
+  "visualStatus": "side_variant_candidate",
+  "rigStatus": "static_mesh_candidate",
+  "approvedForUnity": true,
+  "replacesActivePrefab": false,
+  "outfitIntent": "white-side texture recolor over existing clothing surfaces",
+  "textureRecolorOnly": true,
+  "textureRecolorStats": {
+    "shirtPixels": 871820,
+    "pantsPixels": 522122
+  },
+  "requiredSockets": [
+    "EffectsSocket",
+    "HitSocket",
+    "GroundSocket",
+    "WeaponSocket",
+    "RightHandSocket",
+    "LeftHandSocket",
+    "CastSocket"
+  ],
+  "combatPreparation": {
+    "futureCaptureClip": "Capture_Bishop_PrayerBeam",
+    "weaponConcept": "CastSocket for future prayer/laser effect"
+  },
+  "reviewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/Bishop_Rafael/side_variants/White/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/Bishop_Rafael/side_variants/White/preview_three_quarter.png"
+  }
+}

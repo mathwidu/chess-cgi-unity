@@ -72,22 +72,42 @@ public sealed class PieceView : MonoBehaviour
                 duration,
                 PieceMotionSettings.Default.StepHeight,
                 PieceMotionSettings.Default.LeanAngle,
-                PieceMotionSettings.Default.CaptureDuration));
+                PieceMotionSettings.Default.CaptureDuration,
+                PieceMotionSettings.Default.StrideCycles,
+                PieceMotionSettings.Default.BodySway,
+                PieceMotionSettings.Default.TorsoBobHeight));
     }
 
     public IEnumerator MoveWithWalk(Vector3 target, PieceMotionSettings settings)
     {
         Vector3 start = transform.position;
-        float duration = settings.WalkDuration;
-        if (duration <= 0f)
+        if (settings.WalkDuration <= 0f)
         {
             transform.position = target;
             ResetVisualPose();
             yield break;
         }
 
+        PieceMovementStyle style = PieceMovementStyleLibrary.GetStyle(Kind);
+        PieceMotionSettings effectiveSettings = new PieceMotionSettings(
+            Mathf.Max(settings.WalkDuration, style.Duration),
+            style.StepHeight,
+            style.LeanAngle,
+            settings.CaptureDuration,
+            style.StrideCycles,
+            style.BodySway,
+            settings.TorsoBobHeight);
+        float duration = effectiveSettings.WalkDuration;
         Vector3 visualStartLocalPosition = VisualRoot != null ? VisualRoot.localPosition : Vector3.zero;
         Quaternion visualStartLocalRotation = VisualRoot != null ? VisualRoot.localRotation : Quaternion.identity;
+        ModularCharacterRig modularRig = VisualRoot != null
+            ? VisualRoot.GetComponentInChildren<ModularCharacterRig>()
+            : GetComponentInChildren<ModularCharacterRig>();
+        if (modularRig != null)
+        {
+            modularRig.AutoBind();
+        }
+
         float elapsed = 0f;
 
         FaceTowards(target);
@@ -97,12 +117,17 @@ public sealed class PieceView : MonoBehaviour
             float frameDelta = Time.deltaTime > 0f ? Time.deltaTime : duration;
             elapsed += frameDelta;
             float t = Mathf.Clamp01(elapsed / duration);
-            WalkPose pose = EvaluateWalkPose(start, target, t, settings);
+            WalkPose pose = EvaluateWalkPose(start, target, t, effectiveSettings, style);
             transform.position = pose.RootPosition;
             if (VisualRoot != null && VisualRoot != transform)
             {
                 VisualRoot.localPosition = visualStartLocalPosition + pose.VisualOffset;
                 VisualRoot.localRotation = visualStartLocalRotation * pose.VisualRotation;
+            }
+
+            if (modularRig != null)
+            {
+                modularRig.ApplyWalk(t, effectiveSettings);
             }
 
             yield return null;
@@ -113,6 +138,11 @@ public sealed class PieceView : MonoBehaviour
         {
             VisualRoot.localPosition = visualStartLocalPosition;
             VisualRoot.localRotation = visualStartLocalRotation;
+        }
+
+        if (modularRig != null)
+        {
+            modularRig.ResetPose();
         }
     }
 
@@ -128,12 +158,26 @@ public sealed class PieceView : MonoBehaviour
 
     public static WalkPose EvaluateWalkPose(Vector3 start, Vector3 target, float normalizedTime, PieceMotionSettings settings)
     {
+        return EvaluateWalkPose(start, target, normalizedTime, settings, PieceMovementStyleLibrary.GetStyle(ChessPieceKind.Pawn));
+    }
+
+    public static WalkPose EvaluateWalkPose(
+        Vector3 start,
+        Vector3 target,
+        float normalizedTime,
+        PieceMotionSettings settings,
+        PieceMovementStyle style)
+    {
         float t = Mathf.Clamp01(normalizedTime);
-        float eased = Mathf.SmoothStep(0f, 1f, t);
+        float eased = style.RootProgressAt(t);
         Vector3 rootPosition = Vector3.Lerp(start, target, eased);
-        float step = Mathf.Sin(t * Mathf.PI);
-        Vector3 visualOffset = Vector3.up * Mathf.Abs(step) * settings.StepHeight;
-        float lean = Mathf.Sin(t * Mathf.PI * 2f) * settings.LeanAngle;
+        float phase = t * Mathf.PI * 2f * settings.StrideCycles;
+        float lift = Mathf.Pow(Mathf.Abs(Mathf.Sin(phase)), 1.35f);
+        float hop = Mathf.Sin(t * Mathf.PI) * style.HopHeight;
+        Vector3 visualOffset = Vector3.up * lift * settings.StepHeight +
+            Vector3.up * hop +
+            Vector3.right * Mathf.Sin(phase) * settings.BodySway;
+        float lean = Mathf.Sin(phase) * settings.LeanAngle;
         Quaternion visualRotation = Quaternion.Euler(lean, 0f, 0f);
 
         if (t >= 1f)

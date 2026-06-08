@@ -1,0 +1,45 @@
+{
+  "candidateId": "Pawn_Mathwidu_v3b",
+  "personName": "Mathwidu",
+  "pieceKind": "Pawn",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead_v2_Assets/selected.glb",
+  "activeFallbackPrefabPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead_v2.prefab",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3b/Pawn_Mathwidu_v3b.glb",
+  "reviewModelPath": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3b/Pawn_Mathwidu_v3b.glb",
+  "importedPrefabPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_v3b.prefab",
+  "importedModelPath": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_v3b_Assets/selected.glb",
+  "visualStatus": "unity_import_approved",
+  "rigStatus": "rigged_candidate_initial",
+  "approvedForUnity": true,
+  "replacesActivePrefab": true,
+  "identityChecklist": [
+    "ginger curly short hair",
+    "light ginger beard and mustache",
+    "fair skin",
+    "light gray shirt",
+    "beige cargo pants",
+    "white sneakers",
+    "adult stylized proportions"
+  ],
+  "technicalChecklist": [
+    "baseline-derived from approved visual",
+    "armature-added",
+    "manual vertex groups",
+    "walk-preview action",
+    "base-cleanup attempted",
+    "white sneaker geometry added",
+    "sneakers skinned to foot bones",
+    "semantic team outfit overlays added",
+    "approved for Unity pawn prefab test"
+  ],
+  "generationNotes": {
+    "deletedLowVertices": 2081,
+    "baseCutoffZ": 0.13474,
+    "limitations": "Initial rig candidate from static GLB; deformation quality still needs Blender viewport review."
+  },
+  "previewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3b/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3b/preview_three_quarter.png",
+    "boardScale": "game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/v3b/preview_board_scale.png"
+  }
+}

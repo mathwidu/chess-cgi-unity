@@ -24,6 +24,14 @@ Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS.
 4. Abra a cena `Assets/Scenes/Main.unity`.
 5. Clique em `Play`.
 
+## Continuar no Windows
+
+O handoff para outro computador esta documentado em:
+
+- `CODEX_WINDOWS_HANDOFF.md`: ponto de partida para o Codex no Windows.
+- `docs/setup/windows-environment-setup.md`: instalacao de Unity, Blender, Codex, Unity MCP e Blender MCP.
+- `docs/setup/repository-delivery-flow.md`: branches, tags, GitHub, fallback de entrega e fluxo de push.
+
 ## Controles
 
 - Mouse: selecionar peca e casa de destino.

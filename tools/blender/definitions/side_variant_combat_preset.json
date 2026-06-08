@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "id": "side_variant_combat_preset",
+  "styleTarget": "premium_stylized_game_character",
+  "assetNaming": {
+    "whitePrefabSuffix": "_White",
+    "blackPrefabSuffix": "_Black",
+    "genericFallbackIsTemporary": true
+  },
+  "sideVariants": {
+    "White": {
+      "outfitIntent": "light/white classroom-clean clothing with character-specific identity details preserved",
+      "primaryPalette": ["#f4f0e6", "#ffffff", "#d9dde2", "#c8d8f0"],
+      "avoid": ["pure featureless white", "runtime-only tint", "visible chess pedestal"]
+    },
+    "Black": {
+      "outfitIntent": "black/charcoal/dark-blue clothing with character-specific identity details preserved",
+      "primaryPalette": ["#090b0d", "#181c22", "#222a34", "#303846"],
+      "avoid": ["single flat black silhouette", "runtime-only tint", "visible chess pedestal"]
+    }
+  },
+  "requiredSockets": [
+    "EffectsSocket",
+    "HitSocket",
+    "GroundSocket",
+    "WeaponSocket",
+    "RightHandSocket",
+    "LeftHandSocket",
+    "CastSocket"
+  ],
+  "pieceCombatPresets": {
+    "Pawn": {
+      "character": "Mathwidu",
+      "movementProfile": "grounded_student_walk",
+      "captureClip": "Capture_Pawn_DaggerLunge",
+      "weaponConcept": "small dagger held near the dominant hand",
+      "propGuidance": "small enough to read from the chess camera without covering the face"
+    },
+    "Rook": {
+      "character": "Alex",
+      "movementProfile": "heavy_tower_hop",
+      "captureClip": "Capture_Rook_TowerCrush",
+      "weaponConcept": "small integrated tower that can slam downward",
+      "propGuidance": "tower can be part of the character silhouette, but must not become a base hiding the legs"
+    },
+    "Knight": {
+      "character": "Gustavo",
+      "movementProfile": "horse_arc_jump",
+      "captureClip": "Capture_Knight_HorseLeap",
+      "weaponConcept": "small horse mount with jump anticipation",
+      "propGuidance": "horse should look like a compact chess mount, not a chair"
+    },
+    "Bishop": {
+      "character": "Rafael",
+      "movementProfile": "ritual_diagonal_stride",
+      "captureClip": "Capture_Bishop_PrayerBeam",
+      "weaponConcept": "cast/prayer beam from CastSocket",
+      "propGuidance": "hands and CastSocket must stay visible for a future beam"
+    },
+    "Queen": {
+      "character": "Marta",
+      "movementProfile": "confident_queen_walk",
+      "captureClip": "Capture_Queen_RoyalSlash",
+      "weaponConcept": "elegant sword or energy slash",
+      "propGuidance": "queen cue should stay tasteful and academic"
+    },
+    "King": {
+      "character": "Ricardo Carioca",
+      "movementProfile": "authoritative_short_steps",
+      "captureClip": "Capture_King_OpenHandStrike",
+      "weaponConcept": "open-hand command strike",
+      "propGuidance": "pose should preserve professor identity more than fantasy armor"
+    }
+  }
+}

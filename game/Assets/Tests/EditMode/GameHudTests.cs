@@ -79,6 +79,7 @@ public class GameHudTests
             Transform preview = selectedPanel.Find("SelectedPiecePreview");
             Assert.IsNotNull(preview);
             Assert.IsNotNull(preview.GetComponent<RawImage>().texture);
+            Assert.GreaterOrEqual(preview.GetComponent<RectTransform>().sizeDelta.y, 360f);
             StringAssert.Contains("Mathwidu", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceNameText").text);
             StringAssert.Contains("Peao", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceKindText").text);
             StringAssert.Contains("e2", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceSquareText").text);
@@ -127,6 +128,8 @@ public class GameHudTests
             StringAssert.Contains("Professor", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceRoleText").text);
             StringAssert.Contains("Professor", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceRegistrationText").text);
             StringAssert.Contains("cachecol", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceDescriptionText").text.ToLowerInvariant());
+            StringAssert.Contains("Confident walk", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceMovementText").text);
+            StringAssert.Contains("Captura futura", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceCaptureText").text);
         }
         finally
         {

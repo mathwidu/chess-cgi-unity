@@ -11,8 +11,20 @@ public sealed class PieceFactory : MonoBehaviour
     [SerializeField] private GameObject bishopPrefab;
     [SerializeField] private GameObject queenPrefab;
     [SerializeField] private GameObject kingPrefab;
+    [SerializeField] private GameObject whitePawnPrefab;
+    [SerializeField] private GameObject blackPawnPrefab;
+    [SerializeField] private GameObject whiteRookPrefab;
+    [SerializeField] private GameObject blackRookPrefab;
+    [SerializeField] private GameObject whiteKnightPrefab;
+    [SerializeField] private GameObject blackKnightPrefab;
+    [SerializeField] private GameObject whiteBishopPrefab;
+    [SerializeField] private GameObject blackBishopPrefab;
+    [SerializeField] private GameObject whiteQueenPrefab;
+    [SerializeField] private GameObject blackQueenPrefab;
+    [SerializeField] private GameObject whiteKingPrefab;
+    [SerializeField] private GameObject blackKingPrefab;
     [SerializeField] private float customVisualHeight = 1.15f;
-    [SerializeField] private float customVisualBaseOffset = 0.14f;
+    [SerializeField] private float customVisualBaseOffset = 0.02f;
 
     public void Configure(Material white, Material black)
     {
@@ -45,11 +57,85 @@ public sealed class PieceFactory : MonoBehaviour
         }
     }
 
+    public void ConfigureCustomPrefab(ChessPieceKind kind, ChessSide side, GameObject prefab)
+    {
+        switch (kind)
+        {
+            case ChessPieceKind.Pawn:
+                if (side == ChessSide.White)
+                {
+                    whitePawnPrefab = prefab;
+                }
+                else
+                {
+                    blackPawnPrefab = prefab;
+                }
+
+                break;
+            case ChessPieceKind.Rook:
+                if (side == ChessSide.White)
+                {
+                    whiteRookPrefab = prefab;
+                }
+                else
+                {
+                    blackRookPrefab = prefab;
+                }
+
+                break;
+            case ChessPieceKind.Knight:
+                if (side == ChessSide.White)
+                {
+                    whiteKnightPrefab = prefab;
+                }
+                else
+                {
+                    blackKnightPrefab = prefab;
+                }
+
+                break;
+            case ChessPieceKind.Bishop:
+                if (side == ChessSide.White)
+                {
+                    whiteBishopPrefab = prefab;
+                }
+                else
+                {
+                    blackBishopPrefab = prefab;
+                }
+
+                break;
+            case ChessPieceKind.Queen:
+                if (side == ChessSide.White)
+                {
+                    whiteQueenPrefab = prefab;
+                }
+                else
+                {
+                    blackQueenPrefab = prefab;
+                }
+
+                break;
+            case ChessPieceKind.King:
+                if (side == ChessSide.White)
+                {
+                    whiteKingPrefab = prefab;
+                }
+                else
+                {
+                    blackKingPrefab = prefab;
+                }
+
+                break;
+        }
+    }
+
     public PieceView CreatePiece(VisualPieceState state, Vector3 position, Transform parent)
     {
         GameObject root = new GameObject($"{state.Side} {state.Kind}");
         root.transform.SetParent(parent);
         root.transform.position = position;
+        root.transform.rotation = GetIdleRotation(state.Side);
 
         PieceView pieceView = root.AddComponent<PieceView>();
         AddCollider(root);
@@ -76,37 +162,75 @@ public sealed class PieceFactory : MonoBehaviour
 
     private bool BuildCustomShape(Transform parent, ChessPieceKind kind, ChessSide side, Material sideMaterial)
     {
-        GameObject prefab = GetCustomPrefab(kind);
+        GameObject prefab = GetCustomPrefab(kind, side, out bool isSideSpecific);
         if (prefab == null)
         {
             return false;
         }
 
-        AddCylinder(parent, "TeamBase", new Vector3(0f, 0.06f, 0f), new Vector3(0.74f, 0.12f, 0.74f), sideMaterial);
-
         GameObject visual = Object.Instantiate(prefab, parent);
         visual.name = "CustomVisual";
         visual.transform.localPosition = Vector3.zero;
-        visual.transform.localRotation = Quaternion.Euler(0f, side == ChessSide.Black ? 180f : 0f, 0f);
+        visual.transform.localRotation = Quaternion.identity;
         visual.transform.localScale = Vector3.one;
         FitCustomVisual(visual.transform, GetCustomVisualHeight(kind));
-        ConfigureAnimationDriver(visual);
+        ConfigureCustomVisualExtensions(visual, kind);
+        if (isSideSpecific)
+        {
+            TeamOutfitApplier.ApplyTo(visual.transform, side);
+        }
+        else
+        {
+            TeamOutfitApplier.ApplyToOrCreateAccent(visual.transform, side);
+        }
+
         return true;
     }
 
-    private static void ConfigureAnimationDriver(GameObject visual)
+    private static void ConfigureCustomVisualExtensions(GameObject visual, ChessPieceKind kind)
     {
+        Animator animator = visual.GetComponentInChildren<Animator>();
+
         CharacterAnimationDriver driver = visual.GetComponent<CharacterAnimationDriver>();
         if (driver == null)
         {
             driver = visual.AddComponent<CharacterAnimationDriver>();
         }
 
-        driver.Configure(visual.GetComponentInChildren<Animator>());
+        driver.Configure(animator);
+
+        ModularCharacterRig modularRig = visual.GetComponent<ModularCharacterRig>();
+        if (modularRig == null)
+        {
+            modularRig = visual.AddComponent<ModularCharacterRig>();
+        }
+
+        modularRig.AutoBind();
+
+        CharacterVisualContract contract = visual.GetComponent<CharacterVisualContract>();
+        if (contract == null)
+        {
+            contract = visual.AddComponent<CharacterVisualContract>();
+        }
+
+        contract.Configure(kind, animator != null ? CharacterRigStatus.RigCandidate : CharacterRigStatus.StaticMesh, animator);
     }
 
-    private GameObject GetCustomPrefab(ChessPieceKind kind)
+    private static Quaternion GetIdleRotation(ChessSide side)
     {
+        return side == ChessSide.Black ? Quaternion.Euler(0f, 180f, 0f) : Quaternion.identity;
+    }
+
+    private GameObject GetCustomPrefab(ChessPieceKind kind, ChessSide side, out bool isSideSpecific)
+    {
+        GameObject sidePrefab = GetSideSpecificPrefab(kind, side);
+        if (sidePrefab != null)
+        {
+            isSideSpecific = true;
+            return sidePrefab;
+        }
+
+        isSideSpecific = false;
         switch (kind)
         {
             case ChessPieceKind.Pawn:
@@ -121,6 +245,28 @@ public sealed class PieceFactory : MonoBehaviour
                 return queenPrefab;
             case ChessPieceKind.King:
                 return kingPrefab;
+            default:
+                return null;
+        }
+    }
+
+    private GameObject GetSideSpecificPrefab(ChessPieceKind kind, ChessSide side)
+    {
+        bool isWhite = side == ChessSide.White;
+        switch (kind)
+        {
+            case ChessPieceKind.Pawn:
+                return isWhite ? whitePawnPrefab : blackPawnPrefab;
+            case ChessPieceKind.Rook:
+                return isWhite ? whiteRookPrefab : blackRookPrefab;
+            case ChessPieceKind.Knight:
+                return isWhite ? whiteKnightPrefab : blackKnightPrefab;
+            case ChessPieceKind.Bishop:
+                return isWhite ? whiteBishopPrefab : blackBishopPrefab;
+            case ChessPieceKind.Queen:
+                return isWhite ? whiteQueenPrefab : blackQueenPrefab;
+            case ChessPieceKind.King:
+                return isWhite ? whiteKingPrefab : blackKingPrefab;
             default:
                 return null;
         }

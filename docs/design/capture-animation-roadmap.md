@@ -27,6 +27,21 @@ O jogo deve continuar sendo xadrez. As animacoes nao podem atrasar muito a jogad
 
 ## Fases
 
+### Pre-fase: Movimento Base-Free
+
+Status: em andamento.
+
+Antes de investir em capturas cinematograficas, as pecas personalizadas precisam se mover bem sem `TeamBase`. A leitura de time passa a vir do figurino branco/preto e de highlights discretos. Esta fase estabiliza:
+
+- peao com grounded walk, menos deslizamento e menos salto vertical;
+- torre preparada para heavy hop;
+- cavalo preparado para arcing L jump, como um salto de obstaculo;
+- bispo preparado para ritual stride;
+- rainha preparada para confident walk;
+- rei preparado para authoritative short steps.
+
+Essa pre-fase e requisito para capturas melhores porque um ataque bonito em cima de uma peca que desliza ainda vai parecer artificial.
+
 ### Fase 1: Captura Generica Leve
 
 Status: implementada na camada procedural atual.
@@ -66,6 +81,51 @@ Quando os modelos definitivos estiverem escolhidos:
 - criar uma animacao base por personagem, nao por cada combinacao possivel;
 - reaproveitar a mesma vinheta com pequenas variacoes de timing, escala e particula;
 - evitar depender de expressoes faciais, porque no tamanho do tabuleiro elas aparecem pouco.
+
+### Fase 3.1: Capture Style Contracts
+
+Status: implementada como esqueleto tecnico.
+
+Cada tipo de peca agora tem um contrato nomeado de captura. Esses nomes ainda nao sao clips finais; eles sao alvos estaveis para o fluxo Blender/Unity quando os personagens rigados estiverem prontos.
+
+| Peca | Contrato | Clip futuro |
+| --- | --- | --- |
+| Peao | `DaggerLunge` | `Capture_Pawn_DaggerLunge` |
+| Torre | `TowerCrush` | `Capture_Rook_TowerCrush` |
+| Cavalo | `HorseLeap` | `Capture_Knight_HorseLeap` |
+| Bispo | `PrayerBeam` | `Capture_Bishop_PrayerBeam` |
+| Rainha | `RoyalSlash` | `Capture_Queen_RoyalSlash` |
+| Rei | `OpenHandStrike` | `Capture_King_OpenHandStrike` |
+
+O `PieceMotionController` continua usando captura procedural como fallback. Se um prefab futuro tiver `CharacterAnimationDriver` com Animator e clip configurado, o fluxo ja tenta tocar o clip correspondente antes de executar a vinheta procedural.
+
+### Fase 3.2: Side-Specific Character Variants
+
+Status: em implementacao.
+
+Brancas e pretas nao devem depender de uma pintura generica do mesmo boneco. Cada personagem passa a poder ter dois prefabs finais: `<Piece>_<Name>_White` e `<Piece>_<Name>_Black`. O `PieceFactory` usa o prefab especifico do lado quando ele existe e usa o prefab generico apenas como fallback temporario.
+
+Isso permite que as pretas tenham figurino escuro com personalidade propria e as brancas tenham figurino claro, mantendo rosto, cabelo, oculos, postura e props do personagem.
+
+### Fase 3.3: Combat Sockets
+
+Status: contrato tecnico implementado.
+
+Cada `CustomVisual` deve expor os seguintes pontos de ancoragem:
+
+| Socket | Uso futuro |
+| --- | --- |
+| `EffectsSocket` | particulas gerais e aura curta |
+| `HitSocket` | ponto que recebe impacto |
+| `GroundSocket` | poeira, aterrissagem e contato com o tabuleiro |
+| `WeaponSocket` | arma ou prop principal |
+| `RightHandSocket` | mao direita para golpes e segurar props |
+| `LeftHandSocket` | mao esquerda para golpes e segurar props |
+| `CastSocket` | origem de laser, oracao, magia ou slash |
+
+O Blender pode exportar objetos vazios com esses nomes. Se eles nao existirem, a Unity cria sockets padrao para manter o contrato estavel.
+
+O preset local `tools/blender/definitions/side_variant_combat_preset.json` concentra os nomes dos clips futuros, os sockets obrigatorios e a intencao de figurino branco/preto para que novos personagens sejam gerados com o mesmo contrato.
 
 ### Fase 4: Vinhetas Cinematicas Opcionais
 

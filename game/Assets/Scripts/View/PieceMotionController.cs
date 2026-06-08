@@ -3,9 +3,9 @@ using UnityEngine;
 
 public sealed class PieceMotionController : MonoBehaviour
 {
-    [SerializeField] private float walkDuration = 0.55f;
-    [SerializeField] private float stepHeight = 0.08f;
-    [SerializeField] private float leanAngle = 4.5f;
+    [SerializeField] private float walkDuration = 1.12f;
+    [SerializeField] private float stepHeight = 0.045f;
+    [SerializeField] private float leanAngle = 3.2f;
     [SerializeField] private float captureDuration = 0.45f;
 
     public PieceMotionSettings Settings => new PieceMotionSettings(walkDuration, stepHeight, leanAngle, captureDuration);
@@ -35,6 +35,12 @@ public sealed class PieceMotionController : MonoBehaviour
 
         Vector3 attackerStart = attacker.transform.position;
         CaptureAnimationStyle style = CaptureAnimationLibrary.GetStyle(attacker.Kind);
+        CharacterAnimationDriver driver = attacker.GetComponentInChildren<CharacterAnimationDriver>();
+        if (driver != null)
+        {
+            driver.TryPlayCapture(style);
+        }
+
         Vector3 lungeTarget = Vector3.Lerp(attackerStart, captured.transform.position, style.LungeDistance);
         float elapsed = 0f;
         float duration = Mathf.Max(0.01f, style.Duration);

@@ -1,0 +1,36 @@
+{
+  "candidateId": "Rook_Alex_White",
+  "personName": "Alex",
+  "pieceKind": "Rook",
+  "side": "White",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/Rook_Alex_Assets/selected.glb",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/Rook_Alex/side_variants/White/Rook_Alex_White.glb",
+  "importedPrefabPath": "game/Assets/Resources/CustomPieces/Rook_Alex_White.prefab",
+  "visualStatus": "side_variant_candidate",
+  "rigStatus": "static_mesh_candidate",
+  "approvedForUnity": true,
+  "replacesActivePrefab": false,
+  "outfitIntent": "white-side texture recolor over existing clothing surfaces",
+  "textureRecolorOnly": true,
+  "textureRecolorStats": {
+    "shirtPixels": 751608,
+    "pantsPixels": 1209948
+  },
+  "requiredSockets": [
+    "EffectsSocket",
+    "HitSocket",
+    "GroundSocket",
+    "WeaponSocket",
+    "RightHandSocket",
+    "LeftHandSocket",
+    "CastSocket"
+  ],
+  "combatPreparation": {
+    "futureCaptureClip": "Capture_Rook_TowerCrush",
+    "weaponConcept": "Impact sockets for future tower-drop hit"
+  },
+  "reviewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/Rook_Alex/side_variants/White/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/Rook_Alex/side_variants/White/preview_three_quarter.png"
+  }
+}

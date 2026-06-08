@@ -1,0 +1,106 @@
+{
+  "id": "mathwidu_pawn_v2",
+  "displayName": "Mathwidu",
+  "fullName": "Mathwidu",
+  "piece": "Pawn",
+  "category": "Aluno",
+  "styleTarget": "premium_stylized_cartoon",
+  "identityCues": [
+    "ginger/red curly short hair",
+    "light ginger beard and mustache",
+    "fair skin",
+    "light gray t-shirt",
+    "beige cargo pants",
+    "white sneakers",
+    "friendly confident expression"
+  ],
+  "scale": 1.0,
+  "proportions": {
+    "height": 1.72,
+    "shoulderWidth": 0.44,
+    "torsoHeight": 0.58,
+    "legLength": 0.72,
+    "armLength": 0.58,
+    "headRadius": 0.155,
+    "cartoonHeadScale": 1.08,
+    "cartoonHandScale": 1.12,
+    "athleticSoftness": 0.52
+  },
+  "palette": {
+    "skin": "#efb994",
+    "skinWarm": "#f3c9ae",
+    "cheek": "#df8f7c",
+    "hair": "#b95c25",
+    "hairDark": "#743419",
+    "beard": "#9f4a20",
+    "shirt": "#bac3c8",
+    "shirtShadow": "#8f9ca3",
+    "pants": "#a98252",
+    "pantsShadow": "#715638",
+    "shoes": "#f3f1e8",
+    "sole": "#1c2328",
+    "eyes": "#5d442f",
+    "brow": "#9a4c24",
+    "mouth": "#a96558",
+    "stitch": "#e9dec8"
+  },
+  "presentation": {
+    "hasIntegratedBase": false,
+    "intendedBoardHeight": 1.16,
+    "previewCamera": "front_three_quarter",
+    "silhouette": "readable from isometric chess camera"
+  },
+  "outfit": {
+    "shirt": "light gray t-shirt",
+    "pants": "beige cargo pants with side pockets",
+    "shoes": "white sneakers with dark soles"
+  },
+  "features": {
+    "hairStyle": "short curly ginger",
+    "facialHair": "light ginger beard and mustache",
+    "expression": "friendly confident",
+    "pose": "clean relaxed A-pose with visible hands and separated feet"
+  },
+  "rigging": {
+    "requiresSeparatedFeet": true,
+    "requiresSeparatedHands": true,
+    "requiredNodes": [
+      "TorsoRoot",
+      "HeadRoot",
+      "LeftArmRoot",
+      "RightArmRoot",
+      "LeftLegRoot",
+      "RightLegRoot",
+      "LeftFootRoot",
+      "RightFootRoot",
+      "EffectsSocket",
+      "HitSocket",
+      "GroundSocket",
+      "WeaponSocket",
+      "RightHandSocket",
+      "LeftHandSocket",
+      "CastSocket"
+    ]
+  },
+  "sideVariants": {
+    "White": {
+      "shirt": "clean white/light-gray t-shirt",
+      "pants": "light beige cargo pants",
+      "shoes": "white sneakers",
+      "intent": "readable white-side student pawn while preserving ginger hair and beard"
+    },
+    "Black": {
+      "shirt": "black or charcoal t-shirt",
+      "pants": "dark charcoal cargo pants",
+      "shoes": "black sneakers with light sole detail",
+      "intent": "readable black-side student pawn while preserving ginger hair and beard"
+    }
+  },
+  "combatPreparation": {
+    "futureCaptureClip": "Capture_Pawn_DaggerLunge",
+    "weaponConcept": "small dagger attached to WeaponSocket or RightHandSocket",
+    "requiresVisibleFeetForWalk": true
+  },
+  "animationProfile": "student_walk_v2",
+  "outputName": "MathwiduPawnV2"
+}

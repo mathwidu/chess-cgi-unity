@@ -21,12 +21,17 @@ public sealed class CharacterAnimationDriver : MonoBehaviour
 
     public bool TryPlay(string stateName)
     {
-        if (animator == null || string.IsNullOrEmpty(stateName))
+        if (animator == null || animator.runtimeAnimatorController == null || string.IsNullOrEmpty(stateName))
         {
             return false;
         }
 
         animator.Play(stateName);
         return true;
+    }
+
+    public bool TryPlayCapture(CaptureAnimationStyle style)
+    {
+        return TryPlay(style.FutureClipName);
     }
 }

@@ -2,6 +2,18 @@
 
 Este fluxo existe para evitar que novas pecas personalizadas caiam no visual de prototipo com primitivas. O padrao de qualidade esperado e o mesmo dos modelos atuais do peao Mathwidu e do bispo Rafael: personagem organico, corpo completo, materiais coerentes e leitura boa dentro do tabuleiro.
 
+## Regra V3: qualidade visual antes de rig
+
+A tentativa `MathwiduPawnV2` provou que primitivas modulares conseguem criar uma hierarquia animavel, mas o resultado visual ficou abaixo do alvo e nao deve ser usado como caminho principal.
+
+Nenhum modelo criado por primitivas simples pode substituir um personagem aprovado sem passar por gate visual no Blender. O novo fluxo e:
+
+1. aprovar preview frontal, 3/4 e escala de tabuleiro no Blender;
+2. aprovar semelhanca e qualidade visual;
+3. marcar `approvedForUnity: true` no manifesto;
+4. importar para Unity;
+5. so entao conectar no `PieceFactory`.
+
 ## Objetivo
 
 - Criar uma peca/personagem por tipo de peca, mantendo o xadrez jogavel e legivel.
@@ -23,6 +35,17 @@ Prefabs aprovados entram no projeto:
 Assets/Resources/CustomPieces/<Piece>_<Name>.prefab
 Assets/Resources/CustomPieces/<Piece>_<Name>_Assets/
 ```
+
+Quando existir variante final por time, usar nomes explicitos por lado:
+
+```text
+Assets/Resources/CustomPieces/<Piece>_<Name>_White.prefab
+Assets/Resources/CustomPieces/<Piece>_<Name>_Black.prefab
+Assets/Resources/CustomPieces/<Piece>_<Name>_White_Assets/
+Assets/Resources/CustomPieces/<Piece>_<Name>_Black_Assets/
+```
+
+O prefab sem sufixo continua permitido como fallback temporario, mas nao e a meta visual final quando o personagem ja tiver sido refeito no Blender para brancas e pretas.
 
 Exemplos:
 
@@ -46,6 +69,90 @@ Assets/Resources/CustomPieces/King_Ricardo_Carioca.prefab
 7. Conferir se os prompts proibem fundo, celular, espelho, cadeira, cortes de corpo e estilo de primitivas.
 8. Gerar poucas variacoes por rodada, avaliar, e so entao gastar mais creditos.
 
+## Materiais semanticos de time
+
+As pecas personalizadas nao devem depender de base visivel para comunicar time. A leitura de brancas e pretas deve vir do figurino.
+
+Todo personagem novo deve separar roupa de pele, cabelo, olhos, sapatos e acessorios. A meta profissional agora e gerar duas variantes reais no Blender: uma branca e uma preta. A Unity so recolore materiais explicitamente semanticos quando o asset ainda e generico ou quando a variante final quer manter algum detalhe pequeno controlado por codigo.
+
+Nomes aceitos para materiais ou renderers recoloriveis:
+
+```text
+TeamOutfitPrimary
+TeamOutfitSecondary
+TeamClothes
+TeamUniform
+```
+
+Regras:
+
+- Brancas usam roupa clara/branca mantendo detalhes de identidade.
+- Pretas usam roupa preta/escura mantendo a mesma silhueta e acessorios.
+- As variantes `White` e `Black` devem ser artisticamente diferentes de verdade, nao apenas o mesmo mesh com tint aplicado em runtime.
+- Pele, cabelo, barba, oculos, tenis, cachecol especifico e props principais nao devem usar esses nomes se nao forem para mudar de cor por time.
+- Se o gerador criar tudo em um unico material, o jogo aplica apenas um tint temporario de leitura de time no prefab generico. Isso melhora a partida, mas o asset ainda nao passa no gate profissional de "figurino por time" ate ser separado no Blender ou regenerado como `White` e `Black`.
+- O prefab nao deve trazer base/pedestal integrado. Indicacao de selecao e time deve ser feita por roupa, sombra, highlight ou UI.
+
+## Leitura de time sem geometria runtime
+
+Durante a fase de polimento de 2026-06-07, foi testado um fallback que criava paineis de uniforme em runtime quando o prefab nao tinha material de roupa separavel. Esse caminho foi rejeitado porque criou artefatos retangulares visiveis no Play Mode.
+
+Regra atual: `PieceFactory` tenta primeiro um prefab especifico para o lado (`White` ou `Black`). Se existir, ele e tratado como arte final do lado e nao recebe tint fallback. Se nao existir, `PieceFactory` usa o prefab generico e `TeamOutfitApplier.ApplyToOrCreateAccent` primeiro recolore materiais ou renderers com nomes semanticos (`TeamOutfitPrimary`, `TeamOutfitSecondary`, `TeamClothes` ou `TeamUniform`). Se o asset generico vier com tudo em um unico material, o jogo aplica um tint leve no material existente para diferenciar brancas e pretas, sem criar mesh, painel, collider ou filho visual extra.
+
+A solucao final continua sendo resolver roupa por time no Blender, no gerador 3D ou em uma etapa de separacao de materiais antes do prefab entrar como asset profissional aprovado.
+
+## Variante por textura, sem roupa colada
+
+Quando um personagem aprovado ja tem uma roupa boa, mas o gerador entregou corpo, pele e roupa em uma textura unica, a variante de time deve preferir recolorir a textura existente em vez de criar volumes sobrepostos.
+
+Contrato:
+
+- Nao exportar cubos, placas, lapelas, armas ou paineis visiveis apenas para identificar time.
+- Nao adicionar camiseta/calca geometrica por cima de uma roupa que ja existe no modelo.
+- Recolorir as regioes da textura que correspondem a camiseta, calca e tenis, preservando rosto, pele, cabelo e barba.
+- Usar mascara guiada por rig ou por selecao semantica no Blender quando possivel, para evitar pintar maos, rosto ou cabelo.
+- Registrar no manifesto que a variante e `textureRecolorOnly: true`.
+
+Exemplo atual:
+
+```text
+tools/blender/create_mathwidu_side_variants.py
+game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/side_variants/White/Pawn_Mathwidu_White.glb
+game/Assets/Art/CharacterCandidates/Pawn_Mathwidu/side_variants/Black/Pawn_Mathwidu_Black.glb
+```
+
+## Contrato de sockets para animacoes futuras
+
+Todo prefab aprovado deve aceitar a criacao automatica destes sockets pelo `CharacterVisualContract`. Quando o Blender puder posiciona-los melhor, ele deve exportar objetos com os mesmos nomes:
+
+```text
+EffectsSocket
+HitSocket
+GroundSocket
+WeaponSocket
+RightHandSocket
+LeftHandSocket
+CastSocket
+```
+
+Uso previsto:
+
+- `WeaponSocket`: arma curta, espada, staff ou prop futuro.
+- `RightHandSocket` e `LeftHandSocket`: mao que segura ou inicia o golpe.
+- `CastSocket`: origem de raio, oracao, magia ou slash visual.
+- `HitSocket`: ponto de impacto no alvo.
+- `GroundSocket`: poeira, sombra, aterrissagem e contato com o tabuleiro.
+
+Esses sockets sao preparacao de pipeline. Eles nao obrigam que a captura cinematografica exista agora.
+
+O preset versionado para novas variantes fica em:
+
+```text
+tools/blender/definitions/side_variant_combat_preset.json
+```
+
+Ele define sufixos `White`/`Black`, paletas sugeridas por lado, sockets obrigatorios e o conceito de captura de cada tipo de peca.
+
 ## Prompt base
 
 Use este formato como base para novas pecas:
@@ -57,9 +164,9 @@ Key identity details: <hair>, <glasses/accessories>, <clothes>, <distinctive col
 
 Chess role cue: add a subtle <piece-specific cue> that reads as <piece>, integrated into the outfit or base, not a costume.
 
-Style target: same quality level as a polished stylized mobile/indie 3D character, organic mesh, smooth proportions, detailed clothing, no blocky primitive shapes.
+Style target: same quality level as a polished stylized mobile/indie 3D character, organic mesh, smooth proportions, detailed clothing, no blocky primitive shapes. Clothing materials must be separable from skin and hair, with team-recolorable outfit surfaces named TeamOutfitPrimary or TeamOutfitSecondary.
 
-Avoid: phone, mirror selfie pose, background room, chair, cropped body, oversized props, exaggerated fantasy armor, cartoon mascot style, blocky cylinders/cubes, text, logos, watermarks.
+Avoid: phone, mirror selfie pose, background room, chair, cropped body, oversized props, exaggerated fantasy armor, cartoon mascot style, blocky cylinders/cubes, text, logos, watermarks, fused chess base, single material that mixes face and clothing.
 ```
 
 ## Fluxo recomendado
@@ -213,21 +320,64 @@ Antes de aceitar um novo prefab personalizado:
 - O modelo fica inteiro na sidebar com zoom padrao.
 - A altura normalizada no tabuleiro fica entre 1.15 e 1.45 unidades.
 - A peca olha para o adversario: brancas para frente, pretas rotacionadas 180 graus.
-- A base nao cobre pernas ou props importantes.
+- O prefab nao tem `TeamBase`, pedestal ou base integrada que esconda pernas, tenis ou props importantes.
+- Materiais de roupa que devem mudar por time usam nomes semanticos como `TeamOutfitPrimary`.
 - Materiais nao estouram em branco puro nem somem em preto puro.
 - O personagem continua legivel na camera de jogo padrao.
 
+## Variantes por lado sem geometria colada
+
+Fluxo atual para diferenciar brancas e pretas:
+
+1. Manter o modelo base aprovado em `Assets/Resources/CustomPieces/<Personagem>_Assets/selected.glb`.
+2. Rodar o gerador em lote:
+
+```bash
+/opt/homebrew/bin/blender --background --python tools/blender/create_all_piece_side_variants.py
+```
+
+3. Conferir os previews gerados em:
+
+```text
+Assets/Art/CharacterCandidates/<Personagem>/side_variants/White/preview_three_quarter.png
+Assets/Art/CharacterCandidates/<Personagem>/side_variants/Black/preview_three_quarter.png
+```
+
+4. Validar o contrato Python:
+
+```bash
+python3 -m unittest tools.blender.tests.test_all_piece_side_variants -v
+```
+
+5. Importar e conectar todos os prefabs pelo Editor:
+
+```csharp
+CustomPieceSideVariantImportRunner.ImportAndWireAllSideVariants();
+```
+
+Regra visual: a cor do time deve vir da textura/material do proprio boneco. Nao usar cubos, faixas, coletes, massas ou objetos flutuantes para indicar time.
+
+Arquivos gerados para cada personagem:
+
+```text
+Assets/Art/CharacterCandidates/<Personagem>/side_variants/<White|Black>/<Personagem>_<White|Black>.glb
+Assets/Resources/CustomPieces/<Personagem>_<White|Black>.prefab
+Assets/Resources/CustomPieces/<Personagem>_<White|Black>_Assets/selected.glb
+```
+
+O `PieceFactory` deve usar o prefab especifico do lado quando existir. Prefabs genericos continuam como fallback, mas a arte final do jogo deve apontar para as variantes `White` e `Black`.
+
 ## Integracao no Unity
 
-1. Salvar o prefab aprovado em `Assets/Resources/CustomPieces/Queen_Marta.prefab`.
+1. Salvar o prefab aprovado em `Assets/Resources/CustomPieces/<Personagem>.prefab`.
 2. Abrir `Assets/Scenes/Main.unity`.
 3. Selecionar `GameManager`.
-4. No componente `PieceFactory`, preencher `Queen Prefab` com `Queen_Marta.prefab`.
+4. No componente `PieceFactory`, preencher o prefab generico da peca e, quando existir, os campos `White <Peca> Prefab` e `Black <Peca> Prefab`.
 5. Conferir a orientacao:
    - peca branca deve olhar para o lado adversario;
    - peca preta deve ser rotacionada automaticamente pelo `PieceFactory`.
 6. Conferir escala no tabuleiro e no preview do HUD.
-7. Atualizar `README.md` movendo Marta de planejada para escalacao atual.
+7. Atualizar `README.md` ou a documentacao de elenco quando um personagem novo entrar na escalacao atual.
 
 ## Validacao
 

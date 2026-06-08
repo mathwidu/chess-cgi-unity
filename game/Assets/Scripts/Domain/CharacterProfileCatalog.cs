@@ -13,7 +13,9 @@ public static class CharacterProfileCatalog
                 "Mathwidu",
                 "Aluno",
                 "Matricula nao informada",
-                "Peao personalizado do projeto, com cabelo ruivo e visual casual para representar o autor no tabuleiro.")
+                "Peao personalizado do projeto, com cabelo ruivo e visual casual para representar o autor no tabuleiro.",
+                "Grounded walk",
+                "Adaga curta em captura futura.")
         },
         {
             ChessPieceKind.Rook,
@@ -24,7 +26,9 @@ public static class CharacterProfileCatalog
                 "Alex",
                 "Aluno",
                 "Matricula nao informada",
-                "Torre personalizada com Alex sentado em uma pequena torre, mantendo a silhueta forte da peca.")
+                "Torre personalizada com Alex sentado em uma pequena torre, mantendo a silhueta forte da peca.",
+                "Heavy hop",
+                "Torre cai com impacto pesado em captura futura.")
         },
         {
             ChessPieceKind.Knight,
@@ -35,7 +39,9 @@ public static class CharacterProfileCatalog
                 "Gustavo",
                 "Aluno",
                 "Matricula nao informada",
-                "Cavalo personalizado com Gustavo montado em um cavalo pequeno, criando uma leitura divertida da peca.")
+                "Cavalo personalizado com Gustavo montado em um cavalo pequeno, criando uma leitura divertida da peca.",
+                "Arcing L jump",
+                "Relincho e salto em captura futura.")
         },
         {
             ChessPieceKind.Bishop,
@@ -46,7 +52,9 @@ public static class CharacterProfileCatalog
                 "Rafael",
                 "Aluno",
                 "Matricula nao informada",
-                "Bispo personalizado baseado no Rafael, mantendo postura vertical e identidade visual propria.")
+                "Bispo personalizado baseado no Rafael, mantendo postura vertical e identidade visual propria.",
+                "Ritual stride",
+                "Oracao/laser diagonal em captura futura.")
         },
         {
             ChessPieceKind.Queen,
@@ -57,7 +65,9 @@ public static class CharacterProfileCatalog
                 "Professora Marta",
                 "Professor",
                 "Professor",
-                "Rainha personalizada da professora Marta, com cachecol azul e branco como detalhe de destaque.")
+                "Rainha personalizada da professora Marta, com cachecol azul e branco como detalhe de destaque.",
+                "Confident walk",
+                "Golpe elegante com espada/energia em captura futura.")
         },
         {
             ChessPieceKind.King,
@@ -68,7 +78,9 @@ public static class CharacterProfileCatalog
                 "Professor Ricardo Carioca",
                 "Professor",
                 "Professor",
-                "Rei personalizado do professor Ricardo Carioca, usando blusao azul da Feevale como referencia visual.")
+                "Rei personalizado do professor Ricardo Carioca, usando blusao azul da Feevale como referencia visual.",
+                "Authoritative steps",
+                "Golpe de mao aberta em captura futura.")
         }
     };
 
@@ -86,6 +98,8 @@ public static class CharacterProfileCatalog
             "Peca classica",
             "Modelo classico",
             "Nao se aplica",
-            "Modelo classico usado quando nao ha personagem personalizado.");
+            "Modelo classico usado quando nao ha personagem personalizado.",
+            "Classic move",
+            "Captura classica.");
     }
 }

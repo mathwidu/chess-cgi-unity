@@ -1,0 +1,36 @@
+{
+  "candidateId": "Queen_Marta_Black",
+  "personName": "Marta",
+  "pieceKind": "Queen",
+  "side": "Black",
+  "sourceAssetPath": "game/Assets/Resources/CustomPieces/Queen_Marta_Assets/selected.glb",
+  "candidateModelPath": "game/Assets/Art/CharacterCandidates/Queen_Marta/side_variants/Black/Queen_Marta_Black.glb",
+  "importedPrefabPath": "game/Assets/Resources/CustomPieces/Queen_Marta_Black.prefab",
+  "visualStatus": "side_variant_candidate",
+  "rigStatus": "static_mesh_candidate",
+  "approvedForUnity": true,
+  "replacesActivePrefab": false,
+  "outfitIntent": "black-side texture recolor over existing clothing surfaces",
+  "textureRecolorOnly": true,
+  "textureRecolorStats": {
+    "shirtPixels": 604202,
+    "pantsPixels": 541656
+  },
+  "requiredSockets": [
+    "EffectsSocket",
+    "HitSocket",
+    "GroundSocket",
+    "WeaponSocket",
+    "RightHandSocket",
+    "LeftHandSocket",
+    "CastSocket"
+  ],
+  "combatPreparation": {
+    "futureCaptureClip": "Capture_Queen_SwordCleave",
+    "weaponConcept": "WeaponSocket for future sword apparition"
+  },
+  "reviewImages": {
+    "front": "game/Assets/Art/CharacterCandidates/Queen_Marta/side_variants/Black/preview_front.png",
+    "threeQuarter": "game/Assets/Art/CharacterCandidates/Queen_Marta/side_variants/Black/preview_three_quarter.png"
+  }
+}

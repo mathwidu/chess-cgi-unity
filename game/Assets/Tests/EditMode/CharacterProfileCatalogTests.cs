@@ -34,4 +34,14 @@ public class CharacterProfileCatalogTests
         StringAssert.Contains("torre", rook.Description.ToLowerInvariant());
         Assert.IsFalse(string.IsNullOrWhiteSpace(rook.FullName));
     }
+
+    [Test]
+    public void GetProfile_ContainsMovementAndCapturePlanningText()
+    {
+        CharacterProfile pawn = CharacterProfileCatalog.GetProfile(ChessPieceKind.Pawn);
+        CharacterProfile knight = CharacterProfileCatalog.GetProfile(ChessPieceKind.Knight);
+
+        Assert.AreEqual("Grounded walk", pawn.MovementStyle);
+        StringAssert.Contains("Relincho", knight.CaptureConcept);
+    }
 }

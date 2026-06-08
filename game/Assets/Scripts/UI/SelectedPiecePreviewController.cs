@@ -5,9 +5,11 @@ using UnityEngine.UI;
 public sealed class SelectedPiecePreviewController : MonoBehaviour
 {
     private const float MinZoom = 1.6f;
-    private const float MaxZoom = 4.8f;
+    private const float MaxZoom = 8.5f;
     private const float DefaultZoom = 3f;
     private const float DefaultYaw = 180f;
+    private const float TargetPreviewHeight = 1.55f;
+    private const float FitSafetyMargin = 1.28f;
 
     private readonly Color previewSurfaceColor = new Color(0.12f, 0.13f, 0.13f, 1f);
 
@@ -18,6 +20,8 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
     private Transform previewStage;
     private GameObject previewClone;
     private PieceView previewedPiece;
+    private Vector3 previewFocusPoint;
+    private bool hasPreviewFocusPoint;
 
     public bool HasPreview => previewClone != null;
 
@@ -62,7 +66,8 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
         previewedPiece = selectedPiece;
 
         DisablePreviewInteractionComponents(previewClone);
-        FitPreviewClone(previewClone.transform);
+        Bounds fittedBounds = FitPreviewClone(previewClone.transform);
+        ConfigureCameraForBounds(fittedBounds);
         ApplyView();
     }
 
@@ -107,7 +112,7 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
     {
         if (previewTexture == null)
         {
-            previewTexture = new RenderTexture(768, 512, 24)
+            previewTexture = new RenderTexture(768, 768, 24)
             {
                 name = "SelectedPiecePreviewTexture",
                 antiAliasing = 4,
@@ -122,6 +127,7 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
             stageObject.transform.SetParent(transform, false);
             stageObject.transform.position = new Vector3(96f, 96f, 96f);
             previewStage = stageObject.transform;
+            previewFocusPoint = GetDefaultFocusPoint();
         }
 
         if (previewCamera == null)
@@ -133,7 +139,7 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
             previewCamera.backgroundColor = previewSurfaceColor;
             previewCamera.fieldOfView = 24f;
             previewCamera.nearClipPlane = 0.03f;
-            previewCamera.farClipPlane = 12f;
+            previewCamera.farClipPlane = 24f;
             previewCamera.targetTexture = previewTexture;
         }
 
@@ -169,8 +175,9 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
             return;
         }
 
-        previewCamera.transform.localPosition = new Vector3(0f, 0.92f, -CurrentZoom);
-        previewCamera.transform.LookAt(previewStage.position + new Vector3(0f, 0.82f, 0f));
+        Vector3 focusPoint = hasPreviewFocusPoint ? previewFocusPoint : GetDefaultFocusPoint();
+        previewCamera.transform.position = focusPoint + new Vector3(0f, 0f, -CurrentZoom);
+        previewCamera.transform.LookAt(focusPoint);
     }
 
     private void RenderIfPossible()
@@ -184,20 +191,19 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
         }
     }
 
-    private void FitPreviewClone(Transform clone)
+    private Bounds FitPreviewClone(Transform clone)
     {
         Renderer[] renderers = clone.GetComponentsInChildren<Renderer>();
         if (renderers.Length == 0)
         {
             clone.localPosition = new Vector3(0f, 0.08f, 0f);
-            return;
+            return new Bounds(previewStage.position + new Vector3(0f, 0.58f, 0f), new Vector3(0.6f, 1f, 0.6f));
         }
 
         Bounds bounds = CalculateBounds(renderers);
         if (bounds.size.y > 0.001f)
         {
-            float targetHeight = 1.7f;
-            float scale = targetHeight / bounds.size.y;
+            float scale = TargetPreviewHeight / bounds.size.y;
             clone.localScale *= scale;
         }
 
@@ -208,6 +214,30 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
         bounds = CalculateBounds(renderers);
         float targetFloor = previewStage.position.y + 0.06f;
         clone.position += Vector3.up * (targetFloor - bounds.min.y);
+        bounds = CalculateBounds(renderers);
+        return bounds;
+    }
+
+    private void ConfigureCameraForBounds(Bounds bounds)
+    {
+        if (previewCamera == null || previewTexture == null)
+        {
+            CurrentZoom = DefaultZoom;
+            hasPreviewFocusPoint = false;
+            return;
+        }
+
+        previewFocusPoint = bounds.center;
+        hasPreviewFocusPoint = true;
+
+        float aspect = previewTexture.height > 0 ? (float)previewTexture.width / previewTexture.height : 1f;
+        float fitDistance = CalculateFitDistance(bounds, previewCamera.fieldOfView, aspect, FitSafetyMargin);
+        CurrentZoom = Mathf.Clamp(fitDistance, MinZoom, MaxZoom);
+    }
+
+    private Vector3 GetDefaultFocusPoint()
+    {
+        return previewStage != null ? previewStage.position + new Vector3(0f, 0.82f, 0f) : new Vector3(0f, 0.82f, 0f);
     }
 
     private void ClearClone()
@@ -243,6 +273,15 @@ public sealed class SelectedPiecePreviewController : MonoBehaviour
         }
 
         return bounds;
+    }
+
+    private static float CalculateFitDistance(Bounds bounds, float verticalFieldOfView, float aspect, float safetyMargin)
+    {
+        float verticalHalfAngle = Mathf.Max(1f, verticalFieldOfView) * 0.5f * Mathf.Deg2Rad;
+        float horizontalHalfAngle = Mathf.Atan(Mathf.Tan(verticalHalfAngle) * Mathf.Max(0.1f, aspect));
+        float verticalDistance = bounds.extents.y / Mathf.Tan(verticalHalfAngle);
+        float horizontalDistance = Mathf.Max(bounds.extents.x, bounds.extents.z) / Mathf.Tan(horizontalHalfAngle);
+        return Mathf.Max(verticalDistance, horizontalDistance, MinZoom) * Mathf.Max(1f, safetyMargin);
     }
 
     private static void DestroyUnityObject(Object target)
