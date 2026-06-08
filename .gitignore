@@ -31,8 +31,23 @@ sysinfo.txt
 # VS Code
 .vscode/
 
+# Windows / Visual Studio
+.vs/
+*.userosscache
+*.suo
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Blender local backups
+*.blend1
+*.blend2
+*.blend@
+
 # Test/build outputs
 TestResults/
+RiggingExports/
 
 # Private photo references used only for local asset generation
 game/Assets/Art.meta
@@ -41,3 +56,7 @@ game/Assets/Art/PrivateReferences/
 game/Assets/_Recovery.meta
 game/Assets/_Recovery/
 game/GeneratedAssets/
+
+# Accidental Unity AI scratch asset, not part of the playable project
+game/Assets/New Mesh.prefab
+game/Assets/New Mesh.prefab.meta
