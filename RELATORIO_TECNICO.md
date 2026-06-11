@@ -1,6 +1,6 @@
 # Relatório Técnico - Xadrez CGI
 
-**Disciplina:** Computação Gráfica I
+**Disciplina:** Computação Gráfica
 **Projeto:** Xadrez 3D interativo em Unity
 **Aluno:** Matheus Duarte
 **Matrícula:** 0276899
