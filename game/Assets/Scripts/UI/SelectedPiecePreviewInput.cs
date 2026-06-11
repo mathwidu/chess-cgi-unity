@@ -15,23 +15,6 @@ public sealed class SelectedPiecePreviewInput : MonoBehaviour, IBeginDragHandler
 
     public bool HasInteractivePreview => previewTarget != null && previewCamera != null;
 
-    public Quaternion TargetRotationForTests => previewTarget != null ? previewTarget.rotation : Quaternion.identity;
-
-    public float CameraDistanceForTests
-    {
-        get
-        {
-            NormalizeCameraDistance();
-            return HasInteractivePreview
-                ? Vector3.Distance(previewCamera.transform.position, focusPoint)
-                : 0f;
-        }
-    }
-
-    public Vector3 CameraPositionForTests => previewCamera != null ? previewCamera.transform.position : Vector3.zero;
-
-    public Vector3 FocusPointForTests => focusPoint;
-
     public void Configure(Transform target, Camera camera)
     {
         previewTarget = target;
