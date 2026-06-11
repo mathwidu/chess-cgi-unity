@@ -40,11 +40,15 @@ public sealed class GameHud : MonoBehaviour
     private Text selectedPieceKindText;
     private Text selectedPieceSquareText;
     private Text selectedPieceSideText;
+    private Text selectedPieceProfileText;
+    private Text selectedPieceDescriptionText;
+    private SelectedPiecePreviewInput selectedPiecePreviewInput;
     private RenderTexture selectedPiecePreviewTexture;
     private Camera selectedPiecePreviewCamera;
     private Light selectedPiecePreviewLight;
     private Transform selectedPiecePreviewStage;
     private GameObject selectedPiecePreviewClone;
+    private Vector3 selectedPiecePreviewFocusPoint;
     private PieceView previewedPiece;
 
     public void Configure(ChessGameController controller)
@@ -80,23 +84,29 @@ public sealed class GameHud : MonoBehaviour
         CreateText("TitleText", brandPanel, "Xadrez CGI", 25, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -10f), new Vector2(292f, 34f));
         CreateText("SubtitleText", brandPanel, "Computacao Grafica I", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -45f), new Vector2(292f, 18f));
 
-        RectTransform turnPanel = CreatePanel("TurnPanel", topBar, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -2f), new Vector2(304f, 74f), panelColor);
-        turnText = CreateText("TurnText", turnPanel, "Brancas jogam", 17, FontStyle.Bold, accentColor, TextAnchor.UpperRight, new Vector2(14f, -10f), new Vector2(276f, 24f));
-        statusText = CreateText("StatusText", turnPanel, "Escolha uma peca para mover.", 13, FontStyle.Normal, textColor, TextAnchor.UpperRight, new Vector2(14f, -38f), new Vector2(276f, 26f));
+        RectTransform turnPanel = CreatePanel("TurnPanel", topBar, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -2f), new Vector2(360f, 74f), panelColor);
+        turnText = CreateText("TurnText", turnPanel, "Brancas jogam", 17, FontStyle.Bold, accentColor, TextAnchor.UpperRight, new Vector2(14f, -10f), new Vector2(332f, 24f));
+        statusText = CreateText("StatusText", turnPanel, "Escolha uma peca para mover.", 13, FontStyle.Normal, textColor, TextAnchor.UpperRight, new Vector2(14f, -38f), new Vector2(332f, 26f));
 
-        RectTransform historyPanel = CreatePanel("MoveHistoryPanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -104f), new Vector2(304f, 238f), panelColor);
-        CreateText("MoveHistoryTitle", historyPanel, "Historico", 17, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -12f), new Vector2(276f, 24f));
-        moveHistoryText = CreateText("MoveHistoryText", historyPanel, "Nenhuma jogada ainda.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -42f), new Vector2(276f, 178f));
+        RectTransform historyPanel = CreatePanel("MoveHistoryPanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -104f), new Vector2(360f, 210f), panelColor);
+        CreateText("MoveHistoryTitle", historyPanel, "Historico", 17, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -12f), new Vector2(332f, 24f));
+        moveHistoryText = CreateText("MoveHistoryText", historyPanel, "Nenhuma jogada ainda.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -42f), new Vector2(332f, 150f));
 
-        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -358f), new Vector2(304f, 348f), panelStrongColor);
-        CreateText("SelectedPieceEyebrowText", selectedPiecePanel, "PECA SELECIONADA", 11, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(272f, 18f));
-        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -44f), new Vector2(272f, 174f), Color.white);
-        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -232f), new Vector2(272f, 30f));
-        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -266f), new Vector2(272f, 24f));
-        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -294f), new Vector2(272f, 22f));
-        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -318f), new Vector2(272f, 22f));
+        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -330f), new Vector2(360f, 560f), panelStrongColor);
+        CreateText("SelectedPieceEyebrowText", selectedPiecePanel, "PECA SELECIONADA", 11, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(328f, 18f));
+        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -42f), new Vector2(328f, 310f), Color.white);
+        selectedPiecePreviewInput = selectedPiecePreviewImage.gameObject.AddComponent<SelectedPiecePreviewInput>();
+        CreateButton("PreviewZoomOutButton", selectedPiecePanel, "-", new Vector2(266f, 484f), new Vector2(34f, 34f), neutralButtonColor, ZoomSelectedPiecePreviewOut);
+        CreateButton("PreviewZoomInButton", selectedPiecePanel, "+", new Vector2(306f, 484f), new Vector2(34f, 34f), actionColor, ZoomSelectedPiecePreviewIn);
+        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -368f), new Vector2(328f, 30f));
+        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -402f), new Vector2(328f, 24f));
+        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -430f), new Vector2(150f, 22f));
+        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperRight, new Vector2(190f, -430f), new Vector2(154f, 22f));
+        selectedPieceProfileText = CreateText("SelectedPieceProfileText", selectedPiecePanel, "-", 13, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -462f), new Vector2(328f, 66f));
+        selectedPieceDescriptionText = CreateText("SelectedPieceDescriptionText", selectedPiecePanel, "-", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -532f), new Vector2(328f, 22f));
         EnsureSelectedPiecePreviewResources();
         selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
+        selectedPiecePreviewInput.Configure(null, selectedPiecePreviewCamera);
 
         RectTransform actionBar = CreatePanel("ActionBar", hudRoot, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 16f), new Vector2(410f, 58f), panelColor);
         CreateButton("NewGameButton", actionBar, "Nova partida", new Vector2(14f, 12f), new Vector2(122f, 34f), actionColor, StartGame);
@@ -209,6 +219,22 @@ public sealed class GameHud : MonoBehaviour
         RefreshInterface();
     }
 
+    private void ZoomSelectedPiecePreviewIn()
+    {
+        if (selectedPiecePreviewInput != null)
+        {
+            selectedPiecePreviewInput.ZoomPreview(1f);
+        }
+    }
+
+    private void ZoomSelectedPiecePreviewOut()
+    {
+        if (selectedPiecePreviewInput != null)
+        {
+            selectedPiecePreviewInput.ZoomPreview(-1f);
+        }
+    }
+
     private void OnDestroy()
     {
         ClearSelectedPiecePreviewClone();
@@ -257,6 +283,16 @@ public sealed class GameHud : MonoBehaviour
             selectedPieceSideText.text = $"Time: {SideName(selectedPiece.Side)}";
         }
 
+        if (selectedPieceProfileText != null)
+        {
+            selectedPieceProfileText.text = BuildPieceProfileText(selectedPiece);
+        }
+
+        if (selectedPieceDescriptionText != null)
+        {
+            selectedPieceDescriptionText.text = BuildPieceDescription(selectedPiece);
+        }
+
         if (previewedPiece != selectedPiece || selectedPiecePreviewClone == null)
         {
             BuildSelectedPiecePreview(selectedPiece);
@@ -265,6 +301,15 @@ public sealed class GameHud : MonoBehaviour
 
         if (selectedPiecePreviewCamera != null)
         {
+            if (selectedPiecePreviewInput != null)
+            {
+                selectedPiecePreviewInput.Configure(
+                    selectedPiecePreviewClone != null ? selectedPiecePreviewClone.transform : null,
+                    selectedPiecePreviewCamera,
+                    selectedPiecePreviewFocusPoint);
+                selectedPiecePreviewInput.NormalizeCameraDistance();
+            }
+
             selectedPiecePreviewCamera.Render();
         }
     }
@@ -273,7 +318,7 @@ public sealed class GameHud : MonoBehaviour
     {
         if (selectedPiecePreviewTexture == null)
         {
-            selectedPiecePreviewTexture = new RenderTexture(544, 348, 24)
+            selectedPiecePreviewTexture = new RenderTexture(768, 640, 24)
             {
                 name = "SelectedPiecePreviewTexture",
                 antiAliasing = 4,
@@ -297,13 +342,14 @@ public sealed class GameHud : MonoBehaviour
             selectedPiecePreviewCamera = cameraObject.AddComponent<Camera>();
             selectedPiecePreviewCamera.clearFlags = CameraClearFlags.SolidColor;
             selectedPiecePreviewCamera.backgroundColor = previewSurfaceColor;
-            selectedPiecePreviewCamera.fieldOfView = 26f;
+            selectedPiecePreviewCamera.fieldOfView = 32f;
             selectedPiecePreviewCamera.nearClipPlane = 0.03f;
             selectedPiecePreviewCamera.farClipPlane = 12f;
             selectedPiecePreviewCamera.targetTexture = selectedPiecePreviewTexture;
         }
 
-        selectedPiecePreviewCamera.transform.localPosition = new Vector3(0f, 0.9f, -3f);
+        selectedPiecePreviewCamera.aspect = 768f / 640f;
+        selectedPiecePreviewCamera.transform.localPosition = new Vector3(0f, 0.9f, -3.8f);
         selectedPiecePreviewCamera.transform.LookAt(selectedPiecePreviewStage.position + new Vector3(0f, 0.78f, 0f));
 
         if (selectedPiecePreviewLight == null)
@@ -332,6 +378,12 @@ public sealed class GameHud : MonoBehaviour
 
         DisablePreviewInteractionComponents(selectedPiecePreviewClone);
         FitPreviewClone(selectedPiecePreviewClone.transform);
+        FramePreviewCamera(selectedPiecePreviewClone.transform);
+        if (selectedPiecePreviewInput != null)
+        {
+            selectedPiecePreviewInput.Configure(selectedPiecePreviewClone.transform, selectedPiecePreviewCamera, selectedPiecePreviewFocusPoint);
+            selectedPiecePreviewInput.NormalizeCameraDistance();
+        }
     }
 
     private void ClearSelectedPiecePreviewClone()
@@ -370,7 +422,7 @@ public sealed class GameHud : MonoBehaviour
         Bounds bounds = CalculateBounds(renderers);
         if (bounds.size.y > 0.001f)
         {
-            float targetHeight = 1.58f;
+            float targetHeight = 1.32f;
             float scale = targetHeight / bounds.size.y;
             clone.localScale *= scale;
         }
@@ -382,6 +434,34 @@ public sealed class GameHud : MonoBehaviour
         bounds = CalculateBounds(renderers);
         float targetFloor = selectedPiecePreviewStage.position.y + 0.07f;
         clone.position += Vector3.up * (targetFloor - bounds.min.y);
+    }
+
+    private void FramePreviewCamera(Transform clone)
+    {
+        if (selectedPiecePreviewCamera == null)
+        {
+            return;
+        }
+
+        Renderer[] renderers = clone.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            selectedPiecePreviewCamera.transform.localPosition = new Vector3(0f, 0.9f, -3.8f);
+            selectedPiecePreviewFocusPoint = selectedPiecePreviewStage.position + new Vector3(0f, 0.78f, 0f);
+            selectedPiecePreviewCamera.transform.LookAt(selectedPiecePreviewFocusPoint);
+            return;
+        }
+
+        Bounds bounds = CalculateBounds(renderers);
+        float aspect = Mathf.Max(0.1f, selectedPiecePreviewCamera.aspect);
+        float verticalExtent = Mathf.Max(bounds.extents.y, bounds.extents.x / aspect);
+        float distance = verticalExtent / Mathf.Tan(selectedPiecePreviewCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        distance = Mathf.Clamp(distance * 1.38f, 2.25f, 5.2f);
+
+        Vector3 target = bounds.center + Vector3.up * Mathf.Max(0.02f, bounds.size.y * 0.04f);
+        selectedPiecePreviewFocusPoint = target;
+        selectedPiecePreviewCamera.transform.position = target + new Vector3(0f, bounds.size.y * 0.06f, -distance);
+        selectedPiecePreviewCamera.transform.LookAt(target);
     }
 
     private static Bounds CalculateBounds(Renderer[] renderers)
@@ -520,7 +600,7 @@ public sealed class GameHud : MonoBehaviour
         RectTransform rect = CreateRect(name, parent, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), anchoredPosition, sizeDelta);
         RawImage image = rect.gameObject.AddComponent<RawImage>();
         image.color = color;
-        image.raycastTarget = false;
+        image.raycastTarget = true;
         return image;
     }
 
@@ -603,19 +683,87 @@ public sealed class GameHud : MonoBehaviour
         switch (piece.Kind)
         {
             case ChessPieceKind.Pawn:
-                return "Mathwidu";
+                return "Matheus Duarte";
             case ChessPieceKind.Rook:
-                return "Alex";
+                return "Alex Fenner";
             case ChessPieceKind.Knight:
-                return "Gustavo";
+                return "Gustavo Cornalewski";
             case ChessPieceKind.Bishop:
-                return "Rafael";
+                return "Rafael Scharer";
             case ChessPieceKind.Queen:
-                return "Marta";
+                return "MARTA ROSECLER BEZ";
             case ChessPieceKind.King:
-                return "Ricardo Carioca";
+                return "RICARDO FERREIRA DE OLIVEIRA";
             default:
                 return "Peca classica";
+        }
+    }
+
+    private static string BuildPieceProfileText(PieceView piece)
+    {
+        return $"Nome: {GetPieceFullName(piece)}\n" +
+            $"Categoria: {GetPieceCategory(piece.Kind)}\n" +
+            $"Registro: {GetPieceRegistry(piece.Kind)}";
+    }
+
+    private static string BuildPieceDescription(PieceView piece)
+    {
+        if (piece.Kind == ChessPieceKind.Pawn)
+        {
+            return "Peao representado por Matheus Duarte, criador do jogo.";
+        }
+
+        if (piece.Kind == ChessPieceKind.Queen)
+        {
+            return "Rainha representada por MARTA ROSECLER BEZ, professora de Ciencias da Computacao da Universidade Feevale.";
+        }
+
+        if (piece.Kind == ChessPieceKind.King)
+        {
+            return "Rei representado por RICARDO FERREIRA DE OLIVEIRA, professor de Ciencias da Computacao da Universidade Feevale.";
+        }
+
+        return $"{PieceKindName(piece.Kind)} representado por {GetPieceModelName(piece)}.";
+    }
+
+    private static string GetPieceFullName(PieceView piece)
+    {
+        return GetPieceModelName(piece);
+    }
+
+    private static string GetPieceCategory(ChessPieceKind kind)
+    {
+        switch (kind)
+        {
+            case ChessPieceKind.Pawn:
+                return "Criador do jogo";
+            case ChessPieceKind.Queen:
+                return "Professora";
+            case ChessPieceKind.King:
+                return "Professor";
+            default:
+                return "Colega";
+        }
+    }
+
+    private static string GetPieceRegistry(ChessPieceKind kind)
+    {
+        switch (kind)
+        {
+            case ChessPieceKind.Pawn:
+                return "Matricula 0276899";
+            case ChessPieceKind.Bishop:
+                return "Matricula 040603";
+            case ChessPieceKind.Knight:
+                return "Matricula 0407923";
+            case ChessPieceKind.Rook:
+                return "Matricula 0403240";
+            case ChessPieceKind.Queen:
+                return "Professora de Ciencias da Computacao - Universidade Feevale";
+            case ChessPieceKind.King:
+                return "Professor de Ciencias da Computacao - Universidade Feevale";
+            default:
+                return "-";
         }
     }
 

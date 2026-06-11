@@ -1,0 +1,29 @@
+# Unity text assets. Keep stable line endings across macOS and Windows.
+*.cs text eol=lf
+*.asmdef text eol=lf
+*.unity text eol=lf merge=unityyamlmerge
+*.prefab text eol=lf merge=unityyamlmerge
+*.asset text eol=lf merge=unityyamlmerge
+*.mat text eol=lf merge=unityyamlmerge
+*.meta text eol=lf merge=unityyamlmerge
+*.controller text eol=lf merge=unityyamlmerge
+*.anim text eol=lf merge=unityyamlmerge
+*.json text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.ps1 text eol=crlf
+
+# Binary assets.
+*.dll binary
+*.glb binary
+*.fbx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.exr binary
+*.tga binary
+*.wav binary
+*.mp3 binary
+*.mp4 binary
+*.pdf binary
+*.zip binary

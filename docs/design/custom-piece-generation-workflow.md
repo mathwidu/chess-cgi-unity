@@ -1,6 +1,6 @@
 # Fluxo de geracao de pecas 3D personalizadas
 
-Este fluxo existe para evitar que novas pecas personalizadas caiam no visual de prototipo com primitivas. O padrao de qualidade esperado e o mesmo dos modelos atuais do peao Mathwidu e do bispo Rafael: personagem organico, corpo completo, materiais coerentes e leitura boa dentro do tabuleiro.
+Este fluxo existe para evitar que novas pecas personalizadas caiam no visual de prototipo com primitivas. O padrao de qualidade esperado e o mesmo dos modelos atuais do peao Matheus Duarte e do bispo Rafael Scharer: personagem organico, corpo completo, materiais coerentes e leitura boa dentro do tabuleiro.
 
 ## Objetivo
 
@@ -121,7 +121,7 @@ Convert the provided transparent full-body character concept into a high-quality
 
 Este lote confirmou que props complexos funcionam melhor quando aparecem na concept antes do mesh.
 
-### Alex, Torre
+### Alex Fenner, Torre
 
 Referencias:
 
@@ -136,9 +136,9 @@ Concept aprovada:
 Assets/Art/PrivateReferences/Rook_Alex/alex_rook_concept_front_v1.png
 ```
 
-Resumo do prompt aprovado: Alex sentado em uma pequena torre/castelo estilizado, com cabelo claro curto, blusao escuro com linhas verdes, jeans e torre com ameias visiveis. A torre deve parecer peca de xadrez, nao cadeira.
+Resumo do prompt aprovado: Alex Fenner sentado em uma pequena torre/castelo estilizado, com cabelo claro curto, blusao escuro com linhas verdes, jeans e torre com ameias visiveis. A torre deve parecer peca de xadrez, nao cadeira.
 
-### Gustavo, Cavalo
+### Gustavo Cornalewski, Cavalo
 
 Referencias:
 
@@ -153,9 +153,9 @@ Concept aprovada:
 Assets/Art/PrivateReferences/Knight_Gustavo/gustavo_knight_concept_front_v2.png
 ```
 
-Resumo do prompt aprovado: Gustavo sentado em um cavalo pequeno de xadrez, com oculos pretos, cabelo claro cacheado, moletom preto, relogio no pulso e proporcoes adultas. A v1 ficou mais infantil/chibi, entao a v2 reforcou proporcao adulta e cavalo como peca compacta.
+Resumo do prompt aprovado: Gustavo Cornalewski sentado em um cavalo pequeno de xadrez, com oculos pretos, cabelo claro cacheado, moletom preto, relogio no pulso e proporcoes adultas. A v1 ficou mais infantil/chibi, entao a v2 reforcou proporcao adulta e cavalo como peca compacta.
 
-### Ricardo Carioca, Rei
+### RICARDO FERREIRA DE OLIVEIRA, Rei
 
 Referencias:
 
@@ -170,7 +170,7 @@ Concept aprovada:
 Assets/Art/PrivateReferences/King_Ricardo_Carioca/ricardo_king_concept_front_v2.png
 ```
 
-Resumo do prompt aprovado: professor Ricardo Carioca em pe como Rei, com cabelo grisalho, oculos, moletom azul, calca escura, coroa pequena e postura calma de professor. A v1 foi rejeitada porque trouxe artefatos de interface no topo da imagem; a v2 proibiu explicitamente paineis, screenshots, UI e caracteres.
+Resumo do prompt aprovado: professor RICARDO FERREIRA DE OLIVEIRA em pe como Rei, com cabelo grisalho, oculos, moletom azul, calca escura, coroa pequena e postura calma de professor. A v1 foi rejeitada porque trouxe artefatos de interface no topo da imagem; a v2 proibiu explicitamente paineis, screenshots, UI e caracteres.
 
 ## Checklist de aceite visual
 
