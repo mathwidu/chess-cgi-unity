@@ -1,6 +1,6 @@
 # Xadrez CGI
 
-Projeto de Computacao Grafica I desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 3D local para duas pessoas, com regras completas, tabuleiro interativo, camera por turno, HUD em Canvas e personagens personalizados inspirados na turma.
+Projeto de Computacao Grafica desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 3D local para duas pessoas, com regras completas, tabuleiro interativo, camera por turno, HUD em Canvas e personagens personalizados inspirados na turma.
 
 ## Como Abrir
 
@@ -57,8 +57,6 @@ As fotos usadas como referencia ficam apenas localmente e nao entram no Git. Os 
 ```text
 .
 ├── README.md
-├── RELATORIO_TECNICO.md
-├── RELATORIO_TECNICO.pdf
 └── game/
     ├── Assets/
     │   ├── Plugins/   # ChessDotNet
