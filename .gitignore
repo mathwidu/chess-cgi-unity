@@ -24,6 +24,7 @@
 *.opendb
 *.VC.db
 sysinfo.txt
+game/mono_crash.*.json
 
 # macOS
 .DS_Store
@@ -34,7 +35,6 @@ sysinfo.txt
 # Windows / Visual Studio
 .vs/
 *.userosscache
-*.suo
 
 # Python
 __pycache__/
@@ -47,6 +47,8 @@ __pycache__/
 
 # Test/build outputs
 TestResults/
+game/TestResults-*.txt
+game/TestResults-*.xml
 RiggingExports/
 
 # Private photo references used only for local asset generation

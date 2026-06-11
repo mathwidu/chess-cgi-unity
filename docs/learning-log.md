@@ -20,6 +20,8 @@
 
 - `ChessGameController` coordena selecao, turno, movimento, promocao, historico e mensagens.
 - `BoardView` cuida da representacao visual do tabuleiro e sincroniza as pecas depois de cada jogada.
-- `GameHud` usa `OnGUI`, uma forma simples de desenhar interface no Editor sem criar ainda uma UI definitiva com Canvas.
+- `GameHud` usa Canvas/UGUI para a tela inicial, historico, status, promocao e aba lateral da peca selecionada.
+- A aba lateral usa uma camera separada com `RenderTexture` para mostrar o modelo 3D selecionado sem mexer na cena principal.
+- `SelectedPiecePreviewInput` permite girar o preview com drag e controlar o zoom com scroll ou botoes.
 - Testes EditMode ajudam a validar regras e fluxos sem precisar jogar partidas completas manualmente.
 - Para promocao, o controller pausa a jogada em `IsAwaitingPromotion` ate o jogador escolher rainha, torre, bispo ou cavalo.

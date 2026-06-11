@@ -79,9 +79,67 @@ public class GameHudTests
             Transform preview = selectedPanel.Find("SelectedPiecePreview");
             Assert.IsNotNull(preview);
             Assert.IsNotNull(preview.GetComponent<RawImage>().texture);
-            StringAssert.Contains("Mathwidu", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceNameText").text);
+            Assert.GreaterOrEqual(selectedPanel.GetComponent<RectTransform>().sizeDelta.x, 360f);
+            Assert.GreaterOrEqual(selectedPanel.GetComponent<RectTransform>().sizeDelta.y, 520f);
+            Assert.GreaterOrEqual(preview.GetComponent<RectTransform>().sizeDelta.y, 300f);
+            RenderTexture previewTexture = preview.GetComponent<RawImage>().texture as RenderTexture;
+            Assert.IsNotNull(previewTexture);
+            Assert.GreaterOrEqual(previewTexture.width, 768);
+            Assert.GreaterOrEqual(previewTexture.height, 640);
+            Assert.IsTrue(preview.GetComponent<RawImage>().raycastTarget);
+            Assert.IsNotNull(preview.GetComponent<SelectedPiecePreviewInput>());
+            Assert.IsNotNull(selectedPanel.Find("PreviewZoomInButton"));
+            Assert.IsNotNull(selectedPanel.Find("PreviewZoomOutButton"));
+            Assert.IsNotNull(selectedPanel.Find("PreviewZoomInButton").GetComponent<Button>());
+            Assert.IsNotNull(selectedPanel.Find("PreviewZoomOutButton").GetComponent<Button>());
+            StringAssert.Contains("Matheus Duarte", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceNameText").text);
             StringAssert.Contains("Peao", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceKindText").text);
             StringAssert.Contains("e2", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceSquareText").text);
+            Text profileText = FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceProfileText");
+            StringAssert.Contains("Nome: Matheus Duarte", profileText.text);
+            StringAssert.Contains("Categoria: Criador do jogo", profileText.text);
+            StringAssert.Contains("Registro: Matricula 0276899", profileText.text);
+            StringAssert.Contains("criador do jogo", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceDescriptionText").text);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+        }
+    }
+
+    [Test]
+    public void SelectedPiecePreviewInput_RotatesModelAndZoomsCamera()
+    {
+        GameObject rig = CreatePlayableRig(out BoardView boardView, out ChessGameController controller, out GameHud hud);
+        try
+        {
+            controller.NewGame();
+            PieceView pawn = boardView.Pieces.First(piece => piece.Square.Equals(BoardSquare.FromAlgebraic("e2")));
+            controller.SelectPiece(pawn);
+            hud.RefreshInterface();
+
+            Transform preview = hud.transform.Find("HudRoot/SelectedPiecePanel/SelectedPiecePreview");
+            SelectedPiecePreviewInput input = preview.GetComponent<SelectedPiecePreviewInput>();
+            Assert.IsNotNull(input);
+            Assert.IsTrue(input.HasInteractivePreview);
+
+            Quaternion beforeRotation = input.TargetRotationForTests;
+            float beforeDistance = input.CameraDistanceForTests;
+            Assert.Greater(beforeDistance, 1.35f);
+            Assert.Less(beforeDistance, 5.4f);
+
+            input.RotatePreview(45f);
+            Button zoomInButton = hud.transform.Find("HudRoot/SelectedPiecePanel/PreviewZoomInButton").GetComponent<Button>();
+            Button zoomOutButton = hud.transform.Find("HudRoot/SelectedPiecePanel/PreviewZoomOutButton").GetComponent<Button>();
+            zoomInButton.onClick.Invoke();
+
+            Assert.AreNotEqual(beforeRotation.eulerAngles.y, input.TargetRotationForTests.eulerAngles.y);
+            Assert.Less(input.CameraDistanceForTests, beforeDistance);
+
+            float zoomedInDistance = input.CameraDistanceForTests;
+            zoomOutButton.onClick.Invoke();
+
+            Assert.Greater(input.CameraDistanceForTests, zoomedInDistance);
         }
         finally
         {
@@ -97,10 +155,11 @@ public class GameHudTests
         {
             controller.NewGame();
 
-            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.Rook, "a1", "Alex", "Torre");
-            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.Knight, "b1", "Gustavo", "Cavalo");
-            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.Queen, "d1", "Marta", "Rainha");
-            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.King, "e1", "Ricardo Carioca", "Rei");
+            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.Rook, "a1", "Alex Fenner", "Torre", "Matricula 0403240");
+            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.Knight, "b1", "Gustavo Cornalewski", "Cavalo", "Matricula 0407923");
+            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.Bishop, "c1", "Rafael Scharer", "Bispo", "Matricula 040603");
+            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.Queen, "d1", "MARTA ROSECLER BEZ", "Rainha", "Professora de Ciencias da Computacao - Universidade Feevale");
+            AssertSelectedPieceHud(boardView, controller, hud, ChessPieceKind.King, "e1", "RICARDO FERREIRA DE OLIVEIRA", "Rei", "Professor de Ciencias da Computacao - Universidade Feevale");
         }
         finally
         {
@@ -115,7 +174,8 @@ public class GameHudTests
         ChessPieceKind kind,
         string square,
         string expectedModelName,
-        string expectedKindName)
+        string expectedKindName,
+        string expectedRegistry)
     {
         PieceView piece = boardView.Pieces.First(piece =>
             piece.Kind == kind &&
@@ -127,6 +187,8 @@ public class GameHudTests
         StringAssert.Contains(expectedModelName, FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceNameText").text);
         StringAssert.Contains(expectedKindName, FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceKindText").text);
         StringAssert.Contains(square, FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceSquareText").text);
+        StringAssert.Contains($"Nome: {expectedModelName}", FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceProfileText").text);
+        StringAssert.Contains(expectedRegistry, FindText(hud.transform, "HudRoot/SelectedPiecePanel/SelectedPieceProfileText").text);
     }
 
     private static GameObject CreatePlayableRig(
