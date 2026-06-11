@@ -54,8 +54,8 @@ A distribuição dos personagens ficou:
 | Bispo | Rafael Scharer | Matrícula 040603 |
 | Cavalo | Gustavo Cornalewski | Matrícula 0407923 |
 | Torre | Alex Fenner | Matrícula 0403240 |
-| Rainha | MARTA ROSECLER BEZ | Professora de Ciências da Computação - Universidade Feevale |
-| Rei | RICARDO FERREIRA DE OLIVEIRA | Professor de Ciências da Computação - Universidade Feevale |
+| Rainha | Marta Rosecler Bez | Professora de Ciências da Computação - Universidade Feevale |
+| Rei | Ricardo Ferreira de Oliveira | Professor de Ciências da Computação - Universidade Feevale |
 
 As imagens de referência foram usadas apenas como apoio visual para criar modelos estilizados. Elas não fazem parte do repositório entregue. Dentro do jogo, os modelos foram ajustados para ficarem legíveis a partir da câmera isométrica e funcionarem dentro da escala do tabuleiro.
 

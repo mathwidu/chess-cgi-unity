@@ -691,9 +691,9 @@ public sealed class GameHud : MonoBehaviour
             case ChessPieceKind.Bishop:
                 return "Rafael Scharer";
             case ChessPieceKind.Queen:
-                return "MARTA ROSECLER BEZ";
+                return "Marta Rosecler Bez";
             case ChessPieceKind.King:
-                return "RICARDO FERREIRA DE OLIVEIRA";
+                return "Ricardo Ferreira de Oliveira";
             default:
                 return "Peca classica";
         }
@@ -715,12 +715,12 @@ public sealed class GameHud : MonoBehaviour
 
         if (piece.Kind == ChessPieceKind.Queen)
         {
-            return "Rainha representada por MARTA ROSECLER BEZ, professora de Ciencias da Computacao da Universidade Feevale.";
+            return "Rainha representada por Marta Rosecler Bez, professora de Ciencias da Computacao da Universidade Feevale.";
         }
 
         if (piece.Kind == ChessPieceKind.King)
         {
-            return "Rei representado por RICARDO FERREIRA DE OLIVEIRA, professor de Ciencias da Computacao da Universidade Feevale.";
+            return "Rei representado por Ricardo Ferreira de Oliveira, professor de Ciencias da Computacao da Universidade Feevale.";
         }
 
         return $"{PieceKindName(piece.Kind)} representado por {GetPieceModelName(piece)}.";

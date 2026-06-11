@@ -47,8 +47,8 @@ O jogo alterna automaticamente entre brancas e pretas. Quando o turno muda, a ca
 | Bispo | Rafael Scharer | Matricula 040603 | `game/Assets/Resources/CustomPieces/Bishop_Rafael.prefab` |
 | Cavalo | Gustavo Cornalewski | Matricula 0407923 | `game/Assets/Resources/CustomPieces/Knight_Gustavo.prefab` |
 | Torre | Alex Fenner | Matricula 0403240 | `game/Assets/Resources/CustomPieces/Rook_Alex.prefab` |
-| Rainha | MARTA ROSECLER BEZ | Professora de Ciencias da Computacao - Universidade Feevale | `game/Assets/Resources/CustomPieces/Queen_Marta.prefab` |
-| Rei | RICARDO FERREIRA DE OLIVEIRA | Professor de Ciencias da Computacao - Universidade Feevale | `game/Assets/Resources/CustomPieces/King_Ricardo_Carioca.prefab` |
+| Rainha | Marta Rosecler Bez | Professora de Ciencias da Computacao - Universidade Feevale | `game/Assets/Resources/CustomPieces/Queen_Marta.prefab` |
+| Rei | Ricardo Ferreira de Oliveira | Professor de Ciencias da Computacao - Universidade Feevale | `game/Assets/Resources/CustomPieces/King_Ricardo_Carioca.prefab` |
 
 As fotos usadas como referencia ficam apenas localmente e nao entram no Git. Os personagens foram criados com apoio de ferramentas de IA generativa para modelagem 3D a partir de referencias visuais autorizadas, depois importados e configurados como prefabs no Unity.
 
