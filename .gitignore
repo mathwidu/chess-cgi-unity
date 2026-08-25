@@ -62,3 +62,6 @@ game/GeneratedAssets/
 # Accidental scratch asset, not part of the playable project
 game/Assets/New Mesh.prefab
 game/Assets/New Mesh.prefab.meta
+
+# Node tooling for domainbook (the book itself is committed; deps are not)
+node_modules/

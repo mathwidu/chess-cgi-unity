@@ -1,0 +1,20 @@
+name: domainbook
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  book:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # RafaelAugustScherer/domainbook is untagged, so pin the action to a commit.
+      # main @ 2026-08-15. Bump the SHA (or switch to @v1) when the repo is tagged.
+      - uses: RafaelAugustScherer/domainbook@6a1b6634e745929995065588b68598c1e7d90c22

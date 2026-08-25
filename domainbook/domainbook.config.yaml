@@ -1,0 +1,4 @@
+enforcement:
+  mode: block
+  trailer: Skip-Docs
+  require_reason: agents
