@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "domainbook": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "domainbook",
+        "serve",
+        "mcp"
+      ]
+    }
+  }
+}
