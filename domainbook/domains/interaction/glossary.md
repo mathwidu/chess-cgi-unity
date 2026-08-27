@@ -26,3 +26,37 @@ whose turn it is.
 
 - **Aliases:** Girar câmera
 - **Status:** validated
+
+## VR mode
+
+The game rendered to a headset and controlled with motion controllers instead of
+on a monitor with mouse and keyboard. A proposed conversion target for HTC Vive
+and Meta Quest 3, not yet built.
+
+- **Aliases:** Modo VR, Immersive mode
+- **Status:** draft
+
+## Headset
+
+The head-mounted display the player wears in VR mode. Its tracked pose drives the
+camera, so the view follows where the player looks rather than swinging to the
+side on move.
+
+- **Aliases:** HMD, Óculos VR
+- **Status:** draft
+
+## Motion controller
+
+A tracked hand controller the player holds in VR mode, used to point at and pick
+pieces in place of the mouse.
+
+- **Aliases:** Controle, Hand controller
+- **Status:** draft
+
+## Ray interactor
+
+A ray a motion controller casts and the player points at a piece or square to
+select it, replacing the mouse's screen raycast.
+
+- **Aliases:** Raio de seleção, Pointer ray
+- **Status:** draft
