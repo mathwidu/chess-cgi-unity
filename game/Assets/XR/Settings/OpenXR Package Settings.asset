@@ -79,7 +79,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 274c02963f889a64e90bc2e596e21d13, type: 3}
   m_Name: HTCViveControllerProfile Standalone
   m_EditorClassIdentifier: Unity.XR.OpenXR::UnityEngine.XR.OpenXR.Features.Interactions.HTCViveControllerProfile
-  m_enabled: 0
+  m_enabled: 1
   nameUi: HTC Vive Controller Profile
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.htcvive
@@ -320,25 +320,25 @@ MonoBehaviour:
   m_Name: Standalone
   m_EditorClassIdentifier: Unity.XR.OpenXR::UnityEngine.XR.OpenXR.OpenXRSettings
   features:
-  - {fileID: -1411659247119623896}
-  - {fileID: -8204627483074524052}
   - {fileID: -3580203145760516949}
-  - {fileID: 3967884490356807739}
-  - {fileID: -8532055794373276886}
-  - {fileID: 6203076828982482009}
-  - {fileID: -8040053414822099379}
-  - {fileID: 2867731810665820524}
   - {fileID: 8689094737268932678}
-  - {fileID: 8355548186819463863}
-  - {fileID: -2642154412686412075}
-  - {fileID: 6344837786785874052}
-  - {fileID: -1858180532821047834}
-  - {fileID: -5035704860508018462}
-  - {fileID: -1567337426807640883}
-  - {fileID: 119700319820323531}
+  - {fileID: -8040053414822099379}
   - {fileID: -1748393737284554031}
+  - {fileID: 119700319820323531}
+  - {fileID: 6344837786785874052}
+  - {fileID: 8355548186819463863}
+  - {fileID: -5035704860508018462}
+  - {fileID: -1858180532821047834}
   - {fileID: -4272563675156268263}
+  - {fileID: 2867731810665820524}
+  - {fileID: 6203076828982482009}
+  - {fileID: -2642154412686412075}
+  - {fileID: -8204627483074524052}
+  - {fileID: -8532055794373276886}
+  - {fileID: 3967884490356807739}
+  - {fileID: -1411659247119623896}
   - {fileID: 1602483853742885645}
+  - {fileID: -1567337426807640883}
   customLoaderName: 
   m_renderMode: 1
   m_latencyOptimization: 0
@@ -351,7 +351,7 @@ MonoBehaviour:
   m_symmetricProjection: 0
   m_optimizeMultiviewRenderRegions: 0
   m_multiviewRenderRegionsOptimizationMode: 0
-  m_hasMigratedMultiviewRenderRegionSetting: 0
+  m_hasMigratedMultiviewRenderRegionSetting: 1
   m_foveatedRenderingApi: 0
   m_useOpenXRPredictedTime: 0
 --- !u!114 &2867731810665820524
