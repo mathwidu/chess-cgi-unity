@@ -7,3 +7,9 @@ se o lançamento foi retirado, contendo Added, Changed, Deprecated, Removed,
 Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ## [Unreleased]
+
+### Added
+
+- XR packages (XR Plugin Management, OpenXR Plugin, XR Interaction Toolkit)
+  resolved into the project for the HTC Vive VR conversion phase; see
+  [ADR-0001](decisions/0001-use-openxr-and-the-xr-interaction-toolkit-for-vr-mode.md).
