@@ -192,6 +192,16 @@ Example: The same rules layer receives the same commands
   And the outcome matches the desktop build
 ```
 
+**Built:** the first example above. `XRRig` builds an XR Origin (VR) at runtime
+when a headset is present — a Camera Offset holding the eye camera, a Tracked
+Pose Driver bound to the generic `<XRHMD>` device so it tracks a real headset or
+the XR Device Simulator alike, Device tracking-origin mode, and a recenter
+control on `XRInputSubsystem.TryRecenter`. `CameraController`'s orbit and zoom
+keys are gated out while a headset is present, and desktop mode is unaffected
+when one is not; the desktop camera itself is disabled so the per-turn swing
+still runs but has nothing to show — retiring it at the source is Task 6. The
+other two examples in this rule (controller selection) are still to be built.
+
 ## Rule: The interface lives in the world, not on the screen
 
 ```gherkin

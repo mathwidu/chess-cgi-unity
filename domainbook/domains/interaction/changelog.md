@@ -13,3 +13,7 @@ Security as H3s, each of them a bullet list.
 - XR packages (XR Plugin Management, OpenXR Plugin, XR Interaction Toolkit)
   resolved into the project for the HTC Vive VR conversion phase; see
   [ADR-0001](decisions/0001-use-openxr-and-the-xr-interaction-toolkit-for-vr-mode.md).
+- `XRRig` builds a code-built XR Origin (VR) at runtime when a headset is
+  present, so the eye camera tracks the headset pose instead of the desktop
+  `CameraController`; see [play-in-vr](features/play-in-vr.md). Desktop mode is
+  unchanged when no headset is present.

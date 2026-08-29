@@ -9,6 +9,7 @@ owners: [mathwidu]
 code:
   - game/Assets/Scripts/Controllers/InputController.cs
   - game/Assets/Scripts/Controllers/CameraController.cs
+  - game/Assets/Scripts/Controllers/XRRig.cs
 relationships:
   - with: gameplay
     type: customer-supplier
@@ -32,6 +33,9 @@ the match, and move the camera so the board reads from the active player's side.
   matching command to gameplay.
 - Camera context: `CameraController` orbits and zooms the main view, and swings
   it to face the player whose move it is when the turn changes.
+- VR rig context: `XRRig` builds an XR Origin at runtime when a headset is
+  present — the eye camera, its Tracked Pose Driver, and the recenter control —
+  and repoints `InputController` at the eye camera instead of the desktop one.
 
 ## Inbound Communication
 
