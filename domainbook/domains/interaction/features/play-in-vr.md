@@ -217,6 +217,18 @@ Example: A mesma camada de regras recebe os mesmos comandos
   And o resultado corresponde ao da build de desktop
 ```
 
+**Construído:** o primeiro exemplo acima. `XRRig` monta um XR Origin (VR) em
+tempo de execução quando um headset está presente — um Camera Offset contendo a
+câmera do olho, um Tracked Pose Driver vinculado ao dispositivo genérico
+`<XRHMD>` para que rastreie tanto um headset real quanto o XR Device Simulator,
+modo de origem de rastreamento Device, e um controle de recentragem em
+`XRInputSubsystem.TryRecenter`. As teclas de órbita e zoom do `CameraController`
+ficam desativadas enquanto um headset está presente, e o modo desktop não é
+afetado quando não há; a própria câmera de desktop é desativada, então o giro
+por turno ainda roda mas não tem nada a mostrar — aposentá-la na origem é a
+Tarefa 6. Os outros dois exemplos desta regra (seleção por controle) ainda
+estão por construir.
+
 ## Rule: A interface vive no mundo, não na tela
 
 ```gherkin

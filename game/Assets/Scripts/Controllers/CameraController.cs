@@ -19,6 +19,11 @@ public sealed class CameraController : MonoBehaviour
 
     private void Update()
     {
+        if (XRRig.IsHeadsetPresent)
+        {
+            return;
+        }
+
         Keyboard keyboard = Keyboard.current;
         Mouse mouse = Mouse.current;
 

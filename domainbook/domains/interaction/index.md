@@ -9,6 +9,7 @@ owners: [mathwidu]
 code:
   - game/Assets/Scripts/Controllers/InputController.cs
   - game/Assets/Scripts/Controllers/CameraController.cs
+  - game/Assets/Scripts/Controllers/XRRig.cs
 relationships:
   - with: gameplay
     type: customer-supplier
@@ -34,6 +35,10 @@ do lado do jogador ativo.
 - Contexto de câmera: `CameraController` orbita e dá zoom na visão
   principal, e a gira para ficar voltada para o jogador a jogar quando o
   turno muda.
+- Contexto do rig de VR: `XRRig` monta um XR Origin em tempo de execução
+  quando um headset está presente — a câmera do olho, seu Tracked Pose Driver
+  e o controle de recentragem — e reaponta o `InputController` para a câmera do
+  olho em vez da câmera de desktop.
 
 ## Inbound Communication
 
