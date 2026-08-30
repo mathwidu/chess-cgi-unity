@@ -10,6 +10,7 @@ code:
   - game/Assets/Scripts/Controllers/InputController.cs
   - game/Assets/Scripts/Controllers/CameraController.cs
   - game/Assets/Scripts/Controllers/XRRig.cs
+  - game/Assets/Scripts/Controllers/VrSelectionBridge.cs
 relationships:
   - with: gameplay
     type: customer-supplier
@@ -36,6 +37,12 @@ the match, and move the camera so the board reads from the active player's side.
 - VR rig context: `XRRig` builds an XR Origin at runtime when a headset is
   present — the eye camera, its Tracked Pose Driver, and the recenter control —
   and repoints `InputController` at the eye camera instead of the desktop one.
+  It also builds a ray interactor on each motion controller, bound to the
+  trigger for select.
+- VR selection context: `VrSelectionBridge` maps a piece's or square's select
+  event from an XR Simple Interactable to the same `SelectPiece` / `SelectSquare`
+  commands the desktop click path sends, so gameplay sees one input vocabulary
+  regardless of mode.
 
 ## Inbound Communication
 

@@ -192,15 +192,27 @@ Example: The same rules layer receives the same commands
   And the outcome matches the desktop build
 ```
 
-**Built:** the first example above. `XRRig` builds an XR Origin (VR) at runtime
+**Built:** all three examples above. `XRRig` builds an XR Origin (VR) at runtime
 when a headset is present — a Camera Offset holding the eye camera, a Tracked
 Pose Driver bound to the generic `<XRHMD>` device so it tracks a real headset or
 the XR Device Simulator alike, Device tracking-origin mode, and a recenter
 control on `XRInputSubsystem.TryRecenter`. `CameraController`'s orbit and zoom
 keys are gated out while a headset is present, and desktop mode is unaffected
 when one is not; the desktop camera itself is disabled so the per-turn swing
-still runs but has nothing to show — retiring it at the source is Task 6. The
-other two examples in this rule (controller selection) are still to be built.
+still runs but has nothing to show — retiring it at the source is Task 6.
+
+`XRRig` also builds a [ray interactor](../glossary.md) — a Near-Far Interactor,
+with far casting only, since the seat is table-distance from the board — on
+each [motion controller](../glossary.md), tracked the same generic way through
+`<XRController>{LeftHand}` / `{RightHand}`, and shows the ray with a line
+visual. Selecting is bound to the trigger button, not XRI's default grip
+binding, to match "pull the trigger" in the rule text above. `BoardView` and
+`PieceFactory` give each square and piece an XR Simple Interactable when a
+headset is present, reusing the same colliders `InputController`'s desktop
+raycast already hits; a new `VrSelectionBridge` component listens for that
+interactable's select event and calls `ChessGameController.SelectPiece` /
+`SelectSquare` — the same two calls the desktop click path makes — so the rules
+layer sees identical commands either way.
 
 ## Rule: The interface lives in the world, not on the screen
 

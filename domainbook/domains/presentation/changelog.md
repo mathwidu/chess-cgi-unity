@@ -7,3 +7,10 @@ release was pulled, holding Added, Changed, Deprecated, Removed, Fixed or
 Security as H3s, each of them a bullet list.
 
 ## [Unreleased]
+
+### Added
+
+- `BoardView` and `PieceFactory` add an XR Simple Interactable and a
+  `VrSelectionBridge` to each square and piece when a headset is present, so
+  interaction's ray interactor can select them the same way the desktop
+  raycast does. No change in desktop mode.

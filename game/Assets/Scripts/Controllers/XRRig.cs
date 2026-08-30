@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit.Attachment;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.Interaction.Toolkit.Interactors.Casters;
+using UnityEngine.XR.Interaction.Toolkit.Interactors.Visuals;
 
 public sealed class XRRig : MonoBehaviour
 {
@@ -96,7 +101,58 @@ public sealed class XRRig : MonoBehaviour
             inputController.Configure(gameController, eyeCamera);
         }
 
+        BuildController(offsetObject.transform, "Left Controller", "LeftHand");
+        BuildController(offsetObject.transform, "Right Controller", "RightHand");
+
         rigBuilt = true;
+    }
+
+    private static void BuildController(Transform parent, string name, string hand)
+    {
+        GameObject controllerObject = new GameObject(name);
+        controllerObject.SetActive(false);
+        controllerObject.transform.SetParent(parent, false);
+
+        TrackedPoseDriver poseDriver = controllerObject.AddComponent<TrackedPoseDriver>();
+        poseDriver.positionInput = new InputActionProperty(new InputAction(
+            $"XR {hand} Position", InputActionType.Value, $"<XRController>{{{hand}}}/pointerPosition", expectedControlType: "Vector3"));
+        poseDriver.rotationInput = new InputActionProperty(new InputAction(
+            $"XR {hand} Rotation", InputActionType.Value, $"<XRController>{{{hand}}}/pointerRotation", expectedControlType: "Quaternion"));
+
+        SphereInteractionCaster nearCaster = controllerObject.AddComponent<SphereInteractionCaster>();
+        CurveInteractionCaster farCaster = controllerObject.AddComponent<CurveInteractionCaster>();
+        InteractionAttachController attachController = controllerObject.AddComponent<InteractionAttachController>();
+
+        LineRenderer lineRenderer = controllerObject.AddComponent<LineRenderer>();
+        lineRenderer.material = CreateRayMaterial();
+        controllerObject.AddComponent<XRInteractorLineVisual>();
+
+        NearFarInteractor interactor = controllerObject.AddComponent<NearFarInteractor>();
+        interactor.nearInteractionCaster = nearCaster;
+        interactor.farInteractionCaster = farCaster;
+        interactor.interactionAttachController = attachController;
+        interactor.enableNearCasting = false;
+
+        XRInputButtonReader selectInput = new XRInputButtonReader("Select")
+        {
+            inputSourceMode = XRInputButtonReader.InputSourceMode.InputAction,
+            inputActionPerformed = new InputAction(
+                $"XR {hand} Select", InputActionType.Button, $"<XRController>{{{hand}}}/triggerButton"),
+        };
+        interactor.selectInput = selectInput;
+
+        controllerObject.SetActive(true);
+    }
+
+    private static Material CreateRayMaterial()
+    {
+        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (shader == null)
+        {
+            shader = Shader.Find("Unlit/Color");
+        }
+
+        return new Material(shader) { color = Color.cyan };
     }
 
     private static void Recenter()

@@ -26,7 +26,10 @@ reports. It is what a player actually looks at and reads.
 
 - View context: `BoardView` builds the squares and the frame, `PieceFactory`
   builds one object per piece, and both are rebuilt from a fresh list of pieces
-  after every move rather than mutated in place.
+  after every move rather than mutated in place. In VR mode, each also adds an
+  XR Simple Interactable and a `VrSelectionBridge` alongside the existing
+  collider, so interaction's ray interactor can pick the same object the
+  desktop raycast already hits.
 - Presentation context: `GameHud` builds the whole interface in code — the turn
   and status lines, the move history, the promotion prompt, the start screen,
   and the panel that inspects the selected piece in a small 3D preview.

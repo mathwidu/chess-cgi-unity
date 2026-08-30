@@ -17,3 +17,8 @@ Security as H3s, each of them a bullet list.
   present, so the eye camera tracks the headset pose instead of the desktop
   `CameraController`; see [play-in-vr](features/play-in-vr.md). Desktop mode is
   unchanged when no headset is present.
+- `XRRig` builds a Near-Far Interactor with a visible ray on each motion
+  controller, bound to the trigger for select. A new `VrSelectionBridge`
+  component turns an XR Simple Interactable's select event on a piece or
+  square into the same `ChessGameController.SelectPiece` / `SelectSquare`
+  calls the desktop mouse path makes; see [play-in-vr](features/play-in-vr.md).
