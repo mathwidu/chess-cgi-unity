@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public sealed class PieceFactory : MonoBehaviour
 {
@@ -58,6 +59,13 @@ public sealed class PieceFactory : MonoBehaviour
             BuildPrimitiveShape(root.transform, state.Kind, sideMaterial);
         }
         pieceView.Initialize(state);
+
+        if (XRRig.IsHeadsetPresent)
+        {
+            root.AddComponent<XRSimpleInteractable>();
+            root.AddComponent<VrSelectionBridge>();
+        }
+
         return pieceView;
     }
 

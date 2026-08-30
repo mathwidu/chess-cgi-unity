@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "Unity.InputSystem",
-        "Unity.XR.CoreUtils"
+        "Unity.XR.CoreUtils",
+        "Unity.XR.Interaction.Toolkit"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

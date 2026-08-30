@@ -18,3 +18,9 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   headset em vez do `CameraController` de desktop; veja
   [play-in-vr](features/play-in-vr.md). O modo desktop permanece inalterado
   quando nenhum headset está presente.
+- `XRRig` monta um Near-Far Interactor com um raio visível em cada controle de
+  movimento, vinculado ao gatilho para selecionar. Um novo componente
+  `VrSelectionBridge` transforma o evento de seleção de um XR Simple
+  Interactable numa peça ou casa nas mesmas chamadas
+  `ChessGameController.SelectPiece` / `SelectSquare` que o caminho do mouse de
+  desktop faz; veja [play-in-vr](features/play-in-vr.md).
