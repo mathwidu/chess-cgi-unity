@@ -4,9 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 
 public sealed class GameHud : MonoBehaviour
 {
+    private static readonly Vector3 WorldPanelPosition = new Vector3(4.8f, 1.8f, -1.6f);
+    private const float WorldPanelScale = 0.0032f;
+
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
 
@@ -50,6 +54,7 @@ public sealed class GameHud : MonoBehaviour
     private GameObject selectedPiecePreviewClone;
     private Vector3 selectedPiecePreviewFocusPoint;
     private PieceView previewedPiece;
+    private Canvas hudCanvas;
 
     public void Configure(ChessGameController controller)
     {
@@ -63,12 +68,20 @@ public sealed class GameHud : MonoBehaviour
         {
             gameController = Object.FindFirstObjectByType<ChessGameController>();
         }
+    }
 
+    private void Start()
+    {
         RebuildInterface();
     }
 
     private void Update()
     {
+        if (hudCanvas != null && hudCanvas.renderMode == RenderMode.WorldSpace && hudCanvas.worldCamera == null)
+        {
+            hudCanvas.worldCamera = XRRig.EyeCamera;
+        }
+
         RefreshInterface();
     }
 
@@ -483,6 +496,23 @@ public sealed class GameHud : MonoBehaviour
             canvas = gameObject.AddComponent<Canvas>();
         }
 
+        hudCanvas = canvas;
+
+        bool vrMode = XRRig.IsHeadsetPresent;
+        if (vrMode)
+        {
+            ConfigureWorldSpaceCanvas(canvas);
+        }
+        else
+        {
+            ConfigureScreenSpaceCanvas(canvas);
+        }
+
+        EnsureEventSystem(vrMode);
+    }
+
+    private void ConfigureScreenSpaceCanvas(Canvas canvas)
+    {
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;
         canvas.pixelPerfect = true;
@@ -493,21 +523,72 @@ public sealed class GameHud : MonoBehaviour
             scaler = gameObject.AddComponent<CanvasScaler>();
         }
 
+        scaler.enabled = true;
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = 0.5f;
         scaler.referencePixelsPerUnit = 100f;
 
+        TrackedDeviceGraphicRaycaster xrRaycaster = GetComponent<TrackedDeviceGraphicRaycaster>();
+        if (xrRaycaster != null)
+        {
+            DestroyUnityObject(xrRaycaster);
+        }
+
         if (GetComponent<GraphicRaycaster>() == null)
         {
             gameObject.AddComponent<GraphicRaycaster>();
         }
+    }
 
-        if (Object.FindFirstObjectByType<EventSystem>() == null)
+    private void ConfigureWorldSpaceCanvas(Canvas canvas)
+    {
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.sortingOrder = 0;
+
+        CanvasScaler scaler = GetComponent<CanvasScaler>();
+        if (scaler != null)
         {
-            GameObject eventSystemObject = new GameObject("EventSystem");
-            eventSystemObject.transform.SetParent(transform);
-            eventSystemObject.AddComponent<EventSystem>();
+            scaler.enabled = false;
+        }
+
+        RectTransform canvasRect = (RectTransform)transform;
+        canvasRect.pivot = new Vector2(0.5f, 0.5f);
+        canvasRect.anchorMin = new Vector2(0.5f, 0.5f);
+        canvasRect.anchorMax = new Vector2(0.5f, 0.5f);
+        canvasRect.sizeDelta = new Vector2(1920f, 1080f);
+        canvasRect.localScale = Vector3.one * WorldPanelScale;
+        canvasRect.position = WorldPanelPosition;
+        canvasRect.rotation = Quaternion.LookRotation(XRRig.SeatEyePosition - WorldPanelPosition);
+
+        GraphicRaycaster legacyRaycaster = GetComponent<GraphicRaycaster>();
+        if (legacyRaycaster != null)
+        {
+            DestroyUnityObject(legacyRaycaster);
+        }
+
+        if (GetComponent<TrackedDeviceGraphicRaycaster>() == null)
+        {
+            gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+        }
+    }
+
+    private void EnsureEventSystem(bool vrMode)
+    {
+        if (Object.FindFirstObjectByType<EventSystem>() != null)
+        {
+            return;
+        }
+
+        GameObject eventSystemObject = new GameObject("EventSystem");
+        eventSystemObject.transform.SetParent(transform);
+        eventSystemObject.AddComponent<EventSystem>();
+        if (vrMode)
+        {
+            eventSystemObject.AddComponent<XRUIInputModule>();
+        }
+        else
+        {
             eventSystemObject.AddComponent<InputSystemUIInputModule>();
         }
     }

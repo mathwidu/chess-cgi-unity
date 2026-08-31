@@ -257,6 +257,22 @@ Example: A promoção é escolhida com o controle
   Then o jogador escolhe dama, torre, bispo ou cavalo com o raio do controle
 ```
 
+**Construído:** o primeiro exemplo acima. `GameHud` põe o render mode do seu
+Canvas em World Space quando um headset está presente, escalado e
+posicionado como um painel ao lado do tabuleiro, com um Tracked Device
+Graphic Raycaster no lugar do Graphic Raycaster de tela e o XR UI Input
+Module da interação no lugar do Input System UI Input Module do desktop; o
+Canvas usa a câmera do olho de `XRRig` como sua world camera, para que o
+raycast de UI resolva contra o mesmo ponto de vista que o jogador enxerga.
+Como o painel reaproveita o mesmo layout ancorado que o modo desktop já
+constrói, todo botão do HUD — incluindo o pedido de promoção do segundo
+exemplo — herda a mesma interação por raio sem trabalho por botão; só o
+primeiro exemplo tem uma checagem automatizada dedicada até aqui. Verificado
+via CLI batchmode Play mode: apontar o raio do controle direito para o botão
+"Jogar" da tela inicial e segurar o gatilho aciona o clique e oculta o
+overlay, do mesmo raycast world-space até o mesmo evento `onClick` que o
+clique de mouse do desktop usa.
+
 ## Rule: A mesma build atende HTC Vive e Meta Quest 3
 
 ```gherkin

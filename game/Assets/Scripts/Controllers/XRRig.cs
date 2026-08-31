@@ -14,6 +14,8 @@ public sealed class XRRig : MonoBehaviour
 {
     private const float EyeHeight = 1.2f;
     private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -3.4f);
+    public static readonly Vector3 SeatEyePosition = SeatPosition + Vector3.up * EyeHeight;
+    public static Camera EyeCamera { get; private set; }
 
     private InputController inputController;
     private ChessGameController gameController;
@@ -72,6 +74,7 @@ public sealed class XRRig : MonoBehaviour
         eyeCamera.nearClipPlane = 0.1f;
         eyeCamera.farClipPlane = 100f;
         cameraObject.AddComponent<AudioListener>();
+        EyeCamera = eyeCamera;
 
         TrackedPoseDriver poseDriver = cameraObject.AddComponent<TrackedPoseDriver>();
         poseDriver.positionInput = new InputActionProperty(new InputAction(
@@ -140,6 +143,14 @@ public sealed class XRRig : MonoBehaviour
                 $"XR {hand} Select", InputActionType.Button, $"<XRController>{{{hand}}}/triggerButton"),
         };
         interactor.selectInput = selectInput;
+
+        XRInputButtonReader uiPressInput = new XRInputButtonReader("UI Press")
+        {
+            inputSourceMode = XRInputButtonReader.InputSourceMode.InputAction,
+            inputActionPerformed = new InputAction(
+                $"XR {hand} UI Press", InputActionType.Button, $"<XRController>{{{hand}}}/triggerButton"),
+        };
+        interactor.uiPressInput = uiPressInput;
 
         controllerObject.SetActive(true);
     }

@@ -34,7 +34,11 @@ estado que o gameplay relata. É o que um jogador realmente olha e lê.
 - Contexto de apresentação: `GameHud` constrói toda a interface em código
   — as linhas de turno e status, o histórico de jogadas, o pedido de
   promoção, a tela inicial e o painel que examina a peça selecionada em um
-  pequeno preview 3D.
+  pequeno preview 3D. No modo VR, o mesmo Canvas passa a world-space, vira
+  um painel na cena com um Tracked Device Graphic Raycaster e o XR UI Input
+  Module da interação, para que o raio do controle acione seus botões da
+  mesma forma que o mouse faz no desktop; veja
+  [play-in-vr](../interaction/features/play-in-vr.md).
 - Contexto de identidade: cada tipo de peça tem um modelo de personagem
   customizado; quando um modelo está ausente, uma peça é montada a partir
   de primitivas para que o tabuleiro nunca fique vazio
