@@ -14,3 +14,8 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `VrSelectionBridge` a cada casa e peça quando um headset está presente,
   para que o ray interactor da interação consiga selecioná-los da mesma
   forma que o raycast de desktop faz. Sem mudança no modo desktop.
+- `GameHud` põe seu Canvas em world-space quando um headset está presente,
+  como um painel na cena com um Tracked Device Graphic Raycaster e o XR UI
+  Input Module, em vez do Canvas Screen Space Overlay e o Graphic Raycaster
+  do desktop; veja [play-in-vr](../interaction/features/play-in-vr.md). O
+  modo desktop permanece inalterado quando nenhum headset está presente.
