@@ -10,4 +10,4 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
-- Provider OpenXR habilitado para Standalone, com o perfil de controle do HTC Vive ligado e a renderização definida como Single Pass Instanced ([ADR de interação 0001](domains/interaction/decisions/0001-use-openxr-and-the-xr-interaction-toolkit-for-vr-mode.md)).
+- Provedor OpenXR habilitado para Standalone, com o perfil de controle do HTC Vive ativado e a renderização definida como Single Pass Instanced ([interaction ADR 0001](domains/interaction/decisions/0001-usar-openxr-e-o-xr-interaction-toolkit-para-o-modo-vr.md)).

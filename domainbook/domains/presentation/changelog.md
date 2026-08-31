@@ -10,7 +10,7 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
-- `BoardView` and `PieceFactory` add an XR Simple Interactable and a
-  `VrSelectionBridge` to each square and piece when a headset is present, so
-  interaction's ray interactor can select them the same way the desktop
-  raycast does. No change in desktop mode.
+- `BoardView` e `PieceFactory` adicionam um XR Simple Interactable e um
+  `VrSelectionBridge` a cada casa e peça quando um headset está presente,
+  para que o ray interactor da interação consiga selecioná-los da mesma
+  forma que o raycast de desktop faz. Sem mudança no modo desktop.
