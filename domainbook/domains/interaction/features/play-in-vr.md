@@ -180,11 +180,10 @@ desempenho standalone para o Quest.
 
 7. **Refazer a perspectiva por turno para VR.** Decidir o que "a visão
    fica voltada para o lado a jogar" significa para um único jogador em um
-   headset (ver Open Questions). Provavelmente o rig do tabuleiro gira
-   180° entre os turnos, ou as peças/rótulos se reorientam, em vez de a
-   câmera se mover. Aposentar a órbita/zoom/giro do `CameraController` na
-   câmera do olho; o que sobreviver disso atua sobre o XR Origin ou o
-   tabuleiro, não sobre o HMD.
+   headset. Provavelmente o rig do tabuleiro gira 180° entre os turnos, ou
+   as peças/rótulos se reorientam, em vez de a câmera se mover. Aposentar a
+   órbita/zoom/giro do `CameraController` na câmera do olho; o que
+   sobreviver disso atua sobre o XR Origin ou o tabuleiro, não sobre o HMD.
 
 8. **Validar, compilar e testar no dispositivo.** Rodar novamente a
    validação do projeto, compilar o player Windows PC-VR e o player
@@ -222,11 +221,18 @@ tempo de execução quando um headset está presente — um Camera Offset segura
 a câmera do olho, um Tracked Pose Driver vinculado ao dispositivo genérico
 `<XRHMD>` para rastrear tanto um headset real quanto o XR Device Simulator, o
 modo de tracking-origin Device, e um controle de recentralização sobre
-`XRInputSubsystem.TryRecenter`. As teclas de órbita e zoom do
-`CameraController` ficam desativadas enquanto um headset está presente, e o
-modo de desktop não é afetado quando não há um; a própria câmera de desktop é
-desativada, então o giro por turno ainda roda mas não tem nada para mostrar —
-aposentá-lo na origem é a Tarefa 6.
+`XRInputSubsystem.TryRecenter`. O giro de câmera por turno é aposentado
+quando um headset está presente: `ChessGameController` deixa de chamar
+`CameraController.SetPerspective` a cada troca de turno nesse modo, já que o
+modo VR é de assento único (contra um futuro oponente de IA, não hot-seat) e
+não há um segundo lado para o qual virar a visão. As teclas de órbita (Q/E) e
+o zoom por scroll do `CameraController` continuam funcionando em VR, mas
+passam a girar e aproximar o XR Origin — `XRRig.Origin` — em vez da câmera do
+olho, que só o headset comanda; o jogador pode assim reposicionar seu assento
+ao redor do tabuleiro se quiser, dentro de uma faixa de distância própria
+para a escala de VR, mais perto do tabuleiro do que a órbita externa do
+desktop. O modo de desktop não é afetado quando nenhum headset está
+presente.
 
 `XRRig` também constrói um [raio de seleção](../glossary.md) — um Near-Far
 Interactor, apenas com projeção far, já que o assento fica a uma distância de
@@ -290,22 +296,7 @@ Example: O Quest roda standalone dentro do seu orçamento de quadro
 
 ## Open Questions
 
-- **O que a perspectiva por turno se torna em VR?** Em uma tela
-  compartilhada, a câmera girava para o jogador a jogar. Com uma pessoa em
-  um headset, o tabuleiro gira entre os turnos, as peças/rótulos se
-  reorientam, ou a ideia se aposenta em favor de o jogador girar a cabeça?
-  Isso precisa de uma decisão de design antes de o passo 7 ser construído;
-  é a única decisão comportamental em aberto, e se resolve combinando a
-  experiência de turno pretendida em VR, não com mais pesquisa.
-- **Um assento único ou hot-seat passando o headset?** A build de desktop
-  é dois jogadores em uma tela. VR é um headset — o modo VR é de assento
-  único (um humano, ou contra uma futura IA), ou dois jogadores passam o
-  headset a cada turno? Isso delimita se o trabalho de perspectiva para
-  dois lados no passo 7 sequer é necessário.
-- **A qual framework de XR o projeto se compromete?** O plano assume o
-  OpenXR + XR Interaction Toolkit da Unity. Esse compromisso ganha um
-  registro de decisão quando combinado, com o SDK tudo-em-um da Meta
-  considerado e rejeitado como alternativa.
+Nenhuma.
 
 ### References
 

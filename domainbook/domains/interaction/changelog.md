@@ -24,3 +24,10 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   Simple Interactable em uma peça ou casa nas mesmas chamadas
   `ChessGameController.SelectPiece` / `SelectSquare` que o caminho de mouse
   de desktop faz; veja [play-in-vr](features/play-in-vr.md).
+- `ChessGameController` aposenta o giro de câmera por turno quando um
+  headset está presente, já que o modo VR é de assento único.
+  `CameraController` mantém a órbita (Q/E) e o zoom por scroll disponíveis
+  em VR, mas passam a agir sobre o XR Origin do rig em vez da câmera do
+  olho, dentro de uma faixa de distância própria para a escala de VR; veja
+  [play-in-vr](features/play-in-vr.md). O modo desktop permanece
+  inalterado.

@@ -16,6 +16,7 @@ public sealed class XRRig : MonoBehaviour
     private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -3.4f);
     public static readonly Vector3 SeatEyePosition = SeatPosition + Vector3.up * EyeHeight;
     public static Camera EyeCamera { get; private set; }
+    public static Transform Origin { get; private set; }
 
     private InputController inputController;
     private ChessGameController gameController;
@@ -63,6 +64,7 @@ public sealed class XRRig : MonoBehaviour
     {
         GameObject originObject = new GameObject("XR Origin (Vive)");
         originObject.transform.SetPositionAndRotation(SeatPosition, Quaternion.identity);
+        Origin = originObject.transform;
 
         GameObject offsetObject = new GameObject("Camera Offset");
         offsetObject.transform.SetParent(originObject.transform, false);

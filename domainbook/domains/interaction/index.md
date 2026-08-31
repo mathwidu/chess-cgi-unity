@@ -35,7 +35,11 @@ do lado do jogador ativo.
   o comando correspondente ao gameplay.
 - Contexto de câmera: `CameraController` orbita e dá zoom na visão
   principal, e a gira para ficar voltada para o jogador a jogar quando o
-  turno muda.
+  turno muda. No modo VR, esse giro por turno é aposentado — o modo VR é de
+  assento único — mas a órbita e o zoom continuam disponíveis, agindo sobre
+  o XR Origin do rig de VR em vez da câmera do olho, dentro de uma faixa de
+  distância própria para a escala de VR; veja
+  [play-in-vr](features/play-in-vr.md).
 - Contexto do rig de VR: `XRRig` constrói um XR Origin em tempo de execução
   quando um headset está presente — a câmera do olho, seu Tracked Pose
   Driver e o controle de recentralização — e reaponta o `InputController`
@@ -93,8 +97,11 @@ do lado do jogador ativo.
 
 - Cliques que atingem uma peça ou casa mas chegam ao gameplay como o
   comando errado, ou como nenhum — deve ficar em zero.
-- Mudanças de turno em que a câmera não termina voltada para o jogador a
-  jogar.
+- Mudanças de turno, fora do modo VR, em que a câmera não termina voltada
+  para o jogador a jogar.
+- Mudanças de turno em modo VR que movem o XR Origin sem que o jogador
+  tenha orbitado ou dado zoom — deve ficar em zero, já que o giro por turno
+  é aposentado nesse modo.
 
 ## Open Questions
 
