@@ -1,46 +1,46 @@
 ---
 id: turn-the-camera
-name: Turn the camera
+name: Girar a câmera
 status: ready
 owners: [mathwidu]
-terms: [perspective, orbit]
+terms: [perspectiva, órbita]
 ---
 
 ## Story
 
-As one of two players sharing a screen
-I want the camera to face my side when it is my move
-So that I read the board from my own end without moving my seat
+Como um dos dois jogadores compartilhando uma tela
+Quero que a câmera fique voltada para o meu lado quando for a minha vez
+Para que eu leia o tabuleiro a partir do meu próprio lado sem mudar de lugar
 
-## Rule: The camera faces the player on move when the turn changes
+## Rule: A câmera fica voltada para o jogador a jogar quando o turno muda
 
 ```gherkin
-Example: The view swings to the side on move
-  Given it becomes Black's turn
-  When the turn change is applied
-  Then the camera ends facing the board from Black's end
+Example: A visão gira para o lado a jogar
+  Given passa a ser a vez das Pretas
+  When a mudança de turno é aplicada
+  Then a câmera termina voltada para o tabuleiro a partir do lado das Pretas
 
-Example: A new game sets the view instantly for the first player
-  Given a new game starts with White to move
-  When the board is set up
-  Then the camera is already facing White's end, without a transition
+Example: Uma nova partida define a visão de imediato para o primeiro jogador
+  Given uma nova partida começa com as Brancas a jogar
+  When o tabuleiro é montado
+  Then a câmera já está voltada para o lado das Brancas, sem transição
 ```
 
-## Rule: The player can orbit and zoom without changing whose turn it is
+## Rule: O jogador pode orbitar e dar zoom sem mudar de quem é o turno
 
 ```gherkin
-Example: Q and E orbit the camera around the board
-  Given the game is in play
-  When the player holds Q or E
-  Then the camera rotates around the board
-  And the turn does not change
+Example: Q e E orbitam a câmera ao redor do tabuleiro
+  Given o jogo está em andamento
+  When o jogador segura Q ou E
+  Then a câmera gira ao redor do tabuleiro
+  And o turno não muda
 
-Example: The wheel zooms between a near and far limit
-  Given the game is in play
-  When the player scrolls the wheel
-  Then the camera moves nearer or further, clamped between its limits
+Example: A roda dá zoom entre um limite próximo e um distante
+  Given o jogo está em andamento
+  When o jogador rola a roda
+  Then a câmera se move para mais perto ou mais longe, travada entre seus limites
 ```
 
 ## Open Questions
 
-None.
+Nenhuma.
