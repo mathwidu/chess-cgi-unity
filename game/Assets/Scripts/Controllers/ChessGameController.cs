@@ -274,7 +274,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     private void UpdateCameraForTurn(bool instant)
     {
-        if (cameraController != null)
+        if (cameraController != null && !XRRig.IsHeadsetPresent)
         {
             cameraController.SetPerspective(CurrentTurn, instant);
         }
