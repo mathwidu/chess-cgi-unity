@@ -217,30 +217,30 @@ Example: A mesma camada de regras recebe os mesmos comandos
   And o resultado corresponde ao da build de desktop
 ```
 
-**Construído:** os três exemplos acima. `XRRig` monta um XR Origin (VR) em
-tempo de execução quando um headset está presente — um Camera Offset contendo a
-câmera do olho, um Tracked Pose Driver vinculado ao dispositivo genérico
-`<XRHMD>` para que rastreie tanto um headset real quanto o XR Device Simulator,
-modo de origem de rastreamento Device, e um controle de recentragem em
-`XRInputSubsystem.TryRecenter`. As teclas de órbita e zoom do `CameraController`
-ficam desativadas enquanto um headset está presente, e o modo desktop não é
-afetado quando não há; a própria câmera de desktop é desativada, então o giro
-por turno ainda roda mas não tem nada a mostrar — aposentá-la na origem é a
-Tarefa 6.
+**Construído:** os três exemplos acima. `XRRig` constrói um XR Origin (VR) em
+tempo de execução quando um headset está presente — um Camera Offset segurando
+a câmera do olho, um Tracked Pose Driver vinculado ao dispositivo genérico
+`<XRHMD>` para rastrear tanto um headset real quanto o XR Device Simulator, o
+modo de tracking-origin Device, e um controle de recentralização sobre
+`XRInputSubsystem.TryRecenter`. As teclas de órbita e zoom do
+`CameraController` ficam desativadas enquanto um headset está presente, e o
+modo de desktop não é afetado quando não há um; a própria câmera de desktop é
+desativada, então o giro por turno ainda roda mas não tem nada para mostrar —
+aposentá-lo na origem é a Tarefa 6.
 
-`XRRig` também monta um [raio de seleção](../glossary.md) — um Near-Far
-Interactor, apenas com casting distante, já que o assento está à distância de
+`XRRig` também constrói um [raio de seleção](../glossary.md) — um Near-Far
+Interactor, apenas com projeção far, já que o assento fica a uma distância de
 mesa do tabuleiro — em cada [controle de movimento](../glossary.md), rastreado
-da mesma forma genérica por `<XRController>{LeftHand}` / `{RightHand}`, e mostra
-o raio com um visual de linha. A seleção é vinculada ao botão do gatilho, não à
-vinculação padrão de grip do XRI, para corresponder ao "puxar o gatilho" no
-texto da regra acima. `BoardView` e `PieceFactory` dão a cada casa e peça um XR
-Simple Interactable quando um headset está presente, reutilizando os mesmos
-colliders que o raycast de desktop do `InputController` já atinge; um novo
-componente `VrSelectionBridge` escuta o evento de seleção desse interactable e
-chama `ChessGameController.SelectPiece` / `SelectSquare` — as mesmas duas
-chamadas que o caminho de clique de desktop faz — de modo que a camada de regras
-vê comandos idênticos de qualquer forma.
+da mesma forma genérica por meio de `<XRController>{LeftHand}` /
+`{RightHand}`, e mostra o raio com um line visual. A seleção é vinculada ao
+botão de gatilho, não ao grip binding padrão do XRI, para corresponder a
+"puxa o gatilho" no texto da regra acima. `BoardView` e `PieceFactory` dão a
+cada casa e peça um XR Simple Interactable quando um headset está presente,
+reaproveitando os mesmos colliders que o raycast de desktop do
+`InputController` já atinge; um novo componente `VrSelectionBridge` escuta o
+evento de seleção desse interactable e chama `ChessGameController.SelectPiece`
+/ `SelectSquare` — as mesmas duas chamadas que o caminho de clique de desktop
+faz — para que a camada de regras veja comandos idênticos nos dois modos.
 
 ## Rule: A interface vive no mundo, não na tela
 

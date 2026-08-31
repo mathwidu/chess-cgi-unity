@@ -36,16 +36,17 @@ do lado do jogador ativo.
 - Contexto de câmera: `CameraController` orbita e dá zoom na visão
   principal, e a gira para ficar voltada para o jogador a jogar quando o
   turno muda.
-- Contexto do rig de VR: `XRRig` monta um XR Origin em tempo de execução
-  quando um headset está presente — a câmera do olho, seu Tracked Pose Driver
-  e o controle de recentragem — e reaponta o `InputController` para a câmera do
-  olho em vez da câmera de desktop. Também monta um raio interactor em cada
-  controle de movimento, vinculado ao gatilho para selecionar.
-- Contexto de seleção em VR: `VrSelectionBridge` mapeia o evento de seleção de
-  uma peça ou casa a partir de um XR Simple Interactable para os mesmos comandos
-  `SelectPiece` / `SelectSquare` que o caminho de clique de desktop envia, de
-  modo que o gameplay vê um único vocabulário de entrada independentemente do
-  modo.
+- Contexto do rig de VR: `XRRig` constrói um XR Origin em tempo de execução
+  quando um headset está presente — a câmera do olho, seu Tracked Pose
+  Driver e o controle de recentralização — e reaponta o `InputController`
+  para a câmera do olho em vez da câmera de desktop. Também constrói um
+  ray interactor em cada controle de movimento, vinculado ao gatilho para
+  selecionar.
+- Contexto de seleção em VR: `VrSelectionBridge` mapeia o evento de seleção
+  de uma peça ou casa, vindo de um XR Simple Interactable, para os mesmos
+  comandos `SelectPiece` / `SelectSquare` que o caminho de clique de
+  desktop envia, para que o gameplay veja um único vocabulário de entrada
+  independentemente do modo.
 
 ## Inbound Communication
 
