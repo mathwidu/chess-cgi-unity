@@ -12,6 +12,7 @@ public static class XRHudVerification
 {
     private const string ArmedKey = "ChessCgiXrHudCheckArmed";
     private const string DoneKey = "ChessCgiXrHudCheckDone";
+    private const string ExitCodeKey = "ChessCgiXrHudCheckExitCode";
     private const string MainScenePath = "Assets/Scenes/Main.unity";
     private const int RigSettleFrames = 30;
     private const int HoldSimFrames = 5;
@@ -31,13 +32,14 @@ public static class XRHudVerification
     private static NearFarInteractor interactor;
     private static GameObject startPlayButton;
     private static GameObject startOverlay;
+    private static readonly XRVerificationResult result = new XRVerificationResult();
 
     static XRHudVerification()
     {
         if (SessionState.GetBool(DoneKey, false) && !EditorApplication.isPlayingOrWillChangePlaymode)
         {
             SessionState.SetBool(DoneKey, false);
-            EditorApplication.Exit(0);
+            EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
             return;
         }
 
@@ -145,13 +147,27 @@ public static class XRHudVerification
         Transform overlayTransform = hud != null ? hud.transform.Find("HudRoot/StartOverlay") : null;
         startOverlay = overlayTransform != null ? overlayTransform.gameObject : null;
 
+        bool trackedRaycasterFound = hud != null && hud.GetComponent<TrackedDeviceGraphicRaycaster>() != null;
+        bool legacyRaycasterFound = hud != null && hud.GetComponent<GraphicRaycaster>() != null;
+        bool xrInputModuleFound = eventSystem != null && eventSystem.GetComponent<XRUIInputModule>() != null;
+
         Debug.Log("CHESS_CGI_XR_HUD_CHECK " +
             $"canvasFound={canvas != null} renderMode={(canvas != null ? canvas.renderMode.ToString() : "n/a")} " +
-            $"trackedRaycasterFound={(hud != null && hud.GetComponent<TrackedDeviceGraphicRaycaster>() != null)} " +
-            $"legacyRaycasterFound={(hud != null && hud.GetComponent<GraphicRaycaster>() != null)} " +
+            $"trackedRaycasterFound={trackedRaycasterFound} " +
+            $"legacyRaycasterFound={legacyRaycasterFound} " +
             $"eventSystemFound={eventSystem != null} " +
-            $"xrInputModuleFound={(eventSystem != null && eventSystem.GetComponent<XRUIInputModule>() != null)} " +
+            $"xrInputModuleFound={xrInputModuleFound} " +
             $"buttonFound={startPlayButton != null} controllerFound={controllerObject != null} interactorFound={interactor != null}");
+
+        result.Check(canvas != null, "the HUD canvas should be found");
+        result.Check(canvas != null && canvas.renderMode == RenderMode.WorldSpace, "the HUD canvas should render in world space");
+        result.Check(trackedRaycasterFound, "the HUD canvas should have a TrackedDeviceGraphicRaycaster");
+        result.Check(!legacyRaycasterFound, "the HUD canvas should not have a legacy GraphicRaycaster");
+        result.Check(eventSystem != null, "an EventSystem should be found");
+        result.Check(xrInputModuleFound, "the EventSystem should have an XRUIInputModule");
+        result.Check(startPlayButton != null, "the start play button should be found");
+        result.Check(controllerObject != null, "the right controller should be found");
+        result.Check(interactor != null, "the right controller's NearFarInteractor should be found");
 
         if (canvas == null || startPlayButton == null || overlayTransform == null || interactor == null)
         {
@@ -176,14 +192,25 @@ public static class XRHudVerification
             $"raycastValid={model.currentRaycast.isValid} raycastTarget={(raycastTarget != null ? raycastTarget.name : "none")} " +
             $"select={model.select} position={model.position.ToString("F2")} " +
             $"controllerPos={GameObject.Find("Right Controller")?.transform.position.ToString("F2")}");
+
+        if (when == "duringHold")
+        {
+            result.Check(model.currentRaycast.isValid, "the UI raycast should be valid while aiming at the start button");
+            result.Check(raycastTarget != null && raycastTarget.name == "StartPlayButton",
+                $"the UI raycast should hit StartPlayButton, hit {(raycastTarget != null ? raycastTarget.name : "none")} instead");
+        }
     }
 
     private static void ReportAndStop()
     {
         LogUiModel("afterRelease");
+        bool startOverlayHiddenAfterClick = startOverlay != null && !startOverlay.activeSelf;
         Debug.Log("CHESS_CGI_XR_HUD_CHECK " +
-            $"startOverlayHiddenAfterClick={(startOverlay != null && !startOverlay.activeSelf)}");
+            $"startOverlayHiddenAfterClick={startOverlayHiddenAfterClick}");
+        result.Check(startOverlayHiddenAfterClick, "the start overlay should hide after the button click completes");
 
+        result.LogSummary("CHESS_CGI_XR_HUD_CHECK");
+        SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
         EditorApplication.update -= Tick;
         SessionState.SetBool(ArmedKey, false);
         SessionState.SetBool(DoneKey, true);
@@ -214,6 +241,7 @@ public static class XRHudVerification
     private static void FailAndStop(string reason)
     {
         Debug.LogError($"CHESS_CGI_XR_HUD_CHECK FAILED reason=\"{reason}\"");
+        SessionState.SetInt(ExitCodeKey, 1);
         EditorApplication.update -= Tick;
         SessionState.SetBool(ArmedKey, false);
         SessionState.SetBool(DoneKey, true);
@@ -230,6 +258,6 @@ public static class XRHudVerification
 
         EditorApplication.update -= WaitForEditModeThenExit;
         SessionState.SetBool(DoneKey, false);
-        EditorApplication.Exit(0);
+        EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
     }
 }
