@@ -12,6 +12,7 @@ public static class XRControllerVerification
 {
     private const string ArmedKey = "ChessCgiXrControllerCheckArmed";
     private const string DoneKey = "ChessCgiXrControllerCheckDone";
+    private const string ExitCodeKey = "ChessCgiXrControllerCheckExitCode";
     private const string MainScenePath = "Assets/Scenes/Main.unity";
     private const int RigSettleFrames = 30;
     private const int InputBlockedTimeoutSimFrames = 300;
@@ -42,13 +43,14 @@ public static class XRControllerVerification
     private static PieceView targetPiece;
     private static BoardSquare originSquare;
     private static BoardSquare destinationSquare;
+    private static readonly XRVerificationResult result = new XRVerificationResult();
 
     static XRControllerVerification()
     {
         if (SessionState.GetBool(DoneKey, false) && !EditorApplication.isPlayingOrWillChangePlaymode)
         {
             SessionState.SetBool(DoneKey, false);
-            EditorApplication.Exit(0);
+            EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
             return;
         }
 
@@ -206,6 +208,8 @@ public static class XRControllerVerification
 
             case Stage.VerifyMove:
                 ReportMoveResult();
+                result.LogSummary("CHESS_CGI_XR_CONTROLLER_CHECK");
+                SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
                 EditorApplication.update -= Tick;
                 SessionState.SetBool(ArmedKey, false);
                 SessionState.SetBool(DoneKey, true);
@@ -250,6 +254,8 @@ public static class XRControllerVerification
             $"selectInputSourceMode={(interactor != null ? interactor.selectInput.inputSourceMode.ToString() : "n/a")} " +
             $"lineVisualFound={(controllerObject != null && controllerObject.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactors.Visuals.XRInteractorLineVisual>() != null)}");
 
+        result.Check(interactor != null, "the right controller's NearFarInteractor should be found");
+
         if (interactor == null || gameController == null || boardView == null)
         {
             return false;
@@ -268,6 +274,8 @@ public static class XRControllerVerification
         VrSelectionBridge bridge = targetPiece.GetComponent<VrSelectionBridge>();
         Debug.Log("CHESS_CGI_XR_CONTROLLER_CHECK " +
             $"pieceInteractableFound={interactable != null} pieceBridgeFound={bridge != null}");
+        result.Check(interactable != null, "the a2 pawn should have an XRSimpleInteractable");
+        result.Check(bridge != null, "the a2 pawn should have a VrSelectionBridge");
 
         if (interactable != null)
         {
@@ -285,6 +293,7 @@ public static class XRControllerVerification
     private static void ReportPieceSelection()
     {
         GameObject controllerObject = GameObject.Find("Right Controller");
+        result.Check(gameController.SelectedPiece == targetPiece, "aiming and selecting the a2 pawn should select it in the game controller");
         Debug.Log("CHESS_CGI_XR_CONTROLLER_CHECK " +
             $"pieceSelected={(gameController.SelectedPiece == targetPiece)} " +
             $"highlightCount={boardView.HighlightCount} " +
@@ -330,9 +339,12 @@ public static class XRControllerVerification
         }
 
         XRSimpleInteractable interactable = destinationView.GetComponent<XRSimpleInteractable>();
+        VrSelectionBridge destinationBridge = destinationView.GetComponent<VrSelectionBridge>();
         Debug.Log("CHESS_CGI_XR_CONTROLLER_CHECK " +
             $"destinationSquare={algebraic} destinationInteractableFound={interactable != null} " +
-            $"destinationBridgeFound={destinationView.GetComponent<VrSelectionBridge>() != null}");
+            $"destinationBridgeFound={destinationBridge != null}");
+        result.Check(interactable != null, $"the highlighted destination square {algebraic} should have an XRSimpleInteractable");
+        result.Check(destinationBridge != null, $"the highlighted destination square {algebraic} should have a VrSelectionBridge");
 
         if (interactable != null)
         {
@@ -365,12 +377,17 @@ public static class XRControllerVerification
     {
         PieceView movedPiece = boardView.Pieces.FirstOrDefault(p => p.Square.Equals(destinationSquare));
         bool originCleared = boardView.Pieces.All(p => !p.Square.Equals(originSquare));
+        bool pieceOnDestination = movedPiece != null && movedPiece.Kind == ChessPieceKind.Pawn;
 
         Debug.Log("CHESS_CGI_XR_CONTROLLER_CHECK " +
             $"selectionClearedAfterMove={(gameController.SelectedPiece == null)} " +
-            $"pieceOnDestination={(movedPiece != null && movedPiece.Kind == ChessPieceKind.Pawn)} " +
+            $"pieceOnDestination={pieceOnDestination} " +
             $"originSquareCleared={originCleared} " +
             $"statusMessage=\"{gameController.StatusMessage}\"");
+
+        result.Check(gameController.SelectedPiece == null, "selection should clear after the move completes");
+        result.Check(pieceOnDestination, "the pawn should be on the destination square after the move");
+        result.Check(originCleared, "the origin square should be empty after the move");
     }
 
     private static void AimControllerAt(Vector3 worldTarget)
@@ -397,6 +414,7 @@ public static class XRControllerVerification
     private static void FailAndStop(string reason)
     {
         Debug.LogError($"CHESS_CGI_XR_CONTROLLER_CHECK FAILED reason=\"{reason}\"");
+        SessionState.SetInt(ExitCodeKey, 1);
         EditorApplication.update -= Tick;
         SessionState.SetBool(ArmedKey, false);
         SessionState.SetBool(DoneKey, true);
@@ -413,6 +431,6 @@ public static class XRControllerVerification
 
         EditorApplication.update -= WaitForEditModeThenExit;
         SessionState.SetBool(DoneKey, false);
-        EditorApplication.Exit(0);
+        EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
     }
 }

@@ -22,11 +22,21 @@ public static class XRProjectValidationCheck
         getIssues.Invoke(null, new object[] { failures, BuildTargetGroup.Standalone });
 
         Debug.Log($"CHESS_CGI_XR_VALIDATION_CHECK platform=Standalone issueCount={failures.Count}");
+
+        XRVerificationResult result = new XRVerificationResult();
         foreach (BuildValidationRule failure in failures)
         {
-            Debug.LogWarning($"CHESS_CGI_XR_VALIDATION_CHECK issue category=\"{failure.Category}\" message=\"{failure.Message}\" error={failure.Error}");
+            if (failure.Error)
+            {
+                result.Check(false, $"blocking validation issue: category=\"{failure.Category}\" message=\"{failure.Message}\"");
+            }
+            else
+            {
+                Debug.LogWarning($"CHESS_CGI_XR_VALIDATION_CHECK issue category=\"{failure.Category}\" message=\"{failure.Message}\" error={failure.Error}");
+            }
         }
 
-        EditorApplication.Exit(0);
+        result.LogSummary("CHESS_CGI_XR_VALIDATION_CHECK");
+        EditorApplication.Exit(result.Passed ? 0 : 1);
     }
 }

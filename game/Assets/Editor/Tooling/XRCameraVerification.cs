@@ -10,12 +10,15 @@ public static class XRCameraVerification
 {
     private const string ArmedKey = "ChessCgiXrCameraCheckArmed";
     private const string DoneKey = "ChessCgiXrCameraCheckDone";
+    private const string ExitCodeKey = "ChessCgiXrCameraCheckExitCode";
     private const string MainScenePath = "Assets/Scenes/Main.unity";
     private const string ApplyOrbitAndZoomMethodName = "ApplyOrbitAndZoom";
     private const int RigSettleFrames = 30;
     private const int OrbitStepCount = 20;
     private const int HoldSimFrames = 5;
     private const int InputBlockedTimeoutSimFrames = 300;
+    private const float VrMinDistance = 2.5f;
+    private const float VrMaxDistance = 6f;
 
     private enum Stage
     {
@@ -41,13 +44,14 @@ public static class XRCameraVerification
     private static BoardSquare destinationSquare;
     private static Vector3 preMovePosition;
     private static Quaternion preMoveRotation;
+    private static readonly XRVerificationResult result = new XRVerificationResult();
 
     static XRCameraVerification()
     {
         if (SessionState.GetBool(DoneKey, false) && !EditorApplication.isPlayingOrWillChangePlaymode)
         {
             SessionState.SetBool(DoneKey, false);
-            EditorApplication.Exit(0);
+            EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
             return;
         }
 
@@ -194,6 +198,11 @@ public static class XRCameraVerification
             $"headsetPresent={XRRig.IsHeadsetPresent} originFound={XRRig.Origin != null} " +
             $"cameraControllerFound={cameraController != null} applyOrbitAndZoomMethodFound={applyOrbitAndZoomMethod != null}");
 
+        result.Check(XRRig.IsHeadsetPresent, "headset should be present in the simulator check");
+        result.Check(XRRig.Origin != null, "XR Origin should be found");
+        result.Check(cameraController != null, "CameraController should be found");
+        result.Check(applyOrbitAndZoomMethod != null, "CameraController.ApplyOrbitAndZoom should be found");
+
         return XRRig.Origin != null && cameraController != null && gameController != null &&
             boardView != null && applyOrbitAndZoomMethod != null;
     }
@@ -205,7 +214,7 @@ public static class XRCameraVerification
 
         for (int i = 0; i < OrbitStepCount; i++)
         {
-            applyOrbitAndZoomMethod.Invoke(cameraController, new object[] { XRRig.Origin, -1f, 0f, 2.5f, 6f });
+            applyOrbitAndZoomMethod.Invoke(cameraController, new object[] { XRRig.Origin, -1f, 0f, VrMinDistance, VrMaxDistance });
         }
 
         Vector3 orbitedPosition = XRRig.Origin.position;
@@ -214,12 +223,20 @@ public static class XRCameraVerification
 
         Vector3 target = new Vector3(0f, 0f, 0.35f);
         float distanceBeforeZoom = Vector3.Distance(orbitedPosition, target);
-        applyOrbitAndZoomMethod.Invoke(cameraController, new object[] { XRRig.Origin, 0f, 0.1f, 2.5f, 6f });
+        applyOrbitAndZoomMethod.Invoke(cameraController, new object[] { XRRig.Origin, 0f, 0.1f, VrMinDistance, VrMaxDistance });
         float distanceAfterZoom = Vector3.Distance(XRRig.Origin.position, target);
 
         Debug.Log("CHESS_CGI_XR_CAMERA_CHECK " +
             $"orbitPositionDelta={orbitPositionDelta:F2} orbitRotationDelta={orbitRotationDelta:F2} " +
             $"distanceBeforeZoom={distanceBeforeZoom:F2} distanceAfterZoom={distanceAfterZoom:F2}");
+
+        result.Check(orbitPositionDelta > 0.05f, "manual orbit should move the XR Origin");
+        result.Check(orbitRotationDelta > 0.5f, "manual orbit should rotate the XR Origin");
+        result.Check(distanceBeforeZoom >= VrMinDistance && distanceBeforeZoom <= VrMaxDistance,
+            $"distanceBeforeZoom={distanceBeforeZoom:F2} should be within the VR zoom bounds [{VrMinDistance}, {VrMaxDistance}]");
+        result.Check(distanceAfterZoom >= VrMinDistance && distanceAfterZoom <= VrMaxDistance,
+            $"distanceAfterZoom={distanceAfterZoom:F2} should be within the VR zoom bounds [{VrMinDistance}, {VrMaxDistance}]");
+        result.Check(distanceAfterZoom < distanceBeforeZoom, "zooming in should move the XR Origin closer to the board");
     }
 
     private static void HoldManualSelect()
@@ -275,12 +292,23 @@ public static class XRCameraVerification
         PieceView movedPiece = boardView.Pieces.FirstOrDefault(p => p.Square.Equals(destinationSquare));
         Vector3 postMovePosition = XRRig.Origin.position;
         Quaternion postMoveRotation = XRRig.Origin.rotation;
+        bool originMovedByTurn = Vector3.Distance(preMovePosition, postMovePosition) > 0.01f;
+        bool originRotatedByTurn = Quaternion.Angle(preMoveRotation, postMoveRotation) > 0.5f;
 
         Debug.Log("CHESS_CGI_XR_CAMERA_CHECK " +
             $"turnFlipped={gameController.CurrentTurn} pieceMoved={movedPiece != null} " +
-            $"originMovedByTurn={Vector3.Distance(preMovePosition, postMovePosition) > 0.01f} " +
-            $"originRotatedByTurn={Quaternion.Angle(preMoveRotation, postMoveRotation) > 0.5f} " +
+            $"originMovedByTurn={originMovedByTurn} " +
+            $"originRotatedByTurn={originRotatedByTurn} " +
             $"currentPerspective={cameraController.CurrentPerspective}");
+
+        result.Check(gameController.CurrentTurn == ChessSide.Black, "the turn should pass to Black after the move");
+        result.Check(movedPiece != null, "the pawn should be on the destination square after the move");
+        result.Check(!originMovedByTurn, "the XR Origin should not move on a turn-only change");
+        result.Check(!originRotatedByTurn, "the XR Origin should not rotate on a turn-only change");
+        result.Check(cameraController.CurrentPerspective == ChessSide.White, "the retired per-turn flip should leave CurrentPerspective at White");
+
+        result.LogSummary("CHESS_CGI_XR_CAMERA_CHECK");
+        SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
     }
 
     private static void AimControllerAt(Vector3 worldTarget)
@@ -307,6 +335,7 @@ public static class XRCameraVerification
     private static void FailAndStop(string reason)
     {
         Debug.LogError($"CHESS_CGI_XR_CAMERA_CHECK FAILED reason=\"{reason}\"");
+        SessionState.SetInt(ExitCodeKey, 1);
         EditorApplication.update -= Tick;
         SessionState.SetBool(ArmedKey, false);
         SessionState.SetBool(DoneKey, true);
@@ -323,6 +352,6 @@ public static class XRCameraVerification
 
         EditorApplication.update -= WaitForEditModeThenExit;
         SessionState.SetBool(DoneKey, false);
-        EditorApplication.Exit(0);
+        EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
     }
 }
