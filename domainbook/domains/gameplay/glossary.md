@@ -1,69 +1,108 @@
-# Gameplay glossary
+# Glossário de gameplay
 
-The words the gameplay context uses for the match and its rules. A term is an H2
-heading with its definition below it.
+As palavras que o contexto de gameplay usa para a partida e suas regras. Um
+termo é um heading H2 com sua definição logo abaixo.
 
-## Move
+## Jogada
 
-A piece leaving one square for another, judged legal by the rules before it is
-played. Shown in the history as origin, a separator, and destination — a dash
-for a quiet move, an `x` for a capture.
+Uma peça saindo de uma casa para outra, julgada legal pelas regras antes de
+ser jogada. Mostrada no histórico como origem, um separador e destino — um
+traço para uma jogada silenciosa, um `x` para uma captura.
 
-- **Aliases:** Jogada, Lance
+- **Aliases:** Move, Lance
 - **Status:** validated
-- **Example:** `e2-e4`; `Brancas: e2-e4` in the history line.
+- **Example:** `e2-e4`; `Brancas: e2-e4` na linha do histórico.
 
-## Legal destination
+## Destino legal
 
-A square the rules allow the selected piece to move to. The controller only ever
-offers this set, and the board highlights it.
+Uma casa para a qual as regras permitem que a peça selecionada se mova. O
+controlador só oferece esse conjunto, e o tabuleiro o destaca.
 
-- **Aliases:** Destino legal
-- **Status:** validated
-
-## Capture
-
-A move that lands on a square holding an opponent piece, removing it from the
-board. Written with an `x` between origin and destination.
-
-- **Aliases:** Captura
+- **Aliases:** Legal destination
 - **Status:** validated
 
-## Turn
+## Captura
 
-Whose move it is, White or Black. It passes to the other side after a legal
-move, and the camera turns with it.
+Uma jogada que termina em uma casa ocupada por uma peça adversária, removendo-a
+do tabuleiro. Escrita com um `x` entre origem e destino.
 
-- **Aliases:** Turno
+- **Aliases:** Capture
 - **Status:** validated
 
-## Check
+## Turno
 
-A position where the side to move has its king attacked and must answer it.
+De quem é a vez de jogar, Brancas ou Pretas. Passa para o outro lado após uma
+jogada legal, e a câmera gira junto.
 
-- **Aliases:** Xeque
+- **Aliases:** Turn
 - **Status:** validated
 
-## Checkmate
+## Xeque
 
-A check the side to move cannot escape. It ends the game in favour of the other
-side.
+Uma posição em que o lado a jogar tem seu rei atacado e precisa respondê-lo.
 
-- **Aliases:** Xeque-mate
+- **Aliases:** Check
 - **Status:** validated
 
-## Draw
+## Xeque-mate
 
-A game that ends with neither side winning — stalemate or any drawn position the
-rules recognise.
+Um xeque que o lado a jogar não consegue escapar. Encerra a partida a favor
+do outro lado.
 
-- **Aliases:** Empate
+- **Aliases:** Checkmate
 - **Status:** validated
 
-## Promotion
+## Empate
 
-A pawn reaching the far rank becoming another kind. The move pauses for the
-player to choose queen, rook, bishop, or knight before it is committed.
+Uma partida que termina sem vencedor — afogamento ou qualquer posição de
+empate que as regras reconheçam.
 
-- **Aliases:** Promoção
+- **Aliases:** Draw
 - **Status:** validated
+
+## Promoção
+
+Um peão que chega à última linha se transformando em outro tipo de peça. A
+jogada pausa para o jogador escolher dama, torre, bispo ou cavalo antes de
+ser confirmada.
+
+- **Aliases:** Promotion
+- **Status:** validated
+
+## Adversário controlado pelo computador
+
+Participante não humano que controla exatamente um lado de uma partida local e
+fornece uma jogada quando esse lado possui o turno. A implementação proposta usa
+um motor de xadrez externo, mas sempre devolve a jogada candidata às regras
+locais antes que a partida seja alterada.
+
+- **Aliases:** Adversário de IA, Computer opponent, Computer player
+- **Status:** draft
+
+## Nível de dificuldade
+
+Configuração apresentada ao jogador que limita a força e o orçamento de tempo
+do adversário controlado pelo computador sem modificar quais movimentos são
+legais no xadrez.
+
+- **Aliases:** Dificuldade, Perfil de dificuldade, Difficulty level
+- **Status:** draft
+
+## Estado de pensamento
+
+Intervalo entre o adversário receber uma fotografia imutável da posição e sua
+jogada candidata ser aceita ou a busca falhar. A entrada humana de jogada fica
+bloqueada nesse estado, mas renderização, interface e rastreamento do headset
+continuam funcionando.
+
+- **Aliases:** IA pensando, Turno do computador, Thinking state
+- **Status:** draft
+
+## Motor de xadrez
+
+Programa que recebe uma posição e configurações de busca e devolve uma jogada
+candidata. Ele não controla nem altera diretamente a partida viva; as regras
+locais continuam sendo a autoridade final.
+
+- **Aliases:** Chess engine, Motor de IA
+- **Status:** draft

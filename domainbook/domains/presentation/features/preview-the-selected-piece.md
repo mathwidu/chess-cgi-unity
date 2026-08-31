@@ -1,50 +1,50 @@
 ---
 id: preview-the-selected-piece
-name: Preview the selected piece
+name: Ver o preview da peça selecionada
 status: ready
 owners: [mathwidu]
-terms: [selected-piece-preview, custom-piece]
+terms: [preview-da-peça-selecionada, peça-personalizada]
 decisions: [presentation/ADR-0001]
 ---
 
 ## Story
 
-As a player who picked a piece
-I want to see that piece on its own and turn it around
-So that I can read which character it is and look at the model
+Como jogador que escolheu uma peça
+Quero vê-la sozinha e girá-la
+Para que eu consiga ler qual personagem é e observar o modelo
 
-## Rule: Selecting a piece shows it in its own preview
+## Rule: Selecionar uma peça a mostra em seu próprio preview
 
 ```gherkin
-Example: The panel appears with the selected piece
-  Given no piece is selected and the panel is hidden
-  When a piece is selected
-  Then the selected-piece panel appears
-  And it shows that piece rendered on its own, with its name and square
+Example: O painel aparece com a peça selecionada
+  Given nenhuma peça está selecionada e o painel está oculto
+  When uma peça é selecionada
+  Then o painel da peça selecionada aparece
+  And ele mostra essa peça renderizada sozinha, com seu nome e sua casa
 
-Example: Clearing the selection hides the panel
-  Given a piece is selected and the panel is shown
-  When the selection is cleared
-  Then the panel is hidden
-  And the preview piece is torn down
+Example: Limpar a seleção oculta o painel
+  Given uma peça está selecionada e o painel está exibido
+  When a seleção é limpa
+  Then o painel é ocultado
+  And a peça do preview é desfeita
 ```
 
-## Rule: The preview can be turned and zoomed without touching the board
+## Rule: O preview pode ser girado e ter o zoom ajustado sem tocar o tabuleiro
 
 ```gherkin
-Example: Dragging turns the preview only
-  Given the selected-piece preview is shown
-  When the player drags across it
-  Then the preview piece rotates
-  And no piece on the board moves
+Example: Arrastar gira apenas o preview
+  Given o preview da peça selecionada está exibido
+  When o jogador arrasta sobre ele
+  Then a peça do preview gira
+  And nenhuma peça do tabuleiro se move
 
-Example: The zoom buttons and the wheel change the preview distance
-  Given the selected-piece preview is shown
-  When the player uses the "+" or "-" button, or scrolls over the preview
-  Then the preview camera moves nearer or further
-  And the board camera is unchanged
+Example: Os botões de zoom e a roda mudam a distância do preview
+  Given o preview da peça selecionada está exibido
+  When o jogador usa o botão "+" ou "-", ou rola a roda sobre o preview
+  Then a câmera do preview se move para mais perto ou mais longe
+  And a câmera do tabuleiro permanece inalterada
 ```
 
 ## Open Questions
 
-None.
+Nenhuma.

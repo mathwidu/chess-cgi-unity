@@ -1,247 +1,275 @@
 ---
 id: play-in-vr
-name: Play in VR
+name: Jogar em VR
 status: draft
 owners: [mathwidu, RafaelAugustScherer]
-terms: [vr-mode, headset, motion-controller, ray-interactor]
+terms: [modo-vr, óculos-vr, controle-de-movimento, raio-de-seleção]
 ---
 
 ## Story
 
-As a player with a VR headset
-I want to sit at the chess board in virtual reality and pick pieces with my hands
-So that the game I already have becomes an immersive match instead of a screen one
+Como jogador com um headset de VR
+Quero sentar diante do tabuleiro de xadrez em realidade virtual e escolher peças com as mãos
+Para que o jogo que já tenho se torne uma partida imersiva em vez de uma de tela
 
-This is a plan, not built work. It is a feasibility study and a high-level
-conversion route for taking the current desktop build to VR mode on HTC Vive
-(PC-tethered) and Meta Quest 3 (standalone, plus PC over Link). It stays in the
-interaction context because the change is mostly about how the player perceives
-and controls the game — the [headset](../glossary.md) drives the view and the
-[motion controller](../glossary.md) replaces the mouse — with supporting work in
-presentation's render pipeline. When the route is agreed and the XR framework is
-chosen, that choice earns a decision record and the rules below become the
-acceptance criteria for building it.
+Isto é um plano, não um trabalho construído. É um estudo de viabilidade e uma
+rota de conversão de alto nível para levar a build atual de desktop ao modo VR
+no HTC Vive (conectado a um PC) e no Meta Quest 3 (standalone, além de PC via
+Link). Permanece no contexto de interação porque a mudança é sobretudo sobre
+como o jogador percebe e controla o jogo — os [óculos VR](../glossary.md)
+comandam a visão e o [controle de movimento](../glossary.md) substitui o mouse
+— com trabalho de suporte no pipeline de renderização da apresentação. Quando
+a rota for combinada e o framework de XR estiver escolhido, essa escolha
+ganha um registro de decisão e as regras abaixo se tornam os critérios de
+aceite para construí-la.
 
-### Feasibility study
+### Estudo de viabilidade
 
-#### Verdict
+#### Veredito
 
-Feasible, and a good fit. Both target headsets are reachable through one code
-path — Unity's OpenXR plugin — and the current project is already on the stack
-Unity's XR tooling expects: Unity 6.3 (6000.3), Universal Render Pipeline
-(URP) 17.3, and the new Input System (1.19), which the XR Interaction Toolkit
-builds on. The game is stationary and table-scale, so it avoids the hardest VR
-problem — locomotion comfort. The bulk of the effort is re-plumbing input and
-the camera, plus a standalone-performance pass for the Quest.
+Viável, e um bom encaixe. Os dois headsets alvo são alcançados por um único
+caminho de código — o plugin OpenXR da Unity — e o projeto atual já está na
+pilha que o ferramental de XR da Unity espera: Unity 6.3 (6000.3), Universal
+Render Pipeline (URP) 17.3 e o novo Input System (1.19), sobre o qual o XR
+Interaction Toolkit é construído. O jogo é estacionário e em escala de mesa,
+então evita o problema mais difícil de VR — o conforto de locomoção. O grosso
+do esforço é reencanar a entrada e a câmera, além de um trabalho de
+desempenho standalone para o Quest.
 
-#### The two headsets, one path
+#### Os dois headsets, um único caminho
 
-- **OpenXR is the unified target.** The OpenXR Plugin (`com.unity.xr.openxr`)
-  lets one build drive many runtimes. HTC Vive is reached on the PC as an OpenXR
-  runtime (SteamVR); Meta Quest 3 is reached as an OpenXR runtime both standalone
-  on-device and over Link on the PC. Controllers are selected at runtime from the
-  **Enabled Interaction Profiles** list, so the same build can list the **HTC Vive
-  Controller Profile** and the **Meta Quest Touch (Oculus Touch) Controller
-  Profile** and use whichever device is present.
-- **Quest 3 is a separate build target.** It is an Android device: a standalone
-  Quest build is an Android/ARM64 app, while Vive is a Windows standalone app.
-  These are two player builds from one project — a Windows PC-VR build and an
-  Android Quest build — differing in platform settings, not in game code.
+- **OpenXR é o alvo unificado.** O OpenXR Plugin (`com.unity.xr.openxr`)
+  permite que uma única build controle muitos runtimes. O HTC Vive é
+  alcançado no PC como um runtime OpenXR (SteamVR); o Meta Quest 3 é
+  alcançado como um runtime OpenXR tanto standalone no próprio dispositivo
+  quanto via Link no PC. Os controles são selecionados em tempo de execução
+  a partir da lista **Enabled Interaction Profiles**, então a mesma build
+  pode listar o **HTC Vive Controller Profile** e o **Meta Quest Touch
+  (Oculus Touch) Controller Profile** e usar o dispositivo presente.
+- **O Quest 3 é um alvo de build separado.** É um dispositivo Android: uma
+  build standalone do Quest é um app Android/ARM64, enquanto o Vive é um app
+  standalone Windows. São duas builds de jogador a partir de um único
+  projeto — uma build Windows PC-VR e uma build Android Quest — que diferem
+  nas configurações de plataforma, não no código do jogo.
 
-#### What the current project already gives us
+#### O que o projeto atual já nos dá
 
-- **Colliders on pieces and squares.** `InputController` already raycasts
-  `Physics.Raycast` against `PieceView` and `SquareView` colliders. The same
-  colliders are what a controller ray or a grab interactor hits, so the pickable
-  targets exist.
-- **The scene is built in code at runtime.** `BoardView`, `PieceFactory`, and
-  `GameHud` construct the board, pieces, and UI in scripts. A code-built scene is
-  easier to re-anchor and re-scale for VR than a hand-laid one.
-- **Custom models load through glTFast**, and URP + Shader Graph + built-in
-  shaders already support single-pass instanced stereo rendering, so the piece
-  models render correctly in both eyes without shader work.
-- **Input System is already in.** XRI reads input through Input System actions;
-  the project does not need to migrate off legacy input first.
+- **Colliders nas peças e casas.** `InputController` já faz raycast com
+  `Physics.Raycast` contra os colliders de `PieceView` e `SquareView`. Esses
+  mesmos colliders são o que um raio de controle ou um grab interactor
+  atinge, então os alvos selecionáveis já existem.
+- **A cena é construída em código em tempo de execução.** `BoardView`,
+  `PieceFactory` e `GameHud` constroem o tabuleiro, as peças e a interface
+  em scripts. Uma cena construída em código é mais fácil de reancorar e
+  reescalar para VR do que uma montada manualmente.
+- **Modelos customizados carregam via glTFast**, e URP + Shader Graph +
+  shaders embutidos já suportam renderização estéreo single-pass instanced,
+  então os modelos de peça renderizam corretamente nos dois olhos sem
+  trabalho de shader.
+- **O Input System já está em uso.** O XRI lê entrada por meio de ações do
+  Input System; o projeto não precisa migrar da entrada legada primeiro.
 
-#### What must change (the real work)
+#### O que precisa mudar (o trabalho de verdade)
 
-- **The camera stops being ours to move.** In VR the head-mounted display drives
-  the camera every frame through a Tracked Pose Driver under an XR Origin rig.
-  `CameraController`'s orbit, zoom, and swing-to-face-the-player-on-move logic no
-  longer applies to the eye camera — you cannot move a camera the headset owns.
-  The [perspective](../glossary.md) idea has to move from "point the camera at the
-  side on move" to "re-anchor or turn the board rig", or be dropped in favour of
-  the player physically turning their head.
-- **Mouse picking is replaced by interactors.** `InputController`'s
-  screen-raycast-on-left-click becomes an XRI interactor: point a
-  [ray interactor](../glossary.md) at a piece and pull the trigger, or reach out
-  and grab it directly. This is a rewrite of the input path, not a tweak.
-- **The HUD must leave the screen.** `GameHud` builds a screen-space overlay
-  Canvas (title, turn, status, move history, promotion prompt, start screen, and
-  the selected-piece preview). XRI can only drive a **world-space** Canvas, so the
-  HUD becomes a panel placed in the scene, pointed at with the controller. The
-  render-texture selected-piece preview still works; only its pointer input moves
-  to the controller.
-- **The Quest has a tight frame budget.** A standalone mobile GPU rendering two
-  eyes at 72–120 Hz is far less headroom than a PC. Post-processing and overdraw
-  that are free on desktop are not on Quest. The scene is small, which helps, but
-  a performance pass is required, not optional.
+- **A câmera deixa de ser nossa para mover.** Em VR, o head-mounted display
+  comanda a câmera a cada quadro por meio de um Tracked Pose Driver sob um
+  rig XR Origin. A lógica de órbita, zoom e giro-para-o-jogador-a-jogar do
+  `CameraController` deixa de valer para a câmera do olho — não é possível
+  mover uma câmera que o headset possui. A ideia de
+  [perspectiva](../glossary.md) precisa passar de "apontar a câmera para o
+  lado a jogar" para "reancorar ou girar o rig do tabuleiro", ou ser
+  abandonada em favor de o jogador girar fisicamente a cabeça.
+- **A seleção por mouse é substituída por interactors.** O
+  raycast-de-tela-no-clique-esquerdo do `InputController` vira um interactor
+  XRI: apontar um [raio de seleção](../glossary.md) para uma peça e puxar o
+  gatilho, ou esticar a mão e agarrá-la diretamente. É uma reescrita do
+  caminho de entrada, não um ajuste.
+- **O HUD precisa sair da tela.** `GameHud` constrói um Canvas overlay em
+  espaço de tela (título, turno, status, histórico de jogadas, pedido de
+  promoção, tela inicial e o preview da peça selecionada). O XRI só
+  consegue comandar um Canvas em **world-space**, então o HUD vira um
+  painel colocado na cena, apontado com o controle. O preview em
+  render-texture da peça selecionada continua funcionando; só sua entrada
+  de apontador passa a vir do controle.
+- **O Quest tem um orçamento de quadro apertado.** Uma GPU móvel standalone
+  renderizando dois olhos a 72–120 Hz tem muito menos folga do que um PC.
+  Pós-processamento e overdraw que são de graça no desktop não são no
+  Quest. A cena é pequena, o que ajuda, mas um trabalho de desempenho é
+  obrigatório, não opcional.
 
-#### Effort and risk
+#### Esforço e risco
 
-- **Effort:** medium. No new gameplay or rules — `ChessGameController` and
-  `ChessRulesAdapter` are untouched. The work concentrates in this context
-  (input, camera) and in presentation (render settings, world-space HUD).
-- **Main risks:** (1) reworking the per-turn perspective so a shared-screen idea
-  still makes sense for one person in a headset; (2) Quest standalone performance;
-  (3) two build targets to keep configured and validated. None are blockers.
+- **Esforço:** médio. Nenhum gameplay ou regra nova — `ChessGameController`
+  e `ChessRulesAdapter` ficam intocados. O trabalho se concentra neste
+  contexto (entrada, câmera) e na apresentação (configurações de
+  renderização, HUD em world-space).
+- **Principais riscos:** (1) refazer a perspectiva por turno para que uma
+  ideia de tela compartilhada ainda faça sentido para uma pessoa em um
+  headset; (2) desempenho standalone no Quest; (3) dois alvos de build para
+  manter configurados e validados. Nenhum é bloqueador.
 
-### Conversion plan (high level)
+### Plano de conversão (alto nível)
 
-1. **Add the XR packages and turn on OpenXR.** Through the Package Manager, add
-   XR Plugin Management (`com.unity.xr.management`), the OpenXR Plugin
-   (`com.unity.xr.openxr`), and the XR Interaction Toolkit
-   (`com.unity.xr.interaction.toolkit`, which pulls in XR Core Utilities). Let the
-   editor resolve the versions it verifies for 6000.3 — at the time of writing
-   that is XRI 3.3.2, OpenXR Plugin on the 1.16.x line, and XR Core Utilities on
-   the 2.5.x line. In **Project Settings → XR Plug-in Management**, enable
-   **OpenXR** on both the Windows/Standalone tab (for Vive) and the Android tab
-   (for Quest).
+1. **Adicionar os pacotes de XR e ligar o OpenXR.** Pelo Package Manager,
+   adicionar o XR Plugin Management (`com.unity.xr.management`), o OpenXR
+   Plugin (`com.unity.xr.openxr`) e o XR Interaction Toolkit
+   (`com.unity.xr.interaction.toolkit`, que traz o XR Core Utilities
+   junto). Deixar o editor resolver as versões que verifica para 6000.3 —
+   no momento em que isto foi escrito, isso é XRI 3.3.2, OpenXR Plugin na
+   linha 1.16.x e XR Core Utilities na linha 2.5.x. Em **Project Settings →
+   XR Plug-in Management**, habilitar **OpenXR** tanto na aba
+   Windows/Standalone (para o Vive) quanto na aba Android (para o Quest).
 
-2. **Set the interaction profiles and platform settings.**
-   - **Both:** under **XR Plug-in Management → OpenXR**, add the **HTC Vive
-     Controller Profile** and the **Meta Quest Touch (Oculus Touch) Controller
-     Profile** to Enabled Interaction Profiles.
-   - **Quest 3:** switch to the **Meta Quest build platform/profile** (Unity 6.1+),
-     which installs the **Unity OpenXR: Meta** package
-     (`com.unity.xr.meta-openxr`) and enables the **Meta Quest feature group**.
-     Confirm the defaults it sets: Graphics API **Vulkan**, Scripting Backend
-     **IL2CPP**, Target Architecture **ARM64**, minimum Android **API 29**, target
-     **API 32**, Stereo Rendering **Instancing**.
-   - **Vive / PC-VR:** build target Windows standalone; the active OpenXR runtime
-     is SteamVR. No mobile constraints, so it has performance headroom.
-   - Run **XR Plug-in Management → Project Validation** on each platform tab and
-     clear every flagged item.
+2. **Definir os perfis de interação e as configurações de plataforma.**
+   - **Ambos:** em **XR Plug-in Management → OpenXR**, adicionar o **HTC
+     Vive Controller Profile** e o **Meta Quest Touch (Oculus Touch)
+     Controller Profile** a Enabled Interaction Profiles.
+   - **Quest 3:** trocar para o **Meta Quest build platform/profile**
+     (Unity 6.1+), que instala o pacote **Unity OpenXR: Meta**
+     (`com.unity.xr.meta-openxr`) e habilita o **Meta Quest feature
+     group**. Confirmar os padrões que ele define: Graphics API
+     **Vulkan**, Scripting Backend **IL2CPP**, Target Architecture
+     **ARM64**, Android mínimo **API 29**, alvo **API 32**, Stereo
+     Rendering **Instancing**.
+   - **Vive / PC-VR:** alvo de build Windows standalone; o runtime OpenXR
+     ativo é o SteamVR. Sem restrições móveis, então há folga de
+     desempenho.
+   - Rodar **XR Plug-in Management → Project Validation** em cada aba de
+     plataforma e resolver todo item sinalizado.
 
-3. **Set URP up for stereo.** Set the OpenXR **Render Mode** to **Single Pass
-   Instanced** for each provider (it falls back to multi-pass where unsupported).
-   Keep MSAA on the URP asset for edge quality, and stay within the XR-supported
-   post-processing set — Bloom, Depth of Field, Tonemapping and colour adjustments
-   work in XR, while Lens Distortion, Spatial-Temporal Post-Processing, physical
-   camera, and multi-display do not. Consider fixed-foveated rendering (URP 17's
-   Forward+ path supports it) as a Quest performance lever.
+3. **Configurar o URP para estéreo.** Definir o **Render Mode** do OpenXR
+   como **Single Pass Instanced** para cada provedor (recai para
+   multi-pass onde não é suportado). Manter o MSAA no asset do URP para
+   qualidade de borda, e permanecer dentro do conjunto de pós-processamento
+   suportado em XR — Bloom, Depth of Field, Tonemapping e ajustes de cor
+   funcionam em XR, enquanto Lens Distortion, Spatial-Temporal
+   Post-Processing, câmera física e multi-display não. Considerar
+   renderização fixed-foveated (o caminho Forward+ do URP 17 suporta) como
+   uma alavanca de desempenho no Quest.
 
-4. **Replace the camera with an XR Origin rig.** Swap the single main camera for
-   an **XR Origin (VR)**: a Camera Offset holding the Main Camera, with a **Tracked
-   Pose Driver** binding the eye pose to the headset. For a seated table game, use
-   **Device** tracking-origin mode and set the eye height with **Camera Y Offset**,
-   and wire a **recenter** control (`XRInputSubsystem.TryRecenter`) so the player
-   can reset the board in front of their seat. Point the existing raycast/interactor
-   camera reference at this new eye camera.
+4. **Substituir a câmera por um rig XR Origin.** Trocar a câmera principal
+   única por um **XR Origin (VR)**: um Camera Offset segurando a Main
+   Camera, com um **Tracked Pose Driver** vinculando a pose do olho ao
+   headset. Para um jogo de mesa sentado, usar o modo de tracking-origin
+   **Device** e definir a altura do olho com **Camera Y Offset**, e ligar
+   um controle de **recentralização** (`XRInputSubsystem.TryRecenter`) para
+   que o jogador possa reposicionar o tabuleiro à sua frente. Apontar a
+   referência de câmera existente do raycast/interactor para essa nova
+   câmera do olho.
 
-5. **Replace mouse picking with controller interaction.** Put a **Near-Far
-   Interactor** on each controller (it unifies the near/direct and far/ray cases
-   that used to need two components) and add the XRI **Default Input Actions**.
-   Give each piece an interactable — an **XR Grab Interactable** for reach-and-grab,
-   or an **XR Simple Interactable** for point-and-select — reusing the colliders
-   `PieceView`/`SquareView` already carry. Bridge the interactor's select event to
-   the existing `ChessGameController.SelectPiece` / `SelectSquare` calls, so the
-   rules layer sees the same commands it does today. Keep the legal-destinations
-   highlight; it already marks squares in the scene.
+5. **Substituir a seleção por mouse pela interação com o controle.** Pôr
+   um **Near-Far Interactor** em cada controle (ele unifica os casos
+   near/direct e far/ray que antes precisavam de dois componentes) e
+   adicionar as **Default Input Actions** do XRI. Dar a cada peça um
+   interactable — um **XR Grab Interactable** para alcançar-e-agarrar, ou
+   um **XR Simple Interactable** para apontar-e-selecionar — reaproveitando
+   os colliders que `PieceView`/`SquareView` já carregam. Ligar o evento de
+   seleção do interactor às chamadas existentes de
+   `ChessGameController.SelectPiece` / `SelectSquare`, para que a camada de
+   regras veja os mesmos comandos que vê hoje. Manter o destaque dos
+   destinos legais; ele já marca casas na cena.
 
-6. **Move the HUD to world space.** Set the HUD Canvas render mode to **World
-   Space** and place it as a panel in the scene (for example beside or above the
-   board). Add a **Tracked Device Graphic Raycaster** to the Canvas and swap the
-   EventSystem's Standalone Input Module for the **XR UI Input Module**, so the
-   controller ray drives buttons and the promotion prompt. The selected-piece
-   render-texture preview stays; repoint its drag/scroll input from the mouse to
-   the controller.
+6. **Mover o HUD para o world space.** Definir o render mode do Canvas do
+   HUD como **World Space** e posicioná-lo como um painel na cena (por
+   exemplo, ao lado ou acima do tabuleiro). Adicionar um **Tracked Device
+   Graphic Raycaster** ao Canvas e trocar o Standalone Input Module do
+   EventSystem pelo **XR UI Input Module**, para que o raio do controle
+   acione botões e o pedido de promoção. O preview em render-texture da
+   peça selecionada permanece; apenas sua entrada de arrastar/rolar passa
+   do mouse para o controle.
 
-7. **Rework the per-turn perspective for VR.** Decide what "the view faces the
-   side on move" means for one player in a headset (see Open Questions). Likely the
-   board rig turns 180° between turns, or the pieces/labels reorient, rather than
-   the camera moving. Retire `CameraController`'s orbit/zoom/swing on the eye
-   camera; any of it that survives acts on the XR Origin or the board, not the HMD.
+7. **Refazer a perspectiva por turno para VR.** Decidir o que "a visão
+   fica voltada para o lado a jogar" significa para um único jogador em um
+   headset (ver Open Questions). Provavelmente o rig do tabuleiro gira
+   180° entre os turnos, ou as peças/rótulos se reorientam, em vez de a
+   câmera se mover. Aposentar a órbita/zoom/giro do `CameraController` na
+   câmera do olho; o que sobreviver disso atua sobre o XR Origin ou o
+   tabuleiro, não sobre o HMD.
 
-8. **Validate, build, and test on device.** Re-run project validation, build the
-   Windows PC-VR player and the Android Quest player, and test each on its
-   hardware. Do a Quest performance pass — hold the target refresh, watch draw
-   calls and overdraw, and lean on single-pass instanced and foveated rendering.
+8. **Validar, compilar e testar no dispositivo.** Rodar novamente a
+   validação do projeto, compilar o player Windows PC-VR e o player
+   Android Quest, e testar cada um em seu hardware. Fazer um trabalho de
+   desempenho no Quest — manter a taxa de atualização alvo, observar
+   draw calls e overdraw, e apoiar-se em single-pass instanced e
+   renderização foveada.
 
-## Rule: The player sees and controls the match from inside a headset
+## Rule: O jogador vê e controla a partida de dentro de um headset
 
-These are the acceptance criteria for when this draft is built.
+Estes são os critérios de aceite para quando este rascunho for construído.
 
 ```gherkin
-Example: The headset drives the view
-  Given VR mode is running on a connected headset
-  When the player moves their head
-  Then the eye camera follows the headset pose
-  And the per-turn camera swing no longer moves the eye camera
+Example: O headset comanda a visão
+  Given o modo VR está rodando em um headset conectado
+  When o jogador move a cabeça
+  Then a câmera do olho segue a pose do headset
+  And o giro de câmera por turno não move mais a câmera do olho
 
-Example: Pointing at a piece and pulling the trigger selects it
-  Given it is the player's turn in VR mode
-  When the player points the controller ray at one of their pieces and pulls the trigger
-  Then that piece is selected
-  And its legal destinations are highlighted, as with a mouse click
+Example: Apontar para uma peça e puxar o gatilho a seleciona
+  Given é a vez do jogador no modo VR
+  When o jogador aponta o raio do controle para uma de suas peças e puxa o gatilho
+  Then essa peça é selecionada
+  And seus destinos legais são destacados, como em um clique de mouse
 
-Example: The same rules layer receives the same commands
-  Given a piece is selected in VR mode
-  When the player points at a highlighted square and pulls the trigger
-  Then the move reaches the rules through the existing select-destination command
-  And the outcome matches the desktop build
+Example: A mesma camada de regras recebe os mesmos comandos
+  Given uma peça está selecionada no modo VR
+  When o jogador aponta para uma casa destacada e puxa o gatilho
+  Then a jogada chega às regras pelo comando existente de escolha de destino
+  And o resultado corresponde ao da build de desktop
 ```
 
-## Rule: The interface lives in the world, not on the screen
+## Rule: A interface vive no mundo, não na tela
 
 ```gherkin
-Example: The HUD is a world-space panel the controller can use
-  Given VR mode is running
-  When the player points the controller ray at the new-game button on the HUD panel
-  Then the button responds to the controller, not to a mouse
-  And no screen-space overlay is shown to the headset
+Example: O HUD é um painel em world-space que o controle pode usar
+  Given o modo VR está rodando
+  When o jogador aponta o raio do controle para o botão de nova partida no painel do HUD
+  Then o botão responde ao controle, não a um mouse
+  And nenhum overlay em espaço de tela é mostrado ao headset
 
-Example: Promotion is chosen with the controller
-  Given a pawn reaches the far rank in VR mode
-  When the promotion prompt appears in world space
-  Then the player picks queen, rook, bishop, or knight with the controller ray
+Example: A promoção é escolhida com o controle
+  Given um peão chega à última linha no modo VR
+  When o pedido de promoção aparece em world space
+  Then o jogador escolhe dama, torre, bispo ou cavalo com o raio do controle
 ```
 
-## Rule: The same build serves HTC Vive and Meta Quest 3
+## Rule: A mesma build atende HTC Vive e Meta Quest 3
 
 ```gherkin
-Example: One build reads whichever controller is present
-  Given the build lists both the HTC Vive and Meta Quest Touch interaction profiles
-  When the player runs it on a Vive or on a Quest 3
-  Then OpenXR binds the controller of the device in use
-  And input works without a separate code path per headset
+Example: Uma build lê qualquer controle presente
+  Given a build lista os perfis de interação do HTC Vive e do Meta Quest Touch
+  When o jogador a executa em um Vive ou em um Quest 3
+  Then o OpenXR vincula o controle do dispositivo em uso
+  And a entrada funciona sem um caminho de código separado por headset
 
-Example: Quest runs standalone within its frame budget
-  Given the Android build runs on Meta Quest 3 with single pass instanced rendering
-  When a match is played
-  Then the app holds its target refresh rate
+Example: O Quest roda standalone dentro do seu orçamento de quadro
+  Given a build Android roda no Meta Quest 3 com renderização single pass instanced
+  When uma partida é jogada
+  Then o aplicativo mantém sua taxa de atualização alvo
 ```
 
 ## Open Questions
 
-- **What does the per-turn perspective become in VR?** On a shared screen the
-  camera swung to face the player on move. With one person in a headset, does the
-  board turn between turns, do the pieces/labels reorient, or does the idea retire
-  in favour of the player turning their head? This needs a design call before
-  step 7 is built; it is the one open behavioural decision, and it is settled by
-  agreeing the intended VR turn experience, not by more research.
-- **One seat or hot-seat pass-the-headset?** The desktop build is two players on
-  one screen. VR is one headset — is VR mode single-seat (one human, or versus a
-  future AI), or do two players pass the headset each turn? This scopes whether the
-  two-sided perspective work in step 7 is even needed.
-- **Which XR framework is committed to?** The plan assumes Unity's OpenXR + XR
-  Interaction Toolkit. That commitment earns a decision record once agreed, with
-  the Meta all-in-one SDK considered and rejected as the alternative.
+- **O que a perspectiva por turno se torna em VR?** Em uma tela
+  compartilhada, a câmera girava para o jogador a jogar. Com uma pessoa em
+  um headset, o tabuleiro gira entre os turnos, as peças/rótulos se
+  reorientam, ou a ideia se aposenta em favor de o jogador girar a cabeça?
+  Isso precisa de uma decisão de design antes de o passo 7 ser construído;
+  é a única decisão comportamental em aberto, e se resolve combinando a
+  experiência de turno pretendida em VR, não com mais pesquisa.
+- **Um assento único ou hot-seat passando o headset?** A build de desktop
+  é dois jogadores em uma tela. VR é um headset — o modo VR é de assento
+  único (um humano, ou contra uma futura IA), ou dois jogadores passam o
+  headset a cada turno? Isso delimita se o trabalho de perspectiva para
+  dois lados no passo 7 sequer é necessário.
+- **A qual framework de XR o projeto se compromete?** O plano assume o
+  OpenXR + XR Interaction Toolkit da Unity. Esse compromisso ganha um
+  registro de decisão quando combinado, com o SDK tudo-em-um da Meta
+  considerado e rejeitado como alternativa.
 
 ### References
 
-Official Unity documentation the study is grounded in (Unity 6.3 / 6000.3 and the
-matching package docs):
+Documentação oficial da Unity em que o estudo se baseia (Unity 6.3 / 6000.3 e a
+documentação correspondente dos pacotes):
 
 - XR overview and project setup — https://docs.unity3d.com/6000.3/Documentation/Manual/XR.html
 - XR Interaction Toolkit 3.3.2 for 6000.3 — https://docs.unity3d.com/6000.3/Documentation/Manual/com.unity.xr.interaction.toolkit.html
