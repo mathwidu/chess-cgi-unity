@@ -61,3 +61,13 @@ peça ou casa para selecioná-la, substituindo o raycast de tela do mouse.
 
 - **Aliases:** Ray interactor, Pointer ray
 - **Status:** draft
+
+## Rastreamento de mãos
+
+Uma forma alternativa de entrada no modo VR: o headset rastreia as mãos
+livres do jogador, sem exigir que ele segure um controle de movimento. O
+jogo alterna automaticamente entre controle e mãos, conforme qual dos dois
+o runtime relata como presente.
+
+- **Aliases:** Hand tracking, Mãos rastreadas
+- **Status:** draft
