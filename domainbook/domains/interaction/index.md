@@ -45,7 +45,9 @@ do lado do jogador ativo.
   Driver e o controle de recentralização — e reaponta o `InputController`
   para a câmera do olho em vez da câmera de desktop. Também constrói um
   ray interactor em cada controle de movimento, vinculado ao gatilho para
-  selecionar.
+  selecionar, e um interactor de [rastreamento de mãos](features/play-in-vr.md)
+  para cada lado; um `XRInputModalityManager` decide qual dos dois — controle
+  ou mão — fica ativo a cada instante.
 - Contexto de seleção em VR: `VrSelectionBridge` mapeia o evento de seleção
   de uma peça ou casa, vindo de um XR Simple Interactable, para os mesmos
   comandos `SelectPiece` / `SelectSquare` que o caminho de clique de
@@ -88,7 +90,9 @@ do lado do jogador ativo.
 
 - Exatamente uma câmera principal faz a seleção, e sua visão corresponde ao
   que o jogador vê.
-- O jogador usa mouse e teclado; não há caminho de toque ou gamepad.
+- No desktop, o jogador usa mouse e teclado; não há caminho de toque ou
+  gamepad. No modo VR, a entrada vem de um controle de movimento ou das mãos
+  rastreadas, nunca de mouse/teclado.
 - Os colliders da apresentação nas peças e casas são o que um raio pode
   atingir; a entrada os lê em vez de tentar adivinhar uma posição do
   tabuleiro a partir de coordenadas de tela.

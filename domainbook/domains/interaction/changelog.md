@@ -31,3 +31,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   olho, dentro de uma faixa de distância própria para a escala de VR; veja
   [play-in-vr](features/play-in-vr.md). O modo desktop permanece
   inalterado.
+- Pacote `com.unity.xr.hands` e a feature OpenXR **Hand Tracking Subsystem**
+  habilitados para Standalone. `XRRig` constrói um interactor de mão para
+  cada lado, extraído das amostras oficiais do XR Interaction Toolkit
+  (Starter Assets + Hands Interaction Demo), e um `XRInputModalityManager`
+  alterna automaticamente entre esses interactors e os de controle
+  existentes conforme o que o runtime relata como presente; veja
+  [play-in-vr](features/play-in-vr.md) e
+  [rastreamento de mãos](glossary.md).
