@@ -1,62 +1,63 @@
-# Interaction glossary
+# Glossário de interação
 
-The words the interaction context uses for input and the camera. A term is an H2
-heading with its definition below it.
+As palavras que o contexto de interação usa para a entrada e a câmera. Um
+termo é um heading H2 com sua definição logo abaixo.
 
-## Selection
+## Seleção
 
-The piece a player has picked to move. Picking a piece shows its legal
-destinations; picking one of them, or pressing `Esc`, ends the selection.
+A peça que um jogador escolheu para jogar. Escolher uma peça mostra seus
+destinos legais; escolher um deles, ou pressionar `Esc`, encerra a seleção.
 
-- **Aliases:** Seleção, Peça selecionada
+- **Aliases:** Selection, Peça selecionada
 - **Status:** validated
 
-## Perspective
+## Perspectiva
 
-The side the main camera faces. It follows the turn, swinging to the player on
-move so each reads the board from their own end.
+O lado para o qual a câmera principal está voltada. Ela acompanha o turno,
+girando para o jogador a jogar, de modo que cada um lê o tabuleiro a partir
+do seu próprio lado.
 
-- **Aliases:** Câmera por turno, Per-turn camera
+- **Aliases:** Perspective, Câmera por turno, Per-turn camera
 - **Status:** validated
 
-## Orbit
+## Órbita
 
-Rotating the main camera around the board with `Q` and `E`, independently of
-whose turn it is.
+Girar a câmera principal ao redor do tabuleiro com `Q` e `E`,
+independentemente de quem está jogando.
 
-- **Aliases:** Girar câmera
+- **Aliases:** Orbit, Girar câmera
 - **Status:** validated
 
-## VR mode
+## Modo VR
 
-The game rendered to a headset and controlled with motion controllers instead of
-on a monitor with mouse and keyboard. A proposed conversion target for HTC Vive
-and Meta Quest 3, not yet built.
+O jogo renderizado para um headset e controlado com controles de movimento em
+vez de monitor, mouse e teclado. Um alvo de conversão proposto para HTC Vive e
+Meta Quest 3, ainda não construído.
 
-- **Aliases:** Modo VR, Immersive mode
+- **Aliases:** VR mode, Immersive mode
 - **Status:** draft
 
-## Headset
+## Óculos VR
 
-The head-mounted display the player wears in VR mode. Its tracked pose drives the
-camera, so the view follows where the player looks rather than swinging to the
-side on move.
+O display montado na cabeça que o jogador usa no modo VR. Sua pose rastreada
+comanda a câmera, então a visão acompanha para onde o jogador olha, em vez de
+girar para o lado a jogar.
 
-- **Aliases:** HMD, Óculos VR
+- **Aliases:** Headset, HMD
 - **Status:** draft
 
-## Motion controller
+## Controle de movimento
 
-A tracked hand controller the player holds in VR mode, used to point at and pick
-pieces in place of the mouse.
+Um controle de mão rastreado que o jogador segura no modo VR, usado para
+apontar e escolher peças no lugar do mouse.
 
-- **Aliases:** Controle, Hand controller
+- **Aliases:** Motion controller, Controle, Hand controller
 - **Status:** draft
 
-## Ray interactor
+## Raio de seleção
 
-A ray a motion controller casts and the player points at a piece or square to
-select it, replacing the mouse's screen raycast.
+Um raio que um controle de movimento projeta, e o jogador aponta para uma
+peça ou casa para selecioná-la, substituindo o raycast de tela do mouse.
 
-- **Aliases:** Raio de seleção, Pointer ray
+- **Aliases:** Ray interactor, Pointer ray
 - **Status:** draft

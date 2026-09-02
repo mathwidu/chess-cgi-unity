@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public sealed class BoardView : MonoBehaviour
 {
@@ -80,6 +81,12 @@ public sealed class BoardView : MonoBehaviour
                 SquareView squareView = squareObject.AddComponent<SquareView>();
                 squareView.Initialize(square);
                 squares.Add(squareView);
+
+                if (XRRig.IsHeadsetPresent)
+                {
+                    squareObject.AddComponent<XRSimpleInteractable>();
+                    squareObject.AddComponent<VrSelectionBridge>();
+                }
             }
         }
     }

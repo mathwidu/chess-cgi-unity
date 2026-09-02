@@ -1,38 +1,39 @@
-# Glossary
+# Glossário
 
-The words this book uses across every context, defined once and used the same
-way wherever they appear. Code identifiers are English; the player-facing
-interface is Portuguese, so a term carries its Portuguese name as an alias where
-the HUD shows one.
+As palavras que este livro usa em todo contexto, definidas uma vez e usadas da
+mesma forma onde quer que apareçam. Identificadores de código estão em
+inglês; a interface do jogador é em português, então cada termo carrega o
+nome em inglês (o identificador de código) como alias.
 
-## Board
+## Tabuleiro
 
-The 8×8 grid the game is played on. Built in code at runtime as squares under a
-board frame.
+A grade 8×8 sobre a qual o jogo é disputado. Construída em código em tempo de
+execução como casas sob uma moldura de tabuleiro.
 
-- **Aliases:** Tabuleiro
+- **Aliases:** Board
 - **Status:** validated
 
-## Square
+## Casa
 
-One cell of the board. Held as a file index of 0–7 and a rank of 1–8, and shown
-to a player in algebraic notation from a1 to h8.
+Uma célula do tabuleiro. Guardada como um índice de coluna de 0–7 e uma linha
+de 1–8, e mostrada ao jogador em notação algébrica de a1 a h8.
 
-- **Aliases:** Casa
+- **Aliases:** Square
 - **Status:** validated
-- **Example:** e4 is file index 4, rank 4.
+- **Example:** e4 é índice de coluna 4, linha 4.
 
-## Side
+## Lado
 
-One of the two players, White or Black. Sides alternate turns, White first.
+Um dos dois jogadores, Brancas ou Pretas. Os lados se alternam a cada turno,
+Brancas primeiro.
 
-- **Aliases:** Brancas, Pretas
+- **Aliases:** Side, Brancas, Pretas
 - **Status:** validated
 
-## Piece kind
+## Tipo de peça
 
-The type of a chess piece: pawn, rook, knight, bishop, queen, or king. A kind is
-separate from the side that owns the piece and from the model that shows it.
+O tipo de uma peça de xadrez: peão, torre, cavalo, bispo, dama ou rei. Um
+tipo é diferente do lado dono da peça e do modelo que a representa.
 
-- **Aliases:** Peça
+- **Aliases:** Piece kind, Peça
 - **Status:** validated

@@ -1,77 +1,77 @@
 ---
 id: move-a-piece
-name: Move a piece
+name: Mover uma peça
 status: ready
 owners: [mathwidu]
-terms: [move, legal-destination, capture, turn, check, checkmate, draw]
+terms: [jogada, destino-legal, captura, turno, xeque, xeque-mate, empate]
 decisions: [gameplay/ADR-0001]
 ---
 
 ## Story
 
-As a player at the board
-I want to pick one of my pieces and play it to a legal square
-So that the match advances under the real rules of chess
+Como jogador diante do tabuleiro
+Quero escolher uma das minhas peças e jogá-la em uma casa legal
+Para que a partida avance sob as regras reais do xadrez
 
-## Rule: Only the side on move may start a move, and only to a legal square
+## Rule: Somente o lado a jogar pode iniciar uma jogada, e somente para uma casa legal
 
 ```gherkin
-Example: A piece of the side on move is selected and its legal squares are offered
-  Given it is White's turn
-  When White selects a white piece
-  Then that piece is highlighted
-  And every square the rules allow it is highlighted as a legal destination
+Example: Uma peça do lado a jogar é selecionada e suas casas legais são oferecidas
+  Given é a vez das Brancas
+  When Brancas seleciona uma peça branca
+  Then essa peça é destacada
+  And toda casa que as regras permitem é destacada como destino legal
 
-Example: A piece of the other side does not start a move
-  Given it is White's turn
-  When White selects a black piece
-  Then no piece is selected
-  And no destination is highlighted
+Example: Uma peça do outro lado não inicia uma jogada
+  Given é a vez das Brancas
+  When Brancas seleciona uma peça preta
+  Then nenhuma peça é selecionada
+  And nenhum destino é destacado
 
-Example: A square that is not a legal destination is refused
-  Given a white piece is selected with its legal destinations shown
-  When White chooses a square that is not among them
-  Then the piece does not move
-  And the status reads that the move was invalid
+Example: Uma casa que não é destino legal é recusada
+  Given uma peça branca está selecionada com seus destinos legais mostrados
+  When Brancas escolhe uma casa que não está entre eles
+  Then a peça não se move
+  And o status informa que a jogada é inválida
 ```
 
-## Rule: A played move updates the board and passes the turn
+## Rule: Uma jogada realizada atualiza o tabuleiro e passa o turno
 
 ```gherkin
-Example: A quiet move passes the turn
-  Given it is White's turn and a white piece is selected
-  When White plays it to an empty legal square
-  Then the piece is shown on the new square
-  And it becomes Black's turn
+Example: Uma jogada silenciosa passa o turno
+  Given é a vez das Brancas e uma peça branca está selecionada
+  When Brancas a joga para uma casa legal vazia
+  Then a peça é mostrada na nova casa
+  And passa a ser a vez das Pretas
 
-Example: A capture removes the opponent piece
-  Given a legal destination holds a black piece
-  When White plays the capture
-  Then the black piece is gone from the board
-  And the move is written to the history with an "x"
+Example: Uma captura remove a peça adversária
+  Given um destino legal contém uma peça preta
+  When Brancas joga a captura
+  Then a peça preta desaparece do tabuleiro
+  And a jogada é escrita no histórico com um "x"
 ```
 
-## Rule: The move that ends the game is reported as such
+## Rule: A jogada que encerra a partida é relatada como tal
 
 ```gherkin
-Example: Checkmate ends the game for the other side
-  Given a move that leaves the opponent checkmated
-  When it is played
-  Then the status says the mating side wins
-  And no further move is accepted
+Example: Xeque-mate encerra a partida a favor do outro lado
+  Given uma jogada que deixa o adversário em xeque-mate
+  When ela é jogada
+  Then o status informa que o lado que deu mate venceu
+  And nenhuma outra jogada é aceita
 
-Example: A drawing move ends the game with no winner
-  Given a move that leaves the position drawn or stalemated
-  When it is played
-  Then the status says the game is a draw
+Example: Uma jogada de empate encerra a partida sem vencedor
+  Given uma jogada que deixa a posição empatada ou afogada
+  When ela é jogada
+  Then o status informa que a partida é um empate
 
-Example: A checking move names the check and continues
-  Given a move that leaves the opponent in check but not mated
-  When it is played
-  Then the status says check
-  And it is the opponent's turn
+Example: Uma jogada de xeque nomeia o xeque e continua
+  Given uma jogada que deixa o adversário em xeque, mas não em xeque-mate
+  When ela é jogada
+  Then o status informa xeque
+  And é a vez do adversário
 ```
 
 ## Open Questions
 
-None.
+Nenhuma.
