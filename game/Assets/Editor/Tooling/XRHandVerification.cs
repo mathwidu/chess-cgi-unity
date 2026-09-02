@@ -21,6 +21,7 @@ public static class XRHandVerification
         if (SessionState.GetBool(DoneKey, false) && !EditorApplication.isPlayingOrWillChangePlaymode)
         {
             SessionState.SetBool(DoneKey, false);
+            XRSimulatorSetup.SetAutomaticInstantiate(false);
             EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
             return;
         }
@@ -35,6 +36,7 @@ public static class XRHandVerification
     public static void RunSimulatorCheck()
     {
         EditorSceneManager.OpenScene(MainScenePath);
+        XRSimulatorSetup.SetAutomaticInstantiate(true);
         SessionState.SetBool(ArmedKey, true);
         EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         EditorApplication.isPlaying = true;
