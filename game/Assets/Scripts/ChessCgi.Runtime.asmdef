@@ -2,7 +2,8 @@
     "name": "ChessCgi.Runtime",
     "rootNamespace": "",
     "references": [
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.XR.CoreUtils"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
