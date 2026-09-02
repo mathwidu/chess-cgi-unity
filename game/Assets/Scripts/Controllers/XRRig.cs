@@ -111,6 +111,8 @@ public sealed class XRRig : MonoBehaviour
         GameObject rightController = BuildController(offsetObject.transform, "Right Controller", "RightHand");
         GameObject leftHand = BuildHandInteractor(offsetObject.transform, "LeftHandInteractor");
         GameObject rightHand = BuildHandInteractor(offsetObject.transform, "RightHandInteractor");
+        BuildHandVisual(offsetObject.transform, "LeftHandVisual");
+        BuildHandVisual(offsetObject.transform, "RightHandVisual");
 
         XRInputModalityManager modalityManager = offsetObject.AddComponent<XRInputModalityManager>();
         modalityManager.leftController = leftController;
@@ -137,6 +139,19 @@ public sealed class XRRig : MonoBehaviour
         aimPoseDriver?.positionInput.action?.actionMap?.asset?.Enable();
 
         return instance;
+    }
+
+    private static void BuildHandVisual(Transform parent, string resourceName)
+    {
+        GameObject prefab = Resources.Load<GameObject>($"XR/{resourceName}");
+        if (prefab == null)
+        {
+            Debug.LogWarning($"XRRig could not find Resources/XR/{resourceName}; hand visuals will be unavailable.");
+            return;
+        }
+
+        GameObject instance = Object.Instantiate(prefab, parent);
+        instance.name = resourceName;
     }
 
     private static GameObject BuildController(Transform parent, string name, string hand)
