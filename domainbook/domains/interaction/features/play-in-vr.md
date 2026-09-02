@@ -3,7 +3,7 @@ id: play-in-vr
 name: Jogar em VR
 status: draft
 owners: [mathwidu, RafaelAugustScherer]
-terms: [modo-vr, óculos-vr, controle-de-movimento, raio-de-seleção]
+terms: [modo-vr, óculos-vr, controle-de-movimento, raio-de-seleção, rastreamento-de-mãos]
 ---
 
 ## Story
@@ -214,6 +214,12 @@ Example: A mesma camada de regras recebe os mesmos comandos
   When o jogador aponta para uma casa destacada e puxa o gatilho
   Then a jogada chega às regras pelo comando existente de escolha de destino
   And o resultado corresponde ao da build de desktop
+
+Example: Rastreamento de mãos seleciona peças sem controle físico
+  Given o headset e o runtime relatam rastreamento de mãos ativo
+  When o jogador aponta ou belisca em direção a uma de suas peças com a mão livre
+  Then essa peça é selecionada, do mesmo jeito que apontar o controle e puxar o gatilho
+  And se o jogador voltar a segurar o controle, a seleção volta a vir do controle
 ```
 
 **Construído:** os três exemplos acima. `XRRig` constrói um XR Origin (VR) em
@@ -247,6 +253,46 @@ reaproveitando os mesmos colliders que o raycast de desktop do
 evento de seleção desse interactable e chama `ChessGameController.SelectPiece`
 / `SelectSquare` — as mesmas duas chamadas que o caminho de clique de desktop
 faz — para que a camada de regras veja comandos idênticos nos dois modos.
+
+O quarto exemplo, [rastreamento de mãos](../glossary.md), também está
+construído: o pacote `com.unity.xr.hands` e a feature OpenXR **Hand Tracking
+Subsystem** estão habilitados, e `XRRig` constrói um interactor de mão para
+cada lado a partir de um prefab extraído das amostras oficiais do XR
+Interaction Toolkit (Starter Assets + Hands Interaction Demo), que já traz um
+Near-Far Interactor e um Poke Interactor prontos, movidos pelas poses de
+apontar e beliscar da mão em vez da pose do controle. Um `XRInputModalityManager`
+por cima dos quatro interactors — dois de controle, dois de mão — decide qual
+par fica ativo a cada instante, favorecendo mãos rastreadas sobre um
+controle apenas quando o controle não está sendo segurado; como o interactor
+de mão dispara o mesmo XR Simple Interactable que o de controle, o
+`VrSelectionBridge` não precisa saber qual dos dois originou a seleção.
+Verificação automatizada cobre até aqui a montagem — os dois interactors de
+mão presentes, com Near-Far e Poke Interactor, e referenciados corretamente
+pelo `XRInputModalityManager` — e não uma seleção de peça por beliscar de
+verdade, que depende de um runtime com rastreamento de mãos de fato (headset
+com câmeras de mão, como o Vive Focus 3/XR Elite, ou um sensor como o
+Ultraleap; um Vive/Vive Pro comum só tem os controles).
+
+Além do interactor, `XRRig` também constrói um visual de mão para cada lado —
+uma malha rastreada em vez do modelo de controle — a partir do mesmo pacote
+`com.unity.xr.hands`. A malha é movida por três componentes do próprio
+pacote: `XRHandSkeletonDriver` posiciona os ossos a partir das poses de
+articulação rastreadas, `XRHandMeshController` mostra ou esconde a malha
+conforme o rastreamento está ou não válido, e `XRHandTrackingEvents` acha o
+subsistema de mãos sozinho — nenhum script customizado é necessário. Da
+amostra oficial `HandVisualizer` do XR Hands, só os cinco arquivos que essa
+malha de fato usa (os dois prefabs de mão rastreada, o material e os dois
+modelos FBX) foram mantidos, movidos para `Resources/XR` junto dos demais
+prefabs de XR carregados em tempo de execução; o restante da amostra — o
+visualizador de depuração com esferas de articulação e seus scripts — não é
+usado por nada que o jogo carregue e foi removido. O mesmo enxugamento foi
+aplicado às amostras Starter Assets e Hands Interaction Demo do XR
+Interaction Toolkit, das quais os interactors de mão foram extraídos:
+mantidos os 16 arquivos de fato alcançáveis a partir desses prefabs (fechamento
+de referências por GUID e por tipo C#), removendo cerca de 280 arquivos de
+demonstração não usados. Verificado manualmente no editor: em Play mode com o
+XR Interaction Simulator, a malha da mão aparece rastreada e articulada na
+Game View, sem novos erros no console.
 
 ## Rule: A interface vive no mundo, não na tela
 

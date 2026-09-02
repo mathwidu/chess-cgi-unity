@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Attachment;
+using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Interactors.Casters;
@@ -106,13 +107,54 @@ public sealed class XRRig : MonoBehaviour
             inputController.Configure(gameController, eyeCamera);
         }
 
-        BuildController(offsetObject.transform, "Left Controller", "LeftHand");
-        BuildController(offsetObject.transform, "Right Controller", "RightHand");
+        GameObject leftController = BuildController(offsetObject.transform, "Left Controller", "LeftHand");
+        GameObject rightController = BuildController(offsetObject.transform, "Right Controller", "RightHand");
+        GameObject leftHand = BuildHandInteractor(offsetObject.transform, "LeftHandInteractor");
+        GameObject rightHand = BuildHandInteractor(offsetObject.transform, "RightHandInteractor");
+        BuildHandVisual(offsetObject.transform, "LeftHandVisual");
+        BuildHandVisual(offsetObject.transform, "RightHandVisual");
+
+        XRInputModalityManager modalityManager = offsetObject.AddComponent<XRInputModalityManager>();
+        modalityManager.leftController = leftController;
+        modalityManager.rightController = rightController;
+        modalityManager.leftHand = leftHand;
+        modalityManager.rightHand = rightHand;
 
         rigBuilt = true;
     }
 
-    private static void BuildController(Transform parent, string name, string hand)
+    private static GameObject BuildHandInteractor(Transform parent, string resourceName)
+    {
+        GameObject prefab = Resources.Load<GameObject>($"XR/{resourceName}");
+        if (prefab == null)
+        {
+            Debug.LogWarning($"XRRig could not find Resources/XR/{resourceName}; hand tracking will be unavailable.");
+            return null;
+        }
+
+        GameObject instance = Object.Instantiate(prefab, parent);
+        instance.name = resourceName;
+
+        TrackedPoseDriver aimPoseDriver = instance.transform.Find("Aim Pose")?.GetComponent<TrackedPoseDriver>();
+        aimPoseDriver?.positionInput.action?.actionMap?.asset?.Enable();
+
+        return instance;
+    }
+
+    private static void BuildHandVisual(Transform parent, string resourceName)
+    {
+        GameObject prefab = Resources.Load<GameObject>($"XR/{resourceName}");
+        if (prefab == null)
+        {
+            Debug.LogWarning($"XRRig could not find Resources/XR/{resourceName}; hand visuals will be unavailable.");
+            return;
+        }
+
+        GameObject instance = Object.Instantiate(prefab, parent);
+        instance.name = resourceName;
+    }
+
+    private static GameObject BuildController(Transform parent, string name, string hand)
     {
         GameObject controllerObject = new GameObject(name);
         controllerObject.SetActive(false);
@@ -155,6 +197,7 @@ public sealed class XRRig : MonoBehaviour
         interactor.uiPressInput = uiPressInput;
 
         controllerObject.SetActive(true);
+        return controllerObject;
     }
 
     private static Material CreateRayMaterial()
