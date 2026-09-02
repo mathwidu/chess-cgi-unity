@@ -7,6 +7,7 @@ using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Attachment;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Interactors.Casters;
 using UnityEngine.XR.Interaction.Toolkit.Interactors.Visuals;
@@ -15,6 +16,7 @@ public sealed class XRRig : MonoBehaviour
 {
     private const float EyeHeight = 1.2f;
     private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -3.4f);
+    private static readonly Vector3 BoardTarget = new Vector3(0f, 0f, 0.35f);
     public static readonly Vector3 SeatEyePosition = SeatPosition + Vector3.up * EyeHeight;
     public static Camera EyeCamera { get; private set; }
     public static Transform Origin { get; private set; }
@@ -63,8 +65,14 @@ public sealed class XRRig : MonoBehaviour
 
     private void BuildRig()
     {
+        bool usingSimulator = InputSystem.GetDevice<XRHMD>() is XRSimulatedHMD;
+
         GameObject originObject = new GameObject("XR Origin (Vive)");
-        originObject.transform.SetPositionAndRotation(SeatPosition, Quaternion.identity);
+        Vector3 originPosition = usingSimulator ? SeatEyePosition : SeatPosition;
+        Quaternion originRotation = usingSimulator
+            ? Quaternion.LookRotation((BoardTarget - SeatEyePosition).normalized, Vector3.up)
+            : Quaternion.identity;
+        originObject.transform.SetPositionAndRotation(originPosition, originRotation);
         Origin = originObject.transform;
 
         GameObject offsetObject = new GameObject("Camera Offset");
@@ -90,7 +98,7 @@ public sealed class XRRig : MonoBehaviour
         origin.Camera = eyeCamera;
         origin.CameraFloorOffsetObject = offsetObject;
         origin.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Device;
-        origin.CameraYOffset = EyeHeight;
+        origin.CameraYOffset = usingSimulator ? 0f : EyeHeight;
 
         if (desktopCamera != null)
         {
