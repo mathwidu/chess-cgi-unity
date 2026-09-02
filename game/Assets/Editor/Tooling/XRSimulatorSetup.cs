@@ -53,6 +53,22 @@ public static class XRSimulatorSetup
         Debug.Log($"CHESS_CGI_XR_SIMULATOR_SETUP imported={imported} prefabPath={prefabPath} autoInstantiate=True");
     }
 
+    public static void SetAutomaticInstantiate(bool enabled)
+    {
+        ScriptableObject settings = AssetDatabase.LoadAssetAtPath<ScriptableObject>(SettingsAssetPath);
+        if (settings == null)
+        {
+            throw new System.InvalidOperationException($"Could not load {SettingsAssetPath}.");
+        }
+
+        SerializedObject serializedSettings = new SerializedObject(settings);
+        serializedSettings.FindProperty("m_AutomaticallyInstantiateSimulatorPrefab").boolValue = enabled;
+        serializedSettings.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorUtility.SetDirty(settings);
+        AssetDatabase.SaveAssets();
+    }
+
     private static string FindSimulatorPrefabPath()
     {
         string[] guids = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Samples" });
