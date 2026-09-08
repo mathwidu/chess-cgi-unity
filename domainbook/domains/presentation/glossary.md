@@ -1,45 +1,48 @@
-# Presentation glossary
+# Glossário de apresentação
 
-The words the presentation context uses for what a player sees. A term is an H2
-heading with its definition below it.
+As palavras que o contexto de apresentação usa para o que o jogador vê. Um
+termo é um heading H2 com sua definição logo abaixo.
 
-## Custom piece
+## Peça personalizada
 
-The character model shown for a piece kind, one per kind, inspired by the class.
-Loaded as a prefab and scaled to fit the board.
+O modelo de personagem mostrado para um tipo de peça, um por tipo, inspirado
+na turma. Carregado como um prefab e escalado para caber no tabuleiro.
 
-- **Aliases:** Peça personalizada, Custom character
+- **Aliases:** Custom piece, Custom character
 - **Status:** validated
-- **Example:** the pawn is the "Mathwidu redhead" model; the bishop is "Rafael".
+- **Example:** o peão é o modelo "Mathwidu ruivo"; o bispo é "Rafael".
 
-## Primitive fallback
+## Peça clássica
 
-The piece a factory builds from primitive shapes — cylinders, spheres, cubes —
-when no custom model is set for a kind, so the board is never missing a piece.
+A peça que uma fábrica constrói a partir de formas primitivas — cilindros,
+esferas, cubos — quando nenhum modelo customizado está definido para um
+tipo, para que o tabuleiro nunca fique sem uma peça.
 
-- **Aliases:** Peça clássica
-- **Status:** validated
-
-## Highlight
-
-A marker the board places on each legal destination of the selected piece.
-
-- **Aliases:** Destaque
+- **Aliases:** Primitive fallback
 - **Status:** validated
 
-## Selected-piece preview
+## Destaque
 
-The panel that shows the selected piece on its own, rendered by a small camera
-into a texture, which the player can orbit and zoom to read the character.
+Um marcador que o tabuleiro coloca em cada destino legal da peça
+selecionada.
 
-- **Aliases:** Preview da peça, Painel da peça
+- **Aliases:** Highlight
+- **Status:** validated
+
+## Preview da peça selecionada
+
+O painel que mostra a peça selecionada sozinha, renderizada por uma câmera
+pequena em uma textura, que o jogador pode orbitar e dar zoom para ler o
+personagem.
+
+- **Aliases:** Selected-piece preview, Painel da peça
 - **Status:** validated
 
 ## HUD
 
-The Canvas interface built over the game: the title and turn lines, the status
-message, the move history, the promotion prompt, the start screen, and the
-selected-piece panel.
+A interface Canvas construída sobre o jogo: as linhas de título e turno, a
+mensagem de status, o histórico de jogadas, o pedido de promoção, a tela
+inicial e o painel da peça selecionada.
 
 - **Aliases:** Interface, Canvas UI
 - **Status:** validated

@@ -1,6 +1,6 @@
 ---
 id: interaction
-name: Interaction
+name: Interação
 classification:
   domain: supporting-domain
   business-model: engagement-creator
@@ -22,16 +22,18 @@ relationships:
 
 ## Purpose
 
-Turn what a player does — a click, a key, the scroll wheel — into commands for
-the match, and move the camera so the board reads from the active player's side.
+Transformar o que um jogador faz — um clique, uma tecla, a roda do mouse —
+em comandos para a partida, e mover a câmera para que o tabuleiro seja lido
+do lado do jogador ativo.
 
 ## Domain Roles
 
-- Input context: `InputController` reads the mouse and keyboard, raycasts a click
-  into the scene, decides whether a piece or a square was hit, and sends the
-  matching command to gameplay.
-- Camera context: `CameraController` orbits and zooms the main view, and swings
-  it to face the player whose move it is when the turn changes.
+- Contexto de entrada: `InputController` lê o mouse e o teclado, faz raycast
+  de um clique na cena, decide se uma peça ou uma casa foi atingida, e envia
+  o comando correspondente ao gameplay.
+- Contexto de câmera: `CameraController` orbita e dá zoom na visão
+  principal, e a gira para ficar voltada para o jogador a jogar quando o
+  turno muda.
 
 ## Inbound Communication
 
@@ -55,28 +57,32 @@ the match, and move the camera so the board reads from the active player's side.
 
 ## Business Decisions
 
-- A click is resolved by raycasting into the 3D scene and reading the
-  presentation view it hits — a `PieceView` means select that piece, a
-  `SquareView` means move there — so picking follows what the player sees.
-- The camera reorients to the side of the player on move, because two players
-  share one screen and each should read the board from their own end.
-- Keys are fixed and few: `Esc` cancels, `N` starts a new game, `Q` and `E`
-  orbit, the wheel zooms — no rebindable input layer.
+- Um clique é resolvido fazendo raycast na cena 3D e lendo a view de
+  apresentação que ele atinge — uma `PieceView` significa selecionar
+  aquela peça, uma `SquareView` significa mover para lá — então a escolha
+  segue o que o jogador vê.
+- A câmera se reorienta para o lado do jogador a jogar, porque dois
+  jogadores compartilham uma tela e cada um deve ler o tabuleiro a partir
+  do seu próprio lado.
+- As teclas são fixas e poucas: `Esc` cancela, `N` inicia uma nova partida,
+  `Q` e `E` orbitam, a roda dá zoom — sem camada de entrada remapeável.
 
 ## Assumptions
 
-- Exactly one main camera does the picking, and its view matches what the player
-  sees.
-- The player uses a mouse and keyboard; there is no touch or gamepad path.
-- Presentation's colliders on pieces and squares are what a ray can hit; input
-  reads them rather than guessing a board position from screen coordinates.
+- Exatamente uma câmera principal faz a seleção, e sua visão corresponde ao
+  que o jogador vê.
+- O jogador usa mouse e teclado; não há caminho de toque ou gamepad.
+- Os colliders da apresentação nas peças e casas são o que um raio pode
+  atingir; a entrada os lê em vez de tentar adivinhar uma posição do
+  tabuleiro a partir de coordenadas de tela.
 
 ## Verification Metrics
 
-- Clicks that hit a piece or square but reach gameplay as the wrong command, or
-  as none — should stay at zero.
-- Turn changes where the camera does not end facing the player on move.
+- Cliques que atingem uma peça ou casa mas chegam ao gameplay como o
+  comando errado, ou como nenhum — deve ficar em zero.
+- Mudanças de turno em que a câmera não termina voltada para o jogador a
+  jogar.
 
 ## Open Questions
 
-None.
+Nenhuma.

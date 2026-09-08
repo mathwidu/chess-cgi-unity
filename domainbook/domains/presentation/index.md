@@ -1,6 +1,6 @@
 ---
 id: presentation
-name: Presentation
+name: Apresentação
 classification:
   domain: supporting-domain
   business-model: engagement-creator
@@ -18,21 +18,24 @@ relationships:
 
 ## Purpose
 
-Show the match. This context builds the 3D board, the pieces, the room around
-them, and the Canvas HUD, and keeps all of it in step with the state gameplay
-reports. It is what a player actually looks at and reads.
+Mostrar a partida. Este contexto constrói o tabuleiro 3D, as peças, a sala
+ao redor delas e o HUD em Canvas, e mantém tudo isso em sincronia com o
+estado que o gameplay relata. É o que um jogador realmente olha e lê.
 
 ## Domain Roles
 
-- View context: `BoardView` builds the squares and the frame, `PieceFactory`
-  builds one object per piece, and both are rebuilt from a fresh list of pieces
-  after every move rather than mutated in place.
-- Presentation context: `GameHud` builds the whole interface in code — the turn
-  and status lines, the move history, the promotion prompt, the start screen,
-  and the panel that inspects the selected piece in a small 3D preview.
-- Identity context: each piece kind has a custom character model; when a model
-  is missing, a piece is assembled from primitives instead so the board is never
-  empty (`presentation/ADR-0001`).
+- Contexto de view: `BoardView` constrói as casas e a moldura,
+  `PieceFactory` constrói um objeto por peça, e ambos são reconstruídos a
+  partir de uma lista nova de peças a cada jogada, em vez de sofrer
+  mutação no lugar.
+- Contexto de apresentação: `GameHud` constrói toda a interface em código
+  — as linhas de turno e status, o histórico de jogadas, o pedido de
+  promoção, a tela inicial e o painel que examina a peça selecionada em um
+  pequeno preview 3D.
+- Contexto de identidade: cada tipo de peça tem um modelo de personagem
+  customizado; quando um modelo está ausente, uma peça é montada a partir
+  de primitivas para que o tabuleiro nunca fique vazio
+  (`presentation/ADR-0001`).
 
 ## Inbound Communication
 
@@ -53,33 +56,36 @@ reports. It is what a player actually looks at and reads.
 
 ## Business Decisions
 
-- The board, the pieces, the room scenery, and the entire HUD are generated in
-  code at runtime; the scene stores almost nothing, so a rebuild is the way to
-  refresh, not an edit.
-- A piece is a custom model per kind with a primitive fallback, so a missing
-  prefab degrades to a recognisable shape instead of a hole
-  (`presentation/ADR-0001`).
-- The interface speaks Portuguese to the player; the code that builds it speaks
-  the shared English vocabulary.
-- The selected piece is shown in its own rendered preview so a player can read
-  who the character is without hunting for it on the board.
+- O tabuleiro, as peças, a cenografia da sala e o HUD inteiro são gerados
+  em código em tempo de execução; a cena guarda quase nada, então uma
+  reconstrução é a forma de atualizar, não uma edição.
+- Uma peça é um modelo customizado por tipo com uma alternativa primitiva,
+  então um prefab ausente degrada para uma forma reconhecível em vez de um
+  buraco (`presentation/ADR-0001`).
+- A interface fala português com o jogador; o código que a constrói fala o
+  vocabulário compartilhado em inglês.
+- A peça selecionada é mostrada em seu próprio preview renderizado para que
+  um jogador consiga ler quem é o personagem sem precisar procurá-lo no
+  tabuleiro.
 
 ## Assumptions
 
-- Gameplay's list of pieces is the whole truth for a position; the view holds no
-  state gameplay does not.
-- Rebuilding the board and pieces each move is cheap enough at this scale to
-  prefer over tracking and animating differences.
-- A custom model may be any height, so it is scaled to fit a target size rather
-  than trusted to arrive correctly sized.
+- A lista de peças do gameplay é a verdade completa sobre uma posição; a
+  view não guarda nenhum estado que o gameplay não tenha.
+- Reconstruir o tabuleiro e as peças a cada jogada é barato o suficiente
+  nessa escala para preferir isso a rastrear e animar diferenças.
+- Um modelo customizado pode ter qualquer altura, então ele é escalado
+  para caber em um tamanho alvo em vez de ser confiado como já vindo no
+  tamanho correto.
 
 ## Verification Metrics
 
-- Frames where a shown piece disagrees with gameplay's reported position —
-  should stay at zero, because the view is rebuilt from that list.
-- Piece kinds with neither a custom model nor a primitive fallback rendering —
-  should never happen; the fallback covers every kind.
+- Quadros em que uma peça mostrada diverge da posição relatada pelo
+  gameplay — deve ficar em zero, porque a view é reconstruída a partir
+  dessa lista.
+- Tipos de peça sem modelo customizado nem alternativa primitiva sendo
+  renderizada — nunca deve acontecer; a alternativa cobre todo tipo.
 
 ## Open Questions
 
-None.
+Nenhuma.

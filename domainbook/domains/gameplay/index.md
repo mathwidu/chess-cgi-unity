@@ -14,27 +14,28 @@ code:
 
 ## Purpose
 
-Run a legal game of chess between two players sharing one screen. This context
-owns the match: whose turn it is, which moves are legal, and whether a move ends
-in check, checkmate, or a draw. It is the reason the product exists; everything
-visual serves it.
+Rodar uma partida legal de xadrez entre dois jogadores compartilhando uma
+tela. Este contexto é dono da partida: de quem é o turno, quais jogadas são
+legais e se uma jogada termina em xeque, xeque-mate ou empate. É a razão de
+existir do produto; tudo o que é visual está a seu serviço.
 
 ## Domain Roles
 
-- Execution context: `ChessGameController` drives the match — it selects a piece,
-  asks for legal destinations, plays a move, and turns the result into a status
-  line and a camera cue.
-- Model context: the `Domain/` value types (`BoardSquare`, `ChessSide`,
-  `ChessPieceKind`, `VisualPieceState`, `MoveResult`) are the words the rest of
-  the game speaks, so no view or input handler touches the rules library.
-- Anticorruption context: `ChessRulesAdapter` is the only code that knows the
-  `ChessDotNet` library exists; it translates between the library's types and
-  this context's own.
+- Contexto de execução: `ChessGameController` conduz a partida — seleciona
+  uma peça, pede os destinos legais, joga uma jogada e transforma o
+  resultado em uma linha de status e um sinal para a câmera.
+- Contexto de modelo: os value types de `Domain/` (`BoardSquare`,
+  `ChessSide`, `ChessPieceKind`, `VisualPieceState`, `MoveResult`) são as
+  palavras que o resto do jogo fala, então nenhuma view ou input handler
+  toca a biblioteca de regras.
+- Contexto anticorrupção: `ChessRulesAdapter` é o único código que sabe que a
+  biblioteca `ChessDotNet` existe; ele traduz entre os tipos da biblioteca e
+  os próprios tipos deste contexto.
 
 ## Inbound Communication
 
 | Message              | Collaborator | Type    |
-| -------------------- | ------------ | ------- |
+| --------------------- | ------------ | ------- |
 | `SelectPiece`        | interaction  | Command |
 | `SelectDestination`  | interaction  | Command |
 | `ChoosePromotion`    | presentation | Command |
@@ -52,31 +53,35 @@ visual serves it.
 
 ## Business Decisions
 
-- Legality, check, checkmate, and draws come from the `ChessDotNet` library,
-  reached only through `ChessRulesAdapter` (`gameplay/ADR-0001`).
-- The board is 8×8 with a file index of 0–7 and a rank of 1–8; a `BoardSquare`
-  refuses any coordinate outside that range rather than clamping it.
-- One game runs at a time and it is local: two players take turns on the same
-  machine, White then Black, with no AI opponent and no network.
-- A move is only offered if the rules return it as legal; the controller never
-  invents a destination the library did not allow.
-- A pawn reaching the far rank pauses the turn for a promotion choice before the
-  move is committed.
+- Legalidade, xeque, xeque-mate e empates vêm da biblioteca `ChessDotNet`,
+  acessada somente por `ChessRulesAdapter` (`gameplay/ADR-0001`).
+- O tabuleiro é 8×8 com um índice de coluna de 0–7 e uma linha de 1–8; um
+  `BoardSquare` recusa qualquer coordenada fora desse intervalo em vez de
+  ajustá-la ao limite.
+- Uma partida roda por vez e é local: dois jogadores se revezam na mesma
+  máquina, Brancas depois Pretas, sem adversário de IA e sem rede.
+- Uma jogada só é oferecida se as regras a devolverem como legal; o
+  controlador nunca inventa um destino que a biblioteca não permitiu.
+- Um peão que chega à última linha pausa o turno para uma escolha de
+  promoção antes de a jogada ser confirmada.
 
 ## Assumptions
 
-- Both players are cooperative and share the input; there is no per-side lockout.
-- The rules library is correct about chess; this context does not re-check it.
-- A move either fully succeeds or leaves the match untouched — there is no
-  partial move to unwind.
+- Os dois jogadores cooperam e compartilham a entrada; não há bloqueio por
+  lado.
+- A biblioteca de regras está correta sobre o xadrez; este contexto não a
+  reverifica.
+- Uma jogada ou é totalmente bem-sucedida ou deixa a partida intocada — não
+  existe jogada parcial para desfazer.
 
 ## Verification Metrics
 
-- Moves the controller offers that the rules library would reject — should stay
-  at zero, because the offered set is built from the library's own answer.
-- Turns where the reported status (check, checkmate, draw, or plain turn) does
-  not match the library's view of the position.
+- Jogadas que o controlador oferece e que a biblioteca de regras rejeitaria
+  — deve ficar em zero, porque o conjunto oferecido é construído a partir da
+  própria resposta da biblioteca.
+- Turnos em que o status relatado (xeque, xeque-mate, empate ou turno comum)
+  não corresponde à visão da biblioteca sobre a posição.
 
 ## Open Questions
 
-None.
+Nenhuma.
