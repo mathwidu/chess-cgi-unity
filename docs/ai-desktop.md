@@ -101,10 +101,22 @@ Evidências locais de 2026-09-21, Unity 6000.3.16f1, macOS ARM64:
 | Build macOS | Succeeded, 0 erros e 1 aviso |
 | Compilação da combinação com a ponta VR | Concluída sem erros de C# |
 | PlayMode na combinação com os pacotes VR, sem headset | 8/8 aprovados |
+| Harnesses com XR Interaction Simulator | HUD, seleção por controle e câmera aprovados |
 
 O executável foi aberto e o menu foi inspecionado. O teste automatizado da cena
 real comprova início com pretas, jogada real do motor, resposta ao humano,
 perspectiva fixa e retorno ao modo local. Não equivale a teste em headset.
+
+Os três harnesses concluíram com exit code 0 e marcadores PASSED na branch de
+integração. Os logs estão em `.local/vr-integration/TestResults/`, incluindo
+`XRHudVerification.log`, `XRControllerVerification.log` e
+`XRCameraVerification.log`. Ainda registram `XR_ERROR_RUNTIME_UNAVAILABLE`
+(no Mac sem runtime/headset), `Missing ILineRenderable / Ray Interactor`
+(inicialização do visual dos raios) e uma exceção do indexador `UnityEditor.Search`.
+Portanto, os resultados aprovam as asserções desses harnesses; não comprovam
+uma sessão XR sem erros. A triagem do visual dos raios e a validação em hardware
+continuam com a frente VR. A configuração do simulador foi restaurada para
+auto-instanciação desativada após a verificação.
 
 O SHA-256 do executável macOS usado foi
 `bc0cac905ecdf2147fe22055c733bcd999b1e3f7c399fbaf7fb9055786563590`.
