@@ -10,9 +10,7 @@ mkdir -p "$repo_root/TestResults"
 for mode in EditMode PlayMode; do
   report="$repo_root/TestResults/$mode.xml"
   rm -f "$report"
-  graphics_args=()
-  if [ "$mode" = EditMode ]; then graphics_args=(-nographics); fi
-  "$editor" -batchmode "${graphics_args[@]}" -projectPath "$repo_root/game" \
+  "$editor" -batchmode -projectPath "$repo_root/game" \
     -runTests -testPlatform "$mode" -testResults "$report" \
     -logFile "$repo_root/TestResults/$mode.log"
   python3 - "$report" <<'PY'
