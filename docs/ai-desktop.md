@@ -59,9 +59,15 @@ UCI_LimitStrength=false. São perfis iniciais, sem equivalência de Elo validada
 ## Trabalho paralelo com VR
 
 A branch de IA parte de `origin/main` (`9d59fa7`), sem depender dos pacotes XR.
+A combinação foi preparada separadamente na branch `codex/ai-vr-integration`.
 A ponta usada como referência é `origin/vr/07-tooling-fixes` (`9ac1c3a`), fim
 da sequência de PRs #5–#11. O histórico desses PRs deve ser integrado na ordem
 que a frente de VR já estabeleceu.
+
+O merge C# e dos pacotes foi automático. Nove documentos exigiram conciliação
+entre a documentação da IA e da frente VR; a resolução está na branch de
+integração. A mesma branch adapta os harnesses antigos ao bloqueio do menu,
+ao centro do botão de iniciar e à espera da animação por tempo real.
 
 Preservar no merge:
 
@@ -86,7 +92,23 @@ resultado aprovado. A execução real do Stockfish é identificada pela categori
 `StockfishIntegration`; sem motor local, esses testes são explicitamente
 ignorados. Não conte testes ignorados como integração aprovada.
 
-Os relatórios e logs ficam em `TestResults/`. Cobertura: parsing, FEN/histórico,
+Evidências locais de 2026-09-21, Unity 6000.3.16f1, macOS ARM64:
+
+| Verificação | Resultado |
+| --- | --- |
+| EditMode, incluindo Stockfish real e falhas de processo | 36/36 aprovados, nenhum ignorado |
+| PlayMode, incluindo a cena Main e seus botões | 8/8 aprovados, nenhum ignorado |
+| Build macOS | Succeeded, 0 erros e 1 aviso |
+| Compilação da combinação com a ponta VR | Concluída sem erros de C# |
+| PlayMode na combinação com os pacotes VR, sem headset | 8/8 aprovados |
+
+O executável foi aberto e o menu foi inspecionado. O teste automatizado da cena
+real comprova início com pretas, jogada real do motor, resposta ao humano,
+perspectiva fixa e retorno ao modo local. Não equivale a teste em headset.
+
+O SHA-256 do executável macOS usado foi
+`bc0cac905ecdf2147fe22055c733bcd999b1e3f7c399fbaf7fb9055786563590`.
+A build é `Builds/macOS/XadrezCGI.app`. Os relatórios e logs ficam em `TestResults/`. Cobertura: parsing, FEN/histórico,
 revisão, promoção e subpromoção, roque, en passant, mate, empate, prazo,
 cancelamento, resposta antiga, erro de processo, preservação do modo local,
 reinício durante animação e interação pela tela inicial real.
