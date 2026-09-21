@@ -7,3 +7,12 @@ se o lançamento foi retirado, contendo Added, Changed, Deprecated, Removed,
 Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ## [Unreleased]
+
+### Added
+
+- Adversário offline no desktop, com escolha de lado, três dificuldades e validação local de toda candidata.
+- Cancelamento e timeout de busca, descarte de respostas antigas e recuperação por nova tentativa ou menu.
+
+### Fixed
+
+- Reinício durante a animação não aplica o resultado da partida anterior.

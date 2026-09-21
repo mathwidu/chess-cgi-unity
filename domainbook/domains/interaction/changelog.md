@@ -7,3 +7,12 @@ se o lançamento foi retirado, contendo Added, Changed, Deprecated, Removed,
 Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ## [Unreleased]
+
+### Changed
+
+- Contra a IA, a câmera desktop permanece na perspectiva do lado humano.
+- O controlador central bloqueia seleções humanas no turno do computador, independentemente de mouse ou raio VR.
+
+### Fixed
+
+- Cliques sobre a interface não selecionam peças por trás do HUD; o atalho N fica inativo no menu.

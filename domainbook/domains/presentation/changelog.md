@@ -7,3 +7,8 @@ se o lançamento foi retirado, contendo Added, Changed, Deprecated, Removed,
 Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ## [Unreleased]
+
+### Added
+
+- Tela inicial com modo, lado e dificuldade; estado de pensamento, recuperação de falha e retorno ao menu.
+- Nova partida mantém as opções escolhidas.

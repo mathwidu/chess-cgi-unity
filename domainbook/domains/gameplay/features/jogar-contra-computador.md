@@ -14,9 +14,13 @@ Para escolher um nível de desafio adequado no desktop e em realidade virtual
 
 ### 1. Resumo executivo
 
-Esta funcionalidade encontra-se em fase de planejamento. O jogo ainda não possui
-adversário automático, integração com motor de xadrez, configuração de
-dificuldade ou empacotamento de IA para qualquer plataforma.
+O incremento desktop está implementado; o alvo completo, incluindo Quest
+standalone e distribuição, permanece em evolução. Consulte a entrega
+[desktop](jogar-contra-computador-desktop.md) e o [guia operacional](../../../../docs/ai-desktop.md).
+
+As seções de estado inicial e lacunas abaixo registram o diagnóstico anterior
+à implementação. Não representam o estado atual do desktop. Os portões de
+Windows PC-VR, Quest e redistribuição do binário continuam pendentes.
 
 A proposta é integrar o Stockfish 18 como [motor de xadrez](../glossary.md)
 offline. O motor receberá uma fotografia da posição, calculará uma jogada e

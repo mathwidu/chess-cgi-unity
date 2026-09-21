@@ -72,12 +72,12 @@ ser confirmada.
 ## Adversário controlado pelo computador
 
 Participante não humano que controla exatamente um lado de uma partida local e
-fornece uma jogada quando esse lado possui o turno. A implementação proposta usa
+fornece uma jogada quando esse lado possui o turno. A implementação desktop usa
 um motor de xadrez externo, mas sempre devolve a jogada candidata às regras
 locais antes que a partida seja alterada.
 
 - **Aliases:** Adversário de IA, Computer opponent, Computer player
-- **Status:** draft
+- **Status:** validated
 
 ## Nível de dificuldade
 
@@ -86,7 +86,7 @@ do adversário controlado pelo computador sem modificar quais movimentos são
 legais no xadrez.
 
 - **Aliases:** Dificuldade, Perfil de dificuldade, Difficulty level
-- **Status:** draft
+- **Status:** validated
 
 ## Estado de pensamento
 
@@ -96,7 +96,7 @@ bloqueada nesse estado, mas renderização, interface e rastreamento do headset
 continuam funcionando.
 
 - **Aliases:** IA pensando, Turno do computador, Thinking state
-- **Status:** draft
+- **Status:** validated
 
 ## Motor de xadrez
 
@@ -105,4 +105,13 @@ candidata. Ele não controla nem altera diretamente a partida viva; as regras
 locais continuam sendo a autoridade final.
 
 - **Aliases:** Chess engine, Motor de IA
-- **Status:** draft
+- **Status:** validated
+
+## Fotografia da posição
+
+Valor imutável com FEN atual, lado a jogar, revisão e histórico UCI desde a
+posição inicial. A revisão aumenta a cada jogada válida e reinício; respostas
+de outra revisão não podem alterar a partida.
+
+- **Aliases:** PositionSnapshot
+- **Status:** validated

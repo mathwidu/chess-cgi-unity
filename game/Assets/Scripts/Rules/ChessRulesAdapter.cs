@@ -5,13 +5,29 @@ using ChessDotNet.Pieces;
 public sealed class ChessRulesAdapter
 {
     private ChessGame game = new ChessGame();
+    private readonly List<string> moves = new List<string>();
+    private string initialFen;
+    private long revision;
+
+    public ChessRulesAdapter(string fen = null)
+    {
+        Reset(fen);
+    }
 
     public ChessSide CurrentTurn => ToSide(game.WhoseTurn);
 
-    public void Reset()
+    public void Reset(string fen = null)
     {
-        game = new ChessGame();
+        game = fen == null ? new ChessGame() : new ChessGame(fen);
+        initialFen = game.GetFen();
+        moves.Clear();
+        revision++;
     }
+
+    public PositionSnapshot GetSnapshot() => new PositionSnapshot(game.GetFen(), CurrentTurn,
+        revision, initialFen, string.Join(" ", moves));
+
+    public MoveResult TryMove(ChessMove move) => TryMove(move.From, move.To, move.Promotion);
 
     public List<VisualPieceState> GetPieces()
     {
@@ -51,6 +67,9 @@ public sealed class ChessRulesAdapter
 
     public MoveResult TryMove(BoardSquare from, BoardSquare to, char? promotion)
     {
+        if (from.Rank < 1 || to.Rank < 1 || from.Equals(to) ||
+            (promotion.HasValue && "QRBN".IndexOf(char.ToUpperInvariant(promotion.Value)) < 0))
+            return MoveResult.Failed(from, to, "Movimento invalido.");
         Move move = new Move(ToPosition(from), ToPosition(to), game.WhoseTurn, promotion);
 
         if (!game.IsValidMove(move))
@@ -60,6 +79,8 @@ public sealed class ChessRulesAdapter
 
         Piece capturedPiece;
         MoveType moveType = game.MakeMove(move, true, out capturedPiece);
+        moves.Add(new ChessMove(from, to, promotion).ToUci());
+        revision++;
         bool isCheck = game.IsInCheck(game.WhoseTurn);
         bool isCheckmate = game.IsCheckmated(game.WhoseTurn);
         bool isDraw = game.IsDraw() || game.IsStalemated(game.WhoseTurn);
