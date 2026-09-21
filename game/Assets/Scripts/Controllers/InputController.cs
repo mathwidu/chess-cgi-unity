@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public sealed class InputController : MonoBehaviour
 {
@@ -40,7 +41,7 @@ public sealed class InputController : MonoBehaviour
             gameController.CancelSelection();
         }
 
-        if (keyboard != null && keyboard.nKey.wasPressedThisFrame)
+        if (keyboard != null && keyboard.nKey.wasPressedThisFrame && !gameController.IsMenuOpen)
         {
             gameController.NewGame();
         }
@@ -53,7 +54,7 @@ public sealed class InputController : MonoBehaviour
 
     private void HandlePrimaryClick(Vector2 screenPosition)
     {
-        if (raycastCamera == null)
+        if (raycastCamera == null || (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()))
         {
             return;
         }

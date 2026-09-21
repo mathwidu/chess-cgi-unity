@@ -27,6 +27,15 @@ public sealed class GameHud : MonoBehaviour
 
     private bool showStartScreen = true;
     private bool showHowToPlay;
+    private bool chooseComputer = true;
+    private ChessSide chosenSide = ChessSide.White;
+    private ComputerDifficulty chosenDifficulty = ComputerDifficulty.Beginner;
+    private Text modeChoiceText;
+    private Text sideChoiceText;
+    private Text difficultyChoiceText;
+    private Button sideChoiceButton;
+    private Button difficultyChoiceButton;
+    private RectTransform computerErrorPanel;
     private Font hudFont;
     private RectTransform hudRoot;
     private RectTransform startOverlay;
@@ -121,8 +130,9 @@ public sealed class GameHud : MonoBehaviour
         selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
         selectedPiecePreviewInput.Configure(null, selectedPiecePreviewCamera);
 
-        RectTransform actionBar = CreatePanel("ActionBar", hudRoot, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 16f), new Vector2(410f, 58f), panelColor);
-        CreateButton("NewGameButton", actionBar, "Nova partida", new Vector2(14f, 12f), new Vector2(122f, 34f), actionColor, StartGame);
+        RectTransform actionBar = CreatePanel("ActionBar", hudRoot, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 16f), new Vector2(530f, 58f), panelColor);
+        CreateButton("NewGameButton", actionBar, "Nova partida", new Vector2(14f, 12f), new Vector2(122f, 34f), actionColor, RestartGame);
+        CreateButton("MenuButton", actionBar, "Menu", new Vector2(398f, 12f), new Vector2(108f, 34f), neutralButtonColor, ShowMenu);
         CreateButton("CancelButton", actionBar, "Cancelar", new Vector2(144f, 12f), new Vector2(108f, 34f), neutralButtonColor, CancelSelection);
         howToPlayButtonText = CreateButton("HowToPlayButton", actionBar, "Como jogar", new Vector2(260f, 12f), new Vector2(124f, 34f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
 
@@ -138,13 +148,25 @@ public sealed class GameHud : MonoBehaviour
         CreateButton("PromoteBishopButton", promotionPanel, "Bispo", new Vector2(252f, 92f), new Vector2(94f, 34f), neutralButtonColor, () => ChoosePromotion('B'));
         CreateButton("PromoteKnightButton", promotionPanel, "Cavalo", new Vector2(362f, 92f), new Vector2(104f, 34f), neutralButtonColor, () => ChoosePromotion('N'));
 
+        computerErrorPanel = CreatePanel("ComputerErrorPanel", hudRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(560f, 190f), panelStrongColor);
+        CreateText("ComputerErrorTitle", computerErrorPanel, "A IA nao conseguiu jogar", 22, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(20f, -22f), new Vector2(520f, 32f));
+        CreateText("ComputerErrorHelp", computerErrorPanel, "Sua partida foi preservada. Voce pode tentar novamente.", 14, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(20f, -68f), new Vector2(520f, 38f));
+        CreateButton("RetryComputerButton", computerErrorPanel, "Tentar novamente", new Vector2(66f, 28f), new Vector2(210f, 40f), actionColor, () => gameController.RetryComputerTurn());
+        CreateButton("ComputerMenuButton", computerErrorPanel, "Voltar ao menu", new Vector2(296f, 28f), new Vector2(198f, 40f), neutralButtonColor, ShowMenu);
+
         startOverlay = CreatePanel("StartOverlay", hudRoot, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero, overlayColor);
-        RectTransform startCard = CreatePanel("StartCard", startOverlay, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(560f, 390f), panelStrongColor);
-        CreateText("StartTitle", startCard, "Xadrez CGI", 34, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(24f, -28f), new Vector2(512f, 48f));
-        CreateText("StartSubtitle", startCard, "Xadrez 3D local com personagens da turma.", 15, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(42f, -82f), new Vector2(476f, 28f));
-        CreateButton("StartPlayButton", startCard, "Jogar", new Vector2(160f, 128f), new Vector2(240f, 42f), actionColor, StartGame);
-        startHowToPlayButtonText = CreateButton("StartHowToPlayButton", startCard, "Como jogar", new Vector2(180f, 182f), new Vector2(200f, 36f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
-        startHowToPlayText = CreateText("StartHowToPlayText", startCard, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(64f, -236f), new Vector2(432f, 118f)).rectTransform;
+        RectTransform startCard = CreatePanel("StartCard", startOverlay, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600f, 620f), panelStrongColor);
+        CreateText("StartTitle", startCard, "Xadrez CGI", 34, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(24f, -24f), new Vector2(552f, 48f));
+        CreateText("StartSubtitle", startCard, "Jogue contra a IA ou com outra pessoa neste dispositivo.", 14, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(30f, -80f), new Vector2(540f, 38f));
+        modeChoiceText = CreateButton("ModeChoiceButton", startCard, "", new Vector2(70f, 442f), new Vector2(460f, 44f), actionColor, () => { chooseComputer = !chooseComputer; RefreshInterface(); }).GetComponentInChildren<Text>();
+        sideChoiceButton = CreateButton("SideChoiceButton", startCard, "", new Vector2(70f, 384f), new Vector2(460f, 44f), neutralButtonColor, () => { chosenSide = chosenSide == ChessSide.White ? ChessSide.Black : ChessSide.White; RefreshInterface(); });
+        sideChoiceText = sideChoiceButton.GetComponentInChildren<Text>();
+        difficultyChoiceButton = CreateButton("DifficultyChoiceButton", startCard, "", new Vector2(70f, 326f), new Vector2(460f, 44f), neutralButtonColor, () => { chosenDifficulty = (ComputerDifficulty)(((int)chosenDifficulty + 1) % 3); RefreshInterface(); });
+        difficultyChoiceText = difficultyChoiceButton.GetComponentInChildren<Text>();
+        CreateText("ChoiceHelp", startCard, "Clique nas opcoes para alterar. A IA joga offline.", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(40f, -306f), new Vector2(520f, 24f));
+        CreateButton("StartPlayButton", startCard, "Iniciar partida", new Vector2(160f, 232f), new Vector2(280f, 46f), actionColor, StartGame);
+        startHowToPlayButtonText = CreateButton("StartHowToPlayButton", startCard, "Como jogar", new Vector2(190f, 178f), new Vector2(220f, 36f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
+        startHowToPlayText = CreateText("StartHowToPlayText", startCard, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(64f, -464f), new Vector2(472f, 138f)).rectTransform;
 
         RefreshInterface();
     }
@@ -159,6 +181,12 @@ public sealed class GameHud : MonoBehaviour
         bool hasController = gameController != null;
         bool awaitingPromotion = hasController && gameController.IsAwaitingPromotion;
 
+        if (modeChoiceText != null) modeChoiceText.text = chooseComputer ? "Modo: Contra IA" : "Modo: Dois jogadores";
+        if (sideChoiceText != null) sideChoiceText.text = chosenSide == ChessSide.White ? "Seu lado: Brancas" : "Seu lado: Pretas";
+        if (difficultyChoiceText != null) difficultyChoiceText.text = "Dificuldade: " + DifficultyName(chosenDifficulty);
+        if (sideChoiceButton != null) sideChoiceButton.interactable = chooseComputer;
+        if (difficultyChoiceButton != null) difficultyChoiceButton.interactable = chooseComputer;
+        SetActive(computerErrorPanel, hasController && gameController.HasComputerError && !showStartScreen);
         SetActive(startOverlay, showStartScreen);
         SetActive(howToPlayPanel, showHowToPlay && !showStartScreen);
         SetActive(startHowToPlayText, showHowToPlay && showStartScreen);
@@ -200,9 +228,30 @@ public sealed class GameHud : MonoBehaviour
         showHowToPlay = false;
         if (gameController != null)
         {
-            gameController.StartLocalGame();
+            if (chooseComputer) gameController.StartComputerGame(chosenSide, chosenDifficulty);
+            else gameController.StartLocalGame();
         }
 
+        RefreshInterface();
+    }
+
+    private static string DifficultyName(ComputerDifficulty difficulty)
+    {
+        return difficulty == ComputerDifficulty.Beginner ? "Iniciante" :
+            difficulty == ComputerDifficulty.Intermediate ? "Intermediario" : "Dificil";
+    }
+
+    private void RestartGame()
+    {
+        if (gameController != null) gameController.NewGame();
+        RefreshInterface();
+    }
+
+    private void ShowMenu()
+    {
+        if (gameController != null) gameController.ReturnToMenu();
+        showStartScreen = true;
+        showHowToPlay = false;
         RefreshInterface();
     }
 

@@ -15,7 +15,8 @@ public static class XRControllerVerification
     private const string ExitCodeKey = "ChessCgiXrControllerCheckExitCode";
     private const string MainScenePath = "Assets/Scenes/Main.unity";
     private const int RigSettleFrames = 30;
-    private const int InputBlockedTimeoutSimFrames = 300;
+    private const double MoveTimeoutSeconds = 10;
+    private static double waitForMoveStartedAt;
 
     private enum Stage
     {
@@ -194,13 +195,14 @@ public static class XRControllerVerification
                 return;
 
             case Stage.ReleaseForSquare:
+                waitForMoveStartedAt = EditorApplication.timeSinceStartup;
                 interactor.selectInput.manualPerformed = false;
                 holdStartSimFrame = Time.frameCount;
                 Advance(Stage.WaitForMove);
                 return;
 
             case Stage.WaitForMove:
-                if (gameController.IsInputBlocked && Time.frameCount - holdStartSimFrame < InputBlockedTimeoutSimFrames)
+                if (gameController.IsInputBlocked && EditorApplication.timeSinceStartup - waitForMoveStartedAt < MoveTimeoutSeconds)
                 {
                     return;
                 }
@@ -262,6 +264,9 @@ public static class XRControllerVerification
         {
             return false;
         }
+
+        // Gameplay now blocks board input until a match is explicitly started.
+        gameController.StartLocalGame();
 
         interactor.selectInput.inputSourceMode = UnityEngine.XR.Interaction.Toolkit.Inputs.Readers.XRInputButtonReader.InputSourceMode.ManualValue;
         UseLevelTriggeredSelectForThisHarness(interactor);

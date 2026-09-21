@@ -39,3 +39,19 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   existentes conforme o que o runtime relata como presente; veja
   [play-in-vr](features/play-in-vr.md) e
   [rastreamento de mãos](glossary.md).
+
+### Changed
+
+- Contra a IA, a câmera desktop permanece na perspectiva do lado humano.
+- O controlador central bloqueia seleções humanas no turno do computador, independentemente de mouse ou raio VR.
+
+### Fixed
+
+- Na combinação IA/VR, os harnesses de seleção e câmera iniciam explicitamente
+  o modo local antes de operar peças; o menu agora bloqueia jogadas.
+- O harness do HUD mira o centro do botão, evitando depender da borda/pivô
+  depois da inclusão das opções da partida.
+- Os harnesses aguardam a animação pelo tempo real, pois quadros sem limite
+  no batch podem consumir 300 frames antes dos 280 ms de uma jogada.
+
+- Cliques sobre a interface não selecionam peças por trás do HUD; o atalho N fica inativo no menu.

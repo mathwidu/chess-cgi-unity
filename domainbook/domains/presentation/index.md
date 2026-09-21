@@ -44,6 +44,9 @@ estado que o gameplay relata. É o que um jogador realmente olha e lê.
   de primitivas para que o tabuleiro nunca fique vazio
   (`presentation/ADR-0001`).
 
+- O mesmo menu oferece Contra IA, lado e dificuldade, e o mesmo painel de
+  falha oferece nova tentativa ou retorno ao menu em desktop e world-space.
+
 ## Inbound Communication
 
 | Message            | Collaborator | Type    |

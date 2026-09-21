@@ -19,3 +19,6 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   Input Module, em vez do Canvas Screen Space Overlay e o Graphic Raycaster
   do desktop; veja [play-in-vr](../interaction/features/play-in-vr.md). O
   modo desktop permanece inalterado quando nenhum headset está presente.
+
+- Tela inicial com modo, lado e dificuldade; estado de pensamento, recuperação de falha e retorno ao menu.
+- Nova partida mantém as opções escolhidas.

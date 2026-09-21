@@ -180,7 +180,8 @@ public static class XRHudVerification
             UnityEngine.XR.Interaction.Toolkit.Inputs.Readers.XRInputButtonReader.InputSourceMode.ManualValue;
         interactor.enableUIInteraction = true;
 
-        AimControllerAt(startPlayButton.transform.position);
+        RectTransform buttonRect = startPlayButton.GetComponent<RectTransform>();
+        AimControllerAt(buttonRect.TransformPoint(buttonRect.rect.center));
         LogUiModel("afterAim");
         return true;
     }

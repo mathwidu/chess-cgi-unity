@@ -74,6 +74,11 @@ do lado do jogador ativo.
 | `CancelSelection`   | gameplay     | Command |
 | `NewGame`           | gameplay     | Command |
 
+- Contra o computador, a seleção humana só é aceita no lado humano. O bloqueio
+  está no controlador comum e vale também para `VrSelectionBridge`.
+- A câmera desktop fica no lado humano; a guarda de headset permanece ativa,
+  portanto nenhum turno automático gira o XR Origin.
+
 ## Business Decisions
 
 - Um clique é resolvido fazendo raycast na cena 3D e lendo a view de

@@ -12,7 +12,9 @@ Como jogador com um headset de VR
 Quero sentar diante do tabuleiro de xadrez em realidade virtual e escolher peças com as mãos
 Para que o jogo que já tenho se torne uma partida imersiva em vez de uma de tela
 
-Isto é um plano, não um trabalho construído. É um estudo de viabilidade e uma
+O texto a seguir registra o planejamento inicial e os incrementos de VR
+implementados nesta frente. A combinação com IA mantém os contratos comuns;
+validação em headset e Quest standalone ainda requer hardware. É um estudo de viabilidade e uma
 rota de conversão de alto nível para levar a build atual de desktop ao modo VR
 no HTC Vive (conectado a um PC) e no Meta Quest 3 (standalone, além de PC via
 Link). Permanece no contexto de interação porque a mudança é sobretudo sobre

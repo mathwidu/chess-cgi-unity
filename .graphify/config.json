@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "graphify_version": "0.9.53",
+  "semantic_mode": "on-demand",
+  "query_budget": 1800,
+  "extra_excludes": []
+}

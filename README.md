@@ -1,6 +1,6 @@
 # Xadrez CGI
 
-Projeto de Computacao Grafica desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 3D local para duas pessoas, com regras completas, tabuleiro interativo, camera por turno, HUD em Canvas e personagens personalizados inspirados na turma.
+Projeto de Computacao Grafica desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 3D local para duas pessoas ou contra IA offline, com regras completas, tabuleiro interativo, camera por turno, HUD em Canvas e personagens personalizados inspirados na turma.
 
 ## Como Abrir
 
@@ -24,7 +24,9 @@ A pasta correta para abrir como projeto Unity e `game`.
 - Scroll: aproximar ou afastar a camera principal.
 - Aba lateral: ao selecionar uma peca, mostra o modelo 3D, permite girar com drag, aproximar/afastar com scroll e usar os botoes `+` e `-`.
 
-O jogo alterna automaticamente entre brancas e pretas. Quando o turno muda, a camera vira para o lado do jogador atual.
+O jogo alterna automaticamente entre brancas e pretas. No modo local a camera acompanha o turno; contra a IA ela permanece no lado humano.
+
+No menu, escolha **Contra IA**, o lado e a dificuldade. O Stockfish deve ser preparado uma vez neste dispositivo com `python3 tools/setup_stockfish.py`. O download fica fora dos assets e a partida funciona offline. Veja [configuração, testes e integração com VR](docs/ai-desktop.md).
 
 ## Funcionalidades
 

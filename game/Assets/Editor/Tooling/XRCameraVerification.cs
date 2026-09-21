@@ -16,7 +16,8 @@ public static class XRCameraVerification
     private const int RigSettleFrames = 30;
     private const int OrbitStepCount = 20;
     private const int HoldSimFrames = 5;
-    private const int InputBlockedTimeoutSimFrames = 300;
+    private const double MoveTimeoutSeconds = 10;
+    private static double waitForMoveStartedAt;
     private const float VrMinDistance = 2.5f;
     private const float VrMaxDistance = 6f;
 
@@ -159,11 +160,12 @@ public static class XRCameraVerification
                 return;
 
             case Stage.ReleaseForSquare:
+                waitForMoveStartedAt = EditorApplication.timeSinceStartup;
                 Advance(Stage.WaitForMove);
                 return;
 
             case Stage.WaitForMove:
-                if (gameController.IsInputBlocked && frameCount - holdStartSimFrame < InputBlockedTimeoutSimFrames)
+                if (gameController.IsInputBlocked && EditorApplication.timeSinceStartup - waitForMoveStartedAt < MoveTimeoutSeconds)
                 {
                     return;
                 }
@@ -255,6 +257,9 @@ public static class XRCameraVerification
         {
             return false;
         }
+
+        // Keep this camera regression check in deterministic two-player mode.
+        gameController.StartLocalGame();
 
         interactor.selectInput.inputSourceMode = UnityEngine.XR.Interaction.Toolkit.Inputs.Readers.XRInputButtonReader.InputSourceMode.ManualValue;
         interactor.selectActionTrigger = UnityEngine.XR.Interaction.Toolkit.Interactors.XRBaseInputInteractor.InputTriggerType.State;

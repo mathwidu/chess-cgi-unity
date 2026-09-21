@@ -9,13 +9,14 @@ owners: [mathwidu]
 code:
   - game/Assets/Scripts/Rules/**
   - game/Assets/Scripts/Domain/**
+  - game/Assets/Scripts/AI/**
   - game/Assets/Scripts/Controllers/ChessGameController.cs
 ---
 
 ## Purpose
 
-Rodar uma partida legal de xadrez entre dois jogadores compartilhando uma
-tela. Este contexto é dono da partida: de quem é o turno, quais jogadas são
+Rodar uma partida legal de xadrez entre dois jogadores locais ou entre uma
+pessoa e um adversário offline. Este contexto é dono da partida: de quem é o turno, quais jogadas são
 legais e se uma jogada termina em xeque, xeque-mate ou empate. É a razão de
 existir do produto; tudo o que é visual está a seu serviço.
 
@@ -31,6 +32,9 @@ existir do produto; tudo o que é visual está a seu serviço.
 - Contexto anticorrupção: `ChessRulesAdapter` é o único código que sabe que a
   biblioteca `ChessDotNet` existe; ele traduz entre os tipos da biblioteca e
   os próprios tipos deste contexto.
+
+- `ComputerTurnCoordinator` controla cancelamento, timeout e revisão.
+- `IMoveChooser` isola a escolha assíncrona; o adaptador UCI é exclusivo do desktop.
 
 ## Inbound Communication
 
@@ -58,8 +62,8 @@ existir do produto; tudo o que é visual está a seu serviço.
 - O tabuleiro é 8×8 com um índice de coluna de 0–7 e uma linha de 1–8; um
   `BoardSquare` recusa qualquer coordenada fora desse intervalo em vez de
   ajustá-la ao limite.
-- Uma partida roda por vez e é local: dois jogadores se revezam na mesma
-  máquina, Brancas depois Pretas, sem adversário de IA e sem rede.
+- Uma partida roda por vez e é local: dois jogadores se revezam ou um motor
+  offline controla o lado oposto ao humano. Toda candidata passa pelas mesmas regras.
 - Uma jogada só é oferecida se as regras a devolverem como legal; o
   controlador nunca inventa um destino que a biblioteca não permitiu.
 - Um peão que chega à última linha pausa o turno para uma escolha de
@@ -67,8 +71,8 @@ existir do produto; tudo o que é visual está a seu serviço.
 
 ## Assumptions
 
-- Os dois jogadores cooperam e compartilham a entrada; não há bloqueio por
-  lado.
+- No modo local os dois jogadores compartilham a entrada. Contra o computador,
+  seleções humanas são bloqueadas no turno automático, inclusive após falha do motor.
 - A biblioteca de regras está correta sobre o xadrez; este contexto não a
   reverifica.
 - Uma jogada ou é totalmente bem-sucedida ou deixa a partida intocada — não
