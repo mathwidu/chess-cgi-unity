@@ -6,6 +6,12 @@ public sealed class BoardView : MonoBehaviour
 {
     [SerializeField] private float squareSize = 1.25f;
     [SerializeField] private float pieceBaseHeight = 0.08f;
+    [Header("Desktop")]
+    [SerializeField] private Vector3 desktopBoardPosition = Vector3.zero;
+    [SerializeField] private Vector3 desktopBoardScale = Vector3.one;
+    [Header("VR")]
+    [SerializeField] private Vector3 vrBoardPosition = new Vector3(0f, 0.78f, 0f);
+    [SerializeField] private Vector3 vrBoardScale = new Vector3(0.045f, 0.045f, 0.045f);
     [SerializeField] private Transform boardFrameRoot;
     [SerializeField] private Transform squaresRoot;
     [SerializeField] private Transform piecesRoot;
@@ -59,6 +65,7 @@ public sealed class BoardView : MonoBehaviour
 
     public void BuildBoard()
     {
+        ConfigureBoardTransformForMode();
         EnsureRoots();
         ClearChildren(boardFrameRoot);
         ClearChildren(squaresRoot);
@@ -141,6 +148,20 @@ public sealed class BoardView : MonoBehaviour
     {
         EnsureRoots();
         ClearChildren(highlightsRoot);
+    }
+
+    private void ConfigureBoardTransformForMode()
+    {
+        if (XRRig.IsHeadsetPresent)
+        {
+            transform.localPosition = vrBoardPosition;
+            transform.localScale = vrBoardScale;
+        }
+        else
+        {
+            transform.localPosition = desktopBoardPosition;
+            transform.localScale = desktopBoardScale;
+        }
     }
 
     private void EnsureRoots()

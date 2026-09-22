@@ -15,6 +15,10 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors.Visuals;
 public sealed class XRRig : MonoBehaviour
 {
     private const float EyeHeight = 1.2f;
+    private const float OrbitSpeed = 80f;
+    private const float ZoomSpeed = 6f;
+    private const float MinBoardDistance = 0.35f;
+    private const float MaxBoardDistance = 1.2f;
     private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -0.6f);
     private static readonly Vector3 BoardTarget = new Vector3(0f, 0.78f, 0f);
     public static readonly Vector3 SeatEyePosition = SeatPosition + Vector3.up * EyeHeight;
@@ -56,10 +60,50 @@ public sealed class XRRig : MonoBehaviour
             return;
         }
 
+        if (Origin == null)
+        {
+            return;
+        }
+
         Keyboard keyboard = Keyboard.current;
+        Mouse mouse = Mouse.current;
+
         if (keyboard != null && keyboard.rKey.wasPressedThisFrame)
         {
             Recenter();
+        }
+
+        float orbitDirection = 0f;
+        if (keyboard != null && keyboard.qKey.isPressed)
+        {
+            orbitDirection -= 1f;
+        }
+
+        if (keyboard != null && keyboard.eKey.isPressed)
+        {
+            orbitDirection += 1f;
+        }
+
+        float scrollDelta = mouse == null ? 0f : mouse.scroll.ReadValue().y * 0.01f;
+
+        ApplyOrbitAndZoom(Origin, orbitDirection, scrollDelta);
+    }
+
+    private void ApplyOrbitAndZoom(Transform subject, float orbitDirection, float scrollDelta)
+    {
+        if (Mathf.Abs(orbitDirection) > 0f)
+        {
+            subject.RotateAround(BoardTarget, Vector3.up, orbitDirection * OrbitSpeed * Time.deltaTime);
+            subject.rotation = Quaternion.LookRotation(BoardTarget - subject.position, Vector3.up);
+        }
+
+        if (Mathf.Abs(scrollDelta) > 0.01f)
+        {
+            Vector3 direction = (subject.position - BoardTarget).normalized;
+            float distance = Vector3.Distance(subject.position, BoardTarget);
+            distance = Mathf.Clamp(distance - scrollDelta * ZoomSpeed, MinBoardDistance, MaxBoardDistance);
+            subject.position = BoardTarget + direction * distance;
+            subject.rotation = Quaternion.LookRotation(BoardTarget - subject.position, Vector3.up);
         }
     }
 

@@ -36,9 +36,23 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   sem textura de profundidade nem de opacos, HDR e SSAO desligados, sombras
   mais curtas com menos cascatas e sem soft shadows, e bloom em filtragem
   padrão.
+- O transform do tabuleiro passa a ser aplicado por modo em tempo de
+  execução, na montagem: `BoardView` põe o root do tabuleiro em escala 1 na
+  origem no desktop e em escala de mesa elevada em VR, com campos serializados
+  próprios de cada modo. Assim o valor salvo na cena de um modo não quebra o
+  outro.
 
 ### Fixed
 
+- O tabuleiro de desktop voltou a aparecer emoldurado pela câmera. Ele havia
+  virado um ponto minúsculo e descentralizado porque a cena guardava a escala
+  e a posição de mesa do modo VR no root compartilhado do tabuleiro; agora
+  `BoardView` aplica os valores de cada modo em tempo de execução, então o
+  desktop volta ao tabuleiro em escala 1 na origem.
+- O menu (HUD em world-space) de VR deixou de aparecer espelhado e só visível
+  ao olhar para a direita. `GameHud` centraliza o painel à frente do jogador
+  sentado e o gira para ficar de frente para ele, com o texto legível, em vez
+  de posicioná-lo deslocado à direita e voltado ao contrário.
 - As peças não se empilham mais no centro do tabuleiro. `PieceFactory` fixa a
   escala local do root da peça em `Vector3.one` e ajusta o visual custom em
   espaço local — altura e base calculadas a partir do `lossyScale` do pai —,

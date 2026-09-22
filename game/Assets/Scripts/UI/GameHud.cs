@@ -8,8 +8,8 @@ using UnityEngine.XR.Interaction.Toolkit.UI;
 
 public sealed class GameHud : MonoBehaviour
 {
-    private static readonly Vector3 WorldPanelPosition = new Vector3(4.8f, 1.8f, -1.6f);
-    private const float WorldPanelScale = 0.0032f;
+    private static readonly Vector3 VrPanelPosition = new Vector3(0f, 1.4f, 4f);
+    private const float VrPanelScale = 0.0032f;
 
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
@@ -557,9 +557,9 @@ public sealed class GameHud : MonoBehaviour
         canvasRect.anchorMin = new Vector2(0.5f, 0.5f);
         canvasRect.anchorMax = new Vector2(0.5f, 0.5f);
         canvasRect.sizeDelta = new Vector2(1920f, 1080f);
-        canvasRect.localScale = Vector3.one * WorldPanelScale;
-        canvasRect.position = WorldPanelPosition;
-        canvasRect.rotation = Quaternion.LookRotation(XRRig.SeatEyePosition - WorldPanelPosition);
+        canvasRect.localScale = Vector3.one * VrPanelScale;
+        canvasRect.position = VrPanelPosition;
+        canvasRect.rotation = Quaternion.LookRotation(VrPanelPosition - XRRig.SeatEyePosition, Vector3.up);
 
         GraphicRaycaster legacyRaycaster = GetComponent<GraphicRaycaster>();
         if (legacyRaycaster != null)

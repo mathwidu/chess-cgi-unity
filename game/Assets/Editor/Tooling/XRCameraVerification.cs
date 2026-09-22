@@ -17,8 +17,9 @@ public static class XRCameraVerification
     private const int OrbitStepCount = 20;
     private const int HoldSimFrames = 5;
     private const int InputBlockedTimeoutSimFrames = 300;
-    private const float VrMinDistance = 2.5f;
-    private const float VrMaxDistance = 6f;
+    private const float VrMinDistance = 0.35f;
+    private const float VrMaxDistance = 1.2f;
+    private static readonly Vector3 BoardTarget = new Vector3(0f, 0.78f, 0f);
 
     private enum Stage
     {
@@ -36,6 +37,7 @@ public static class XRCameraVerification
     private static int frameCount;
     private static int holdStartSimFrame;
     private static CameraController cameraController;
+    private static XRRig xrRig;
     private static MethodInfo applyOrbitAndZoomMethod;
     private static NearFarInteractor interactor;
     private static ChessGameController gameController;
@@ -193,20 +195,23 @@ public static class XRCameraVerification
         cameraController = Object.FindFirstObjectByType<CameraController>();
         gameController = Object.FindFirstObjectByType<ChessGameController>();
         boardView = Object.FindFirstObjectByType<BoardView>();
-        applyOrbitAndZoomMethod = typeof(CameraController).GetMethod(
+        xrRig = Object.FindFirstObjectByType<XRRig>();
+        applyOrbitAndZoomMethod = typeof(XRRig).GetMethod(
             ApplyOrbitAndZoomMethodName, BindingFlags.NonPublic | BindingFlags.Instance);
 
         Debug.Log("CHESS_CGI_XR_CAMERA_CHECK " +
             $"headsetPresent={XRRig.IsHeadsetPresent} originFound={XRRig.Origin != null} " +
-            $"cameraControllerFound={cameraController != null} applyOrbitAndZoomMethodFound={applyOrbitAndZoomMethod != null}");
+            $"cameraControllerFound={cameraController != null} xrRigFound={xrRig != null} " +
+            $"applyOrbitAndZoomMethodFound={applyOrbitAndZoomMethod != null}");
 
         result.Check(XRRig.IsHeadsetPresent, "headset should be present in the simulator check");
         result.Check(XRRig.Origin != null, "XR Origin should be found");
         result.Check(cameraController != null, "CameraController should be found");
-        result.Check(applyOrbitAndZoomMethod != null, "CameraController.ApplyOrbitAndZoom should be found");
+        result.Check(xrRig != null, "XRRig should be found");
+        result.Check(applyOrbitAndZoomMethod != null, "XRRig.ApplyOrbitAndZoom should be found");
 
         return XRRig.Origin != null && cameraController != null && gameController != null &&
-            boardView != null && applyOrbitAndZoomMethod != null;
+            boardView != null && xrRig != null && applyOrbitAndZoomMethod != null;
     }
 
     private static void ReportOrbitAndZoomResult()
@@ -216,24 +221,23 @@ public static class XRCameraVerification
 
         for (int i = 0; i < OrbitStepCount; i++)
         {
-            applyOrbitAndZoomMethod.Invoke(cameraController, new object[] { XRRig.Origin, -1f, 0f, VrMinDistance, VrMaxDistance });
+            applyOrbitAndZoomMethod.Invoke(xrRig, new object[] { XRRig.Origin, -1f, 0f });
         }
 
         Vector3 orbitedPosition = XRRig.Origin.position;
         float orbitPositionDelta = Vector3.Distance(baselinePosition, orbitedPosition);
         float orbitRotationDelta = Quaternion.Angle(baselineRotation, XRRig.Origin.rotation);
 
-        Vector3 target = new Vector3(0f, 0f, 0.35f);
-        float distanceBeforeZoom = Vector3.Distance(orbitedPosition, target);
-        applyOrbitAndZoomMethod.Invoke(cameraController, new object[] { XRRig.Origin, 0f, 0.1f, VrMinDistance, VrMaxDistance });
-        float distanceAfterZoom = Vector3.Distance(XRRig.Origin.position, target);
+        float distanceBeforeZoom = Vector3.Distance(orbitedPosition, BoardTarget);
+        applyOrbitAndZoomMethod.Invoke(xrRig, new object[] { XRRig.Origin, 0f, 0.02f });
+        float distanceAfterZoom = Vector3.Distance(XRRig.Origin.position, BoardTarget);
 
         Debug.Log("CHESS_CGI_XR_CAMERA_CHECK " +
             $"orbitPositionDelta={orbitPositionDelta:F2} orbitRotationDelta={orbitRotationDelta:F2} " +
             $"distanceBeforeZoom={distanceBeforeZoom:F2} distanceAfterZoom={distanceAfterZoom:F2}");
 
-        result.Check(orbitPositionDelta > 0.05f, "manual orbit should move the XR Origin");
-        result.Check(orbitRotationDelta > 0.5f, "manual orbit should rotate the XR Origin");
+        result.Check(orbitPositionDelta > 0.005f, "manual orbit should move the XR Origin");
+        result.Check(orbitRotationDelta > 0.2f, "manual orbit should rotate the XR Origin");
         result.Check(distanceBeforeZoom >= VrMinDistance && distanceBeforeZoom <= VrMaxDistance,
             $"distanceBeforeZoom={distanceBeforeZoom:F2} should be within the VR zoom bounds [{VrMinDistance}, {VrMaxDistance}]");
         result.Check(distanceAfterZoom >= VrMinDistance && distanceAfterZoom <= VrMaxDistance,

@@ -25,12 +25,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `ChessGameController.SelectPiece` / `SelectSquare` que o caminho de mouse
   de desktop faz; veja [play-in-vr](features/play-in-vr.md).
 - `ChessGameController` aposenta o giro de câmera por turno quando um
-  headset está presente, já que o modo VR é de assento único.
-  `CameraController` mantém a órbita (Q/E) e o zoom por scroll disponíveis
-  em VR, mas passam a agir sobre o XR Origin do rig em vez da câmera do
-  olho, dentro de uma faixa de distância própria para a escala de VR; veja
-  [play-in-vr](features/play-in-vr.md). O modo desktop permanece
-  inalterado.
+  headset está presente, já que o modo VR é de assento único. A órbita
+  (Q/E) e o zoom por scroll continuam disponíveis em VR, agora de posse do
+  `XRRig`: agem sobre o XR Origin do rig, ao redor do tabuleiro e dentro de
+  uma faixa de distância própria da escala de VR. O `CameraController` passa
+  a ser exclusivo do desktop; veja [play-in-vr](features/play-in-vr.md).
 - Pacote `com.unity.xr.hands` e a feature OpenXR **Hand Tracking Subsystem**
   habilitados para Standalone. `XRRig` constrói um interactor de mão para
   cada lado, extraído das amostras oficiais do XR Interaction Toolkit
@@ -52,10 +51,16 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 - O assento de VR foi reposicionado para uma vista de mesa: `XRRig` senta o
   jogador logo à frente e acima de um tabuleiro em escala de mesa, em vez de
-  colocá-lo dentro de um tabuleiro em escala de sala, e `CameraController` teve
-  as faixas de distância e o alvo de órbita/zoom reajustados para essa escala.
-  O modo desktop permanece inalterado. Veja
+  colocá-lo dentro de um tabuleiro em escala de sala. O modo desktop permanece
+  inalterado. Veja
   [ADR-0002](decisions/0002-ver-o-tabuleiro-como-uma-mesa-a-partir-de-um-assento.md).
+- Os modos VR e desktop ficaram independentes na câmera e nos controles. O
+  `CameraController` não age mais em VR (retorna cedo quando um headset está
+  presente) e perdeu os campos de distância de VR, que migraram junto com a
+  órbita/zoom para o `XRRig`. Voltou aos valores originais de terceira pessoa,
+  para o tabuleiro em escala 1 na origem. A seleção de desktop faz raycast a
+  partir da Main Camera e a de VR a partir da Eye Camera, cada modo com a sua
+  câmera, de modo que mexer em um modo não afete o outro.
 
 ### Fixed
 

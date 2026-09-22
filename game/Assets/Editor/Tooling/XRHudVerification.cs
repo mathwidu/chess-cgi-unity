@@ -171,6 +171,8 @@ public static class XRHudVerification
         result.Check(controllerObject != null, "the right controller should be found");
         result.Check(interactor != null, "the right controller's NearFarInteractor should be found");
 
+        CheckCanvasPlacement(canvas);
+
         if (canvas == null || startPlayButton == null || overlayTransform == null || interactor == null)
         {
             return false;
@@ -180,9 +182,44 @@ public static class XRHudVerification
             UnityEngine.XR.Interaction.Toolkit.Inputs.Readers.XRInputButtonReader.InputSourceMode.ManualValue;
         interactor.enableUIInteraction = true;
 
-        AimControllerAt(startPlayButton.transform.position);
+        AimControllerAt(GetRectWorldCenter(startPlayButton.GetComponent<RectTransform>()));
         LogUiModel("afterAim");
         return true;
+    }
+
+    private static Vector3 GetRectWorldCenter(RectTransform rect)
+    {
+        Vector3[] corners = new Vector3[4];
+        rect.GetWorldCorners(corners);
+        return (corners[0] + corners[2]) * 0.5f;
+    }
+
+    private static void CheckCanvasPlacement(Canvas canvas)
+    {
+        Camera eyeCamera = XRRig.EyeCamera;
+        if (canvas == null || eyeCamera == null)
+        {
+            Debug.Log($"CHESS_CGI_XR_HUD_CHECK canvasPlacement canvasFound={canvas != null} eyeCameraFound={eyeCamera != null}");
+            result.Check(eyeCamera != null, "the eye camera should be found for the HUD placement check");
+            return;
+        }
+
+        Transform eye = eyeCamera.transform;
+        Vector3 canvasCenter = canvas.transform.position;
+        Vector3 localToEye = eye.InverseTransformPoint(canvasCenter);
+        Vector3 dirToCanvas = (canvasCenter - eye.position).normalized;
+        float inFrontDot = Vector3.Dot(dirToCanvas, eye.forward);
+        float facingDot = Vector3.Dot(canvas.transform.forward, eye.forward);
+        float horizontalOffset = localToEye.z > 0.001f ? Mathf.Abs(localToEye.x) / localToEye.z : Mathf.Infinity;
+
+        Debug.Log("CHESS_CGI_XR_HUD_CHECK " +
+            $"canvasPlacement localToEye={localToEye.ToString("F2")} inFrontDot={inFrontDot:F2} " +
+            $"facingDot={facingDot:F2} horizontalOffset={horizontalOffset:F2}");
+
+        result.Check(localToEye.z > 0f, "the HUD canvas should sit in front of the eye camera");
+        result.Check(inFrontDot > 0.5f, "the HUD canvas should be within the eye camera's forward view");
+        result.Check(horizontalOffset < 0.5f, "the HUD canvas should be centered, not off to the side");
+        result.Check(facingDot > 0.5f, "the HUD canvas should face the player so its text is readable, not mirrored");
     }
 
     private static void LogUiModel(string when)
