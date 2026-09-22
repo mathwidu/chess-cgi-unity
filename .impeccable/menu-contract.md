@@ -10,7 +10,7 @@ OWN-WORLD: verde Feevale como campo contínuo, título branco, ação amarela e 
 
 STORY: reconhecer o projeto da turma, escolher adversário, lado e dificuldade, e jogar.
 
-FIRST VIEWPORT: título Xadrez CGI em grande escala à esquerda superior; configuração alinhada à esquerda abaixo dele; três personagens reais sobre uma pequena base de tabuleiro dominam a metade direita; assinatura Feevale no alto à direita. Jogar fica abaixo da configuração. Trocar lado muda suavemente o enquadramento do elenco; nenhum carrossel ou autoplay.
+FIRST VIEWPORT: assinatura compacta Xadrez CGI no alto à esquerda e marca oficial Feevale no alto à direita; três personagens reais sobre uma base de tabuleiro ocupam o centro. Uma faixa inferior reúne modo, lado e dificuldade em grupos horizontais, com Jogar destacado à direita e Como jogar logo abaixo. Trocar lado muda suavemente o enquadramento do elenco; nenhum carrossel ou autoplay. Esta distribuição substitui o primeiro layout lateral, rejeitado pelo usuário por distribuição e tratamento das logos.
 
 FORM: challenger highlife-sleeve, seed 9d5682be, aprovado pela página. Tradução obrigatória da composição coletiva para cores Feevale e tipografia de referência Avenir; sem motivos tropicais ou conteúdo musical.
 

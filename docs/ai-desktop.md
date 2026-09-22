@@ -60,7 +60,8 @@ Roteiro manual, diretamente na aba **Game** da Unity:
 `GameHud.Menu.cs` concentra a configuração e `GameHud.Match.cs` apresenta a
 partida. O ciclo de vida do Canvas e a integração XR permanecem em `GameHud.cs`.
 O menu usa a direção **Palco da turma**, escolhida pelo usuário: campo verde,
-título branco, ação amarela e três modelos reais do projeto no palco à direita.
+assinaturas no cabeçalho, três modelos reais do projeto no centro e escolhas
+horizontais na base, com Jogar destacado à direita.
 `MenuCastPreview` mantém esses modelos fora da partida e renderiza apenas na
 abertura ou durante a transição de lado; os colliders ficam desativados. A
 composição reaproveita uGUI e o Input System, sem novos pacotes. A assinatura

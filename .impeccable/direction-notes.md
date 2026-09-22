@@ -13,3 +13,10 @@ O contrato está em `surfaces/game-assets-scripts-ui-gamehud-menu-cs.md`.
 
 As capturas de revisão são renders da cena Main na Unity, não comps ou imagens
 geradas. A revisão independente e a documentação registram o resultado final.
+
+## Ajuste solicitado em 2026-09-21
+
+O usuário rejeitou a distribuição do primeiro layout e pediu mais cuidado com
+as logos, preservando as peças visíveis. O menu passou a ter assinaturas no
+cabeçalho, elenco central e configuração horizontal na base. A revisão
+anterior não representa aprovação visual do usuário para esta composição.
