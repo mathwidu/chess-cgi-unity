@@ -1,0 +1,233 @@
+{
+  "title": "Xadrez CGI · direção Feevale",
+  "question": "Compare as três prévias. Qual delas deve orientar a nova interface na Unity? Você também pode sugerir uma combinação ou ajuste.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Mesa de campeonato",
+      "thesis": "O menu como preparação de uma partida, com o tabuleiro e a turma em primeiro plano.",
+      "lineage": "Quadros de emparceiramento e súmulas de torneios de xadrez",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "campo verde",
+        "tabuleiro 3D",
+        "linhas de súmula"
+      ],
+      "viewport": "Cena ampla do tabuleiro, configurações em linhas e ação de jogar claramente separada.",
+      "risk": "A atmosfera de campeonato pode parecer mais formal.",
+      "comp": ".impeccable/mocks/decision/mesa.png",
+      "raised": [
+        {
+          "from": "Montagem de filme",
+          "raise": "Escolhas ficam numa faixa contínua, sem grade de cartões."
+        },
+        {
+          "from": "Palco de código",
+          "raise": "A configuração escolhida se revela no próprio cenário."
+        },
+        {
+          "from": "Mergulho",
+          "raise": "Uma única sequência conduz do modo à dificuldade e ao início."
+        },
+        {
+          "from": "Jardins",
+          "raise": "A composição usa o eixo do tabuleiro para organizar os controles."
+        },
+        {
+          "from": "Catálogo gráfico",
+          "raise": "A tipografia tem espaço e cada informação aparece uma só vez."
+        }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "Mostra da turma",
+      "kicker": "IMPECCABLE’S PICK",
+      "thesis": "Uma abertura clara com personalidade de mostra acadêmica e os personagens como protagonistas.",
+      "lineage": "Exposições de projetos e comunicação institucional da Feevale",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "fundo claro",
+        "letras amplas",
+        "personagens 3D"
+      ],
+      "viewport": "Título amplo, personagens no centro e uma faixa inferior com as escolhas da partida.",
+      "risk": "Mais institucional; a presença dos personagens evita parecer um portal acadêmico.",
+      "comp": ".impeccable/mocks/decision/mostra.png"
+    },
+    {
+      "id": "challenger-highlife-sleeve",
+      "label": "Palco da turma",
+      "verdict": "competitive",
+      "thesis": "A turma vira o elenco de abertura, com composição expressiva em verde e amarelo.",
+      "lineage": "Retratos coletivos e capas de discos, traduzidos para a identidade Feevale",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "cor institucional",
+        "elenco 3D",
+        "composição assimétrica"
+      ],
+      "viewport": "Personagens em grande escala, título integrado à composição e controles compactos nas margens.",
+      "case": "Ganha em personalidade, mas precisa controlar a competição entre personagens e opções.",
+      "risk": "É a opção mais expressiva e pode pedir mais trabalho de enquadramento.",
+      "comp": ".impeccable/mocks/decision/palco.png",
+      "hero": "https://impeccable.style/worlds/cards/highlife-sleeve-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/highlife-sleeve.webp"
+    },
+    {
+      "id": "declined-3",
+      "label": "Montagem de filme",
+      "verdict": "declined",
+      "thesis": "A linguagem de cinema enfraquece o reconhecimento do xadrez.",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "Referência de composição"
+      ],
+      "viewport": "Uma faixa de escolhas com estados claros.",
+      "risk": "A linguagem de cinema enfraquece o reconhecimento do xadrez.",
+      "case": "A linguagem de cinema enfraquece o reconhecimento do xadrez.",
+      "kept": "Uma faixa de escolhas com estados claros."
+    },
+    {
+      "id": "declined-4",
+      "label": "Palco de código",
+      "verdict": "declined",
+      "thesis": "Código decorativo distrai da partida.",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "Referência de composição"
+      ],
+      "viewport": "A escolha muda o estado que o jogador vê.",
+      "risk": "Código decorativo distrai da partida.",
+      "case": "Código decorativo distrai da partida.",
+      "kept": "A escolha muda o estado que o jogador vê."
+    },
+    {
+      "id": "declined-5",
+      "label": "Mergulho",
+      "verdict": "declined",
+      "thesis": "O tema não pertence ao jogo nem à universidade.",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "Referência de composição"
+      ],
+      "viewport": "Uma sequência simples de preparação.",
+      "risk": "O tema não pertence ao jogo nem à universidade.",
+      "case": "O tema não pertence ao jogo nem à universidade.",
+      "kept": "Uma sequência simples de preparação."
+    },
+    {
+      "id": "declined-6",
+      "label": "Jardins",
+      "verdict": "declined",
+      "thesis": "O cerimonial clássico afasta o projeto da turma.",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "Referência de composição"
+      ],
+      "viewport": "Eixo visual e espaço em torno dos controles.",
+      "risk": "O cerimonial clássico afasta o projeto da turma.",
+      "case": "O cerimonial clássico afasta o projeto da turma.",
+      "kept": "Eixo visual e espaço em torno dos controles."
+    },
+    {
+      "id": "declined-7",
+      "label": "Catálogo gráfico",
+      "verdict": "declined",
+      "thesis": "Números e códigos escondem o que cada botão faz.",
+      "palette": [
+        "#006128",
+        "#009042",
+        "#9aca3c",
+        "#ffdd00",
+        "#ffffff",
+        "#6d6e71"
+      ],
+      "materials": [
+        "Referência de composição"
+      ],
+      "viewport": "Hierarquia e economia de texto.",
+      "risk": "Números e códigos escondem o que cada botão faz.",
+      "case": "Números e códigos escondem o que cada botão faz.",
+      "kept": "Hierarquia e economia de texto."
+    }
+  ],
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "Menu convencional",
+    "thesis": "Menu de jogo tradicional usando as cores da Feevale.",
+    "palette": [
+      "#006128",
+      "#009042",
+      "#9aca3c",
+      "#ffdd00",
+      "#ffffff",
+      "#6d6e71"
+    ],
+    "materials": [
+      "botões e painel tradicionais"
+    ],
+    "viewport": "Título no topo e opções agrupadas abaixo.",
+    "risk": "Pode repetir o caráter genérico que você rejeitou."
+  },
+  "steer": true
+}

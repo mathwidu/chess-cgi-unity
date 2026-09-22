@@ -22,8 +22,10 @@ public class DesktopSceneTests
         var controller = Object.FindFirstObjectByType<ChessGameController>();
         var board = Object.FindFirstObjectByType<BoardView>();
         Assert.That(controller.IsMenuOpen, Is.True);
-        GameObject.Find("SideChoiceButton").GetComponent<Button>().onClick.Invoke();
+        GameObject.Find("BlackSideButton").GetComponent<Button>().onClick.Invoke();
+        GameObject.Find("HardDifficultyButton").GetComponent<Button>().onClick.Invoke();
         GameObject.Find("StartPlayButton").GetComponent<Button>().onClick.Invoke();
+        Assert.That(controller.Difficulty, Is.EqualTo(ComputerDifficulty.Hard));
         Assert.That(controller.IsAgainstComputer, Is.True);
         Assert.That(controller.HumanSide, Is.EqualTo(ChessSide.Black));
         float deadline = Time.realtimeSinceStartup + 10;
@@ -41,7 +43,7 @@ public class DesktopSceneTests
         Assert.That(controller.CurrentTurn, Is.EqualTo(ChessSide.Black));
         GameObject.Find("MenuButton").GetComponent<Button>().onClick.Invoke();
         Assert.That(controller.IsMenuOpen, Is.True);
-        GameObject.Find("ModeChoiceButton").GetComponent<Button>().onClick.Invoke();
+        GameObject.Find("LocalModeButton").GetComponent<Button>().onClick.Invoke();
         GameObject.Find("StartPlayButton").GetComponent<Button>().onClick.Invoke();
         Assert.That(controller.IsAgainstComputer, Is.False);
         Assert.That(controller.MoveHistory.Count, Is.Zero);

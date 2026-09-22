@@ -74,3 +74,7 @@ node_modules/
 
 # Local engine downloads; never package them into Assets
 /.local/
+
+# Impeccable local decision server and generated visual evidence
+/.impeccable/questions/
+/.impeccable/review/*.png

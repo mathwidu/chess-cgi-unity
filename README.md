@@ -11,7 +11,7 @@ Projeto de Computacao Grafica desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 
 5. Selecione a pasta `game` dentro deste repositorio.
 6. Abra o projeto.
 7. Abra a cena `Assets/Scenes/Main.unity`, caso ela nao abra automaticamente.
-8. Clique em `Play`.
+8. Clique em `Play`. Alternativamente, use **Chess CGI → Jogar no Editor** para abrir a cena principal e iniciar a partida. Não é necessário gerar uma build.
 
 A pasta correta para abrir como projeto Unity e `game`.
 
