@@ -39,6 +39,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   existentes conforme o que o runtime relata como presente; veja
   [play-in-vr](features/play-in-vr.md) e
   [rastreamento de mãos](glossary.md).
+- O **Oculus Touch Controller Profile** foi habilitado para Standalone ao lado
+  do HTC Vive Controller Profile, então uma mesma build detecta e usa o
+  dispositivo presente automaticamente — Vive pelo runtime OpenXR do SteamVR,
+  Oculus Rift pelo runtime da Oculus ou pelo SteamVR — sem caminho de código
+  por fabricante; veja
+  [ADR-0001](decisions/0001-usar-openxr-e-o-xr-interaction-toolkit-para-o-modo-vr.md).
+  O Rift usa os [controles de movimento](glossary.md) Touch (raio de seleção e
+  gatilho), não rastreamento de mãos articulado, que a Rift não possui.
 
 ### Changed
 

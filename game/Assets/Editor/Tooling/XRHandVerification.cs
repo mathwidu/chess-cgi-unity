@@ -75,7 +75,7 @@ public static class XRHandVerification
 
     private static void ReportAndStop()
     {
-        GameObject originObject = GameObject.Find("XR Origin (Vive)");
+        GameObject originObject = GameObject.Find("XR Origin (VR)");
         Transform cameraOffset = originObject != null ? originObject.transform.Find("Camera Offset") : null;
 
         GameObject leftHand = cameraOffset != null ? cameraOffset.Find("LeftHandInteractor")?.gameObject : null;

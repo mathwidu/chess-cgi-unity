@@ -67,7 +67,7 @@ public sealed class XRRig : MonoBehaviour
     {
         bool usingSimulator = InputSystem.GetDevice<XRHMD>() is XRSimulatedHMD;
 
-        GameObject originObject = new GameObject("XR Origin (Vive)");
+        GameObject originObject = new GameObject("XR Origin (VR)");
         Vector3 originPosition = usingSimulator ? SeatEyePosition : SeatPosition;
         Quaternion originRotation = usingSimulator
             ? Quaternion.LookRotation((BoardTarget - SeatEyePosition).normalized, Vector3.up)

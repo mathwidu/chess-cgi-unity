@@ -77,11 +77,11 @@ public static class XRRigVerification
     {
         XRHMD hmd = InputSystem.GetDevice<XRHMD>();
         bool headsetPresent = XRRig.IsHeadsetPresent;
-        GameObject originObject = GameObject.Find("XR Origin (Vive)");
+        GameObject originObject = GameObject.Find("XR Origin (VR)");
 
         Debug.Log($"CHESS_CGI_XR_RIG_CHECK headsetPresent={headsetPresent} hmdDevice={(hmd != null ? hmd.displayName : "none")} originBuilt={originObject != null}");
         result.Check(headsetPresent, "headset should be present in the simulator check");
-        result.Check(originObject != null, "XR Origin (Vive) should be built");
+        result.Check(originObject != null, "XR Origin (VR) should be built");
 
         if (originObject != null)
         {
