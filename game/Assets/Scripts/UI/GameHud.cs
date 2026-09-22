@@ -5,38 +5,33 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
-public sealed class GameHud : MonoBehaviour
+public sealed partial class GameHud : MonoBehaviour
 {
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
 
-    private readonly Color panelColor = new Color(0.085f, 0.082f, 0.074f, 0.94f);
-    private readonly Color panelStrongColor = new Color(0.048f, 0.046f, 0.043f, 0.98f);
-    private readonly Color previewSurfaceColor = new Color(0.12f, 0.13f, 0.13f, 1f);
-    private readonly Color overlayColor = new Color(0.02f, 0.018f, 0.016f, 0.66f);
-    private readonly Color textColor = new Color(0.97f, 0.94f, 0.87f, 1f);
-    private readonly Color mutedTextColor = new Color(0.78f, 0.76f, 0.68f, 1f);
-    private readonly Color accentColor = new Color(1f, 0.77f, 0.36f, 1f);
-    private readonly Color actionColor = new Color(0.2f, 0.32f, 0.38f, 0.96f);
-    private readonly Color actionHoverColor = new Color(0.27f, 0.42f, 0.49f, 1f);
-    private readonly Color neutralButtonColor = new Color(0.27f, 0.25f, 0.22f, 0.96f);
+    private readonly Color panelColor = new Color32(10, 57, 36, 248);
+    private readonly Color panelStrongColor = new Color32(4, 43, 27, 255);
+    private readonly Color previewSurfaceColor = new Color32(24, 66, 43, 255);
+    private readonly Color overlayColor = new Color32(0, 97, 40, 255);
+    private readonly Color textColor = Color.white;
+    private readonly Color mutedTextColor = new Color32(202, 228, 211, 255);
+    private readonly Color accentColor = new Color32(255, 221, 0, 255);
+    private readonly Color actionColor = new Color32(255, 221, 0, 255);
+    private readonly Color actionHoverColor = new Color32(255, 235, 108, 255);
+    private readonly Color neutralButtonColor = new Color32(11, 75, 43, 255);
 
     private bool showStartScreen = true;
     private bool showHowToPlay;
     private bool chooseComputer = true;
     private ChessSide chosenSide = ChessSide.White;
     private ComputerDifficulty chosenDifficulty = ComputerDifficulty.Beginner;
-    private Text modeChoiceText;
-    private Text sideChoiceText;
-    private Text difficultyChoiceText;
-    private Button sideChoiceButton;
-    private Button difficultyChoiceButton;
     private RectTransform computerErrorPanel;
     private Font hudFont;
+    private Font hudBoldFont;
     private RectTransform hudRoot;
     private RectTransform startOverlay;
     private RectTransform howToPlayPanel;
-    private RectTransform startHowToPlayText;
     private RectTransform promotionPanel;
     private RectTransform selectedPiecePanel;
     private RawImage selectedPiecePreviewImage;
@@ -44,7 +39,6 @@ public sealed class GameHud : MonoBehaviour
     private Text statusText;
     private Text moveHistoryText;
     private Text howToPlayButtonText;
-    private Text startHowToPlayButtonText;
     private Text selectedPieceNameText;
     private Text selectedPieceKindText;
     private Text selectedPieceSquareText;
@@ -88,72 +82,9 @@ public sealed class GameHud : MonoBehaviour
 
         hudRoot = CreateRect("HudRoot", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero);
 
-        RectTransform topBar = CreateRect("TopBar", hudRoot, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -16f), new Vector2(0f, 88f));
-        RectTransform brandPanel = CreatePanel("BrandPanel", topBar, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -2f), new Vector2(320f, 74f), panelColor);
-        CreateText("TitleText", brandPanel, "Xadrez CGI", 25, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -10f), new Vector2(292f, 34f));
-        CreateText("SubtitleText", brandPanel, "Computacao Grafica I", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -45f), new Vector2(292f, 18f));
-
-        RectTransform turnPanel = CreatePanel("TurnPanel", topBar, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -2f), new Vector2(360f, 74f), panelColor);
-        turnText = CreateText("TurnText", turnPanel, "Brancas jogam", 17, FontStyle.Bold, accentColor, TextAnchor.UpperRight, new Vector2(14f, -10f), new Vector2(332f, 24f));
-        statusText = CreateText("StatusText", turnPanel, "Escolha uma peca para mover.", 13, FontStyle.Normal, textColor, TextAnchor.UpperRight, new Vector2(14f, -38f), new Vector2(332f, 26f));
-
-        RectTransform historyPanel = CreatePanel("MoveHistoryPanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -104f), new Vector2(360f, 210f), panelColor);
-        CreateText("MoveHistoryTitle", historyPanel, "Historico", 17, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(14f, -12f), new Vector2(332f, 24f));
-        moveHistoryText = CreateText("MoveHistoryText", historyPanel, "Nenhuma jogada ainda.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(14f, -42f), new Vector2(332f, 150f));
-
-        selectedPiecePanel = CreatePanel("SelectedPiecePanel", hudRoot, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -330f), new Vector2(360f, 560f), panelStrongColor);
-        CreateText("SelectedPieceEyebrowText", selectedPiecePanel, "PECA SELECIONADA", 11, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(328f, 18f));
-        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(16f, -42f), new Vector2(328f, 310f), Color.white);
-        selectedPiecePreviewInput = selectedPiecePreviewImage.gameObject.AddComponent<SelectedPiecePreviewInput>();
-        CreateButton("PreviewZoomOutButton", selectedPiecePanel, "-", new Vector2(266f, 484f), new Vector2(34f, 34f), neutralButtonColor, ZoomSelectedPiecePreviewOut);
-        CreateButton("PreviewZoomInButton", selectedPiecePanel, "+", new Vector2(306f, 484f), new Vector2(34f, 34f), actionColor, ZoomSelectedPiecePreviewIn);
-        selectedPieceNameText = CreateText("SelectedPieceNameText", selectedPiecePanel, "-", 22, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -368f), new Vector2(328f, 30f));
-        selectedPieceKindText = CreateText("SelectedPieceKindText", selectedPiecePanel, "-", 15, FontStyle.Bold, accentColor, TextAnchor.UpperLeft, new Vector2(16f, -402f), new Vector2(328f, 24f));
-        selectedPieceSquareText = CreateText("SelectedPieceSquareText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -430f), new Vector2(150f, 22f));
-        selectedPieceSideText = CreateText("SelectedPieceSideText", selectedPiecePanel, "-", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperRight, new Vector2(190f, -430f), new Vector2(154f, 22f));
-        selectedPieceProfileText = CreateText("SelectedPieceProfileText", selectedPiecePanel, "-", 13, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -462f), new Vector2(328f, 66f));
-        selectedPieceDescriptionText = CreateText("SelectedPieceDescriptionText", selectedPiecePanel, "-", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperLeft, new Vector2(16f, -532f), new Vector2(328f, 22f));
-        EnsureSelectedPiecePreviewResources();
-        selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
-        selectedPiecePreviewInput.Configure(null, selectedPiecePreviewCamera);
-
-        RectTransform actionBar = CreatePanel("ActionBar", hudRoot, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 16f), new Vector2(530f, 58f), panelColor);
-        CreateButton("NewGameButton", actionBar, "Nova partida", new Vector2(14f, 12f), new Vector2(122f, 34f), actionColor, RestartGame);
-        CreateButton("MenuButton", actionBar, "Menu", new Vector2(398f, 12f), new Vector2(108f, 34f), neutralButtonColor, ShowMenu);
-        CreateButton("CancelButton", actionBar, "Cancelar", new Vector2(144f, 12f), new Vector2(108f, 34f), neutralButtonColor, CancelSelection);
-        howToPlayButtonText = CreateButton("HowToPlayButton", actionBar, "Como jogar", new Vector2(260f, 12f), new Vector2(124f, 34f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
-
-        howToPlayPanel = CreatePanel("HowToPlayPanel", hudRoot, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -104f), new Vector2(380f, 210f), panelStrongColor);
-        CreateText("HowToPlayTitle", howToPlayPanel, "Como jogar", 18, FontStyle.Bold, textColor, TextAnchor.UpperLeft, new Vector2(16f, -14f), new Vector2(348f, 26f));
-        CreateText("HowToPlayText", howToPlayPanel, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(16f, -48f), new Vector2(348f, 142f));
-
-        promotionPanel = CreatePanel("PromotionPanel", hudRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(500f, 150f), panelStrongColor);
-        CreateText("PromotionTitle", promotionPanel, "Promocao", 22, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(18f, -14f), new Vector2(464f, 30f));
-        CreateText("PromotionHelp", promotionPanel, "Escolha a nova peca do peao.", 13, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(18f, -48f), new Vector2(464f, 22f));
-        CreateButton("PromoteQueenButton", promotionPanel, "Rainha", new Vector2(22f, 92f), new Vector2(104f, 34f), actionColor, () => ChoosePromotion('Q'));
-        CreateButton("PromoteRookButton", promotionPanel, "Torre", new Vector2(142f, 92f), new Vector2(94f, 34f), neutralButtonColor, () => ChoosePromotion('R'));
-        CreateButton("PromoteBishopButton", promotionPanel, "Bispo", new Vector2(252f, 92f), new Vector2(94f, 34f), neutralButtonColor, () => ChoosePromotion('B'));
-        CreateButton("PromoteKnightButton", promotionPanel, "Cavalo", new Vector2(362f, 92f), new Vector2(104f, 34f), neutralButtonColor, () => ChoosePromotion('N'));
-
-        computerErrorPanel = CreatePanel("ComputerErrorPanel", hudRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(560f, 190f), panelStrongColor);
-        CreateText("ComputerErrorTitle", computerErrorPanel, "A IA nao conseguiu jogar", 22, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(20f, -22f), new Vector2(520f, 32f));
-        CreateText("ComputerErrorHelp", computerErrorPanel, "Sua partida foi preservada. Voce pode tentar novamente.", 14, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(20f, -68f), new Vector2(520f, 38f));
-        CreateButton("RetryComputerButton", computerErrorPanel, "Tentar novamente", new Vector2(66f, 28f), new Vector2(210f, 40f), actionColor, () => gameController.RetryComputerTurn());
-        CreateButton("ComputerMenuButton", computerErrorPanel, "Voltar ao menu", new Vector2(296f, 28f), new Vector2(198f, 40f), neutralButtonColor, ShowMenu);
-
-        startOverlay = CreatePanel("StartOverlay", hudRoot, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero, overlayColor);
-        RectTransform startCard = CreatePanel("StartCard", startOverlay, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600f, 620f), panelStrongColor);
-        CreateText("StartTitle", startCard, "Xadrez CGI", 34, FontStyle.Bold, textColor, TextAnchor.UpperCenter, new Vector2(24f, -24f), new Vector2(552f, 48f));
-        CreateText("StartSubtitle", startCard, "Jogue contra a IA ou com outra pessoa neste dispositivo.", 14, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(30f, -80f), new Vector2(540f, 38f));
-        modeChoiceText = CreateButton("ModeChoiceButton", startCard, "", new Vector2(70f, 442f), new Vector2(460f, 44f), actionColor, () => { chooseComputer = !chooseComputer; RefreshInterface(); }).GetComponentInChildren<Text>();
-        sideChoiceButton = CreateButton("SideChoiceButton", startCard, "", new Vector2(70f, 384f), new Vector2(460f, 44f), neutralButtonColor, () => { chosenSide = chosenSide == ChessSide.White ? ChessSide.Black : ChessSide.White; RefreshInterface(); });
-        sideChoiceText = sideChoiceButton.GetComponentInChildren<Text>();
-        difficultyChoiceButton = CreateButton("DifficultyChoiceButton", startCard, "", new Vector2(70f, 326f), new Vector2(460f, 44f), neutralButtonColor, () => { chosenDifficulty = (ComputerDifficulty)(((int)chosenDifficulty + 1) % 3); RefreshInterface(); });
-        difficultyChoiceText = difficultyChoiceButton.GetComponentInChildren<Text>();
-        CreateText("ChoiceHelp", startCard, "Clique nas opcoes para alterar. A IA joga offline.", 12, FontStyle.Normal, mutedTextColor, TextAnchor.UpperCenter, new Vector2(40f, -306f), new Vector2(520f, 24f));
-        CreateButton("StartPlayButton", startCard, "Iniciar partida", new Vector2(160f, 232f), new Vector2(280f, 46f), actionColor, StartGame);
-        startHowToPlayButtonText = CreateButton("StartHowToPlayButton", startCard, "Como jogar", new Vector2(190f, 178f), new Vector2(220f, 36f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
-        startHowToPlayText = CreateText("StartHowToPlayText", startCard, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(64f, -464f), new Vector2(472f, 138f)).rectTransform;
+        BuildMatchInterface();
+        BuildStartMenu();
+        BuildHelpDialog();
 
         RefreshInterface();
     }
@@ -168,16 +99,16 @@ public sealed class GameHud : MonoBehaviour
         bool hasController = gameController != null;
         bool awaitingPromotion = hasController && gameController.IsAwaitingPromotion;
 
-        if (modeChoiceText != null) modeChoiceText.text = chooseComputer ? "Modo: Contra IA" : "Modo: Dois jogadores";
-        if (sideChoiceText != null) sideChoiceText.text = chosenSide == ChessSide.White ? "Seu lado: Brancas" : "Seu lado: Pretas";
-        if (difficultyChoiceText != null) difficultyChoiceText.text = "Dificuldade: " + DifficultyName(chosenDifficulty);
-        if (sideChoiceButton != null) sideChoiceButton.interactable = chooseComputer;
-        if (difficultyChoiceButton != null) difficultyChoiceButton.interactable = chooseComputer;
+        RefreshStartMenu();
+        SetActive(matchInterface, !showStartScreen);
         SetActive(computerErrorPanel, hasController && gameController.HasComputerError && !showStartScreen);
         SetActive(startOverlay, showStartScreen);
-        SetActive(howToPlayPanel, showHowToPlay && !showStartScreen);
-        SetActive(startHowToPlayText, showHowToPlay && showStartScreen);
-        SetActive(promotionPanel, awaitingPromotion);
+        SetActive(howToPlayPanel, showHowToPlay);
+        SetActive(promotionPanel, awaitingPromotion && !showStartScreen);
+        if (matchSummaryText != null && hasController)
+            matchSummaryText.text = gameController.IsAgainstComputer
+                ? "CONTRA IA  /  " + DifficultyName(gameController.Difficulty).ToUpperInvariant() + "  /  " + SideName(gameController.HumanSide).ToUpperInvariant()
+                : "DOIS JOGADORES  /  PARTIDA LOCAL";
 
         if (turnText != null)
         {
@@ -186,7 +117,7 @@ public sealed class GameHud : MonoBehaviour
 
         if (statusText != null)
         {
-            string status = hasController ? CompactStatus(gameController.StatusMessage) : "Escolha uma peca para mover.";
+            string status = hasController ? CompactStatus(gameController.StatusMessage) : "Escolha uma peça para mover.";
             statusText.text = status;
             statusText.color = status.StartsWith("Movimento invalido") ? new Color(0.95f, 0.45f, 0.36f, 1f) : textColor;
         }
@@ -197,16 +128,13 @@ public sealed class GameHud : MonoBehaviour
         }
 
         RefreshSelectedPiecePanel(hasController ? gameController.SelectedPiece : null);
+        RefreshNavigationFocus();
 
         if (howToPlayButtonText != null)
         {
             howToPlayButtonText.text = showHowToPlay && !showStartScreen ? "Ocultar" : "Como jogar";
         }
 
-        if (startHowToPlayButtonText != null)
-        {
-            startHowToPlayButtonText.text = showHowToPlay ? "Ocultar como jogar" : "Como jogar";
-        }
     }
 
     private void StartGame()
@@ -225,7 +153,7 @@ public sealed class GameHud : MonoBehaviour
     private static string DifficultyName(ComputerDifficulty difficulty)
     {
         return difficulty == ComputerDifficulty.Beginner ? "Iniciante" :
-            difficulty == ComputerDifficulty.Intermediate ? "Intermediario" : "Dificil";
+            difficulty == ComputerDifficulty.Intermediate ? "Intermediário" : "Difícil";
     }
 
     private void RestartGame()
@@ -254,8 +182,16 @@ public sealed class GameHud : MonoBehaviour
 
     private void ToggleHowToPlay()
     {
+        if (!showHowToPlay && EventSystem.current != null)
+            focusBeforeHelp = EventSystem.current.currentSelectedGameObject;
         showHowToPlay = !showHowToPlay;
         RefreshInterface();
+        if (EventSystem.current != null)
+        {
+            GameObject target = showHowToPlay
+                ? howToPlayPanel.GetComponentInChildren<Button>().gameObject : focusBeforeHelp;
+            EventSystem.current.SetSelectedGameObject(target != null && target.activeInHierarchy ? target : null);
+        }
     }
 
     private void ChoosePromotion(char piece)
@@ -287,6 +223,7 @@ public sealed class GameHud : MonoBehaviour
     private void OnDestroy()
     {
         ClearSelectedPiecePreviewClone();
+        if (selectedPiecePreviewStage != null) DestroyUnityObject(selectedPiecePreviewStage.gameObject);
 
         if (selectedPiecePreviewTexture != null)
         {
@@ -304,7 +241,7 @@ public sealed class GameHud : MonoBehaviour
         }
 
         bool hasSelection = selectedPiece != null;
-        SetActive(selectedPiecePanel, hasSelection);
+        SetActive(selectedPiecePanel, hasSelection && !showStartScreen);
         if (!hasSelection)
         {
             previewedPiece = null;
@@ -379,7 +316,7 @@ public sealed class GameHud : MonoBehaviour
         if (selectedPiecePreviewStage == null)
         {
             GameObject stageObject = new GameObject("SelectedPiecePreviewStage");
-            stageObject.transform.SetParent(transform, false);
+            // A rendered 3D preview must not inherit the Canvas scale (especially in VR).
             stageObject.transform.position = new Vector3(96f, 96f, 96f);
             selectedPiecePreviewStage = stageObject.transform;
         }
@@ -586,7 +523,7 @@ public sealed class GameHud : MonoBehaviour
         if (color.a > 0.75f)
         {
             Outline outline = rect.gameObject.AddComponent<Outline>();
-            outline.effectColor = new Color(0f, 0f, 0f, 0.45f);
+            outline.effectColor = new Color(0.45f, 0.57f, 0.56f, 0.15f);
             outline.effectDistance = new Vector2(1f, -1f);
         }
 
@@ -626,9 +563,9 @@ public sealed class GameHud : MonoBehaviour
     {
         RectTransform rect = CreateRect(name, parent, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), anchoredPosition, sizeDelta);
         Text label = rect.gameObject.AddComponent<Text>();
-        label.font = GetHudFont();
+        label.font = fontStyle == FontStyle.Bold ? GetHudBoldFont() : GetHudFont();
         label.fontSize = fontSize;
-        label.fontStyle = fontStyle;
+        label.fontStyle = FontStyle.Normal;
         label.color = color;
         label.alignment = alignment;
         label.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -664,23 +601,23 @@ public sealed class GameHud : MonoBehaviour
     {
         RectTransform rect = CreateRect(name, parent, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), anchoredPosition, sizeDelta);
         Image image = rect.gameObject.AddComponent<Image>();
-        image.color = normalColor;
+        image.color = Color.white;
 
         Button button = rect.gameObject.AddComponent<Button>();
         button.targetGraphic = image;
         button.colors = new ColorBlock
         {
             normalColor = normalColor,
-            highlightedColor = normalColor == actionColor ? actionHoverColor : new Color(0.36f, 0.33f, 0.28f, 1f),
-            pressedColor = new Color(0.14f, 0.22f, 0.26f, 1f),
-            selectedColor = normalColor,
+            highlightedColor = normalColor == actionColor ? actionHoverColor : new Color32(24, 102, 61, 255),
+            pressedColor = normalColor == actionColor ? new Color32(221, 190, 0, 255) : new Color32(5, 65, 35, 255),
+            selectedColor = normalColor == actionColor ? actionHoverColor : new Color32(24, 102, 61, 255),
             disabledColor = new Color(0.16f, 0.15f, 0.14f, 0.65f),
             colorMultiplier = 1f,
             fadeDuration = 0.12f
         };
         button.onClick.AddListener(action);
 
-        Text buttonText = CreateText("Label", rect, label, 13, FontStyle.Bold, textColor, TextAnchor.MiddleCenter, Vector2.zero, sizeDelta);
+        Text buttonText = CreateText("Label", rect, label, 20, FontStyle.Bold, normalColor == actionColor ? panelStrongColor : textColor, TextAnchor.MiddleCenter, Vector2.zero, sizeDelta);
         buttonText.raycastTarget = false;
         return button;
     }
@@ -713,7 +650,7 @@ public sealed class GameHud : MonoBehaviour
     {
         if (status.StartsWith("Turno:"))
         {
-            return "Escolha uma peca para mover.";
+            return "Escolha uma peça para mover.";
         }
 
         return status;
@@ -854,13 +791,20 @@ public sealed class GameHud : MonoBehaviour
             return hudFont;
         }
 
-        hudFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        hudFont = Resources.Load<Font>("UI/Lato-Regular");
+        if (hudFont == null) hudFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         if (hudFont == null)
         {
             hudFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
         }
 
         return hudFont;
+    }
+
+    private Font GetHudBoldFont()
+    {
+        if (hudBoldFont == null) hudBoldFont = Resources.Load<Font>("UI/Lato-Bold");
+        return hudBoldFont != null ? hudBoldFont : GetHudFont();
     }
 
     private static void SetActive(Component component, bool active)

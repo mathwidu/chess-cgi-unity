@@ -12,3 +12,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 - Tela inicial com modo, lado e dificuldade; estado de pensamento, recuperação de falha e retorno ao menu.
 - Nova partida mantém as opções escolhidas.
+
+### Changed
+
+- Menu com escolhas explícitas de modo, lado e três dificuldades, estado selecionado e resumo antes da partida.
+- HUD, promoção, recuperação de falha e ajuda com tipografia ampliada e identidade visual comum.
+- Ajuda bloqueia os botões de fundo; a configuração é preservada ao fechar e ao retornar ao menu.
+- A composição do menu se ajusta às dimensões do Canvas desktop ou world-space; o modo local oculta as opções exclusivas da IA.
+- Direção Palco da turma: cores Feevale, assinatura original, tipografia Lato e elenco real em preview 3D isolado; trocar lado move suavemente o palco, sem alterar a partida.
+- Navegação por teclado inicia com foco visível e transfere o foco para ajuda, promoção e recuperação de erro.
+- O palco 3D do preview da peça selecionada não herda a escala do Canvas, mantendo o enquadramento em Canvas de tela ou world-space.
