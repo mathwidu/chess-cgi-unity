@@ -10,6 +10,8 @@ public sealed class ChessGameController : MonoBehaviour
     [SerializeField] private CameraController cameraController;
     [SerializeField] private float moveDuration = 0.28f;
 
+    private const string PerformanceModeKey = "ChessCgi.PerformanceMode";
+
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
     private readonly List<BoardSquare> legalDestinations = new List<BoardSquare>();
     private readonly List<string> moveHistory = new List<string>();
@@ -24,6 +26,7 @@ public sealed class ChessGameController : MonoBehaviour
     public bool IsInputBlocked => inputBlocked || awaitingPromotion;
     public bool IsAwaitingPromotion => awaitingPromotion;
     public ChessSide CurrentTurn => rules.CurrentTurn;
+    public bool PerformanceMode => pieceFactory != null && pieceFactory.UsePrimitivePieces;
     public IReadOnlyList<string> MoveHistory => moveHistory;
     public string StatusMessage { get; private set; } = "Turno: Brancas";
 
@@ -50,6 +53,11 @@ public sealed class ChessGameController : MonoBehaviour
         if (pieceFactory == null)
         {
             pieceFactory = Object.FindFirstObjectByType<PieceFactory>();
+        }
+
+        if (pieceFactory != null)
+        {
+            pieceFactory.UsePrimitivePieces = PlayerPrefs.GetInt(PerformanceModeKey, 0) == 1;
         }
 
         if (hud == null)
@@ -92,6 +100,23 @@ public sealed class ChessGameController : MonoBehaviour
         boardView.SyncPieces(rules.GetPieces(), pieceFactory);
         SetStatusForTurn();
         UpdateCameraForTurn(true);
+    }
+
+    public void SetPerformanceMode(bool enabled)
+    {
+        if (pieceFactory == null)
+        {
+            return;
+        }
+
+        pieceFactory.UsePrimitivePieces = enabled;
+        PlayerPrefs.SetInt(PerformanceModeKey, enabled ? 1 : 0);
+
+        if (boardView != null && boardView.Pieces.Count > 0)
+        {
+            ClearSelection();
+            boardView.SyncPieces(rules.GetPieces(), pieceFactory);
+        }
     }
 
     public void SelectPiece(PieceView piece)

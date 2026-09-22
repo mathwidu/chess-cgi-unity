@@ -16,9 +16,20 @@ na turma. Carregado como um prefab e escalado para caber no tabuleiro.
 
 A peça que uma fábrica constrói a partir de formas primitivas — cilindros,
 esferas, cubos — quando nenhum modelo customizado está definido para um
-tipo, para que o tabuleiro nunca fique sem uma peça.
+tipo ou quando o modo desempenho está ligado, para que o tabuleiro nunca
+fique sem uma peça.
 
 - **Aliases:** Primitive fallback
+- **Status:** validated
+
+## Modo desempenho
+
+Opção do menu que troca as peças personalizadas pelas peças clássicas para
+aliviar a GPU. Ligá-la faz a fábrica construir peças clássicas mesmo quando
+há um prefab de peça personalizada; desligá-la volta às peças personalizadas.
+A escolha é persistida e vale desde a primeira montagem das peças.
+
+- **Aliases:** Performance mode
 - **Status:** validated
 
 ## Destaque

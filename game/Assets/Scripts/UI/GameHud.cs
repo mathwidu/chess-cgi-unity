@@ -146,6 +146,9 @@ public sealed class GameHud : MonoBehaviour
         startHowToPlayButtonText = CreateButton("StartHowToPlayButton", startCard, "Como jogar", new Vector2(180f, 182f), new Vector2(200f, 36f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
         startHowToPlayText = CreateText("StartHowToPlayText", startCard, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(64f, -236f), new Vector2(432f, 118f)).rectTransform;
 
+        bool performanceMode = gameController != null && gameController.PerformanceMode;
+        CreateToggle("PerformanceModeToggle", startCard, "Modo desempenho", new Vector2(160f, 236f), new Vector2(240f, 28f), performanceMode, OnPerformanceModeChanged);
+
         RefreshInterface();
     }
 
@@ -214,6 +217,14 @@ public sealed class GameHud : MonoBehaviour
         }
 
         RefreshInterface();
+    }
+
+    private void OnPerformanceModeChanged(bool enabled)
+    {
+        if (gameController != null)
+        {
+            gameController.SetPerformanceMode(enabled);
+        }
     }
 
     private void ToggleHowToPlay()
@@ -715,6 +726,37 @@ public sealed class GameHud : MonoBehaviour
         Text buttonText = CreateText("Label", rect, label, 13, FontStyle.Bold, textColor, TextAnchor.MiddleCenter, Vector2.zero, sizeDelta);
         buttonText.raycastTarget = false;
         return button;
+    }
+
+    private Toggle CreateToggle(
+        string name,
+        Transform parent,
+        string label,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta,
+        bool isOn,
+        UnityEngine.Events.UnityAction<bool> action)
+    {
+        RectTransform rect = CreateRect(name, parent, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), anchoredPosition, sizeDelta);
+
+        Toggle toggle = rect.gameObject.AddComponent<Toggle>();
+
+        RectTransform boxRect = CreateRect("Box", rect, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(28f, 28f));
+        Image boxImage = boxRect.gameObject.AddComponent<Image>();
+        boxImage.color = neutralButtonColor;
+
+        RectTransform checkRect = CreateRect("Checkmark", boxRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(18f, 18f));
+        Image checkImage = checkRect.gameObject.AddComponent<Image>();
+        checkImage.color = accentColor;
+
+        toggle.targetGraphic = boxImage;
+        toggle.graphic = checkImage;
+        toggle.isOn = isOn;
+        toggle.onValueChanged.AddListener(action);
+
+        Text toggleLabel = CreateText("Label", rect, label, 13, FontStyle.Bold, textColor, TextAnchor.MiddleLeft, new Vector2(38f, 0f), new Vector2(sizeDelta.x - 38f, sizeDelta.y));
+        toggleLabel.raycastTarget = false;
+        return toggle;
     }
 
     private string FormatMoveHistory(IReadOnlyList<string> moveHistory)

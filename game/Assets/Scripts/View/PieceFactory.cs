@@ -13,6 +13,15 @@ public sealed class PieceFactory : MonoBehaviour
     [SerializeField] private GameObject kingPrefab;
     [SerializeField] private float customVisualHeight = 1.15f;
     [SerializeField] private float customVisualBaseOffset = 0.14f;
+    [Header("Performance")]
+    [Tooltip("Swap the custom model pieces for lightweight primitive pieces.")]
+    [SerializeField] private bool usePrimitivePieces;
+
+    public bool UsePrimitivePieces
+    {
+        get => usePrimitivePieces;
+        set => usePrimitivePieces = value;
+    }
 
     public void Configure(Material white, Material black)
     {
@@ -55,7 +64,7 @@ public sealed class PieceFactory : MonoBehaviour
         PieceView pieceView = root.AddComponent<PieceView>();
         AddCollider(root);
         Material sideMaterial = state.Side == ChessSide.White ? whiteMaterial : blackMaterial;
-        if (!BuildCustomShape(root.transform, state.Kind, state.Side, sideMaterial))
+        if (usePrimitivePieces || !BuildCustomShape(root.transform, state.Kind, state.Side, sideMaterial))
         {
             BuildPrimitiveShape(root.transform, state.Kind, sideMaterial);
         }

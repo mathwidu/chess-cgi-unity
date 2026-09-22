@@ -7,3 +7,11 @@ se o lançamento foi retirado, contendo Added, Changed, Deprecated, Removed,
 Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ## [Unreleased]
+
+### Added
+
+- `ChessGameController.SetPerformanceMode` liga ou desliga o modo desempenho:
+  ajusta a fábrica de peças e, com uma partida em andamento, refaz as peças na
+  hora com `BoardView.SyncPieces` para trocar peças personalizadas por peças
+  clássicas sem reiniciar o jogo. A escolha é lida na inicialização e persistida
+  com `PlayerPrefs`; o padrão é desligado, preservando as peças personalizadas.

@@ -10,6 +10,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Modo desempenho: `PieceFactory` ganha uma flag `usePrimitivePieces` que faz
+  `CreatePiece` construir peças clássicas mesmo quando há um prefab de peça
+  personalizada definido, um ganho em GPUs modestas. O `GameHud` acrescenta uma
+  caixa de seleção "Modo desempenho" ao menu inicial — presente no desktop e no
+  VR, já que o menu é o mesmo — que reflete o estado atual e chama
+  `ChessGameController.SetPerformanceMode`. O padrão é desligado.
 - `BoardView` e `PieceFactory` adicionam um XR Simple Interactable e um
   `VrSelectionBridge` a cada casa e peça quando um headset está presente,
   para que o ray interactor da interação consiga selecioná-los da mesma
