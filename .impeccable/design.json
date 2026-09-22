@@ -1,129 +1,611 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-22T11:19:12.536996+00:00",
+  "generatedAt": "2026-09-22T22:00:39.561565+00:00",
   "title": "Design System: Xadrez CGI",
   "extensions": {
     "colorMeta": {
-      "accent": {
-        "role": "primary",
-        "displayName": "Amarelo de ação"
-      },
       "overlay": {
         "role": "neutral",
-        "displayName": "Verde de fundo"
+        "displayName": "Verde de fundo",
+        "tonalRamp": [
+          "oklch(0.1500 0.0380 171.75)",
+          "oklch(0.2643 0.0380 171.75)",
+          "oklch(0.3786 0.0380 171.75)",
+          "oklch(0.4929 0.0380 171.75)",
+          "oklch(0.6071 0.0380 171.75)",
+          "oklch(0.7214 0.0380 171.75)",
+          "oklch(0.8357 0.0380 171.75)",
+          "oklch(0.9500 0.0380 171.75)"
+        ]
       },
       "panel": {
         "role": "neutral",
-        "displayName": "Verde de painel"
+        "displayName": "Verde do HUD",
+        "tonalRamp": [
+          "oklch(0.1500 0.0626 159.33 / 0.9725)",
+          "oklch(0.2643 0.0626 159.33 / 0.9725)",
+          "oklch(0.3786 0.0626 159.33 / 0.9725)",
+          "oklch(0.4929 0.0626 159.33 / 0.9725)",
+          "oklch(0.6071 0.0626 159.33 / 0.9725)",
+          "oklch(0.7214 0.0626 159.33 / 0.9725)",
+          "oklch(0.8357 0.0626 159.33 / 0.9725)",
+          "oklch(0.9500 0.0626 159.33 / 0.9725)"
+        ]
       },
       "panel-strong": {
         "role": "neutral",
-        "displayName": "Verde de painel forte"
+        "displayName": "Verde do painel forte",
+        "tonalRamp": [
+          "oklch(0.1500 0.0527 161.33)",
+          "oklch(0.2643 0.0527 161.33)",
+          "oklch(0.3786 0.0527 161.33)",
+          "oklch(0.4929 0.0527 161.33)",
+          "oklch(0.6071 0.0527 161.33)",
+          "oklch(0.7214 0.0527 161.33)",
+          "oklch(0.8357 0.0527 161.33)",
+          "oklch(0.9500 0.0527 161.33)"
+        ]
+      },
+      "preview-surface": {
+        "role": "neutral",
+        "displayName": "Verde do preview",
+        "tonalRamp": [
+          "oklch(0.1500 0.0623 156.74)",
+          "oklch(0.2643 0.0623 156.74)",
+          "oklch(0.3786 0.0623 156.74)",
+          "oklch(0.4929 0.0623 156.74)",
+          "oklch(0.6071 0.0623 156.74)",
+          "oklch(0.7214 0.0623 156.74)",
+          "oklch(0.8357 0.0623 156.74)",
+          "oklch(0.9500 0.0623 156.74)"
+        ]
       },
       "text": {
         "role": "neutral",
-        "displayName": "Texto claro"
+        "displayName": "Texto claro",
+        "tonalRamp": [
+          "oklch(0.1500 0.0000 0.00)",
+          "oklch(0.2643 0.0000 0.00)",
+          "oklch(0.3786 0.0000 0.00)",
+          "oklch(0.4929 0.0000 0.00)",
+          "oklch(0.6071 0.0000 0.00)",
+          "oklch(0.7214 0.0000 0.00)",
+          "oklch(0.8357 0.0000 0.00)",
+          "oklch(0.9500 0.0000 0.00)"
+        ]
       },
       "muted-text": {
         "role": "neutral",
-        "displayName": "Texto de apoio"
+        "displayName": "Texto de apoio",
+        "tonalRamp": [
+          "oklch(0.1500 0.0359 156.95)",
+          "oklch(0.2643 0.0359 156.95)",
+          "oklch(0.3786 0.0359 156.95)",
+          "oklch(0.4929 0.0359 156.95)",
+          "oklch(0.6071 0.0359 156.95)",
+          "oklch(0.7214 0.0359 156.95)",
+          "oklch(0.8357 0.0359 156.95)",
+          "oklch(0.9500 0.0359 156.95)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Amarelo de ação",
+        "tonalRamp": [
+          "oklch(0.1500 0.1857 97.86)",
+          "oklch(0.2643 0.1857 97.86)",
+          "oklch(0.3786 0.1857 97.86)",
+          "oklch(0.4929 0.1857 97.86)",
+          "oklch(0.6071 0.1857 97.86)",
+          "oklch(0.7214 0.1857 97.86)",
+          "oklch(0.8357 0.1857 97.86)",
+          "oklch(0.9500 0.1857 97.86)"
+        ]
+      },
+      "action-hover": {
+        "role": "primary",
+        "displayName": "Amarelo de ação em hover",
+        "tonalRamp": [
+          "oklch(0.1500 0.1478 100.45)",
+          "oklch(0.2643 0.1478 100.45)",
+          "oklch(0.3786 0.1478 100.45)",
+          "oklch(0.4929 0.1478 100.45)",
+          "oklch(0.6071 0.1478 100.45)",
+          "oklch(0.7214 0.1478 100.45)",
+          "oklch(0.8357 0.1478 100.45)",
+          "oklch(0.9500 0.1478 100.45)"
+        ]
+      },
+      "action-pressed": {
+        "role": "primary",
+        "displayName": "Amarelo de ação pressionada",
+        "tonalRamp": [
+          "oklch(0.1500 0.1658 97.24)",
+          "oklch(0.2643 0.1658 97.24)",
+          "oklch(0.3786 0.1658 97.24)",
+          "oklch(0.4929 0.1658 97.24)",
+          "oklch(0.6071 0.1658 97.24)",
+          "oklch(0.7214 0.1658 97.24)",
+          "oklch(0.8357 0.1658 97.24)",
+          "oklch(0.9500 0.1658 97.24)"
+        ]
+      },
+      "neutral-button": {
+        "role": "neutral",
+        "displayName": "Verde de ação auxiliar",
+        "tonalRamp": [
+          "oklch(0.1500 0.0828 155.63)",
+          "oklch(0.2643 0.0828 155.63)",
+          "oklch(0.3786 0.0828 155.63)",
+          "oklch(0.4929 0.0828 155.63)",
+          "oklch(0.6071 0.0828 155.63)",
+          "oklch(0.7214 0.0828 155.63)",
+          "oklch(0.8357 0.0828 155.63)",
+          "oklch(0.9500 0.0828 155.63)"
+        ]
+      },
+      "neutral-hover": {
+        "role": "neutral",
+        "displayName": "Verde auxiliar em hover",
+        "tonalRamp": [
+          "oklch(0.1500 0.0998 155.31)",
+          "oklch(0.2643 0.0998 155.31)",
+          "oklch(0.3786 0.0998 155.31)",
+          "oklch(0.4929 0.0998 155.31)",
+          "oklch(0.6071 0.0998 155.31)",
+          "oklch(0.7214 0.0998 155.31)",
+          "oklch(0.8357 0.0998 155.31)",
+          "oklch(0.9500 0.0998 155.31)"
+        ]
+      },
+      "neutral-pressed": {
+        "role": "neutral",
+        "displayName": "Verde auxiliar pressionado",
+        "tonalRamp": [
+          "oklch(0.1500 0.0783 155.00)",
+          "oklch(0.2643 0.0783 155.00)",
+          "oklch(0.3786 0.0783 155.00)",
+          "oklch(0.4929 0.0783 155.00)",
+          "oklch(0.6071 0.0783 155.00)",
+          "oklch(0.7214 0.0783 155.00)",
+          "oklch(0.8357 0.0783 155.00)",
+          "oklch(0.9500 0.0783 155.00)"
+        ]
+      },
+      "menu-panel": {
+        "role": "neutral",
+        "displayName": "Verde de configuração",
+        "tonalRamp": [
+          "oklch(0.1500 0.0480 168.16 / 0.9647)",
+          "oklch(0.2643 0.0480 168.16 / 0.9647)",
+          "oklch(0.3786 0.0480 168.16 / 0.9647)",
+          "oklch(0.4929 0.0480 168.16 / 0.9647)",
+          "oklch(0.6071 0.0480 168.16 / 0.9647)",
+          "oklch(0.7214 0.0480 168.16 / 0.9647)",
+          "oklch(0.8357 0.0480 168.16 / 0.9647)",
+          "oklch(0.9500 0.0480 168.16 / 0.9647)"
+        ]
+      },
+      "menu-border": {
+        "role": "neutral",
+        "displayName": "Contorno da configuração",
+        "tonalRamp": [
+          "oklch(0.1500 0.0592 162.13)",
+          "oklch(0.2643 0.0592 162.13)",
+          "oklch(0.3786 0.0592 162.13)",
+          "oklch(0.4929 0.0592 162.13)",
+          "oklch(0.6071 0.0592 162.13)",
+          "oklch(0.7214 0.0592 162.13)",
+          "oklch(0.8357 0.0592 162.13)",
+          "oklch(0.9500 0.0592 162.13)"
+        ]
+      },
+      "choice": {
+        "role": "neutral",
+        "displayName": "Verde de escolha",
+        "tonalRamp": [
+          "oklch(0.1500 0.0504 166.03)",
+          "oklch(0.2643 0.0504 166.03)",
+          "oklch(0.3786 0.0504 166.03)",
+          "oklch(0.4929 0.0504 166.03)",
+          "oklch(0.6071 0.0504 166.03)",
+          "oklch(0.7214 0.0504 166.03)",
+          "oklch(0.8357 0.0504 166.03)",
+          "oklch(0.9500 0.0504 166.03)"
+        ]
+      },
+      "choice-selected": {
+        "role": "neutral",
+        "displayName": "Verde de escolha confirmada",
+        "tonalRamp": [
+          "oklch(0.1500 0.0554 163.44)",
+          "oklch(0.2643 0.0554 163.44)",
+          "oklch(0.3786 0.0554 163.44)",
+          "oklch(0.4929 0.0554 163.44)",
+          "oklch(0.6071 0.0554 163.44)",
+          "oklch(0.7214 0.0554 163.44)",
+          "oklch(0.8357 0.0554 163.44)",
+          "oklch(0.9500 0.0554 163.44)"
+        ]
+      },
+      "choice-border": {
+        "role": "neutral",
+        "displayName": "Contorno de escolha",
+        "tonalRamp": [
+          "oklch(0.1500 0.0516 163.26)",
+          "oklch(0.2643 0.0516 163.26)",
+          "oklch(0.3786 0.0516 163.26)",
+          "oklch(0.4929 0.0516 163.26)",
+          "oklch(0.6071 0.0516 163.26)",
+          "oklch(0.7214 0.0516 163.26)",
+          "oklch(0.8357 0.0516 163.26)",
+          "oklch(0.9500 0.0516 163.26)"
+        ]
+      },
+      "play-border": {
+        "role": "primary",
+        "displayName": "Borda iluminada de Jogar",
+        "tonalRamp": [
+          "oklch(0.1500 0.1673 100.21)",
+          "oklch(0.2643 0.1673 100.21)",
+          "oklch(0.3786 0.1673 100.21)",
+          "oklch(0.4929 0.1673 100.21)",
+          "oklch(0.6071 0.1673 100.21)",
+          "oklch(0.7214 0.1673 100.21)",
+          "oklch(0.8357 0.1673 100.21)",
+          "oklch(0.9500 0.1673 100.21)"
+        ]
+      },
+      "play-depth": {
+        "role": "primary",
+        "displayName": "Base de Jogar",
+        "tonalRamp": [
+          "oklch(0.1500 0.1363 94.15)",
+          "oklch(0.2643 0.1363 94.15)",
+          "oklch(0.3786 0.1363 94.15)",
+          "oklch(0.4929 0.1363 94.15)",
+          "oklch(0.6071 0.1363 94.15)",
+          "oklch(0.7214 0.1363 94.15)",
+          "oklch(0.8357 0.1363 94.15)",
+          "oklch(0.9500 0.1363 94.15)"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Título do jogo",
-        "purpose": "Xadrez, em Lato Black."
+        "purpose": "Xadrez em Lato Black."
       },
       "headline": {
-        "displayName": "Título de superfície",
-        "purpose": "Menu e ajuda."
+        "displayName": "Título da configuração",
+        "purpose": "Nova partida em Lato Bold."
+      },
+      "help-title": {
+        "displayName": "Título da ajuda",
+        "purpose": "Como jogar em Lato Bold."
+      },
+      "title": {
+        "displayName": "Título local",
+        "purpose": "Apresentação do modo para duas pessoas."
+      },
+      "body": {
+        "displayName": "Corpo",
+        "purpose": "Explicação local e instruções de ajuda."
+      },
+      "label": {
+        "displayName": "Rótulo de grupo",
+        "purpose": "Modo, lado e dificuldade em Lato Regular."
       },
       "control": {
-        "displayName": "Opções",
-        "purpose": "Modo, lado e dificuldade."
+        "displayName": "Escolha em repouso",
+        "purpose": "Opção não selecionada em Lato Regular."
+      },
+      "control-selected": {
+        "displayName": "Escolha confirmada",
+        "purpose": "Opção selecionada em Lato Bold."
+      },
+      "caption": {
+        "displayName": "Professor em evidência",
+        "purpose": "Nome do professor cuja função aparece abaixo."
+      },
+      "supporting": {
+        "displayName": "Apoio",
+        "purpose": "Função do professor e resumo da configuração."
+      },
+      "button": {
+        "displayName": "Ação comum",
+        "purpose": "Botões compartilhados pelo HUD e diálogos."
       },
       "play": {
         "displayName": "Jogar",
-        "purpose": "Ação principal do menu."
+        "purpose": "Ação principal do menu em Lato Black."
       }
     },
+    "tonalRampPolicy": "Rampas OKLCH sintetizadas apenas para exploração visual no painel. Não são tokens implementados nem aprovam novas cores; valores normativos estão no frontmatter.",
+    "shadows": [
+      {
+        "name": "cast-contact",
+        "value": "MenuGroundShadow: 240x55; Color(0.015, 0.025, 0.017, 0.68); alpha *= pow(1 - r*r, 3)",
+        "purpose": "Contato de cada base com o tabuleiro cenográfico."
+      },
+      {
+        "name": "cast-caption-shade",
+        "value": "MenuGroundShadow: 540x124; Color(0.01, 0.025, 0.018, 0.8); SolidCore = 0.75; borda com SmoothStep",
+        "purpose": "Contraste das legendas nas casas claras e escuras; segue a base projetada."
+      },
+      {
+        "name": "cast-caption-text",
+        "value": "Unity UI Shadow: Color(0.015, 0.025, 0.018, 0.85); effectDistance = (1, -2)",
+        "purpose": "Recorte suave das letras dos nomes e funções."
+      },
+      {
+        "name": "hud-outline",
+        "value": "Unity UI Outline: Color(0.45, 0.57, 0.56, 0.15); effectDistance = (1, -1); aplicado quando alpha > 0.75",
+        "purpose": "Contorno tonal dos painéis compartilhados; não é elevação."
+      }
+    ],
     "motion": [
       {
         "name": "button-color-fade",
         "value": "Unity ColorBlock.fadeDuration = 0.12s",
-        "purpose": "Transição das cores de interação dos botões."
+        "purpose": "Transição das cores e tints de interação dos botões."
       },
       {
         "name": "cast-emphasis",
-        "value": "Mathf.Lerp(current, target, 1 - Mathf.Exp(-9 * Time.unscaledDeltaTime))",
-        "purpose": "Transição de escala, profundidade e luminosidade dos professores conforme o lado escolhido."
+        "value": "Lerp(current, target, 1 - Exp(-9 * Time.unscaledDeltaTime)); limiar de movimento 0.001",
+        "purpose": "Transição de escala, profundidade e luminosidade dos professores; renderiza durante a mudança e ao inicializar."
       }
-    ]
+    ],
+    "nativeUnity": {
+      "platform": "Unity uGUI",
+      "adaptation": "Extensão específica de Unity: componentes descritos por primitives nativas, sem HTML/CSS aproximado. O frontmatter continua proprietário dos tokens; o sidecar registra estados, recursos e comportamento que seu schema não representa.",
+      "units": "px no frontmatter representa unidade lógica de RectTransform/Text.fontSize; não é pixel físico nem tamanho angular em VR.",
+      "sources": [
+        "game/Assets/Scripts/UI/GameHud.cs",
+        "game/Assets/Scripts/UI/GameHud.Menu.cs",
+        "game/Assets/Scripts/UI/GameHud.Match.cs",
+        "game/Assets/Scripts/UI/MenuCastPreview.cs",
+        "game/Assets/Scripts/UI/MenuSurface.cs",
+        "game/Assets/Scripts/UI/MenuGroundShadow.cs"
+      ],
+      "approvedComposition": ".impeccable/mocks/approved/mesa-de-partida.png",
+      "fontAssets": [
+        {
+          "family": "Lato",
+          "weight": 400,
+          "path": "game/Assets/Resources/UI/Lato-Regular.ttf",
+          "resource": "UI/Lato-Regular"
+        },
+        {
+          "family": "Lato",
+          "weight": 700,
+          "path": "game/Assets/Resources/UI/Lato-Bold.ttf",
+          "resource": "UI/Lato-Bold"
+        },
+        {
+          "family": "Lato",
+          "weight": 900,
+          "path": "game/Assets/Resources/UI/Lato-Black.ttf",
+          "resource": "UI/Lato-Black"
+        }
+      ],
+      "fontLicense": "game/Assets/Resources/UI/OFL.txt",
+      "fontFallbackPolicy": "LegacyRuntime.ttf e Arial.ttf são fallback de recuperação no código, não famílias aprovadas para a identidade.",
+      "provenance": "game/Assets/Resources/UI/ORIGINS.md",
+      "canvas": {
+        "referenceResolution": [
+          1920,
+          1080
+        ],
+        "matchWidthOrHeight": 0.5,
+        "menuComposition": [
+          1672,
+          941
+        ],
+        "scale": "max(0.1, min((available.x - 2) / 1672, (available.y - 2) / 941))",
+        "responsiveBehavior": "Ajuste uniforme centralizado, sem breakpoints ou rearranjo. Campo verde exterior quando a proporção diverge."
+      },
+      "menuSurface": {
+        "primitive": "MenuSurface : MaskableGraphic",
+        "cornerSegments": 8,
+        "bottomRgbMultiplier": 0.95,
+        "playBottomRgbMultiplier": 0.98,
+        "choiceBorderWidth": 1.5,
+        "panelAndPlayBorderWidth": 2
+      },
+      "menuInteraction": {
+        "colorBlockMode": "multiplicative tint over MenuSurface",
+        "normal": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "selected": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "highlighted": [
+          0.91,
+          1,
+          0.94,
+          1
+        ],
+        "pressed": [
+          0.72,
+          0.82,
+          0.75,
+          1
+        ],
+        "disabled": [
+          0.45,
+          0.5,
+          0.45,
+          1
+        ],
+        "focus": {
+          "primitive": "MenuSurface",
+          "colorToken": "muted-text",
+          "offsetToken": "focus-offset",
+          "width": 2,
+          "choiceRadius": 10,
+          "playRadius": 13,
+          "independentOfSelection": true
+        },
+        "selectionIcon": {
+          "path": "game/Assets/Resources/UI/SelectionCheck.png",
+          "displaySize": [
+            30,
+            30
+          ],
+          "source": "Bootstrap Icons 1.13.1 check-circle-fill",
+          "license": "MIT",
+          "colorToken": "accent"
+        },
+        "raycast": "Image raiz como hit target; MenuSurface filho como targetGraphic; decoração sem raycast."
+      },
+      "cast": {
+        "primitive": "RawImage + RenderTexture",
+        "models": [
+          "CustomPieces/Queen_Marta",
+          "CustomPieces/King_Ricardo_Carioca"
+        ],
+        "frameSize": [
+          645,
+          588
+        ],
+        "renderTexture": [
+          1290,
+          1176
+        ],
+        "antiAliasing": 4,
+        "camera": "orthographic",
+        "scaleRange": [
+          0.68,
+          1
+        ],
+        "depthRange": [
+          0.72,
+          -0.08
+        ],
+        "heightRange": [
+          0.24,
+          0
+        ],
+        "brightnessRange": [
+          0.82,
+          1
+        ],
+        "localModeEmphasis": 0.5,
+        "captions": "Posicionadas por BaseViewport; sombra de contato e apoio escuro seguem cada base."
+      },
+      "logo": {
+        "path": "game/Assets/Resources/UI/FeevaleLogo.png",
+        "sourceSize": [
+          950,
+          369
+        ],
+        "artworkHorizontalCenter": 0.49842105263157893,
+        "alignment": "Eixo central do painel; preserva proporção e considera a margem transparente."
+      },
+      "backdrop": {
+        "path": "game/Assets/Resources/UI/MenuStudyBackground.png",
+        "role": "Ambiente, tabuleiro cenográfico, livros e planta. Textos, professores, logo e controles são camadas separadas. Não utilizado no tabuleiro da partida."
+      }
+    }
   },
   "components": [
     {
-      "name": "Botão principal",
+      "name": "Botão principal do HUD",
       "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Unity uGUI Button e Image com rótulo Text centralizado. Estados e tokens pertencem ao frontmatter; não há implementação HTML/CSS."
+      "description": "Button e Image retangulares com rótulo Text centralizado; ColorBlock usa os estados absolutos do frontmatter.",
+      "refersTo": "button-primary"
     },
     {
-      "name": "Botão secundário",
+      "name": "Botão secundário do HUD",
       "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "Ações auxiliares verdes, com estados do ColorBlock nativo."
+      "description": "Ações auxiliares verdes, com os estados absolutos do ColorBlock nativo.",
+      "refersTo": "button-secondary"
     },
     {
-      "name": "Opção selecionada",
+      "name": "Escolha do menu",
       "kind": "button",
-      "refersTo": "choice-selected",
-      "description": "Fundo verde e marcador amarelo inferior; foco independente usa quatro bordas claras de duas unidades lógicas."
+      "description": "MenuSurface arredondada; Lato Regular no repouso. Seleção usa o token choice-selected, Lato Bold, borda amarela e SelectionCheck.png. Contorno de foco exterior independente.",
+      "refersTo": "choice"
     },
     {
       "name": "Jogar",
       "kind": "button",
-      "refersTo": "play",
-      "description": "Ação principal que ocupa a largura da coluna de configuração."
+      "description": "MenuSurface com borda iluminada, base inferior, Lato Black e foco próprio. O Image raiz permanece como alvo de raycast.",
+      "refersTo": "play"
+    },
+    {
+      "name": "Superfície de configuração",
+      "kind": "card",
+      "description": "Painel nativo quase opaco sobre o cenário; geometria arredondada, contorno e modulação tonal vertical.",
+      "refersTo": "menu-panel"
     },
     {
       "name": "Painel do HUD",
       "kind": "card",
-      "refersTo": "hud-panel",
-      "description": "Image retangular com Outline discreto. Não usa sombra uGUI nem sprite arredondado."
+      "description": "Image retangular com Outline discreto, preservando o vocabulário do HUD e dos diálogos.",
+      "refersTo": "hud-panel"
     },
     {
       "name": "Palco dos professores",
       "kind": "custom",
-      "description": "RawImage recebe RenderTexture dos modelos existentes de Marta e Ricardo. O lado humano altera sua ênfase; no modo local os dois recebem ênfase igual."
+      "description": "RawImage transparente renderiza os prefabs de Marta e Ricardo. Ênfase segue o lado humano; sombras e legendas acompanham as bases projetadas."
+    },
+    {
+      "name": "Assinatura Feevale",
+      "kind": "custom",
+      "description": "RawImage proporcional do PNG original; o centro do conteúdo visível é alinhado ao eixo do painel, incluindo o emblema."
     }
   ],
   "narrative": {
     "northStar": "Palco da turma",
-    "overview": "Os personagens próprios apresentam o xadrez da turma. A direção escolhida pelo usuário combina a identidade Feevale com o elenco 3D do projeto; a assinatura institucional permanece separada do título do trabalho acadêmico.\n\nEste documento registra o código observado no commit `444133e`: `GameHud.cs`, `GameHud.Menu.cs`, `GameHud.Match.cs` e `MenuCastPreview.cs`. A composição atual usa campo verde profundo, tipografia clara, ação amarela e controles à direita. O tom “sóbrio” continua sendo hipótese de implementação, não preferência aprovada nem aceite visual final.",
+    "overview": "Os personagens próprios apresentam o xadrez da turma. A identidade Feevale, os professores 3D e o cenário de estudo compõem um ambiente acolhedor de partida, com verde profundo, texto claro e amarelo pontual. A assinatura institucional permanece separada do título do trabalho acadêmico, sem apresentar o jogo como produto oficial da universidade.\n\nA composição aprovada **Mesa de partida** atualiza a expressão do menu: tabuleiro cenográfico, livros e planta acolhem as peças personalizadas, enquanto uma superfície verde concentra a configuração. A imagem aprovada é referência de composição; o cenário raster, os prefabs 3D e os controles Unity são camadas independentes. Essa composição pertence ao menu e não impõe um cenário ilustrado a todas as telas.",
     "keyCharacteristics": [
-      "Personagens existentes do projeto como elemento visual principal.",
-      "Marca Feevale original e proporcional, sem apresentar o jogo como produto oficial.",
-      "Cor e tipografia separam ação, informação e estado.",
-      "Interface Unity uGUI nativa, compartilhando contratos com o Canvas world-space."
+      "Professores existentes do projeto, renderizados em 3D, como presença principal.",
+      "Cenário de estudo independente dos textos, da marca e dos controles.",
+      "Marca Feevale original, proporcional e alinhada pelo conteúdo visível.",
+      "Seleção persistente com cor, peso e ícone; foco com contorno próprio.",
+      "Interface Unity uGUI nativa, com medidas lógicas e contratos de Canvas world-space."
     ],
     "rules": [
       {
         "name": "The Foco separado Rule",
-        "body": "Nas opções do menu, foco usa contorno claro; seleção usa fundo verde e sublinhado amarelo. Um estado não substitui o outro.",
+        "body": "Seleção usa fundo, borda amarela, texto em negrito e ícone de confirmação. Foco usa contorno claro exterior, inclusive sobre uma escolha não selecionada. Um estado não substitui o outro.",
         "section": "colors"
+      },
+      {
+        "name": "The Leitura antes da escala Rule",
+        "body": "O menu compensa a redução do Canvas: controles buscam 16 pixels efetivos; rótulos comuns, 14; textos nominais a partir de 28, 18; créditos nominais até 16, 12. A compensação usa piso de escala 0,4 e altura mínima de caixa de 1,25 vezes o tamanho calculado. Isso não garante leitura em viewports arbitrariamente pequenos e não é uma regra aplicada a todo o HUD.",
+        "section": "typography"
+      },
+      {
+        "name": "The Contraste acompanha o personagem Rule",
+        "body": "Ao deslocar ou redimensionar um professor, reposicionar junto sua sombra de contato e o apoio escuro da legenda; verificar a leitura sobre ambas as cores do tabuleiro cenográfico.",
+        "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** preservar os personagens próprios e a relação visual com a Feevale.",
-      "**Do** manter a proporção original da assinatura institucional.",
-      "**Do** distinguir foco de seleção nas escolhas do menu.",
+      "**Do** preservar as peças personalizadas e a relação visual com a Feevale.",
+      "**Do** manter a proporção original e o alinhamento óptico da assinatura institucional.",
+      "**Do** manter cenário, professores e controles em camadas independentes.",
+      "**Do** distinguir foco de seleção nas escolhas e em Jogar.",
+      "**Do** verificar legendas sobre casas claras e escuras, acompanhando a posição das bases.",
       "**Do** verificar leitura e enquadramento no Canvas e viewport de destino."
     ],
     "donts": [
-      "**Don't** substituir a identidade do projeto por uma interface genérica.",
-      "**Don't** restaurar no menu os três modelos ou o antigo tabuleiro com borda amarela rejeitados pelo usuário.",
+      "**Don't** substituir os professores 3D por retratos gerados nem incorporar textos e controles ao cenário raster.",
+      "**Don't** restaurar os três modelos ou o antigo tabuleiro com borda amarela rejeitados pelo usuário; o tabuleiro cenográfico da composição aprovada é uma decisão posterior e distinta.",
+      "**Don't** aplicar a composição ilustrada ou o relevo do menu indiscriminadamente ao HUD da partida.",
       "**Don't** tratar medidas lógicas do Canvas como comprovação de legibilidade angular em VR.",
-      "**Don't** apresentar uma hipótese de tom visual ou uma revisão técnica como aprovação estética do usuário."
+      "**Don't** transformar inconsistências de captura, recursos ausentes ou falhas de contraste em regras do sistema.",
+      "**Don't** apresentar aprovação da direção visual ou revisão técnica como aceite funcional do produto."
     ]
   }
 }

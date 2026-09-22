@@ -39,10 +39,10 @@ ou pacote do sistema é instalado.
 ## Menu e teste local no Editor
 
 O menu apresenta **Contra IA** e **Dois jogadores**, com escolhas diretas
-para **Brancas / Pretas** e **Iniciante / Intermediário / Difícil**. O sublinhado amarelo e o
-destaque identificam a opção selecionada; um contorno claro identifica o foco
-de navegação sem mudar o valor da opção; o resumo confirma a configuração
-antes de iniciar. No modo local, as opções exclusivas da IA saem da tela.
+para **Brancas / Pretas** e **Iniciante / Intermediário / Difícil**. A borda amarela e o
+ícone de confirmação identificam a opção selecionada; um contorno claro identifica
+o foco de navegação sem mudar o valor da opção, inclusive em Jogar. Uma descrição
+explica o nível escolhido antes de iniciar. No modo local, as opções exclusivas da IA saem da tela.
 Voltar ao modo IA conserva as escolhas durante a sessão; sair de Play restaura
 os valores iniciais (IA, brancas, iniciante).
 
@@ -60,12 +60,14 @@ Roteiro manual, diretamente na aba **Game** da Unity:
 
 `GameHud.Menu.cs` concentra a configuração e `GameHud.Match.cs` apresenta a
 partida. O ciclo de vida do Canvas e a integração XR permanecem em `GameHud.cs`.
-O menu usa a direção **Palco da turma**, escolhida pelo usuário: campo verde,
-assinaturas no cabeçalho, Marta e Ricardo à esquerda e configuração em
-coluna à direita. O lado escolhido destaca o professor correspondente: Marta
-representa as brancas e Ricardo, as pretas; no modo local, os dois recebem
-o mesmo destaque. A iluminação do palco é independente da partida e a marca
-Feevale mantém sua proporção original, sem redimensionamento NPOT.
+O menu segue a prévia **Mesa de partida**, aprovada pelo usuário por imagem:
+cenário com tabuleiro, livros e planta, professores 3D à esquerda e painel
+à direita. A marca Feevale é centralizada pelo conteúdo visível do PNG no
+mesmo eixo do painel. Os controles têm bordas arredondadas, confirmação
+amarela e foco claro separado; uma descrição explica o nível da IA.
+Marta representa as brancas e Ricardo, as pretas. O lado escolhido avança e
+recebe mais luz; seus nomes acompanham as bases. No modo local, ambos têm
+a mesma ênfase. As texturas e modelos existentes continuam preservados.
 `MenuCastPreview` mantém esses modelos fora da partida e renderiza apenas na
 abertura ou durante a transição de lado; os colliders ficam desativados e
 o palco é desativado durante a partida. As luzes direcionais externas são
@@ -77,8 +79,10 @@ original da Feevale e as fontes Lato (SIL OFL) têm suas origens registradas em
 As decisões visuais ficam em `DESIGN.md`. Para repetir as capturas da cena real,
 com esse checkout fechado no Editor, execute Unity em `-batchmode` com
 `-projectPath game -executeMethod MenuReviewCapture.Run -logFile TestResults/menu-capture.log`.
-O utilitário exporta `.impeccable/review/*.png` em cinco dimensões de desktop e
-nos estados IA com pretas/difícil, local, ajuda, partida, seleção, promoção e erro,
+O utilitário exporta `.impeccable/review/*.png` em cinco dimensões, incluindo
+a referência 1672×941, e nos estados IA com pretas/difícil, brancas/iniciante,
+local, ajuda, partida, seleção, promoção e erro, além de Intermediário
+selecionado em 1024×768 e Jogar com foco pelo teclado,
 e sai sem gerar build. Promoção e erro usam condições determinísticas de teste.
 Para preservar as cores da UI overlay, a captura desativa o pós-processamento
 na câmera de evidência. O tabuleiro nessas imagens fica sem os efeitos de cor
@@ -142,37 +146,43 @@ resultado aprovado. A execução real do Stockfish é identificada pela categori
 `StockfishIntegration`; sem motor local, esses testes são explicitamente
 ignorados. Não conte testes ignorados como integração aprovada.
 
-Evidências locais de 2026-09-21 e 2026-09-22, Unity 6000.3.16f1, macOS ARM64:
+Evidências locais, Unity 6000.3.16f1, macOS ARM64:
 
-| Verificação | Resultado |
+| Verificação | Resultado e versão |
 | --- | --- |
-| EditMode, incluindo Stockfish real e falhas de processo | 36/36 aprovados, nenhum ignorado |
-| PlayMode desktop antes da troca para dois professores | 12/12 aprovados, nenhum ignorado |
-| Build macOS anterior à reforma do menu | Succeeded, 0 erros e 1 aviso; não atualizada nesta reforma |
-| Compilação da combinação com a ponta VR | Concluída sem erros de C# |
-| PlayMode atual na combinação com os pacotes VR, incluindo professores e proporção da marca | 13/13 aprovados, nenhum ignorado |
-| Harnesses com XR Interaction Simulator | HUD, seleção por controle e câmera aprovados |
+| EditMode, incluindo Stockfish real e falhas de processo | 36/36 aprovados anteriormente, antes da composição Mesa de partida; regras/motor não alterados nesta revisão |
+| PlayMode desktop, Mesa de partida, 22/09/2026 | 13/13 aprovados, nenhum ignorado; `TestResults/MenuStudyPlayMode.xml` |
+| PlayMode na combinação com VR, mesma revisão | 13/13 aprovados, nenhum ignorado; `.local/vr-integration/TestResults/MenuStudyPlayMode.xml` |
+| Interface da Unity | Cena Main aberta no checkout desktop e Play iniciado pelo menu Chess CGI; troca para Pretas/Difícil confirmada na aba Game |
+| Capturas nativas da cena Main | 14 estados/tamanhos exportados; `.impeccable/review/` |
+| HUD com XR Interaction Simulator, mesma revisão | PASSED, exit 0; raio atingiu StartPlayButton e iniciou a partida |
+| Revisão visual independente pelo roteiro local Impeccable | F1–F3 resolvidos; `.impeccable/review/study-review.md` |
+| Build macOS | Anterior à reforma; nenhuma build gerada nesta revisão |
 
-A validação atual é pelo Editor; a build anterior não representa o menu reformulado.
-A redistribuição do menu foi verificada em 1920×1080, 1280×800, 1024×768,
-2560×1080 e 1223×704. O teste de texto também verifica Canvas world-space. A última revisão foi
-capturada e testada na cópia de integração, com fontes de menu, modelos e marca
-idênticos à cópia desktop, evitando abrir outro processo sobre os Editors em uso.
-Os harnesses XR foram reexecutados após essa redistribuição: o raio do controle
-alcançou Jogar e iniciou a partida. O teste automatizado da cena
-real comprova início com pretas, jogada real do motor, resposta ao humano,
-perspectiva fixa e retorno ao modo local. Não equivale a teste em headset.
+A validação atual usa Play no Editor. As capturas do menu cobrem 1672×941,
+1280×800, 1024×768, 2560×1080 e 1223×704, além de estados em 1920×1080.
+São renders da cena real, não screenshots da interface do Editor. O teste de
+texto inclui Canvas world-space e Intermediário selecionado; o teste de foco
+confirma navegação até Jogar. Também verifica proporção e centralização óptica
+da marca, geometria renderizada e alternância dos professores. O teste de
+partida comprova início com pretas, jogada real do motor, resposta ao humano,
+perspectiva fixa e retorno ao modo local.
 
-Os três harnesses concluíram com exit code 0 e marcadores PASSED na branch de
-integração. Os logs estão em `.local/vr-integration/TestResults/`, incluindo
-`XRHudVerification.log`, `XRControllerVerification.log` e
-`XRCameraVerification.log`. Ainda registram `XR_ERROR_RUNTIME_UNAVAILABLE`
-(no Mac sem runtime/headset), `Missing ILineRenderable / Ray Interactor`
-(inicialização do visual dos raios) e uma exceção do indexador `UnityEditor.Search`.
-Portanto, os resultados aprovam as asserções desses harnesses; não comprovam
-uma sessão XR sem erros. A triagem do visual dos raios e a validação em hardware
-continuam com a frente VR. A configuração do simulador foi restaurada para
-auto-instanciação desativada após a verificação.
+A revisão final ficou limitada às correções levantadas: contraste dos nomes,
+Intermediário no compacto e foco de Jogar. O comparador mecânico registra 88,54%
+(`match`), sem significar identidade visual ou substituir a inspeção. Os modelos
+reais, a marca original e Lato são adaptações deliberadas da referência. A
+validação nativa e a limitação do gate web do Impeccable estão em
+`.impeccable/review/study-verdict.md`.
+
+O log `.local/vr-integration/TestResults/MenuStudyXRHud.log` registra o clique
+por raio e `CHESS_CGI_XR_HUD_CHECK PASSED`. Também registra
+`XR_ERROR_RUNTIME_UNAVAILABLE` (Mac sem runtime/headset), `Missing ILineRenderable / Ray Interactor`
+na inicialização dos visuais e uma exceção do indexador `UnityEditor.Search`.
+As asserções do harness passaram; isso não comprova uma sessão XR sem erros
+nem conforto/desempenho no headset. A auto-instanciação do simulador foi
+restaurada para desativada após a verificação. Os harnesses de seleção e câmera
+passaram na revisão anterior e não foram repetidos nesta alteração visual.
 
 O SHA-256 do executável macOS usado foi
 `bc0cac905ecdf2147fe22055c733bcd999b1e3f7c399fbaf7fb9055786563590`.

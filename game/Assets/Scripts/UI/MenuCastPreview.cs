@@ -3,6 +3,7 @@ using UnityEngine;
 
 // The two existing professor models are display clones, never gameplay pieces.
 // Render only during a selection transition; keep studio lighting out of the match.
+[DefaultExecutionOrder(-10)]
 public sealed class MenuCastPreview : MonoBehaviour
 {
     private const int PreviewLayer = 30;
@@ -49,25 +50,33 @@ public sealed class MenuCastPreview : MonoBehaviour
         bool moving = Mathf.Abs(selection - targetSelection) > 0.001f;
         if (!dirty && !moving) return;
         selection = moving ? Mathf.Lerp(selection, targetSelection, 1f - Mathf.Exp(-9f * Time.unscaledDeltaTime)) : targetSelection;
-        Pose(white, new Vector3(-0.70f, 0, 0), 1f - selection, 174f);
-        Pose(black, new Vector3(0.72f, 0, 0), selection, 186f);
+        Pose(white, new Vector3(-0.82f, 0, 0), 1f - selection, 174f);
+        Pose(black, new Vector3(0.65f, 0, 0), selection, 186f);
         RenderStudio();
         dirty = false;
     }
 
     private void Pose(Figure figure, Vector3 position, float emphasis, float rotation)
     {
-        float scale = Mathf.Lerp(0.78f, 1f, emphasis);
-        position.z = Mathf.Lerp(0.65f, -0.16f, emphasis);
+        float scale = Mathf.Lerp(0.68f, 1f, emphasis);
+        position.z = Mathf.Lerp(0.72f, -0.08f, emphasis);
+        position.y = Mathf.Lerp(0.24f, 0f, emphasis);
         figure.Root.localPosition = position;
         figure.Root.localScale = Vector3.one * scale;
         figure.Root.localRotation = Quaternion.Euler(0, rotation, 0);
         foreach (Surface surface in figure.Surfaces)
         {
-            Color color = surface.Color * Mathf.Lerp(0.58f, 1f, emphasis);
+            Color color = surface.Color * Mathf.Lerp(0.82f, 1f, emphasis);
             color.a = surface.Color.a;
             surface.Material.SetColor(surface.ColorProperty, color);
         }
+    }
+
+    public Vector2 BaseViewport(ChessSide side)
+    {
+        if (previewCamera == null) return Vector2.one * 0.5f;
+        Transform figure = side == ChessSide.White ? white.Root : black.Root;
+        return previewCamera.WorldToViewportPoint(figure.position);
     }
 
     private void OnEnable()
@@ -89,7 +98,7 @@ public sealed class MenuCastPreview : MonoBehaviour
         white = AddFigure("CustomPieces/Queen_Marta", "WhiteProfessor", new Color32(221, 227, 214, 255));
         black = AddFigure("CustomPieces/King_Ricardo_Carioca", "BlackProfessor", new Color32(24, 32, 27, 255));
 
-        texture = new RenderTexture(1260, 960, 24, RenderTextureFormat.ARGB32)
+        texture = new RenderTexture(1290, 1176, 24, RenderTextureFormat.ARGB32)
         {
             name = "MenuCastTexture", antiAliasing = 4, useMipMap = false
         };
@@ -102,14 +111,14 @@ public sealed class MenuCastPreview : MonoBehaviour
         previewCamera.backgroundColor = Color.clear;
         previewCamera.cullingMask = 1 << PreviewLayer;
         previewCamera.orthographic = true;
-        previewCamera.orthographicSize = 1.65f;
+        previewCamera.orthographicSize = 1.29f;
         previewCamera.nearClipPlane = 0.1f;
         previewCamera.farClipPlane = 20;
         previewCamera.targetTexture = texture;
-        previewCamera.transform.localPosition = new Vector3(0, 1.85f, -6f);
-        previewCamera.transform.LookAt(stage.transform.position + new Vector3(0, 1.18f, 0));
-        AddLight("StudioKey", LightType.Directional, new Vector3(-2, 4, -3), 0.78f, new Color(1f, 0.97f, 0.90f));
-        AddLight("StudioFill", LightType.Point, new Vector3(2, 2, -2), 2.5f, new Color(0.80f, 0.92f, 1f));
+        previewCamera.transform.localPosition = new Vector3(0, 2.3f, -6f);
+        previewCamera.transform.LookAt(stage.transform.position + new Vector3(0, 1.15f, 0));
+        AddLight("StudioKey", LightType.Directional, new Vector3(-2, 4, -3), 1.1f, new Color(1f, 0.96f, 0.86f));
+        AddLight("StudioFill", LightType.Point, new Vector3(2, 2, -2), 3.2f, new Color(0.80f, 0.92f, 1f));
         AddLight("StudioRim", LightType.Point, new Vector3(0.5f, 3, 1), 4f, new Color(1f, 0.95f, 0.80f));
         FindSceneLights();
     }
@@ -119,8 +128,8 @@ public sealed class MenuCastPreview : MonoBehaviour
         var figure = new Figure { Root = new GameObject(name).transform };
         figure.Root.SetParent(stage.transform, false);
         Material baseMaterial = MakeMaterial(baseColor);
-        Cylinder(figure.Root, "TeamBase", new Vector3(0, 0.03f, 0), new Vector3(1.08f, 0.03f, 1.08f), baseMaterial);
-        Cylinder(figure.Root, "BaseRim", new Vector3(0, 0.006f, 0), new Vector3(1.10f, 0.006f, 1.10f), MakeMaterial(new Color32(130, 123, 89, 255)));
+        Cylinder(figure.Root, "TeamBase", new Vector3(0, 0.045f, 0), new Vector3(1.02f, 0.045f, 1.02f), baseMaterial);
+        Cylinder(figure.Root, "BaseRim", new Vector3(0, 0.006f, 0), new Vector3(1.04f, 0.006f, 1.04f), MakeMaterial(new Color32(130, 123, 89, 255)));
         GameObject prefab = Resources.Load<GameObject>(path);
         if (prefab == null) return figure;
         GameObject character = Instantiate(prefab, figure.Root);
@@ -135,7 +144,7 @@ public sealed class MenuCastPreview : MonoBehaviour
         character.transform.localScale *= 2.35f / Mathf.Max(0.01f, bounds.size.y);
         bounds = BoundsOf(renderers);
         Vector3 foot = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
-        character.transform.position += figure.Root.TransformPoint(Vector3.up * 0.06f) - foot;
+        character.transform.position += figure.Root.TransformPoint(Vector3.up * 0.09f) - foot;
         foreach (Renderer renderer in renderers)
         {
             Material[] clones = renderer.sharedMaterials;
