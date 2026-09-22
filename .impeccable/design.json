@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-22T11:19:12.536996+00:00",
+  "title": "Design System: Xadrez CGI",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Amarelo de ação"
+      },
+      "overlay": {
+        "role": "neutral",
+        "displayName": "Verde de fundo"
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Verde de painel"
+      },
+      "panel-strong": {
+        "role": "neutral",
+        "displayName": "Verde de painel forte"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Texto claro"
+      },
+      "muted-text": {
+        "role": "neutral",
+        "displayName": "Texto de apoio"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Título do jogo",
+        "purpose": "Xadrez, em Lato Black."
+      },
+      "headline": {
+        "displayName": "Título de superfície",
+        "purpose": "Menu e ajuda."
+      },
+      "control": {
+        "displayName": "Opções",
+        "purpose": "Modo, lado e dificuldade."
+      },
+      "play": {
+        "displayName": "Jogar",
+        "purpose": "Ação principal do menu."
+      }
+    },
+    "motion": [
+      {
+        "name": "button-color-fade",
+        "value": "Unity ColorBlock.fadeDuration = 0.12s",
+        "purpose": "Transição das cores de interação dos botões."
+      },
+      {
+        "name": "cast-emphasis",
+        "value": "Mathf.Lerp(current, target, 1 - Mathf.Exp(-9 * Time.unscaledDeltaTime))",
+        "purpose": "Transição de escala, profundidade e luminosidade dos professores conforme o lado escolhido."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Unity uGUI Button e Image com rótulo Text centralizado. Estados e tokens pertencem ao frontmatter; não há implementação HTML/CSS."
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ações auxiliares verdes, com estados do ColorBlock nativo."
+    },
+    {
+      "name": "Opção selecionada",
+      "kind": "button",
+      "refersTo": "choice-selected",
+      "description": "Fundo verde e marcador amarelo inferior; foco independente usa quatro bordas claras de duas unidades lógicas."
+    },
+    {
+      "name": "Jogar",
+      "kind": "button",
+      "refersTo": "play",
+      "description": "Ação principal que ocupa a largura da coluna de configuração."
+    },
+    {
+      "name": "Painel do HUD",
+      "kind": "card",
+      "refersTo": "hud-panel",
+      "description": "Image retangular com Outline discreto. Não usa sombra uGUI nem sprite arredondado."
+    },
+    {
+      "name": "Palco dos professores",
+      "kind": "custom",
+      "description": "RawImage recebe RenderTexture dos modelos existentes de Marta e Ricardo. O lado humano altera sua ênfase; no modo local os dois recebem ênfase igual."
+    }
+  ],
+  "narrative": {
+    "northStar": "Palco da turma",
+    "overview": "Os personagens próprios apresentam o xadrez da turma. A direção escolhida pelo usuário combina a identidade Feevale com o elenco 3D do projeto; a assinatura institucional permanece separada do título do trabalho acadêmico.\n\nEste documento registra o código observado no commit `444133e`: `GameHud.cs`, `GameHud.Menu.cs`, `GameHud.Match.cs` e `MenuCastPreview.cs`. A composição atual usa campo verde profundo, tipografia clara, ação amarela e controles à direita. O tom “sóbrio” continua sendo hipótese de implementação, não preferência aprovada nem aceite visual final.",
+    "keyCharacteristics": [
+      "Personagens existentes do projeto como elemento visual principal.",
+      "Marca Feevale original e proporcional, sem apresentar o jogo como produto oficial.",
+      "Cor e tipografia separam ação, informação e estado.",
+      "Interface Unity uGUI nativa, compartilhando contratos com o Canvas world-space."
+    ],
+    "rules": [
+      {
+        "name": "The Foco separado Rule",
+        "body": "Nas opções do menu, foco usa contorno claro; seleção usa fundo verde e sublinhado amarelo. Um estado não substitui o outro.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** preservar os personagens próprios e a relação visual com a Feevale.",
+      "**Do** manter a proporção original da assinatura institucional.",
+      "**Do** distinguir foco de seleção nas escolhas do menu.",
+      "**Do** verificar leitura e enquadramento no Canvas e viewport de destino."
+    ],
+    "donts": [
+      "**Don't** substituir a identidade do projeto por uma interface genérica.",
+      "**Don't** restaurar no menu os três modelos ou o antigo tabuleiro com borda amarela rejeitados pelo usuário.",
+      "**Don't** tratar medidas lógicas do Canvas como comprovação de legibilidade angular em VR.",
+      "**Don't** apresentar uma hipótese de tom visual ou uma revisão técnica como aprovação estética do usuário."
+    ]
+  }
+}
