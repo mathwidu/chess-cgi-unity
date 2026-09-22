@@ -58,3 +58,8 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   espaço local — altura e base calculadas a partir do `lossyScale` do pai —,
   em vez de deixá-lo herdar a escala de mundo do tabuleiro; assim cada peça
   assenta na sua casa na escala de mesa.
+- A mesa da cenografia deixou de aparecer como um cubo pequeno flutuando no
+  centro do tabuleiro no modo desktop. `ScenePolish` passa a posicionar e
+  dimensionar a mesa por modo: no desktop ela vira uma plataforma larga logo
+  abaixo do tabuleiro em escala 1, e em VR mantém o bloco em escala de mesa sob
+  o tabuleiro reduzido.

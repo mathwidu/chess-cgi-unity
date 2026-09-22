@@ -6,6 +6,11 @@ public sealed class ScenePolish : MonoBehaviour
     private const string CollegeThemeName = "CollegeTheme";
     private const string LightingRigName = "LightingRig";
 
+    private static readonly Vector3 DesktopTablePosition = new Vector3(0f, -0.54f, 0f);
+    private static readonly Vector3 DesktopTableScale = new Vector3(12f, 0.8f, 12f);
+    private static readonly Vector3 VrTablePosition = new Vector3(0f, 0.387f, 0f);
+    private static readonly Vector3 VrTableScale = new Vector3(0.9f, 0.774f, 0.9f);
+
     [SerializeField] private bool applyOnAwake = true;
 
     public void ApplyPolish()
@@ -55,8 +60,12 @@ public sealed class ScenePolish : MonoBehaviour
         Material tableMaterial = CreateMaterial("Runtime_Table_Wood", new Color(0.42f, 0.27f, 0.17f), 0.38f, 0.48f);
         Material floorMaterial = CreateMaterial("Runtime_Floor", new Color(0.32f, 0.31f, 0.29f), 0f, 0.4f);
 
+        bool headsetPresent = XRRig.IsHeadsetPresent;
+        Vector3 tablePosition = headsetPresent ? VrTablePosition : DesktopTablePosition;
+        Vector3 tableScale = headsetPresent ? VrTableScale : DesktopTableScale;
+
         CreateCube(collegeTheme, "Floor", new Vector3(0f, -0.02f, 0f), new Vector3(4f, 0.04f, 4f), floorMaterial, false);
-        CreateCube(collegeTheme, "Table", new Vector3(0f, 0.387f, 0f), new Vector3(0.9f, 0.774f, 0.9f), tableMaterial, false);
+        CreateCube(collegeTheme, "Table", tablePosition, tableScale, tableMaterial, false);
     }
 
     private void ApplyCameraDefaults()
