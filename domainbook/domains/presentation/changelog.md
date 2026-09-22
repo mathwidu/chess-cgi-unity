@@ -34,3 +34,6 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - Navegação por teclado inicia com foco visível e transfere o foco para ajuda, promoção e recuperação de erro.
 - O palco 3D do preview da peça selecionada não herda a escala do Canvas, mantendo o enquadramento em Canvas de tela ou world-space.
 - Redistribuição do menu: assinaturas no cabeçalho, elenco central e faixa inferior com modo, lado, dificuldade e ação de jogar; navegação explícita acompanha os grupos horizontais.
+- O menu destaca Marta (brancas) ou Ricardo (pretas) conforme o lado selecionado; no modo local, ambos recebem o mesmo destaque. O palco usa iluminação própria e os dois modelos existentes.
+- Corrigida a proporção da assinatura Feevale desativando o redimensionamento NPOT na importação.
+- Foco de navegação usa contorno claro, separado do valor escolhido; textos pequenos preservam leitura nas dimensões menores do Game view.

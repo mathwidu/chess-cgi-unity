@@ -77,6 +77,20 @@ Example: Uma escolha obrigatória interrompe as ações comuns
   And as ações comuns da partida ficam indisponíveis
 ```
 
+## Rule: O palco apresenta os dois lados sem alterar a partida
+
+```gherkin
+Example: Escolher o lado humano
+  Given o menu está aberto contra IA
+  When o jogador escolhe Brancas
+  Then a professora Marta aparece maior e em primeiro plano
+  When o jogador escolhe Pretas
+  Then o professor Ricardo aparece maior e em primeiro plano
+  And a configuração e o nome visível correspondem ao lado escolhido
+  When o jogador escolhe Dois jogadores
+  Then os dois professores recebem o mesmo destaque
+```
+
 ## Open Questions
 
 A legibilidade e o conforto no headset ainda exigem validação em hardware.

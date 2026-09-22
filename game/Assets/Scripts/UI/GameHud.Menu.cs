@@ -9,6 +9,15 @@ public sealed partial class GameHud
         public UnityEngine.UI.Button Button;
         public UnityEngine.UI.Text Title;
         public UnityEngine.UI.Image Marker;
+        public GameObject FocusRing;
+    }
+
+    private sealed class MenuTextSize
+    {
+        public UnityEngine.UI.Text Label;
+        public int FontSize;
+        public float Height;
+        public float MinimumPixels;
     }
 
     private RectTransform menuContent;
@@ -25,74 +34,84 @@ public sealed partial class GameHud
     private UnityEngine.UI.Button menuPlayButton;
     private UnityEngine.UI.Button menuHelpButton;
     private RectTransform focusScope;
+    private UnityEngine.UI.Text castName;
+    private UnityEngine.UI.Text castRole;
+    private readonly List<MenuTextSize> menuTypography = new List<MenuTextSize>();
+    private Canvas menuCanvas;
 
     private void BuildStartMenu()
     {
         modeChoices.Clear();
         sideChoices.Clear();
         difficultyChoices.Clear();
+        menuTypography.Clear();
+        menuCanvas = GetComponent<Canvas>();
         startOverlay = CreatePanel("StartOverlay", hudRoot, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero, overlayColor);
         menuContent = CreateRect("MenuContent", startOverlay, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, new Vector2(1600f, 960f));
         menuControls = menuContent.gameObject.AddComponent<CanvasGroup>();
 
-        var castImage = CreateRawImage("MenuCast", menuContent, new Vector2(305, 42), new Vector2(990, 756), Color.white);
+        var castImage = CreateRawImage("MenuCast", menuContent, new Vector2(24, -106), new Vector2(970, 740), Color.white);
         castImage.raycastTarget = false;
         menuCast = castImage.gameObject.AddComponent<MenuCastPreview>();
         menuCast.Configure(castImage, chosenSide);
 
-        // A compact typographic signature and a small chessboard mark form one lockup.
-        for (int row = 0; row < 2; row++)
-        for (int file = 0; file < 2; file++)
-        {
-            var tile = MenuRect("BrandTile", menuContent, 64 + file * 24, 55 + row * 24, 22, 22).gameObject.AddComponent<UnityEngine.UI.Image>();
-            tile.color = (row + file) % 2 == 0 ? textColor : accentColor;
-            tile.raycastTarget = false;
-        }
-        var title = MenuLabel("StartTitle", menuContent, "Xadrez", 80, textColor, 132, 25, 325, 104, true);
+        var title = MenuLabel("StartTitle", menuContent, "Xadrez", 46, textColor, 64, 32, 220, 66, true);
         Font display = Resources.Load<Font>("UI/Lato-Black");
         if (display != null) title.font = display;
-        MenuLabel("ProjectName", menuContent, "CGI", 30, accentColor, 400, 66, 94, 44, true);
-        MenuLabel("CastCaption", menuContent, "A turma no tabuleiro.", 21, mutedTextColor, 135, 126, 560, 32);
+        MenuLabel("ProjectName", menuContent, "CGI", 22, accentColor, 228, 55, 78, 32, true);
+        MenuLabel("CastCaption", menuContent, "A turma no tabuleiro.", 19, mutedTextColor, 65, 103, 470, 30);
 
         var logo = Resources.Load<Texture2D>("UI/FeevaleLogo");
         if (logo != null)
         {
-            float width = 340;
-            var logoImage = CreateRawImage("FeevaleSignature", menuContent, new Vector2(1200, -8), new Vector2(width, width * logo.height / logo.width), Color.white);
+            float width = 280;
+            var logoImage = CreateRawImage("FeevaleSignature", menuContent, new Vector2(1264, -22), new Vector2(width, width * logo.height / logo.width), Color.white);
             logoImage.texture = logo;
             logoImage.raycastTarget = false;
         }
-        var credit = MenuLabel("ProjectCredit", menuContent, "Projeto de Computação Gráfica I", 17, mutedTextColor, 1110, 112, 412, 30);
-        credit.alignment = TextAnchor.UpperRight;
 
-        MenuRule(menuContent, 64, 751, 1472);
-        RectTransform controls = MenuRect("StartCard", menuContent, 64, 781, 1472, 165);
-        MenuLabel("ModeHeading", controls, "Modo de jogo", 19, mutedTextColor, 14, 0, 326, 28);
-        RectTransform modes = ChoiceRow("ModeOptions", controls, 0, 40, 362, 54);
-        modeChoices.Add(CreateMenuChoice("ComputerModeButton", modes, "Contra IA", 158, 54, () => ChooseMode(true)));
-        modeChoices.Add(CreateMenuChoice("LocalModeButton", modes, "Dois jogadores", 180, 54, () => ChooseMode(false)));
+        castName = MenuLabel("CastName", menuContent, "", 30, textColor, 82, 808, 810, 44, true);
+        castRole = MenuLabel("CastRole", menuContent, "", 19, mutedTextColor, 84, 856, 810, 30);
+        MenuRule(menuContent, 64, 929, 1472);
+        MenuLabel("ProjectCredit", menuContent, "Projeto de Computação Gráfica I", 16, mutedTextColor, 64, 945, 760, 26);
 
-        computerOptions = MenuRect("ComputerOptions", controls, 388, 0, 768, 104);
-        MenuLabel("SideHeading", computerOptions, "Você joga com", 19, mutedTextColor, 14, 0, 212, 28);
-        RectTransform sides = ChoiceRow("SideOptions", computerOptions, 0, 40, 226, 54);
-        sideChoices.Add(CreateMenuChoice("WhiteSideButton", sides, "Brancas", 101, 54, () => ChooseSide(ChessSide.White)));
-        sideChoices.Add(CreateMenuChoice("BlackSideButton", sides, "Pretas", 101, 54, () => ChooseSide(ChessSide.Black)));
-        MenuLabel("DifficultyHeading", computerOptions, "Dificuldade da IA", 19, mutedTextColor, 288, 0, 466, 28);
-        RectTransform levels = ChoiceRow("DifficultyOptions", computerOptions, 274, 40, 494, 54);
-        levels.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().spacing = 10;
-        difficultyChoices.Add(CreateMenuChoice("BeginnerDifficultyButton", levels, "Iniciante", 158, 54, () => ChooseDifficulty(ComputerDifficulty.Beginner)));
-        difficultyChoices.Add(CreateMenuChoice("IntermediateDifficultyButton", levels, "Intermediário", 158, 54, () => ChooseDifficulty(ComputerDifficulty.Intermediate)));
-        difficultyChoices.Add(CreateMenuChoice("HardDifficultyButton", levels, "Difícil", 158, 54, () => ChooseDifficulty(ComputerDifficulty.Hard)));
+        RectTransform controls = MenuRect("StartCard", menuContent, 1050, 220, 486, 660);
+        MenuLabel("MenuTitle", controls, "Nova partida", 42, textColor, 0, 0, 486, 60, true);
+        MenuLabel("ModeHeading", controls, "Modo de jogo", 19, mutedTextColor, 0, 96, 486, 28);
+        RectTransform modes = ChoiceRow("ModeOptions", controls, 0, 132, 486, 58);
+        modes.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().spacing = 12;
+        modeChoices.Add(CreateMenuChoice("ComputerModeButton", modes, "Contra IA", 224, 58, () => ChooseMode(true)));
+        modeChoices.Add(CreateMenuChoice("LocalModeButton", modes, "Dois jogadores", 250, 58, () => ChooseMode(false)));
 
-        localOptions = MenuRect("LocalOptions", controls, 402, 0, 754, 104);
-        MenuLabel("LocalTitle", localOptions, "As brancas começam.", 27, textColor, 0, 0, 754, 40, true);
-        MenuLabel("LocalDescription", localOptions, "Revezem os lances. A câmera acompanha cada turno.", 20, mutedTextColor, 0, 50, 754, 44);
+        computerOptions = MenuRect("ComputerOptions", controls, 0, 220, 486, 236);
+        MenuLabel("SideHeading", computerOptions, "Você joga com", 19, mutedTextColor, 0, 0, 486, 28);
+        RectTransform sides = ChoiceRow("SideOptions", computerOptions, 0, 36, 486, 64);
+        sides.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().spacing = 12;
+        sideChoices.Add(CreateMenuChoice("WhiteSideButton", sides, "Brancas", 237, 64, () => ChooseSide(ChessSide.White)));
+        sideChoices.Add(CreateMenuChoice("BlackSideButton", sides, "Pretas", 237, 64, () => ChooseSide(ChessSide.Black)));
+        MenuLabel("DifficultyHeading", computerOptions, "Dificuldade da IA", 19, mutedTextColor, 0, 132, 486, 28);
+        RectTransform levels = ChoiceRow("DifficultyOptions", computerOptions, 0, 168, 486, 58);
+        levels.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().spacing = 8;
+        difficultyChoices.Add(CreateMenuChoice("BeginnerDifficultyButton", levels, "Iniciante", 140, 58, () => ChooseDifficulty(ComputerDifficulty.Beginner)));
+        difficultyChoices.Add(CreateMenuChoice("IntermediateDifficultyButton", levels, "Intermediário", 210, 58, () => ChooseDifficulty(ComputerDifficulty.Intermediate)));
+        difficultyChoices.Add(CreateMenuChoice("HardDifficultyButton", levels, "Difícil", 120, 58, () => ChooseDifficulty(ComputerDifficulty.Hard)));
 
-        menuSummary = MenuLabel("MatchSummary", controls, "", 17, mutedTextColor, 14, 116, 1142, 28);
-        menuPlayButton = MenuButton("StartPlayButton", controls, "Jogar", 1204, 25, 268, 69, actionColor, StartGame);
+        localOptions = MenuRect("LocalOptions", controls, 0, 238, 486, 218);
+        MenuLabel("LocalTitle", localOptions, "O tabuleiro é dos dois.", 28, textColor, 0, 0, 486, 48, true);
+        MenuLabel("LocalDescription", localOptions, "As brancas começam. Revezem os lances; a câmera acompanha cada turno.", 22, mutedTextColor, 0, 64, 470, 132);
+
+        menuSummary = MenuLabel("MatchSummary", controls, "", 18, mutedTextColor, 0, 486, 486, 30);
+        menuPlayButton = MenuButton("StartPlayButton", controls, "Jogar", 0, 540, 486, 72, actionColor, StartGame);
         menuPlayButton.GetComponentInChildren<UnityEngine.UI.Text>().fontSize = 27;
-        menuHelpButton = MenuButton("StartHowToPlayButton", controls, "Como jogar", 1204, 108, 268, 40, Color.clear, ToggleHowToPlay);
+        menuHelpButton = MenuButton("StartHowToPlayButton", controls, "Como jogar", 0, 626, 486, 44, Color.clear, ToggleHowToPlay);
         ConfigureMenuNavigation();
+        foreach (var label in menuContent.GetComponentsInChildren<UnityEngine.UI.Text>(true))
+        {
+            bool buttonLabel = label.transform.parent.GetComponent<UnityEngine.UI.Button>() != null;
+            menuTypography.Add(new MenuTextSize { Label = label, FontSize = label.fontSize,
+                Height = label.rectTransform.rect.height,
+                MinimumPixels = buttonLabel ? 16 : label.fontSize >= 28 ? 18 : label.fontSize <= 16 ? 12 : 14 });
+        }
     }
 
     private void ConfigureMenuNavigation()
@@ -154,12 +173,23 @@ public sealed partial class GameHud
         Vector2 available = startOverlay.rect.size;
         float scale = Mathf.Min(1f, (available.x - 80f) / 1600f, (available.y - 64f) / 960f);
         menuContent.localScale = Vector3.one * Mathf.Max(0.1f, scale);
+        float effectiveScale = menuContent.localScale.x * (menuCanvas.renderMode == RenderMode.WorldSpace ? 1f : menuCanvas.scaleFactor);
+        foreach (MenuTextSize type in menuTypography)
+        {
+            int fontSize = Mathf.Max(type.FontSize, Mathf.CeilToInt(type.MinimumPixels / Mathf.Max(0.4f, effectiveScale)));
+            if (type.Label.fontSize != fontSize) type.Label.fontSize = fontSize;
+            float height = Mathf.Max(type.Height, fontSize * 1.25f);
+            if (!Mathf.Approximately(type.Label.rectTransform.rect.height, height))
+                type.Label.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        }
         for (int i = 0; i < modeChoices.Count; i++) SetChoice(modeChoices[i], i == (chooseComputer ? 0 : 1));
         for (int i = 0; i < sideChoices.Count; i++) SetChoice(sideChoices[i], i == (chosenSide == ChessSide.White ? 0 : 1));
         for (int i = 0; i < difficultyChoices.Count; i++) SetChoice(difficultyChoices[i], i == (int)chosenDifficulty);
         SetActive(computerOptions, chooseComputer);
         SetActive(localOptions, !chooseComputer);
-        if (menuCast != null) menuCast.SetSide(chosenSide);
+        if (menuCast != null) menuCast.SetSide(chosenSide, !chooseComputer);
+        castName.text = !chooseComputer ? "Marta e Ricardo" : chosenSide == ChessSide.White ? "Professora Marta" : "Professor Ricardo";
+        castRole.text = !chooseComputer ? "Duas pessoas. Uma partida." : chosenSide == ChessSide.White ? "Rainha  /  Você joga de brancas" : "Rei  /  Você joga de pretas";
         menuSummary.text = chooseComputer
             ? "Contra IA   /   " + DifficultyName(chosenDifficulty) + "   /   " + SideName(chosenSide)
             : "Partida local   /   Dois jogadores   /   Brancas começam";
@@ -171,23 +201,34 @@ public sealed partial class GameHud
         var layout = button.gameObject.AddComponent<UnityEngine.UI.LayoutElement>();
         layout.preferredWidth = width;
         layout.preferredHeight = height;
-        var titleLabel = MenuLabel("Title", button.transform, title, 20, textColor, 14, 6, width - 28, height - 12, true);
+        var titleLabel = MenuLabel("Title", button.transform, title, 22, textColor, 12, 6, width - 24, height - 12, true);
         titleLabel.alignment = TextAnchor.MiddleLeft;
         var marker = MenuRect("SelectedMarker", button.transform, 14, height - 3, width - 28, 2).gameObject.AddComponent<UnityEngine.UI.Image>();
         marker.color = accentColor;
         marker.raycastTarget = false;
-        return new MenuChoice { Button = button, Title = titleLabel, Marker = marker };
+        RectTransform focus = MenuRect("FocusRing", button.transform, 0, 0, width, height);
+        foreach (Rect edge in new[] { new Rect(0, 0, width, 2), new Rect(0, height - 2, width, 2), new Rect(0, 0, 2, height), new Rect(width - 2, 0, 2, height) })
+        {
+            var line = MenuRect("Edge", focus, edge.x, edge.y, edge.width, edge.height).gameObject.AddComponent<UnityEngine.UI.Image>();
+            line.color = mutedTextColor;
+            line.raycastTarget = false;
+        }
+        return new MenuChoice { Button = button, Title = titleLabel, Marker = marker, FocusRing = focus.gameObject };
     }
 
     private void SetChoice(MenuChoice choice, bool selected)
     {
         choice.Marker.enabled = selected;
+        choice.FocusRing.SetActive(EventSystem.current != null && EventSystem.current.currentSelectedGameObject == choice.Button.gameObject);
         choice.Title.color = selected ? textColor : mutedTextColor;
         var colors = choice.Button.colors;
-        Color normal = selected ? new Color(1, 1, 1, 0.055f) : Color.clear;
-        if (colors.normalColor != normal)
+        Color normal = selected ? new Color32(19, 64, 49, 255) : Color.clear;
+        Color hover = selected ? new Color32(24, 80, 58, 255) : new Color32(15, 49, 38, 255);
+        if (colors.normalColor != normal || colors.selectedColor != normal || colors.highlightedColor != hover)
         {
             colors.normalColor = normal;
+            colors.selectedColor = normal;
+            colors.highlightedColor = hover;
             choice.Button.colors = colors;
         }
     }

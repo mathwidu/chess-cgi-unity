@@ -104,6 +104,32 @@ public class MenuPresentationTests
     }
 
     [UnityTest]
+    public IEnumerator ProfessorFocusFollowsSideWithoutChangingMatchOrLogoProportions()
+    {
+        var signature = GameObject.Find("FeevaleSignature").GetComponent<RawImage>();
+        float originalAspect = 950f / 369f;
+        Assert.That((float)signature.texture.width / signature.texture.height, Is.EqualTo(originalAspect).Within(0.002f), "Logo import changed its original aspect ratio");
+        Assert.That(signature.rectTransform.rect.width / signature.rectTransform.rect.height, Is.EqualTo(originalAspect).Within(0.002f));
+        var white = GameObject.Find("WhiteProfessor").transform;
+        var black = GameObject.Find("BlackProfessor").transform;
+        Assert.That(white.Find("Menu_Queen_Marta"), Is.Not.Null);
+        Assert.That(black.Find("Menu_King_Ricardo_Carioca"), Is.Not.Null);
+        Assert.That(white.localScale.x, Is.GreaterThan(black.localScale.x));
+        yield return Click("BlackSideButton");
+        yield return new WaitForSecondsRealtime(0.6f);
+        Assert.That(black.localScale.x, Is.GreaterThan(white.localScale.x));
+        Assert.That(black.localPosition.z, Is.LessThan(white.localPosition.z));
+        Assert.That(GameObject.Find("CastName").GetComponent<Text>().text, Is.EqualTo("Professor Ricardo"));
+        Assert.That(controller.IsMenuOpen, Is.True);
+        yield return Click("WhiteSideButton");
+        yield return new WaitForSecondsRealtime(0.6f);
+        Assert.That(white.localScale.x, Is.GreaterThan(black.localScale.x));
+        yield return Click("LocalModeButton");
+        yield return new WaitForSecondsRealtime(0.8f);
+        Assert.That(white.localScale.x, Is.EqualTo(black.localScale.x).Within(0.002f));
+    }
+
+    [UnityTest]
     public IEnumerator MenuFitsDesktopAndWorldCanvasSizesWithoutClippedLabels()
     {
         var canvas = hud.GetComponent<Canvas>();

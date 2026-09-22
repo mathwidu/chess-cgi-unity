@@ -40,7 +40,8 @@ ou pacote do sistema é instalado.
 
 O menu apresenta **Contra IA** e **Dois jogadores**, com escolhas diretas
 para **Brancas / Pretas** e **Iniciante / Intermediário / Difícil**. O sublinhado amarelo e o
-destaque identificam a opção selecionada; o resumo confirma a configuração
+destaque identificam a opção selecionada; um contorno claro identifica o foco
+de navegação sem mudar o valor da opção; o resumo confirma a configuração
 antes de iniciar. No modo local, as opções exclusivas da IA saem da tela.
 Voltar ao modo IA conserva as escolhas durante a sessão; sair de Play restaura
 os valores iniciais (IA, brancas, iniciante).
@@ -60,10 +61,15 @@ Roteiro manual, diretamente na aba **Game** da Unity:
 `GameHud.Menu.cs` concentra a configuração e `GameHud.Match.cs` apresenta a
 partida. O ciclo de vida do Canvas e a integração XR permanecem em `GameHud.cs`.
 O menu usa a direção **Palco da turma**, escolhida pelo usuário: campo verde,
-assinaturas no cabeçalho, três modelos reais do projeto no centro e escolhas
-horizontais na base, com Jogar destacado à direita.
+assinaturas no cabeçalho, Marta e Ricardo à esquerda e configuração em
+coluna à direita. O lado escolhido destaca o professor correspondente: Marta
+representa as brancas e Ricardo, as pretas; no modo local, os dois recebem
+o mesmo destaque. A iluminação do palco é independente da partida e a marca
+Feevale mantém sua proporção original, sem redimensionamento NPOT.
 `MenuCastPreview` mantém esses modelos fora da partida e renderiza apenas na
-abertura ou durante a transição de lado; os colliders ficam desativados. A
+abertura ou durante a transição de lado; os colliders ficam desativados e
+o palco é desativado durante a partida. As luzes direcionais externas são
+suspensas somente durante o render síncrono do preview, com restauração em finally. A
 composição reaproveita uGUI e o Input System, sem novos pacotes. A assinatura
 original da Feevale e as fontes Lato (SIL OFL) têm suas origens registradas em
 `game/Assets/Resources/UI/ORIGINS.md`; Lato não é a fonte institucional Avenir.
@@ -141,13 +147,19 @@ Evidências locais de 2026-09-21, Unity 6000.3.16f1, macOS ARM64:
 | Verificação | Resultado |
 | --- | --- |
 | EditMode, incluindo Stockfish real e falhas de processo | 36/36 aprovados, nenhum ignorado |
-| PlayMode, incluindo Main, cliques por raycast, níveis, ajuda e dimensões do menu | 12/12 aprovados, nenhum ignorado |
+| PlayMode desktop antes da troca para dois professores | 12/12 aprovados, nenhum ignorado |
 | Build macOS anterior à reforma do menu | Succeeded, 0 erros e 1 aviso; não atualizada nesta reforma |
 | Compilação da combinação com a ponta VR | Concluída sem erros de C# |
-| PlayMode na combinação com os pacotes VR, sem headset | 8/8 aprovados |
+| PlayMode atual na combinação com os pacotes VR, incluindo professores e proporção da marca | 13/13 aprovados, nenhum ignorado |
 | Harnesses com XR Interaction Simulator | HUD, seleção por controle e câmera aprovados |
 
-A validação atual é pelo Editor; a build anterior não representa o menu reformulado. O teste automatizado da cena
+A validação atual é pelo Editor; a build anterior não representa o menu reformulado.
+A redistribuição do menu foi verificada em 1920×1080, 1280×800, 1024×768,
+2560×1080 e 1223×704. O teste de texto também verifica Canvas world-space. A última revisão foi
+capturada e testada na cópia de integração, com fontes de menu, modelos e marca
+idênticos à cópia desktop, evitando abrir outro processo sobre os Editors em uso.
+Os harnesses XR foram reexecutados após essa redistribuição: o raio do controle
+alcançou Jogar e iniciou a partida. O teste automatizado da cena
 real comprova início com pretas, jogada real do motor, resposta ao humano,
 perspectiva fixa e retorno ao modo local. Não equivale a teste em headset.
 
