@@ -22,3 +22,5 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 - Tela inicial com modo, lado e dificuldade; estado de pensamento, recuperação de falha e retorno ao menu.
 - Nova partida mantém as opções escolhidas.
+
+- Harness de HUD XR localiza StartPlayButton por identidade entre os botões, sem depender dos contêineres visuais do menu.

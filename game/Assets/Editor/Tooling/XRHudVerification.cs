@@ -142,9 +142,16 @@ public static class XRHudVerification
         GameObject controllerObject = GameObject.Find("Right Controller");
         interactor = controllerObject != null ? controllerObject.GetComponent<NearFarInteractor>() : null;
 
-        Transform buttonTransform = hud != null
-            ? hud.transform.Find("HudRoot/StartOverlay/StartCard/StartPlayButton")
-            : null;
+        Transform buttonTransform = null;
+        if (hud != null)
+        {
+            foreach (Button button in hud.GetComponentsInChildren<Button>(true))
+            {
+                if (button.name != "StartPlayButton") continue;
+                buttonTransform = button.transform;
+                break;
+            }
+        }
         startPlayButton = buttonTransform != null ? buttonTransform.gameObject : null;
         Transform overlayTransform = hud != null ? hud.transform.Find("HudRoot/StartOverlay") : null;
         startOverlay = overlayTransform != null ? overlayTransform.gameObject : null;
