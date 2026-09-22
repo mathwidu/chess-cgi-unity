@@ -142,7 +142,7 @@ resultado aprovado. A execução real do Stockfish é identificada pela categori
 `StockfishIntegration`; sem motor local, esses testes são explicitamente
 ignorados. Não conte testes ignorados como integração aprovada.
 
-Evidências locais de 2026-09-21, Unity 6000.3.16f1, macOS ARM64:
+Evidências locais de 2026-09-21 e 2026-09-22, Unity 6000.3.16f1, macOS ARM64:
 
 | Verificação | Resultado |
 | --- | --- |
