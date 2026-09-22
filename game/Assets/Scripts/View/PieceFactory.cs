@@ -50,6 +50,7 @@ public sealed class PieceFactory : MonoBehaviour
         GameObject root = new GameObject($"{state.Side} {state.Kind}");
         root.transform.SetParent(parent);
         root.transform.position = position;
+        root.transform.localScale = Vector3.one;
 
         PieceView pieceView = root.AddComponent<PieceView>();
         AddCollider(root);
@@ -142,15 +143,17 @@ public sealed class PieceFactory : MonoBehaviour
             return;
         }
 
+        float unit = visual.parent.lossyScale.y;
         Bounds bounds = CalculateBounds(renderers);
-        if (bounds.size.y > 0.001f)
+        float localHeight = bounds.size.y / unit;
+        if (localHeight > 0.001f)
         {
-            float scale = targetHeight / bounds.size.y;
-            visual.localScale *= scale;
+            visual.localScale *= targetHeight / localHeight;
         }
 
         bounds = CalculateBounds(renderers);
-        visual.position += new Vector3(0f, customVisualBaseOffset - bounds.min.y, 0f);
+        float localBottom = visual.parent.InverseTransformPoint(bounds.min).y;
+        visual.localPosition += new Vector3(0f, customVisualBaseOffset - localBottom, 0f);
     }
 
     private static Bounds CalculateBounds(Renderer[] renderers)

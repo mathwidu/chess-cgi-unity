@@ -41,4 +41,37 @@ public static class ChessCgiBuild
             throw new InvalidOperationException($"macOS build failed with result {summary.result} and {summary.totalErrors} errors.");
         }
     }
+
+    [MenuItem("Chess CGI/Build/Windows")]
+    public static void BuildWindows()
+    {
+        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+        string repositoryRoot = Directory.GetParent(projectRoot).FullName;
+        string outputDirectory = Path.Combine(repositoryRoot, "Builds", "Windows");
+        string outputPath = Path.Combine(outputDirectory, $"{ProductName}.exe");
+
+        if (Directory.Exists(outputDirectory))
+        {
+            Directory.Delete(outputDirectory, true);
+        }
+        Directory.CreateDirectory(outputDirectory);
+
+        BuildPlayerOptions options = new BuildPlayerOptions
+        {
+            scenes = new[] { MainScene },
+            locationPathName = outputPath,
+            target = BuildTarget.StandaloneWindows64,
+            targetGroup = BuildTargetGroup.Standalone,
+            options = BuildOptions.None
+        };
+
+        BuildReport report = BuildPipeline.BuildPlayer(options);
+        BuildSummary summary = report.summary;
+        Debug.Log($"CHESS_CGI_BUILD_RESULT result={summary.result} path={outputPath} size={summary.totalSize} warnings={summary.totalWarnings} errors={summary.totalErrors}");
+
+        if (summary.result != BuildResult.Succeeded)
+        {
+            throw new InvalidOperationException($"Windows build failed with result {summary.result} and {summary.totalErrors} errors.");
+        }
+    }
 }

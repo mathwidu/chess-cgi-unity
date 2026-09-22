@@ -19,3 +19,28 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   Input Module, em vez do Canvas Screen Space Overlay e o Graphic Raycaster
   do desktop; veja [play-in-vr](../interaction/features/play-in-vr.md). O
   modo desktop permanece inalterado quando nenhum headset está presente.
+
+### Changed
+
+- A cena ao redor foi reduzida a mesa e chão. `ScenePolish` deixou de montar a
+  sala de aula de faculdade e as duas luzes de ponto, e passou a construir uma
+  plataforma de mesa com um equipamento de duas luzes direcionais (uma chave
+  com sombras e uma de preenchimento sem sombras).
+- O tabuleiro virou uma unidade única que escala e move como um todo.
+  `BoardView` posiciona casas, peças e destaques em espaço local e os converte
+  com `Transform.TransformPoint`, de modo que o transform do root do tabuleiro
+  reja toda a montagem — a base para o jogador reposicionar e redimensionar o
+  tabuleiro no futuro. Veja
+  [ADR-0002](../interaction/decisions/0002-ver-o-tabuleiro-como-uma-mesa-a-partir-de-um-assento.md).
+- Perfil de render reduzido para caber numa GPU modesta (ex.: GTX 1050 Ti):
+  sem textura de profundidade nem de opacos, HDR e SSAO desligados, sombras
+  mais curtas com menos cascatas e sem soft shadows, e bloom em filtragem
+  padrão.
+
+### Fixed
+
+- As peças não se empilham mais no centro do tabuleiro. `PieceFactory` fixa a
+  escala local do root da peça em `Vector3.one` e ajusta o visual custom em
+  espaço local — altura e base calculadas a partir do `lossyScale` do pai —,
+  em vez de deixá-lo herdar a escala de mundo do tabuleiro; assim cada peça
+  assenta na sua casa na escala de mesa.

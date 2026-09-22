@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
@@ -86,10 +87,20 @@ public static class XRHandVerification
         NearFarInteractor leftHandNearFar = leftHand != null ? leftHand.GetComponentInChildren<NearFarInteractor>(true) : null;
         XRPokeInteractor leftHandPoke = leftHand != null ? leftHand.GetComponentInChildren<XRPokeInteractor>(true) : null;
 
+        GameObject leftHandVisual = cameraOffset != null ? cameraOffset.Find("LeftHandVisual")?.gameObject : null;
+        GameObject rightHandVisual = cameraOffset != null ? cameraOffset.Find("RightHandVisual")?.gameObject : null;
+        int leftVisualRenderers = leftHandVisual != null ? leftHandVisual.GetComponentsInChildren<Renderer>(true).Length : 0;
+        int rightVisualRenderers = rightHandVisual != null ? rightHandVisual.GetComponentsInChildren<Renderer>(true).Length : 0;
+        TrackedPoseDriver leftControllerPose = leftController != null ? leftController.GetComponent<TrackedPoseDriver>() : null;
+        TrackedPoseDriver rightControllerPose = rightController != null ? rightController.GetComponent<TrackedPoseDriver>() : null;
+
         Debug.Log("CHESS_CGI_XR_HAND_CHECK " +
             $"leftHandFound={leftHand != null} rightHandFound={rightHand != null} " +
             $"leftHandNearFarFound={leftHandNearFar != null} leftHandPokeFound={leftHandPoke != null} " +
             $"modalityManagerFound={modalityManager != null} " +
+            $"leftHandVisualFound={leftHandVisual != null} rightHandVisualFound={rightHandVisual != null} " +
+            $"leftVisualRenderers={leftVisualRenderers} rightVisualRenderers={rightVisualRenderers} " +
+            $"leftControllerTracked={leftControllerPose != null} rightControllerTracked={rightControllerPose != null} " +
             $"currentInputMode={XRInputModalityManager.currentInputMode.Value}");
 
         result.Check(leftHand != null, "LeftHandInteractor should be built under Camera Offset");
@@ -97,6 +108,12 @@ public static class XRHandVerification
         result.Check(leftHandNearFar != null, "the left hand interactor should include a NearFarInteractor");
         result.Check(leftHandPoke != null, "the left hand interactor should include an XRPokeInteractor");
         result.Check(modalityManager != null, "an XRInputModalityManager should be present on Camera Offset");
+        result.Check(leftHandVisual != null, "a LeftHandVisual should be built so the left hand is visible");
+        result.Check(rightHandVisual != null, "a RightHandVisual should be built so the right hand is visible");
+        result.Check(leftVisualRenderers > 0, "the left hand visual should carry a renderer so it actually shows");
+        result.Check(rightVisualRenderers > 0, "the right hand visual should carry a renderer so it actually shows");
+        result.Check(leftControllerPose != null, "the left controller should have a TrackedPoseDriver so it tracks the controller pose");
+        result.Check(rightControllerPose != null, "the right controller should have a TrackedPoseDriver so it tracks the controller pose");
         result.Check(modalityManager != null && modalityManager.leftHand == leftHand, "XRInputModalityManager.leftHand should reference the built left hand interactor");
         result.Check(modalityManager != null && modalityManager.rightHand == rightHand, "XRInputModalityManager.rightHand should reference the built right hand interactor");
         result.Check(modalityManager != null && modalityManager.leftController == leftController, "XRInputModalityManager.leftController should reference the built left controller");

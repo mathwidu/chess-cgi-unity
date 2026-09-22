@@ -42,16 +42,19 @@ public sealed class BoardView : MonoBehaviour
 
     public Vector3 GetWorldPosition(BoardSquare square)
     {
-        float x = (square.FileIndex - 3.5f) * squareSize;
-        float z = (square.Rank - 4.5f) * squareSize;
-        return transform.TransformPoint(new Vector3(x, 0f, z));
+        return transform.TransformPoint(LocalSquarePosition(square, 0f));
     }
 
     public Vector3 GetPieceWorldPosition(BoardSquare square)
     {
-        Vector3 position = GetWorldPosition(square);
-        position.y += pieceBaseHeight;
-        return position;
+        return transform.TransformPoint(LocalSquarePosition(square, pieceBaseHeight));
+    }
+
+    private Vector3 LocalSquarePosition(BoardSquare square, float localY)
+    {
+        float x = (square.FileIndex - 3.5f) * squareSize;
+        float z = (square.Rank - 4.5f) * squareSize;
+        return new Vector3(x, localY, z);
     }
 
     public void BuildBoard()
@@ -114,7 +117,7 @@ public sealed class BoardView : MonoBehaviour
             GameObject highlight = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             highlight.name = $"Highlight {square.ToAlgebraic()}";
             highlight.transform.SetParent(highlightsRoot);
-            highlight.transform.position = GetWorldPosition(square) + new Vector3(0f, 0.095f, 0f);
+            highlight.transform.position = transform.TransformPoint(LocalSquarePosition(square, 0.095f));
             highlight.transform.localRotation = Quaternion.identity;
             highlight.transform.localScale = new Vector3(squareSize * 0.28f, 0.014f, squareSize * 0.28f);
 

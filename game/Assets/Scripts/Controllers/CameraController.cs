@@ -6,14 +6,14 @@ public sealed class CameraController : MonoBehaviour
 {
     [SerializeField] private float orbitSpeed = 80f;
     [SerializeField] private float zoomSpeed = 6f;
-    [SerializeField] private float minDistance = 7f;
-    [SerializeField] private float maxDistance = 15f;
-    [SerializeField] private float vrMinDistance = 2.5f;
-    [SerializeField] private float vrMaxDistance = 6f;
-    [SerializeField] private float turnPerspectiveDistance = 11.2f;
-    [SerializeField] private float turnPerspectiveHeight = 8.4f;
+    [SerializeField] private float minDistance = 0.4f;
+    [SerializeField] private float maxDistance = 1.6f;
+    [SerializeField] private float vrMinDistance = 0.35f;
+    [SerializeField] private float vrMaxDistance = 1.2f;
+    [SerializeField] private float turnPerspectiveDistance = 0.7f;
+    [SerializeField] private float turnPerspectiveHeight = 1.3f;
     [SerializeField] private float transitionSpeed = 5f;
-    [SerializeField] private Vector3 target = new Vector3(0f, 0f, 0.35f);
+    [SerializeField] private Vector3 target = new Vector3(0f, 0.78f, 0f);
 
     private Coroutine perspectiveTransition;
 

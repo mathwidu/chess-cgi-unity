@@ -238,6 +238,14 @@ public static class XRControllerVerification
         targetInteractor.selectActionTrigger = UnityEngine.XR.Interaction.Toolkit.Interactors.XRBaseInputInteractor.InputTriggerType.State;
     }
 
+    private static void MakeMovesInstantForThisHarness(ChessGameController controller)
+    {
+        System.Reflection.FieldInfo field = typeof(ChessGameController).GetField(
+            "moveDuration",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        field?.SetValue(controller, 0f);
+    }
+
     private static bool TryBeginSelectPiece()
     {
         GameObject controllerObject = GameObject.Find("Right Controller");
@@ -265,6 +273,7 @@ public static class XRControllerVerification
 
         interactor.selectInput.inputSourceMode = UnityEngine.XR.Interaction.Toolkit.Inputs.Readers.XRInputButtonReader.InputSourceMode.ManualValue;
         UseLevelTriggeredSelectForThisHarness(interactor);
+        MakeMovesInstantForThisHarness(gameController);
 
         targetPiece = boardView.Pieces.FirstOrDefault(p => p.Square.ToAlgebraic() == "a2");
         if (targetPiece == null)

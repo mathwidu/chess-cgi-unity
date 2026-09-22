@@ -15,8 +15,8 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors.Visuals;
 public sealed class XRRig : MonoBehaviour
 {
     private const float EyeHeight = 1.2f;
-    private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -3.4f);
-    private static readonly Vector3 BoardTarget = new Vector3(0f, 0f, 0.35f);
+    private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -0.6f);
+    private static readonly Vector3 BoardTarget = new Vector3(0f, 0.78f, 0f);
     public static readonly Vector3 SeatEyePosition = SeatPosition + Vector3.up * EyeHeight;
     public static Camera EyeCamera { get; private set; }
     public static Transform Origin { get; private set; }
@@ -180,13 +180,17 @@ public sealed class XRRig : MonoBehaviour
 
         LineRenderer lineRenderer = controllerObject.AddComponent<LineRenderer>();
         lineRenderer.material = CreateRayMaterial();
-        controllerObject.AddComponent<XRInteractorLineVisual>();
+        lineRenderer.widthMultiplier = 0.01f;
 
         NearFarInteractor interactor = controllerObject.AddComponent<NearFarInteractor>();
         interactor.nearInteractionCaster = nearCaster;
         interactor.farInteractionCaster = farCaster;
         interactor.interactionAttachController = attachController;
         interactor.enableNearCasting = false;
+
+        CurveVisualController curveVisual = controllerObject.AddComponent<CurveVisualController>();
+        curveVisual.lineRenderer = lineRenderer;
+        curveVisual.curveInteractionDataProvider = interactor;
 
         XRInputButtonReader selectInput = new XRInputButtonReader("Select")
         {

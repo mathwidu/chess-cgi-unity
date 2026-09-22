@@ -39,3 +39,20 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   existentes conforme o que o runtime relata como presente; veja
   [play-in-vr](features/play-in-vr.md) e
   [rastreamento de mãos](glossary.md).
+
+### Changed
+
+- O assento de VR foi reposicionado para uma vista de mesa: `XRRig` senta o
+  jogador logo à frente e acima de um tabuleiro em escala de mesa, em vez de
+  colocá-lo dentro de um tabuleiro em escala de sala, e `CameraController` teve
+  as faixas de distância e o alvo de órbita/zoom reajustados para essa escala.
+  O modo desktop permanece inalterado. Veja
+  [ADR-0002](decisions/0002-ver-o-tabuleiro-como-uma-mesa-a-partir-de-um-assento.md).
+
+### Fixed
+
+- O [raio de seleção](glossary.md) dos controles voltou a ser desenhado. Ele
+  passou a usar um `CurveVisualController` (com `LineRenderer`) em vez de um
+  `XRInteractorLineVisual`, que exigia um componente `ILineRenderable` que o
+  Near-Far Interactor não fornece e enchia o console com erros de
+  "Missing ILineRenderable".
