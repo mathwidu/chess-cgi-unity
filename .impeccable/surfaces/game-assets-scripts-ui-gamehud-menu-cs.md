@@ -22,3 +22,7 @@ FIRST VIEWPORT: assinatura compacta Xadrez CGI no alto esquerdo e marca oficial 
 FORM: challenger highlife-sleeve, seed 9d5682be, aprovado pela página. Tradução obrigatória da composição coletiva para cores Feevale e tipografia de referência Avenir; sem motivos tropicais ou conteúdo musical.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+## Comp aprovada em 22/09/2026
+
+Fonte visual atual: `.impeccable/mocks/approved/mesa-de-partida.png`. Escolha explícita por imagem anexada. Seguir o adendo Mesa de partida em `../menu-contract.md`; topologia e medidas registradas em `../build/regions.json`.

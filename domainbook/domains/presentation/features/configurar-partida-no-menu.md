@@ -18,8 +18,8 @@ Para que eu inicie uma partida com a configuração que escolhi
 Example: Escolher dificuldade e lado contra a IA
   Given o menu está aberto no modo Contra IA
   When o jogador escolhe Difícil e Pretas
-  Then ambas as opções recebem sublinhado amarelo e destaque de seleção
-  And o resumo mostra Contra IA, Difícil e Pretas
+  Then ambas as opções recebem contorno amarelo e marcador de confirmação
+  And uma descrição explica a dificuldade escolhida
   When o jogador inicia a partida
   Then o controlador recebe o lado e a dificuldade escolhidos
   And a IA faz o primeiro lance
@@ -87,9 +87,32 @@ Example: Escolher o lado humano
   When o jogador escolhe Pretas
   Then o professor Ricardo aparece maior e em primeiro plano
   And a configuração e o nome visível correspondem ao lado escolhido
+  And cada nome acompanha a base do professor correspondente
   When o jogador escolhe Dois jogadores
   Then os dois professores recebem o mesmo destaque
 ```
+
+## Rule: A composição mantém identidade e alinhamento
+
+```gherkin
+Example: Apresentar a marca sobre as escolhas
+  Given o menu mostra o painel de configuração à direita
+  Then a parte visível da logo Feevale fica centralizada no eixo desse painel
+  And a textura mantém sua proporção original
+  And o cenário ilustrado não bloqueia os controles
+
+Example: Separar seleção e foco
+  Given uma opção de cada grupo está selecionada
+  Then somente ela tem o marcador amarelo de confirmação
+  When o foco do teclado muda para outra opção
+  Then o contorno claro indica foco sem mudar a seleção
+```
+
+A composição aprovada é `.impeccable/mocks/approved/mesa-de-partida.png`.
+O fundo cenográfico é um asset separado; texto e controles são uGUI nativos.
+Os professores continuam sendo peças personalizadas 3D renderizadas durante
+as transições de lado. `MenuSurface` desenha os controles na resolução do
+Canvas; `MenuGroundShadow` acompanha as bases, sem afetar a partida.
 
 ## Open Questions
 

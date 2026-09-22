@@ -1,0 +1,16 @@
+Source: /Users/mathwidu/.codex/generated_images/01a0c542-f344-7321-9e2c-80807416be1a/exec-d0d39e83-cb0c-4859-8466-506e4327ae96.png
+Generated with: built-in image_gen image editing
+Output: 1672x941 opaque PNG
+Generated original: /Users/mathwidu/.codex/generated_images/01a0cb04-c2b0-7552-9650-7cbb8aca3775/exec-2c7d5b2c-9e4d-482e-9da7-4e70030879fc.png
+
+Exact prompt:
+
+Use case: precise-object-edit
+Asset type: clean background plate for a Unity 3D chess menu, with real 3D characters and native UI overlaid later.
+Input image: the provided 1672x941 PNG is the EDIT TARGET, not merely a style reference.
+Primary request: edit this exact image by removing both human teacher figurines completely, including their crowns, clothes, heads, bodies, both round bases and all shadows cast by those figures or bases. Remove ALL interface: the upper-left Xadrez CGI title and subtitle, the entire upper-right Universidade Feevale logo, the entire right-hand panel including its rectangle, borders, every label, every button and checkmark, the lower character names/subtitles, and the footer text and horizontal separator.
+Reconstruct the empty background under all removed material seamlessly. Fill character/base/shadow regions with the matching sage-green and ivory floor chessboard in the EXACT existing perspective, with consistent grid alignment and natural lighting. Fill the removed UI regions with the continuous deep green background, mainly #08251D on the right, with the floor continuing beneath where it belongs.
+Invariants: preserve the exact original camera framing, scene composition, perspective, sage-green/ivory floor chessboard scale and angle, deep green studio background, soft cinematic lighting, material detail, plant in the upper-left, stacked books at the far-left and the blurry dark chess-piece silhouettes behind. Preserve the four book spine inscriptions exactly: ESTRATÉGIA, LÓGICA, APRENDIZADO, MOVIMENTO. These are physical book material details, and are the ONLY text permitted anywhere.
+The finished scene must be empty in all locations occupied by the teachers or interface, and contain NO people, figurines, character pedestals, cast shadows from removed characters, menus, UI panels, logos, names, headings, labels, buttons, icons, watermark or footer.
+Do not add any new objects. Do not move or change existing environment objects. Do not redesign or reframe. Output one landscape opaque PNG at 1672x941 pixels, keeping the original approximately 16:9 aspect ratio without stretching, cropping, or letterboxing.
+

@@ -19,12 +19,13 @@ public static class MenuReviewCapture
     private static RenderTexture target;
     private static string directory;
     private static readonly Vector2Int[] sizes = {
-        new Vector2Int(1920,1080), new Vector2Int(1280,800), new Vector2Int(1024,768),
+        new Vector2Int(1672,941), new Vector2Int(1280,800), new Vector2Int(1024,768),
         new Vector2Int(2560,1080), new Vector2Int(1223,704),
         new Vector2Int(1920,1080), new Vector2Int(1920,1080), new Vector2Int(1920,1080), new Vector2Int(1920,1080),
-        new Vector2Int(1920,1080), new Vector2Int(1920,1080), new Vector2Int(1920,1080)
+        new Vector2Int(1920,1080), new Vector2Int(1920,1080), new Vector2Int(1920,1080),
+        new Vector2Int(1024,768), new Vector2Int(1672,941)
     };
-    private static readonly string[] names = {"desktop", "laptop", "compact", "wide", "editor", "black-hard", "local", "help", "match", "selection", "promotion", "error"};
+    private static readonly string[] names = {"desktop", "laptop", "compact", "wide", "editor", "white-beginner", "local", "help", "match", "selection", "promotion", "error", "intermediate-compact", "play-focus"};
     static MenuReviewCapture() { EditorApplication.update += Tick; }
     public static void Run()
     {
@@ -47,7 +48,8 @@ public static class MenuReviewCapture
             {
                 directory = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.impeccable/review"));
                 Directory.CreateDirectory(directory);
-                if (step == 5) { Click("BlackSideButton"); Click("HardDifficultyButton"); }
+                if (step == 0) { Click("BlackSideButton"); Click("HardDifficultyButton"); }
+                if (step == 5) { Click("WhiteSideButton"); Click("BeginnerDifficultyButton"); }
                 if (step == 6) Click("LocalModeButton");
                 if (step == 7) Click("StartHowToPlayButton");
                 if (step == 8) { Click("CloseHelpButton"); Click("StartPlayButton"); }
@@ -69,6 +71,8 @@ public static class MenuReviewCapture
                     controller.SetMoveChooserFactory(() => throw new InvalidOperationException("Visual review: unavailable engine fixture"));
                     controller.StartComputerGame(ChessSide.Black, ComputerDifficulty.Beginner);
                 }
+                if (step == 12) { Click("ComputerMenuButton"); Click("ComputerModeButton"); Click("IntermediateDifficultyButton"); }
+                if (step == 13) UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(GameObject.Find("StartPlayButton"));
                 target = new RenderTexture(sizes[step].x, sizes[step].y, 24, RenderTextureFormat.ARGB32);
                 target.Create();
                 camera.targetTexture = target;

@@ -34,7 +34,7 @@ O usuário rejeitou a primeira reforma por parecer genérica e sem personalidade
 - Personagens 3D próprios em game/Assets/Resources/CustomPieces.
 - Manual oficial da marca: https://www.feevale.br/institucional/bem-vindo/marketing/manual-da-marca
 - Referências do Impeccable 4.3.1 consultadas em .local/impeccable (temporárias, sem instalação global).
-- Na página de decisão 29cc4bd4, o usuário escolheu Palco da turma e mudou esta sessão para implementação direta na Unity. As prévias em imagem interrompidas pela conexão não foram concluídas.
+- A direção inicial Palco da turma foi implementada e depois revista. Em 22/09/2026, o usuário escolheu explicitamente a imagem Mesa de partida, preservada em `.impeccable/mocks/approved/mesa-de-partida.png`: cenário de estudo com tabuleiro, professores reais à esquerda e configuração à direita. Essa composição é a referência vigente.
 
 ## Product Principles
 

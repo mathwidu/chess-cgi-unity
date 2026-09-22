@@ -76,6 +76,8 @@ public class MenuPresentationTests
         move = new AxisEventData(events) { moveDir = MoveDirection.Down, moveVector = Vector2.down };
         ExecuteEvents.Execute(events.currentSelectedGameObject, move, ExecuteEvents.moveHandler);
         Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("StartPlayButton"));
+        yield return null;
+        Assert.That(events.currentSelectedGameObject.transform.Find("FocusRing").gameObject.activeSelf, Is.True);
         ExecuteEvents.Execute(events.currentSelectedGameObject, new BaseEventData(events), ExecuteEvents.submitHandler);
         yield return null;
         Assert.That(controller.IsMenuOpen, Is.False);
@@ -110,6 +112,20 @@ public class MenuPresentationTests
         float originalAspect = 950f / 369f;
         Assert.That((float)signature.texture.width / signature.texture.height, Is.EqualTo(originalAspect).Within(0.002f), "Logo import changed its original aspect ratio");
         Assert.That(signature.rectTransform.rect.width / signature.rectTransform.rect.height, Is.EqualTo(originalAspect).Within(0.002f));
+        var panel = (RectTransform)GameObject.Find("StartCard").transform;
+        Vector3 visibleLogoCenter = signature.rectTransform.TransformPoint(new Vector3(
+            signature.rectTransform.rect.xMin + signature.rectTransform.rect.width * (473.5f / 950f), 0, 0));
+        Vector3 panelCenter = panel.TransformPoint(panel.rect.center);
+        Assert.That(hud.transform.InverseTransformPoint(visibleLogoCenter).x,
+            Is.EqualTo(hud.transform.InverseTransformPoint(panelCenter).x).Within(1), "Visible logo must be centered above configuration panel");
+        foreach (var surface in hud.GetComponentsInChildren<MenuSurface>())
+        {
+            var mesh = surface.canvasRenderer.GetMesh();
+            Assert.That(mesh, Is.Not.Null, "Missing menu mesh: " + surface.name);
+            Assert.That(mesh.vertexCount, Is.GreaterThan(0), "Missing rendered menu surface: " + surface.name);
+        }
+        Assert.That(GameObject.Find("ComputerModeButton").transform.Find("SelectedMarker").GetComponent<Image>().sprite,
+            Is.Not.Null, "Selection check must be a bundled runtime icon");
         var white = GameObject.Find("WhiteProfessor").transform;
         var black = GameObject.Find("BlackProfessor").transform;
         Assert.That(white.Find("Menu_Queen_Marta"), Is.Not.Null);
@@ -142,6 +158,7 @@ public class MenuPresentationTests
             root.sizeDelta = size;
             Canvas.ForceUpdateCanvases();
             hud.RefreshInterface();
+            GameObject.Find("IntermediateDifficultyButton").GetComponent<Button>().onClick.Invoke();
             Canvas.ForceUpdateCanvases();
             var content = (RectTransform)GameObject.Find("MenuContent").transform;
             var corners = new Vector3[4];

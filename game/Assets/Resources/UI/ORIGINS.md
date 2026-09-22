@@ -26,5 +26,24 @@ Avenir não foi incorporada, licenciada ou apresentada como sendo Lato.
 ## Personagens
 
 O menu instancia `CustomPieces/Queen_Marta` e
-`CustomPieces/King_Ricardo_Carioca`, já existentes no projeto. Não incorpora
-novas texturas ou ilustrações de IA. A base do palco é geometria gerada na Unity.
+`CustomPieces/King_Ricardo_Carioca`, já existentes no projeto. As bases são geometria gerada na Unity. Os modelos originais e seus materiais
+não são substituídos pela ilustração da prévia.
+
+## Cenário do menu
+
+`MenuStudyBackground.png` (1672 × 941) é um cenário criado com ImageGen a partir
+da composição que o usuário anexou e aprovou em 22/09/2026. O arquivo contém
+apenas ambiente/tabuleiro/livros/planta; os professores, a marca, os textos e
+os controles são camadas independentes. O prompt exato e a fonte estão no
+metadado PNG e em `.impeccable/mocks/approved/menu-background.prompt.txt`.
+A referência aprovada está em `.impeccable/mocks/approved/mesa-de-partida.png`.
+Não é uma fotografia do campus. Importação sem compressão, sem mipmaps, NPOT
+None e máximo 2048. Não é utilizado no tabuleiro da partida.
+
+## Marcador de seleção
+
+`SelectionCheck.png`: Bootstrap Icons **v1.13.1**, `check-circle-fill.svg`, MIT.
+Fonte: https://raw.githubusercontent.com/twbs/icons/v1.13.1/icons/check-circle-fill.svg .
+Rasterizado com sharp a 96 × 96, preenchimento branco e fundo transparente;
+a UI aplica o amarelo do projeto. Licença integral em `BOOTSTRAP-ICONS-LICENSE.txt`.
+A proveniência também está embutida no PNG.
