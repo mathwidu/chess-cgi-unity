@@ -20,3 +20,10 @@ O usuário rejeitou a distribuição do primeiro layout e pediu mais cuidado com
 as logos, preservando as peças visíveis. O menu passou a ter assinaturas no
 cabeçalho, elenco central e configuração horizontal na base. A revisão
 anterior não representa aprovação visual do usuário para esta composição.
+
+O usuário rejeitou também a faixa horizontal com três personagens e forneceu
+uma captura do próprio Editor. Pediu dois professores (Marta branca e Ricardo
+preto), destaque conforme o lado e correção da assinatura Feevale amassada.
+A causa encontrada foi NPOT Scale arredondando 950×369 para uma textura com
+outra proporção. A nova revisão usa luz de estúdio, dois modelos e configuração
+em coluna; a cor sóbria foi proposta enquanto se aguarda preferência opcional.

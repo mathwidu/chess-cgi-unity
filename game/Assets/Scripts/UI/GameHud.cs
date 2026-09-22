@@ -13,7 +13,7 @@ public sealed partial class GameHud : MonoBehaviour
     private readonly Color panelColor = new Color32(10, 57, 36, 248);
     private readonly Color panelStrongColor = new Color32(4, 43, 27, 255);
     private readonly Color previewSurfaceColor = new Color32(24, 66, 43, 255);
-    private readonly Color overlayColor = new Color32(0, 97, 40, 255);
+    private readonly Color overlayColor = new Color32(8, 37, 29, 255);
     private readonly Color textColor = Color.white;
     private readonly Color mutedTextColor = new Color32(202, 228, 211, 255);
     private readonly Color accentColor = new Color32(255, 221, 0, 255);

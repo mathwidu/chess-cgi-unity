@@ -5,7 +5,7 @@
 `FeevaleLogo.png` conserva os pixels e proporções do arquivo oficial
 `SEM_SLOGAN_HORIZONTAL/UniversidadeFeevale_Logos2020_Horizontal_ColorBranco_semdecodificador.png`.
 Foi acrescentado somente um campo PNG de proveniência, sem redesenhar a marca.
-Importação: Texture2D, alpha, sem mipmaps e sem compressão.
+Importação: Texture2D, alpha, sem mipmaps, sem compressão e NPOT Scale None, preservando 950 × 369.
 
 - Manual e arquivos: https://www.feevale.br/institucional/bem-vindo/marketing/manual-da-marca
 - Manual PDF: https://www.feevale.br/Comum/midias/d6c03391-8e23-4bf5-893b-f73859a18b79/UniversidadeFeevale_MIV.pdf
@@ -25,6 +25,6 @@ Avenir não foi incorporada, licenciada ou apresentada como sendo Lato.
 
 ## Personagens
 
-O menu instancia `CustomPieces/Knight_Gustavo`, `CustomPieces/Queen_Marta` e
-`CustomPieces/Pawn_Mathwidu_Redhead_v2`, já existentes no projeto. Não incorpora
+O menu instancia `CustomPieces/Queen_Marta` e
+`CustomPieces/King_Ricardo_Carioca`, já existentes no projeto. Não incorpora
 novas texturas ou ilustrações de IA. A base do palco é geometria gerada na Unity.

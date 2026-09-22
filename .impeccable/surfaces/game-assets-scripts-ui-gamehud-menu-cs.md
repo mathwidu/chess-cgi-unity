@@ -13,11 +13,11 @@ Escopo: menu e HUD uGUI, desktop primeiro, Canvas comum ao VR. Modo: Experience 
 
 THESIS: o elenco de peças-personagens apresenta o jogo. Uma composição de capa coletiva substitui a grade de cartões genéricos.
 
-OWN-WORLD: verde Feevale como campo contínuo, título branco, ação amarela e controles tipográficos discretos. Assinatura institucional original, separada do título do trabalho.
+OWN-WORLD: verde profundo derivado da identidade Feevale como campo contínuo, título branco, ação amarela e controles tipográficos discretos. Assinatura institucional original, separada do título do trabalho.
 
 STORY: reconhecer o projeto da turma, escolher adversário, lado e dificuldade, e jogar.
 
-FIRST VIEWPORT: assinatura compacta Xadrez CGI no alto à esquerda e marca oficial Feevale no alto à direita; três personagens reais sobre uma base de tabuleiro ocupam o centro. Uma faixa inferior reúne modo, lado e dificuldade em grupos horizontais, com Jogar destacado à direita e Como jogar logo abaixo. Trocar lado muda suavemente o enquadramento do elenco; nenhum carrossel ou autoplay. Esta distribuição substitui o primeiro layout lateral, rejeitado pelo usuário por distribuição e tratamento das logos.
+FIRST VIEWPORT: assinatura compacta Xadrez CGI no alto esquerdo e marca oficial Feevale preservada na proporção original no alto direito. Dois professores reais ocupam a área principal: Marta com base branca e Ricardo com base preta. O lado escolhido avança, cresce e recebe mais luz; o outro recua. Configuração em coluna à direita, com modo, lado, dificuldade e Jogar; o nome do professor em destaque aparece sob o palco. Verde profundo, iluminação de estúdio e amarelo pontual, sem o antigo tabuleiro de borda amarela.
 
 FORM: challenger highlife-sleeve, seed 9d5682be, aprovado pela página. Tradução obrigatória da composição coletiva para cores Feevale e tipografia de referência Avenir; sem motivos tropicais ou conteúdo musical.
 
