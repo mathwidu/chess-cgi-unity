@@ -3,7 +3,7 @@ id: play-in-vr
 name: Jogar em VR
 status: draft
 owners: [mathwidu, RafaelAugustScherer]
-terms: [modo-vr, óculos-vr, controle-de-movimento, raio-de-seleção, rastreamento-de-mãos]
+terms: [modo-vr, óculos-vr, controle-de-movimento, raio-de-seleção, agarrar-e-soltar, rastreamento-de-mãos]
 ---
 
 ## Story
@@ -203,17 +203,28 @@ Example: O headset comanda a visão
   Then a câmera do olho segue a pose do headset
   And o giro de câmera por turno não move mais a câmera do olho
 
-Example: Apontar para uma peça e puxar o gatilho a seleciona
+Example: Agarrar uma peça a seleciona
   Given é a vez do jogador no modo VR
-  When o jogador aponta o raio do controle para uma de suas peças e puxa o gatilho
+  When o jogador segura o grip com a mão perto de uma de suas peças
   Then essa peça é selecionada
   And seus destinos legais são destacados, como em um clique de mouse
 
-Example: A mesma camada de regras recebe os mesmos comandos
-  Given uma peça está selecionada no modo VR
-  When o jogador aponta para uma casa destacada e puxa o gatilho
+Example: Soltar sobre um destino legal faz a jogada
+  Given o jogador segura uma peça no modo VR
+  When solta o grip com a peça sobre uma casa destacada
   Then a jogada chega às regras pelo comando existente de escolha de destino
   And o resultado corresponde ao da build de desktop
+
+Example: Soltar em um lugar inválido devolve a peça
+  Given o jogador segura uma peça no modo VR
+  When solta o grip com a peça fora dos destinos legais, ou fora do tabuleiro
+  Then o jogo informa jogada inválida
+  And a peça volta à casa de origem, sem passar o turno
+
+Example: Só as peças de quem joga podem ser agarradas
+  Given é a vez das brancas no modo VR
+  When o jogador tenta agarrar uma peça preta
+  Then a peça não é agarrada
 
 Example: Rastreamento de mãos seleciona peças sem controle físico
   Given o headset e o runtime relatam rastreamento de mãos ativo
@@ -240,19 +251,26 @@ para a escala de VR, mais perto do tabuleiro do que a órbita externa do
 desktop. O modo de desktop não é afetado quando nenhum headset está
 presente.
 
-`XRRig` também constrói um [raio de seleção](../glossary.md) — um Near-Far
-Interactor, apenas com projeção far, já que o assento fica a uma distância de
-mesa do tabuleiro — em cada [controle de movimento](../glossary.md), rastreado
-da mesma forma genérica por meio de `<XRController>{LeftHand}` /
-`{RightHand}`, e mostra o raio com um line visual. A seleção é vinculada ao
-botão de gatilho, não ao grip binding padrão do XRI, para corresponder a
-"puxa o gatilho" no texto da regra acima. `BoardView` e `PieceFactory` dão a
-cada casa e peça um XR Simple Interactable quando um headset está presente,
-reaproveitando os mesmos colliders que o raycast de desktop do
-`InputController` já atinge; um novo componente `VrSelectionBridge` escuta o
-evento de seleção desse interactable e chama `ChessGameController.SelectPiece`
-/ `SelectSquare` — as mesmas duas chamadas que o caminho de clique de desktop
-faz — para que a camada de regras veja comandos idênticos nos dois modos.
+`XRRig` também constrói um Near-Far Interactor em cada
+[controle de movimento](../glossary.md), rastreado da mesma forma genérica por
+meio de `<XRController>{LeftHand}` / `{RightHand}`. O alcance próximo (uma
+esfera de 6 cm ao redor da mão) [agarra](../glossary.md) as peças, vinculado
+ao botão de grip. O alcance distante virou o [raio de seleção](../glossary.md)
+do HUD: sua máscara exclui a layer das peças (`PieceView.PhysicsLayer`), então
+ele não atinge peças, e um `UiOnlyCurveData` só o desenha ao apontar para a UI;
+o gatilho continua sendo o clique de UI. `PieceFactory` dá a cada peça um XR
+Grab Interactable (com Rigidbody kinematic, sem rotação nem arremesso) quando
+um headset está presente; as casas deixaram de ser interactables. O
+`VrSelectionBridge` da peça filtra quem pode ser agarrado (só o lado do turno),
+chama `ChessGameController.GrabPiece` ao agarrar e `ReleasePiece` ao soltar; o
+`ReleasePiece` traduz a posição da peça em casa com
+`BoardView.TryGetSquareAt` e, se ela for um destino legal, usa o mesmo
+`SelectDestination` do clique de desktop, para que a camada de regras veja
+comandos idênticos nos dois modos. Cobre esses exemplos a verificação
+`XRGrabVerification` (simulador de XR, sem headset real): agarrar, soltar na
+própria casa, soltar num destino legal, soltar num destino inválido e fora do
+tabuleiro. O feeling do agarrar (raio de 6 cm, ponto de agarre na mão) só se
+confirma no Rift de verdade.
 
 O quarto exemplo, [rastreamento de mãos](../glossary.md), também está
 construído: o pacote `com.unity.xr.hands` e a feature OpenXR **Hand Tracking

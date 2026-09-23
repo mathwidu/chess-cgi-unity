@@ -29,6 +29,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- Em VR, as peças ganham um XR Grab Interactable (com Rigidbody kinematic) e
+  ficam na layer `PieceView.PhysicsLayer` (nomeada "ChessPieces" no
+  TagManager), que o raio distante dos controles ignora; as casas deixaram de
+  receber um XR Simple Interactable. `BoardView.TryGetSquareAt` traduz uma
+  posição no mundo em casa do tabuleiro, para saber onde uma peça foi solta.
+  Sem mudança no modo desktop; veja
+  [play-in-vr](../interaction/features/play-in-vr.md).
 - A cena ao redor foi reduzida a mesa e chão. `ScenePolish` deixou de montar a
   sala de aula de faculdade e as duas luzes de ponto, e passou a construir uma
   plataforma de mesa com um equipamento de duas luzes direcionais (uma chave

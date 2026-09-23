@@ -10,6 +10,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- `ChessGameController` ganha `CanGrabPiece`, `GrabPiece` e `ReleasePiece`
+  para o [agarrar e soltar](../interaction/glossary.md) do VR. Agarrar uma
+  peça do lado do turno a seleciona; soltar sobre um destino legal faz a
+  jogada pelo mesmo `SelectDestination` do clique, e soltar em qualquer outro
+  lugar (fora dos destinos legais ou do tabuleiro) informa "Movimento
+  invalido.", limpa a seleção e devolve a peça à casa de origem em vez de
+  manter a peça selecionada como no clique. Soltar na própria casa apenas
+  desfaz a seleção. Nenhuma regra de xadrez mudou.
 - `ChessGameController.SetPerformanceMode` liga ou desliga o modo desempenho:
   ajusta a fábrica de peças e, com uma partida em andamento, refaz as peças na
   hora com `BoardView.SyncPieces` para trocar peças personalizadas por peças

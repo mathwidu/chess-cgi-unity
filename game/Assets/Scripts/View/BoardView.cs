@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public sealed class BoardView : MonoBehaviour
 {
@@ -56,6 +55,22 @@ public sealed class BoardView : MonoBehaviour
         return transform.TransformPoint(LocalSquarePosition(square, pieceBaseHeight));
     }
 
+    public bool TryGetSquareAt(Vector3 worldPosition, out BoardSquare square)
+    {
+        Vector3 local = transform.InverseTransformPoint(worldPosition);
+        int fileIndex = Mathf.RoundToInt(local.x / squareSize + 3.5f);
+        int rank = Mathf.RoundToInt(local.z / squareSize + 4.5f);
+
+        if (fileIndex < 0 || fileIndex > 7 || rank < 1 || rank > 8)
+        {
+            square = default;
+            return false;
+        }
+
+        square = new BoardSquare(fileIndex, rank);
+        return true;
+    }
+
     private Vector3 LocalSquarePosition(BoardSquare square, float localY)
     {
         float x = (square.FileIndex - 3.5f) * squareSize;
@@ -91,12 +106,6 @@ public sealed class BoardView : MonoBehaviour
                 SquareView squareView = squareObject.AddComponent<SquareView>();
                 squareView.Initialize(square);
                 squares.Add(squareView);
-
-                if (XRRig.IsHeadsetPresent)
-                {
-                    squareObject.AddComponent<XRSimpleInteractable>();
-                    squareObject.AddComponent<VrSelectionBridge>();
-                }
             }
         }
     }

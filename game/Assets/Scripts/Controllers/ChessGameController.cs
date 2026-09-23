@@ -10,6 +10,7 @@ public sealed class ChessGameController : MonoBehaviour
     [SerializeField] private CameraController cameraController;
     [SerializeField] private float moveDuration = 0.28f;
 
+    private const float ReturnDuration = 0.15f;
     private const string PerformanceModeKey = "ChessCgi.PerformanceMode";
 
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
@@ -143,6 +144,55 @@ public sealed class ChessGameController : MonoBehaviour
         SelectOwnPiece(piece);
     }
 
+    public bool CanGrabPiece(PieceView piece)
+    {
+        return piece != null && !IsInputBlocked && !gameOver && piece.Side == CurrentTurn;
+    }
+
+    public void GrabPiece(PieceView piece)
+    {
+        if (CanGrabPiece(piece))
+        {
+            SelectOwnPiece(piece);
+        }
+    }
+
+    public void ReleasePiece(PieceView piece, Vector3 worldPosition)
+    {
+        if (piece == null)
+        {
+            return;
+        }
+
+        if (piece != selectedPiece)
+        {
+            ReturnToSquare(piece);
+            return;
+        }
+
+        bool onBoard = boardView.TryGetSquareAt(worldPosition, out BoardSquare destination);
+        if (onBoard && destination.Equals(piece.Square))
+        {
+            CancelSelection();
+            ReturnToSquare(piece);
+            return;
+        }
+
+        if (!onBoard || !legalDestinations.Contains(destination))
+        {
+            ClearSelection();
+            StatusMessage = "Movimento invalido.";
+            ReturnToSquare(piece);
+            return;
+        }
+
+        SelectDestination(destination);
+        if (awaitingPromotion)
+        {
+            piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(destination), ReturnDuration));
+        }
+    }
+
     public void SelectSquare(SquareView square)
     {
         if (square == null)
@@ -193,6 +243,11 @@ public sealed class ChessGameController : MonoBehaviour
         awaitingPromotion = false;
         ClearSelection();
         SetStatusForTurn();
+    }
+
+    private void ReturnToSquare(PieceView piece)
+    {
+        piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(piece.Square), ReturnDuration));
     }
 
     private void SelectOwnPiece(PieceView piece)

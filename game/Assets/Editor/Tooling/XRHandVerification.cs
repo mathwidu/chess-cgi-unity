@@ -83,6 +83,11 @@ public static class XRHandVerification
         GameObject leftController = cameraOffset != null ? cameraOffset.Find("Left Controller")?.gameObject : null;
         GameObject rightController = cameraOffset != null ? cameraOffset.Find("Right Controller")?.gameObject : null;
         XRInputModalityManager modalityManager = cameraOffset != null ? cameraOffset.GetComponent<XRInputModalityManager>() : null;
+        int originCount = Object.FindObjectsByType<Unity.XR.CoreUtils.XROrigin>(FindObjectsSortMode.None).Length;
+        int leftControllerHandRenderers = CountRenderers(leftController, "LeftControllerHand");
+        int rightControllerHandRenderers = CountRenderers(rightController, "RightControllerHand");
+        LineRenderer leftRay = leftController != null ? leftController.GetComponent<LineRenderer>() : null;
+        bool leftRayHasShader = leftRay != null && leftRay.sharedMaterial != null && leftRay.sharedMaterial.shader != null;
 
         NearFarInteractor leftHandNearFar = leftHand != null ? leftHand.GetComponentInChildren<NearFarInteractor>(true) : null;
         XRPokeInteractor leftHandPoke = leftHand != null ? leftHand.GetComponentInChildren<XRPokeInteractor>(true) : null;
@@ -101,7 +106,9 @@ public static class XRHandVerification
             $"leftHandVisualFound={leftHandVisual != null} rightHandVisualFound={rightHandVisual != null} " +
             $"leftVisualRenderers={leftVisualRenderers} rightVisualRenderers={rightVisualRenderers} " +
             $"leftControllerTracked={leftControllerPose != null} rightControllerTracked={rightControllerPose != null} " +
-            $"currentInputMode={XRInputModalityManager.currentInputMode.Value}");
+            $"currentInputMode={XRInputModalityManager.currentInputMode.Value} originCount={originCount} " +
+            $"leftControllerHandRenderers={leftControllerHandRenderers} rightControllerHandRenderers={rightControllerHandRenderers} " +
+            $"leftRayHasShader={leftRayHasShader} leftControllerActive={leftController != null && leftController.activeInHierarchy}");
 
         result.Check(leftHand != null, "LeftHandInteractor should be built under Camera Offset");
         result.Check(rightHand != null, "RightHandInteractor should be built under Camera Offset");
@@ -118,6 +125,11 @@ public static class XRHandVerification
         result.Check(modalityManager != null && modalityManager.rightHand == rightHand, "XRInputModalityManager.rightHand should reference the built right hand interactor");
         result.Check(modalityManager != null && modalityManager.leftController == leftController, "XRInputModalityManager.leftController should reference the built left controller");
         result.Check(modalityManager != null && modalityManager.rightController == rightController, "XRInputModalityManager.rightController should reference the built right controller");
+        result.Check(originCount == 1, "exactly one XR Origin should be built");
+        result.Check(leftControllerHandRenderers > 0, "the left controller should carry a hand model so the hand shows without hand tracking");
+        result.Check(rightControllerHandRenderers > 0, "the right controller should carry a hand model so the hand shows without hand tracking");
+        result.Check(leftRayHasShader, "the controller ray should use a material with a shader");
+        result.Check(leftController != null && leftController.activeInHierarchy, "the left controller should be active once the simulated controller is tracked");
 
         result.LogSummary("CHESS_CGI_XR_HAND_CHECK");
         SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
@@ -125,6 +137,12 @@ public static class XRHandVerification
         SessionState.SetBool(DoneKey, true);
         EditorApplication.isPlaying = false;
         EditorApplication.update += WaitForEditModeThenExit;
+    }
+
+    private static int CountRenderers(GameObject controller, string handName)
+    {
+        Transform hand = controller != null ? controller.transform.Find(handName) : null;
+        return hand != null ? hand.GetComponentsInChildren<Renderer>(true).Length : 0;
     }
 
     private static void WaitForEditModeThenExit()

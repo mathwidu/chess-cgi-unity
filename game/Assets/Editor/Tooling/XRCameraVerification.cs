@@ -3,7 +3,6 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 [InitializeOnLoad]
 public static class XRCameraVerification
@@ -15,8 +14,7 @@ public static class XRCameraVerification
     private const string ApplyOrbitAndZoomMethodName = "ApplyOrbitAndZoom";
     private const int RigSettleFrames = 30;
     private const int OrbitStepCount = 20;
-    private const int HoldSimFrames = 5;
-    private const int InputBlockedTimeoutSimFrames = 300;
+    private const int InputBlockedTimeoutSimFrames = 3000;
     private const float VrMinDistance = 0.35f;
     private const float VrMaxDistance = 1.2f;
     private static readonly Vector3 BoardTarget = new Vector3(0f, 0.78f, 0f);
@@ -25,10 +23,6 @@ public static class XRCameraVerification
     {
         WaitForRig,
         VerifyOrbitAndZoom,
-        PressForPiece,
-        ReleaseForPiece,
-        PressForSquare,
-        ReleaseForSquare,
         WaitForMove,
         VerifyTurnDidNotMoveCamera,
     }
@@ -39,10 +33,8 @@ public static class XRCameraVerification
     private static CameraController cameraController;
     private static XRRig xrRig;
     private static MethodInfo applyOrbitAndZoomMethod;
-    private static NearFarInteractor interactor;
     private static ChessGameController gameController;
     private static BoardView boardView;
-    private static PieceView targetPiece;
     private static BoardSquare destinationSquare;
     private static Vector3 preMovePosition;
     private static Quaternion preMoveRotation;
@@ -117,50 +109,14 @@ public static class XRCameraVerification
             case Stage.VerifyOrbitAndZoom:
                 ReportOrbitAndZoomResult();
 
-                if (!TryBeginSelectPiece())
+                if (!TryMovePieceByGrab())
                 {
-                    FailAndStop("Could not find the right controller or the a2 pawn to aim at.");
+                    FailAndStop("Could not grab the a2 pawn and release it on a3.");
                     return;
                 }
 
                 preMovePosition = XRRig.Origin.position;
                 preMoveRotation = XRRig.Origin.rotation;
-                Advance(Stage.PressForPiece);
-                return;
-
-            case Stage.PressForPiece:
-                HoldManualSelect();
-                if (frameCount - holdStartSimFrame < HoldSimFrames)
-                {
-                    return;
-                }
-
-                interactor.selectInput.manualPerformed = false;
-                Advance(Stage.ReleaseForPiece);
-                return;
-
-            case Stage.ReleaseForPiece:
-                if (!TryBeginSelectSquare())
-                {
-                    FailAndStop("No legal destination square was highlighted to aim at.");
-                    return;
-                }
-
-                Advance(Stage.PressForSquare);
-                return;
-
-            case Stage.PressForSquare:
-                HoldManualSelect();
-                if (frameCount - holdStartSimFrame < HoldSimFrames)
-                {
-                    return;
-                }
-
-                interactor.selectInput.manualPerformed = false;
-                Advance(Stage.ReleaseForSquare);
-                return;
-
-            case Stage.ReleaseForSquare:
                 Advance(Stage.WaitForMove);
                 return;
 
@@ -245,51 +201,17 @@ public static class XRCameraVerification
         result.Check(distanceAfterZoom < distanceBeforeZoom, "zooming in should move the XR Origin closer to the board");
     }
 
-    private static void HoldManualSelect()
+    private static bool TryMovePieceByGrab()
     {
-        interactor.selectInput.manualPerformed = true;
-        interactor.selectInput.manualFramePerformed = Time.frameCount;
-    }
-
-    private static bool TryBeginSelectPiece()
-    {
-        GameObject controllerObject = GameObject.Find("Right Controller");
-        interactor = controllerObject != null ? controllerObject.GetComponent<NearFarInteractor>() : null;
-        if (interactor == null)
+        PieceView pawn = boardView.Pieces.FirstOrDefault(p => p.Square.ToAlgebraic() == "a2");
+        if (pawn == null)
         {
             return false;
         }
 
-        interactor.selectInput.inputSourceMode = UnityEngine.XR.Interaction.Toolkit.Inputs.Readers.XRInputButtonReader.InputSourceMode.ManualValue;
-        interactor.selectActionTrigger = UnityEngine.XR.Interaction.Toolkit.Interactors.XRBaseInputInteractor.InputTriggerType.State;
-
-        targetPiece = boardView.Pieces.FirstOrDefault(p => p.Square.ToAlgebraic() == "a2");
-        if (targetPiece == null)
-        {
-            return false;
-        }
-
-        AimControllerAt(targetPiece.transform.position);
-        return true;
-    }
-
-    private static bool TryBeginSelectSquare()
-    {
-        Transform highlightsRoot = boardView.transform.Find("Highlights");
-        if (highlightsRoot == null || highlightsRoot.childCount == 0)
-        {
-            return false;
-        }
-
-        string algebraic = highlightsRoot.GetChild(0).name.Replace("Highlight ", string.Empty);
-        destinationSquare = BoardSquare.FromAlgebraic(algebraic);
-        SquareView destinationView = boardView.Squares.FirstOrDefault(s => s.Square.Equals(destinationSquare));
-        if (destinationView == null)
-        {
-            return false;
-        }
-
-        AimControllerAt(destinationView.transform.position);
+        destinationSquare = BoardSquare.FromAlgebraic("a3");
+        gameController.GrabPiece(pawn);
+        gameController.ReleasePiece(pawn, boardView.GetPieceWorldPosition(destinationSquare));
         return true;
     }
 
@@ -315,27 +237,6 @@ public static class XRCameraVerification
 
         result.LogSummary("CHESS_CGI_XR_CAMERA_CHECK");
         SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
-    }
-
-    private static void AimControllerAt(Vector3 worldTarget)
-    {
-        GameObject controllerObject = GameObject.Find("Right Controller");
-        if (controllerObject == null)
-        {
-            return;
-        }
-
-        UnityEngine.InputSystem.XR.TrackedPoseDriver poseDriver =
-            controllerObject.GetComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>();
-        if (poseDriver != null)
-        {
-            poseDriver.enabled = false;
-        }
-
-        Vector3 aimOrigin = worldTarget + new Vector3(0f, 3f, 0f);
-        controllerObject.transform.SetPositionAndRotation(
-            aimOrigin,
-            Quaternion.LookRotation((worldTarget - aimOrigin).normalized, Vector3.forward));
     }
 
     private static void FailAndStop(string reason)

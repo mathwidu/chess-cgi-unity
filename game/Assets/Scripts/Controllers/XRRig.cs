@@ -19,6 +19,8 @@ public sealed class XRRig : MonoBehaviour
     private const float ZoomSpeed = 6f;
     private const float MinBoardDistance = 0.35f;
     private const float MaxBoardDistance = 1.2f;
+    private const float GrabRadius = 0.06f;
+    private static readonly Vector3 GrabPointOffset = new Vector3(0f, -0.02f, 0f);
     private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -0.6f);
     private static readonly Vector3 BoardTarget = new Vector3(0f, 0.78f, 0f);
     public static readonly Vector3 SeatEyePosition = SeatPosition + Vector3.up * EyeHeight;
@@ -109,6 +111,7 @@ public sealed class XRRig : MonoBehaviour
 
     private void BuildRig()
     {
+        rigBuilt = true;
         bool usingSimulator = InputSystem.GetDevice<XRHMD>() is XRSimulatedHMD;
 
         GameObject originObject = new GameObject("XR Origin (VR)");
@@ -159,8 +162,8 @@ public sealed class XRRig : MonoBehaviour
             inputController.Configure(gameController, eyeCamera);
         }
 
-        GameObject leftController = BuildController(offsetObject.transform, "Left Controller", "LeftHand");
-        GameObject rightController = BuildController(offsetObject.transform, "Right Controller", "RightHand");
+        GameObject leftController = BuildController(offsetObject.transform, "Left Controller", "LeftHand", "LeftControllerHand");
+        GameObject rightController = BuildController(offsetObject.transform, "Right Controller", "RightHand", "RightControllerHand");
         GameObject leftHand = BuildHandInteractor(offsetObject.transform, "LeftHandInteractor");
         GameObject rightHand = BuildHandInteractor(offsetObject.transform, "RightHandInteractor");
         BuildHandVisual(offsetObject.transform, "LeftHandVisual");
@@ -171,8 +174,6 @@ public sealed class XRRig : MonoBehaviour
         modalityManager.rightController = rightController;
         modalityManager.leftHand = leftHand;
         modalityManager.rightHand = rightHand;
-
-        rigBuilt = true;
     }
 
     private static GameObject BuildHandInteractor(Transform parent, string resourceName)
@@ -186,11 +187,33 @@ public sealed class XRRig : MonoBehaviour
 
         GameObject instance = Object.Instantiate(prefab, parent);
         instance.name = resourceName;
+        RestrictRayToUi(instance);
 
         TrackedPoseDriver aimPoseDriver = instance.transform.Find("Aim Pose")?.GetComponent<TrackedPoseDriver>();
         aimPoseDriver?.positionInput.action?.actionMap?.asset?.Enable();
 
         return instance;
+    }
+
+    private static void RestrictRayToUi(GameObject interactorObject)
+    {
+        NearFarInteractor interactor = interactorObject.GetComponentInChildren<NearFarInteractor>(true);
+        if (interactor == null)
+        {
+            return;
+        }
+
+        CurveInteractionCaster farCaster = interactor.farInteractionCaster as CurveInteractionCaster;
+        if (farCaster != null)
+        {
+            farCaster.raycastMask = ~(1 << PieceView.PhysicsLayer);
+        }
+
+        CurveVisualController curveVisual = interactorObject.GetComponentInChildren<CurveVisualController>(true);
+        if (curveVisual != null)
+        {
+            curveVisual.curveInteractionDataProvider = new UiOnlyCurveData(interactor);
+        }
     }
 
     private static void BuildHandVisual(Transform parent, string resourceName)
@@ -206,7 +229,7 @@ public sealed class XRRig : MonoBehaviour
         instance.name = resourceName;
     }
 
-    private static GameObject BuildController(Transform parent, string name, string hand)
+    private static GameObject BuildController(Transform parent, string name, string hand, string handModelName)
     {
         GameObject controllerObject = new GameObject(name);
         controllerObject.SetActive(false);
@@ -218,29 +241,36 @@ public sealed class XRRig : MonoBehaviour
         poseDriver.rotationInput = new InputActionProperty(new InputAction(
             $"XR {hand} Rotation", InputActionType.Value, $"<XRController>{{{hand}}}/pointerRotation", expectedControlType: "Quaternion"));
 
+        GameObject grabPoint = new GameObject("Grab Point");
+        grabPoint.transform.SetParent(controllerObject.transform, false);
+        grabPoint.transform.localPosition = GrabPointOffset;
+
         SphereInteractionCaster nearCaster = controllerObject.AddComponent<SphereInteractionCaster>();
+        nearCaster.castOrigin = grabPoint.transform;
+        nearCaster.castRadius = GrabRadius;
         CurveInteractionCaster farCaster = controllerObject.AddComponent<CurveInteractionCaster>();
+        farCaster.raycastMask = ~(1 << PieceView.PhysicsLayer);
         InteractionAttachController attachController = controllerObject.AddComponent<InteractionAttachController>();
 
         LineRenderer lineRenderer = controllerObject.AddComponent<LineRenderer>();
-        lineRenderer.material = CreateRayMaterial();
+        lineRenderer.sharedMaterial = Resources.Load<Material>("XR/ControllerRayMaterial");
         lineRenderer.widthMultiplier = 0.01f;
 
         NearFarInteractor interactor = controllerObject.AddComponent<NearFarInteractor>();
         interactor.nearInteractionCaster = nearCaster;
         interactor.farInteractionCaster = farCaster;
         interactor.interactionAttachController = attachController;
-        interactor.enableNearCasting = false;
+        interactor.enableNearCasting = true;
 
         CurveVisualController curveVisual = controllerObject.AddComponent<CurveVisualController>();
         curveVisual.lineRenderer = lineRenderer;
-        curveVisual.curveInteractionDataProvider = interactor;
+        curveVisual.curveInteractionDataProvider = new UiOnlyCurveData(interactor);
 
         XRInputButtonReader selectInput = new XRInputButtonReader("Select")
         {
             inputSourceMode = XRInputButtonReader.InputSourceMode.InputAction,
             inputActionPerformed = new InputAction(
-                $"XR {hand} Select", InputActionType.Button, $"<XRController>{{{hand}}}/triggerButton"),
+                $"XR {hand} Select", InputActionType.Button, $"<XRController>{{{hand}}}/gripButton"),
         };
         interactor.selectInput = selectInput;
 
@@ -252,19 +282,10 @@ public sealed class XRRig : MonoBehaviour
         };
         interactor.uiPressInput = uiPressInput;
 
+        BuildHandVisual(controllerObject.transform, handModelName);
+
         controllerObject.SetActive(true);
         return controllerObject;
-    }
-
-    private static Material CreateRayMaterial()
-    {
-        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
-        if (shader == null)
-        {
-            shader = Shader.Find("Unlit/Color");
-        }
-
-        return new Material(shader) { color = Color.cyan };
     }
 
     private static void Recenter()

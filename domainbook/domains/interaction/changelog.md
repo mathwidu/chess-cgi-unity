@@ -46,6 +46,19 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   [ADR-0001](decisions/0001-usar-openxr-e-o-xr-interaction-toolkit-para-o-modo-vr.md).
   O Rift usa os [controles de movimento](glossary.md) Touch (raio de seleção e
   gatilho), não rastreamento de mãos articulado, que a Rift não possui.
+- Cada [controle de movimento](glossary.md) carrega um modelo de mão
+  (`Resources/XR/LeftControllerHand` / `RightControllerHand`) que segue a
+  pose do controle, para que o jogador veja as mãos mesmo sem rastreamento
+  de mãos articulado, como na Rift com os Touch. Os prefabs são gerados por
+  **Chess CGI → VR → Create Controller Hands And Ray Material**.
+- No Oculus Rift, o jogador [agarra e solta](glossary.md) as peças com a mão em
+  vez de apontar um raio. Segurar o grip do [controle de movimento](glossary.md)
+  perto de uma peça da vez a agarra e mostra seus destinos legais; soltá-la
+  sobre um destino legal faz a jogada, e soltá-la em qualquer outro lugar
+  conta como jogada inválida e a peça volta à casa de origem. O
+  `VrSelectionBridge` agora liga o evento de agarrar e soltar de um XR Grab
+  Interactable a `ChessGameController.GrabPiece` / `ReleasePiece`; veja
+  [play-in-vr](features/play-in-vr.md).
 
 ### Changed
 
@@ -62,6 +75,15 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   partir da Main Camera e a de VR a partir da Eye Camera, cada modo com a sua
   câmera, de modo que mexer em um modo não afete o outro.
 
+- O [raio de seleção](glossary.md) deixou de escolher peças e casas: os
+  controles selecionam com o grip (não mais o gatilho) e só o alcance próximo
+  agarra peças. O raio distante ficou só para o HUD, e só é desenhado quando
+  aponta para ele; o gatilho continua clicando nos botões do HUD. As casas do
+  tabuleiro deixaram de ser interactables, e os interactors de mão seguem a
+  mesma regra. Removida a verificação `XRControllerVerification`, que testava
+  o fluxo antigo de apontar e puxar o gatilho; o `XRGrabVerification` a
+  substitui.
+
 ### Fixed
 
 - O [raio de seleção](glossary.md) dos controles voltou a ser desenhado. Ele
@@ -69,3 +91,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `XRInteractorLineVisual`, que exigia um componente `ILineRenderable` que o
   Near-Far Interactor não fornece e enchia o console com erros de
   "Missing ILineRenderable".
+- Na build de Windows, os [controles de movimento](glossary.md) não apareciam
+  e não interagiam com nada (nem raio, nem menus). O `XRRig` buscava o shader
+  do [raio de seleção](glossary.md) com `Shader.Find`, mas nenhum material
+  usava "Universal Render Pipeline/Unlit", então a build o removia;
+  `new Material(null)` lançava uma exceção no meio da construção do rig, e o
+  rig tentava de novo a cada frame. O raio agora usa o material
+  `Resources/XR/ControllerRayMaterial`, que entra na build, e o `XRRig`
+  marca o rig como construído antes de montá-lo, para que uma falha não o
+  reconstrua a cada frame.

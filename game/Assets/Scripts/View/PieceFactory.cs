@@ -60,6 +60,7 @@ public sealed class PieceFactory : MonoBehaviour
         root.transform.SetParent(parent);
         root.transform.position = position;
         root.transform.localScale = Vector3.one;
+        root.layer = PieceView.PhysicsLayer;
 
         PieceView pieceView = root.AddComponent<PieceView>();
         AddCollider(root);
@@ -72,11 +73,24 @@ public sealed class PieceFactory : MonoBehaviour
 
         if (XRRig.IsHeadsetPresent)
         {
-            root.AddComponent<XRSimpleInteractable>();
+            AddGrabInteractable(root);
             root.AddComponent<VrSelectionBridge>();
         }
 
         return pieceView;
+    }
+
+    private static void AddGrabInteractable(GameObject root)
+    {
+        Rigidbody body = root.AddComponent<Rigidbody>();
+        body.isKinematic = true;
+        body.useGravity = false;
+
+        XRGrabInteractable grab = root.AddComponent<XRGrabInteractable>();
+        grab.movementType = XRBaseInteractable.MovementType.Instantaneous;
+        grab.trackRotation = false;
+        grab.throwOnDetach = false;
+        grab.useDynamicAttach = true;
     }
 
     private static void AddCollider(GameObject root)
