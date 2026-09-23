@@ -15,6 +15,8 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- Construção visual do menu separada de escolhas, foco e ajuste ao Canvas. HUD e palco divididos em etapas nomeadas; cenários de captura do Editor declarados junto de suas dimensões e foco esperado. Composição aprovada preservada.
+
 - Menu com escolhas explícitas de modo, lado e três dificuldades, estado selecionado e resumo antes da partida.
 - HUD, promoção, recuperação de falha e ajuda com tipografia ampliada e identidade visual comum.
 - Ajuda bloqueia os botões de fundo; a configuração é preservada ao fechar e ao retornar ao menu.

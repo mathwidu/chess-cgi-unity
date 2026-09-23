@@ -7,6 +7,8 @@ using UnityEngine;
 public sealed class MenuCastPreview : MonoBehaviour
 {
     private const int PreviewLayer = 30;
+    private const float SelectionTransitionSpeed = 9f;
+
     private sealed class Figure
     {
         public Transform Root;
@@ -33,7 +35,10 @@ public sealed class MenuCastPreview : MonoBehaviour
 
     public void Configure(UnityEngine.UI.RawImage image, ChessSide side)
     {
-        if (stage == null) BuildStage();
+        if (stage == null)
+        {
+            BuildStage();
+        }
         image.texture = texture;
         SetSide(side);
         selection = targetSelection;
@@ -46,10 +51,16 @@ public sealed class MenuCastPreview : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (stage == null) return;
+        if (stage == null)
+        {
+            return;
+        }
         bool moving = Mathf.Abs(selection - targetSelection) > 0.001f;
-        if (!dirty && !moving) return;
-        selection = moving ? Mathf.Lerp(selection, targetSelection, 1f - Mathf.Exp(-9f * Time.unscaledDeltaTime)) : targetSelection;
+        if (!dirty && !moving)
+        {
+            return;
+        }
+        selection = moving ? Mathf.Lerp(selection, targetSelection, 1f - Mathf.Exp(-SelectionTransitionSpeed * Time.unscaledDeltaTime)) : targetSelection;
         Pose(white, new Vector3(-0.82f, 0, 0), 1f - selection, 174f);
         Pose(black, new Vector3(0.65f, 0, 0), selection, 186f);
         RenderStudio();
@@ -74,7 +85,10 @@ public sealed class MenuCastPreview : MonoBehaviour
 
     public Vector2 BaseViewport(ChessSide side)
     {
-        if (previewCamera == null) return Vector2.one * 0.5f;
+        if (previewCamera == null)
+        {
+            return Vector2.one * 0.5f;
+        }
         Transform figure = side == ChessSide.White ? white.Root : black.Root;
         return previewCamera.WorldToViewportPoint(figure.position);
     }
@@ -89,7 +103,13 @@ public sealed class MenuCastPreview : MonoBehaviour
         }
     }
 
-    private void OnDisable() { if (stage != null) stage.SetActive(false); }
+    private void OnDisable()
+    {
+        if (stage != null)
+        {
+            stage.SetActive(false);
+        }
+    }
 
     private void BuildStage()
     {
@@ -131,26 +151,52 @@ public sealed class MenuCastPreview : MonoBehaviour
         Cylinder(figure.Root, "TeamBase", new Vector3(0, 0.045f, 0), new Vector3(1.02f, 0.045f, 1.02f), baseMaterial);
         Cylinder(figure.Root, "BaseRim", new Vector3(0, 0.006f, 0), new Vector3(1.04f, 0.006f, 1.04f), MakeMaterial(new Color32(130, 123, 89, 255)));
         GameObject prefab = Resources.Load<GameObject>(path);
-        if (prefab == null) return figure;
+        if (prefab == null)
+        {
+            return figure;
+        }
         GameObject character = Instantiate(prefab, figure.Root);
         character.name = "Menu_" + prefab.name;
         character.transform.localPosition = Vector3.zero;
         character.transform.localRotation = Quaternion.identity;
-        foreach (Collider collider in character.GetComponentsInChildren<Collider>()) collider.enabled = false;
-        foreach (Transform child in character.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = PreviewLayer;
+        foreach (Collider collider in character.GetComponentsInChildren<Collider>())
+        {
+            collider.enabled = false;
+        }
+        foreach (Transform child in character.GetComponentsInChildren<Transform>(true))
+        {
+            child.gameObject.layer = PreviewLayer;
+        }
         Renderer[] renderers = character.GetComponentsInChildren<Renderer>();
-        if (renderers.Length == 0) return figure;
+        if (renderers.Length == 0)
+        {
+            return figure;
+        }
+        FitCharacterToBase(character.transform, figure.Root, renderers);
+        CloneFigureMaterials(figure, renderers);
+        return figure;
+    }
+
+    private static void FitCharacterToBase(Transform character, Transform baseTransform, Renderer[] renderers)
+    {
         Bounds bounds = BoundsOf(renderers);
-        character.transform.localScale *= 2.35f / Mathf.Max(0.01f, bounds.size.y);
+        character.localScale *= 2.35f / Mathf.Max(0.01f, bounds.size.y);
         bounds = BoundsOf(renderers);
         Vector3 foot = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
-        character.transform.position += figure.Root.TransformPoint(Vector3.up * 0.09f) - foot;
+        character.position += baseTransform.TransformPoint(Vector3.up * 0.09f) - foot;
+    }
+
+    private void CloneFigureMaterials(Figure figure, Renderer[] renderers)
+    {
         foreach (Renderer renderer in renderers)
         {
             Material[] clones = renderer.sharedMaterials;
             for (int i = 0; i < clones.Length; i++)
             {
-                if (clones[i] == null) continue;
+                if (clones[i] == null)
+                {
+                    continue;
+                }
                 Material clone = new Material(clones[i]);
                 clones[i] = clone;
                 materials.Add(clone);
@@ -159,7 +205,6 @@ public sealed class MenuCastPreview : MonoBehaviour
             }
             renderer.sharedMaterials = clones;
         }
-        return figure;
     }
 
     private void FindSceneLights()
@@ -168,7 +213,10 @@ public sealed class MenuCastPreview : MonoBehaviour
         lightStates.Clear();
         foreach (Light light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
         {
-            if (light.type != LightType.Directional || light.transform.IsChildOf(stage.transform)) continue;
+            if (light.type != LightType.Directional || light.transform.IsChildOf(stage.transform))
+            {
+                continue;
+            }
             sceneLights.Add(light);
             lightStates.Add(false);
         }
@@ -179,15 +227,24 @@ public sealed class MenuCastPreview : MonoBehaviour
         // Camera.Render is synchronous. Restore every external light before the main camera renders.
         for (int i = 0; i < sceneLights.Count; i++)
         {
-            if (sceneLights[i] == null) continue;
+            if (sceneLights[i] == null)
+            {
+                continue;
+            }
             lightStates[i] = sceneLights[i].enabled;
             sceneLights[i].enabled = false;
         }
-        try { previewCamera.Render(); }
+        try
+        {
+            previewCamera.Render();
+        }
         finally
         {
             for (int i = 0; i < sceneLights.Count; i++)
-                if (sceneLights[i] != null) sceneLights[i].enabled = lightStates[i];
+                if (sceneLights[i] != null)
+                {
+                    sceneLights[i].enabled = lightStates[i];
+                }
         }
     }
 
@@ -235,9 +292,22 @@ public sealed class MenuCastPreview : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (previewCamera != null) previewCamera.targetTexture = null;
-        if (texture != null) { texture.Release(); Destroy(texture); }
-        if (stage != null) Destroy(stage);
-        foreach (Material material in materials) if (material != null) Destroy(material);
+        if (previewCamera != null)
+        {
+            previewCamera.targetTexture = null;
+        }
+        if (texture != null)
+        {
+            texture.Release();
+            Destroy(texture);
+        }
+        if (stage != null)
+        {
+            Destroy(stage);
+        }
+        foreach (Material material in materials)
+        {
+            if (material != null) Destroy(material);
+        }
     }
 }

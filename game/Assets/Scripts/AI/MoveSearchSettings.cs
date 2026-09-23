@@ -1,7 +1,5 @@
 using System;
 
-public enum ComputerDifficulty { Beginner, Intermediate, Hard }
-
 public readonly struct MoveSearchSettings
 {
     public int SkillLevel { get; }

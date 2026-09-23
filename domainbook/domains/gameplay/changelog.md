@@ -13,6 +13,10 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - Adversário offline no desktop, com escolha de lado, três dificuldades e validação local de toda candidata.
 - Cancelamento e timeout de busca, descarte de respostas antigas e recuperação por nova tentativa ou menu.
 
+### Changed
+
+- Organização da IA para revisão: dificuldade e resultado em arquivos próprios; inicialização UCI, configuração e leitura da resposta em rotinas nomeadas; observação de tarefas tardias usa `Task`. Contratos, perfis e cancelamento preservados.
+
 ### Fixed
 
 - Reinício durante a animação não aplica o resultado da partida anterior.

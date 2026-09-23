@@ -1,23 +1,26 @@
-# Menu inicial do Xadrez CGI
+# Menu inicial — Mesa de partida
 
-Escopo: menu e HUD uGUI, desktop primeiro, Canvas comum ao VR. Modo: Experience na abertura; Operate nas escolhas. A direção inicial Palco da turma foi substituída pela composição Mesa de partida, gerada e aprovada explicitamente por imagem em 22/09/2026. A seção final e a imagem aprovada são a referência vigente; o contrato abaixo preserva o histórico da direção inicial.
+Escopo: menu e HUD uGUI, desktop primeiro, Canvas comum ao VR. Experience na apresentação dos professores; Operate nas escolhas da partida. A imagem `mocks/approved/mesa-de-partida.png` (1672 × 941) foi escolhida explicitamente pelo usuário em 22/09/2026 e substitui as direções anteriores.
 
 ## Direction contract
 
-THESIS: o elenco de peças-personagens apresenta o jogo. Uma composição de capa coletiva substitui a grade de cartões genéricos.
+THESIS: os professores que dão identidade às peças apresentam o jogo em uma mesa de estudo.
 
-OWN-WORLD: verde profundo derivado da identidade Feevale como campo contínuo, título branco, ação amarela e controles tipográficos discretos. Assinatura institucional original, separada do título do trabalho.
+OWN-WORLD: verdes Feevale, tabuleiro, livros e planta; personagens 3D reais, título branco e ação amarela. Marca institucional original, proporcional e separada do título acadêmico.
 
-STORY: reconhecer o projeto da turma, escolher adversário, lado e dificuldade, e jogar.
+STORY: reconhecer o projeto da turma, escolher adversário, lado e dificuldade e iniciar a partida.
 
-FIRST VIEWPORT: assinatura compacta Xadrez CGI no alto esquerdo e marca oficial Feevale preservada na proporção original no alto direito. Dois professores reais ocupam a área principal: Marta com base branca e Ricardo com base preta. O lado escolhido avança, cresce e recebe mais luz; o outro recua. Configuração em coluna à direita, com modo, lado, dificuldade e Jogar; o nome do professor em destaque aparece sob o palco. Verde profundo, iluminação de estúdio e amarelo pontual, sem o antigo tabuleiro de borda amarela.
+FIRST VIEWPORT: Xadrez CGI no alto à esquerda; Marta e Ricardo sobre o tabuleiro cenográfico. Configuração em painel à direita, com a parte visível da assinatura Feevale centralizada no mesmo eixo. Seleção tem borda e confirmação amarelas; foco tem contorno claro próprio. Jogar é a ação dominante.
 
-FORM: challenger highlife-sleeve, seed 9d5682be, aprovado pela página. Tradução obrigatória da composição coletiva para cores Feevale e tipografia de referência Avenir; sem motivos tropicais ou conteúdo musical.
+FORM: composição Mesa de partida aprovada por imagem. Preservar seus alinhamentos, distribuição, hierarquia e camadas. No jogo, manter os prefabs 3D e a logo originais em vez das versões ilustradas da referência; usar Lato incorporada como alternativa redistribuível, sem afirmar que é Avenir.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+FINISH: referências vigentes em `../DESIGN.md` e `design.json`; revisão em `review/study-review.md` e limites de validação em `review/study-verdict.md` e `../docs/ai-desktop.md`.
 
-## Composição aprovada — Mesa de partida (22/09/2026)
+## Comportamento que deve ser preservado
 
-O usuário anexou e escolheu explicitamente `.impeccable/mocks/approved/mesa-de-partida.png` (1672 × 941). Esta imagem substitui a composição anterior. Menu à direita sobre painel verde, professores à esquerda, tabuleiro cenográfico, livros e planta. Assinatura Feevale centralizada pelo conteúdo visível sobre o painel. Título Xadrez maior, seleção com confirmação e botão Jogar com volume.
+- Marta representa brancas, Ricardo representa pretas. Escolher o lado ajusta posição, escala e luz; nomes acompanham as bases. No modo local, ambos têm a mesma ênfase.
+- Fundo cenográfico é uma imagem separada; marca, personagens, textos e controles são camadas independentes.
+- Configuração, ajuda, promoção e erro mantêm seleção e navegação por teclado. Os controles continuam uGUI para o Canvas world-space.
+- O palco de menu não participa da partida e restaura a iluminação externa após cada render.
 
-Os professores continuam sendo os prefabs 3D do jogo, com destaque animado pela cor escolhida; não substituir por retratos gerados. Fundo ilustrado é uma camada separada; nenhum controle ou texto de interface fica embutido nele. Os nomes acompanham a projeção das bases. Dificuldades, modo local, ajuda, foco e contratos de Canvas world-space permanecem funcionais. O fundo não faz parte da cena de partida nem interfere em suas luzes.
+Estudos anteriores ficam em `direction-notes.md`, `direction-options.json` e nos relatórios de revisão iniciais. São histórico, não instruções para substituir a composição aprovada.

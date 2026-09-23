@@ -114,6 +114,13 @@ Os professores continuam sendo peças personalizadas 3D renderizadas durante
 as transições de lado. `MenuSurface` desenha os controles na resolução do
 Canvas; `MenuGroundShadow` acompanha as bases, sem afetar a partida.
 
+### Organização da implementação
+
+`GameHud.Menu.Layout.cs` constrói os elementos na ordem visual aprovada;
+`GameHud.Menu.cs` mantém seleção, foco e dimensionamento. `GameHud.Match.cs`
+organiza os painéis da partida e diálogos obrigatórios. A divisão é interna ao
+mesmo HUD, preservando referências e integração por Canvas desktop/world-space.
+
 ## Open Questions
 
 A legibilidade e o conforto no headset ainda exigem validação em hardware.

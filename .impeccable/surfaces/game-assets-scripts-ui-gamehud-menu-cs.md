@@ -2,27 +2,19 @@
 version: 1
 slug: "game-assets-scripts-ui-gamehud-menu-cs"
 primary_target: "game/Assets/Scripts/UI/GameHud.Menu.cs"
-related_targets: ["game/Assets/Scripts/UI/GameHud.Match.cs"]
+related_targets: ["game/Assets/Scripts/UI/GameHud.Menu.Layout.cs", "game/Assets/Scripts/UI/GameHud.Match.cs", "game/Assets/Scripts/UI/MenuCastPreview.cs"]
 ---
 
 # Menu inicial do Xadrez CGI
 
-Escopo: menu e HUD uGUI, desktop primeiro, Canvas comum ao VR. Modo: Experience na abertura; Operate nas escolhas. O usuário escolheu Palco da turma e mudou para implementação direta na página de decisão (answer 29cc4bd4). Não há comp aprovado nem gerado.
+A composição vigente é **Mesa de partida**, escolhida por imagem em 22/09/2026.
+O contrato único está em `../menu-contract.md`; a referência aprovada, em
+`../mocks/approved/mesa-de-partida.png`. `DESIGN.md` e `../design.json` registram
+as medidas e estados da implementação nativa Unity.
 
-## Direction contract
+`GameHud.Menu.Layout.cs` constrói os elementos. `GameHud.Menu.cs` mantém escolhas,
+foco e ajuste ao Canvas; `GameHud.Match.cs` constrói o HUD e os diálogos;
+`MenuCastPreview.cs` isola os professores 3D da cena de partida.
 
-THESIS: o elenco de peças-personagens apresenta o jogo. Uma composição de capa coletiva substitui a grade de cartões genéricos.
-
-OWN-WORLD: verde profundo derivado da identidade Feevale como campo contínuo, título branco, ação amarela e controles tipográficos discretos. Assinatura institucional original, separada do título do trabalho.
-
-STORY: reconhecer o projeto da turma, escolher adversário, lado e dificuldade, e jogar.
-
-FIRST VIEWPORT: assinatura compacta Xadrez CGI no alto esquerdo e marca oficial Feevale preservada na proporção original no alto direito. Dois professores reais ocupam a área principal: Marta com base branca e Ricardo com base preta. O lado escolhido avança, cresce e recebe mais luz; o outro recua. Configuração em coluna à direita, com modo, lado, dificuldade e Jogar; o nome do professor em destaque aparece sob o palco. Verde profundo, iluminação de estúdio e amarelo pontual, sem o antigo tabuleiro de borda amarela.
-
-FORM: challenger highlife-sleeve, seed 9d5682be, aprovado pela página. Tradução obrigatória da composição coletiva para cores Feevale e tipografia de referência Avenir; sem motivos tropicais ou conteúdo musical.
-
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
-
-## Comp aprovada em 22/09/2026
-
-Fonte visual atual: `.impeccable/mocks/approved/mesa-de-partida.png`. Escolha explícita por imagem anexada. Seguir o adendo Mesa de partida em `../menu-contract.md`; topologia e medidas registradas em `../build/regions.json`.
+A organização do código não autoriza redesenho. Preservar a composição aprovada,
+a marca original centralizada, os modelos reais e a integração uGUI/world-space.

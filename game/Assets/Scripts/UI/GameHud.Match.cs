@@ -1,18 +1,32 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public sealed partial class GameHud
 {
     private RectTransform matchInterface;
-    private UnityEngine.UI.Text matchSummaryText;
+    private Text matchSummaryText;
 
     private void BuildMatchInterface()
     {
         matchInterface = CreateRect("MatchInterface", hudRoot, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero);
         matchControls = matchInterface.gameObject.AddComponent<CanvasGroup>();
+        BuildMatchHeader();
+        BuildTurnAndHistory();
+        BuildSelectedPieceDetails();
+        BuildMatchActions();
+        BuildPromotionDialog();
+        BuildComputerErrorDialog();
+    }
+
+    private void BuildMatchHeader()
+    {
         RectTransform brand = CreatePanel("BrandPanel", matchInterface, new Vector2(0, 1), new Vector2(0, 1), new Vector2(0, 1), new Vector2(24, -24), new Vector2(650, 94), panelColor);
         MenuLabel("TitleText", brand, "XADREZ / CGI", 27, textColor, 24, 16, 596, 34, true);
         matchSummaryText = MenuLabel("MatchDetails", brand, "", 16, accentColor, 24, 60, 602, 26);
+    }
 
+    private void BuildTurnAndHistory()
+    {
         RectTransform turn = CreatePanel("TurnPanel", matchInterface, Vector2.one, Vector2.one, Vector2.one, new Vector2(-24, -24), new Vector2(408, 108), panelColor);
         turnText = MenuLabel("TurnText", turn, "Brancas jogam", 26, accentColor, 24, 16, 360, 35, true);
         statusText = MenuLabel("StatusText", turn, "Escolha uma peça para mover.", 18, textColor, 24, 58, 360, 46);
@@ -20,7 +34,10 @@ public sealed partial class GameHud
         MenuLabel("MoveHistoryTitle", history, "ÚLTIMOS LANCES", 15, mutedTextColor, 24, 20, 360, 24, true);
         MenuRule(history, 24, 56, 360);
         moveHistoryText = MenuLabel("MoveHistoryText", history, "Seu primeiro lance começa a história.", 19, textColor, 24, 76, 360, 158);
+    }
 
+    private void BuildSelectedPieceDetails()
+    {
         selectedPiecePanel = CreatePanel("SelectedPiecePanel", matchInterface, Vector2.one, Vector2.one, Vector2.one, new Vector2(-24, -404), new Vector2(408, 534), panelStrongColor);
         selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(24, -24), new Vector2(360, 232), Color.white);
         selectedPiecePreviewInput = selectedPiecePreviewImage.gameObject.AddComponent<SelectedPiecePreviewInput>();
@@ -36,13 +53,19 @@ public sealed partial class GameHud
         EnsureSelectedPiecePreviewResources();
         selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
         selectedPiecePreviewInput.Configure(null, selectedPiecePreviewCamera);
+    }
 
+    private void BuildMatchActions()
+    {
         RectTransform actions = CreatePanel("ActionBar", matchInterface, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(24, 24), new Vector2(708, 82), panelColor);
         MenuButton("NewGameButton", actions, "Nova partida", 16, 16, 194, 50, actionColor, RestartGame);
         MenuButton("CancelButton", actions, "Cancelar", 222, 16, 148, 50, neutralButtonColor, CancelSelection);
-        howToPlayButtonText = MenuButton("HowToPlayButton", actions, "Como jogar", 382, 16, 166, 50, neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<UnityEngine.UI.Text>();
+        howToPlayButtonText = MenuButton("HowToPlayButton", actions, "Como jogar", 382, 16, 166, 50, neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
         MenuButton("MenuButton", actions, "Menu", 560, 16, 132, 50, neutralButtonColor, ShowMenu);
+    }
 
+    private void BuildPromotionDialog()
+    {
         promotionPanel = ModalOverlay("PromotionPanel");
         RectTransform promotion = ModalCard("PromotionCard", promotionPanel, 760, 244);
         MenuLabel("PromotionTitle", promotion, "Promova seu peão", 34, textColor, 36, 32, 688, 44, true);
@@ -51,7 +74,10 @@ public sealed partial class GameHud
         MenuButton("PromoteRookButton", promotion, "Torre", 211, 152, 163, 56, neutralButtonColor, () => ChoosePromotion('R'));
         MenuButton("PromoteBishopButton", promotion, "Bispo", 386, 152, 163, 56, neutralButtonColor, () => ChoosePromotion('B'));
         MenuButton("PromoteKnightButton", promotion, "Cavalo", 561, 152, 163, 56, neutralButtonColor, () => ChoosePromotion('N'));
+    }
 
+    private void BuildComputerErrorDialog()
+    {
         computerErrorPanel = ModalOverlay("ComputerErrorPanel");
         RectTransform error = ModalCard("ComputerErrorCard", computerErrorPanel, 800, 266);
         MenuLabel("ComputerErrorTitle", error, "A IA não conseguiu jogar", 32, textColor, 36, 34, 728, 46, true);

@@ -88,17 +88,36 @@ public sealed class ChessGameController : MonoBehaviour
         if (!matchStarted)
         {
             StartLocalGame();
-            if (hud != null) ReturnToMenu();
+            if (hud != null)
+            {
+                ReturnToMenu();
+            }
         }
     }
 
     private void Update()
     {
-        if (!matchStarted || suspended || !IsComputerTurn || inputBlocked || HasComputerError) return;
-        if (computerTurn == null || !computerTurn.IsThinking) BeginComputerTurn();
-        if (computerTurn == null || !computerTurn.TryTakeResult(rules.GetSnapshot(), out ComputerTurnResult result)) return;
-        if (!result.Success) { FailComputerTurn(result.Error); return; }
-        if (!ExecuteMove(result.Move)) FailComputerTurn("A IA devolveu uma jogada ilegal. Tente novamente.");
+        if (!matchStarted || suspended || !IsComputerTurn || inputBlocked || HasComputerError)
+        {
+            return;
+        }
+        if (computerTurn == null || !computerTurn.IsThinking)
+        {
+            BeginComputerTurn();
+        }
+        if (computerTurn == null || !computerTurn.TryTakeResult(rules.GetSnapshot(), out ComputerTurnResult result))
+        {
+            return;
+        }
+        if (!result.Success)
+        {
+            FailComputerTurn(result.Error);
+            return;
+        }
+        if (!ExecuteMove(result.Move))
+        {
+            FailComputerTurn("A IA devolveu uma jogada ilegal. Tente novamente.");
+        }
     }
 
     // Injection point for another platform adapter and deterministic gameplay tests.
@@ -156,7 +175,10 @@ public sealed class ChessGameController : MonoBehaviour
 
     public void RetryComputerTurn()
     {
-        if (!IsComputerTurn || !HasComputerError) return;
+        if (!IsComputerTurn || !HasComputerError)
+        {
+            return;
+        }
         StopComputerTurn();
         SetStatusForTurn();
     }
@@ -165,11 +187,17 @@ public sealed class ChessGameController : MonoBehaviour
     {
         try
         {
-            if (computerTurn == null) computerTurn = new ComputerTurnCoordinator(moveChooserFactory());
+            if (computerTurn == null)
+            {
+                computerTurn = new ComputerTurnCoordinator(moveChooserFactory());
+            }
             computerTurn.Begin(rules.GetSnapshot(), MoveSearchSettings.ForDifficulty(Difficulty));
             StatusMessage = "IA pensando...";
         }
-        catch (System.Exception exception) { FailComputerTurn(exception.Message); }
+        catch (System.Exception exception)
+        {
+            FailComputerTurn(exception.Message);
+        }
     }
 
     private void FailComputerTurn(string detail)
@@ -197,21 +225,33 @@ public sealed class ChessGameController : MonoBehaviour
             ClearSelection();
             awaitingPromotion = false;
             boardView.SyncPieces(rules.GetPieces(), pieceFactory);
-            if (animatingMove.HasValue) ApplyMoveResult(animatingMove.Value);
+            if (animatingMove.HasValue)
+            {
+                ApplyMoveResult(animatingMove.Value);
+            }
             animatingMove = null;
         }
     }
 
     private void OnEnable()
     {
-        if (matchStarted && !gameOver) SetStatusForTurn();
+        if (matchStarted && !gameOver)
+        {
+            SetStatusForTurn();
+        }
     }
 
     private void OnApplicationPause(bool paused)
     {
         suspended = paused;
-        if (paused) StopComputerTurn();
-        else if (matchStarted && !gameOver) SetStatusForTurn();
+        if (paused)
+        {
+            StopComputerTurn();
+        }
+        else if (matchStarted && !gameOver)
+        {
+            SetStatusForTurn();
+        }
     }
 
     private void OnDestroy() => StopComputerTurn();
@@ -287,7 +327,10 @@ public sealed class ChessGameController : MonoBehaviour
 
     public void CancelSelection()
     {
-        if (!isActiveAndEnabled || !matchStarted || suspended || inputBlocked || IsComputerTurn || gameOver) return;
+        if (!isActiveAndEnabled || !matchStarted || suspended || inputBlocked || IsComputerTurn || gameOver)
+        {
+            return;
+        }
         awaitingPromotion = false;
         ClearSelection();
         SetStatusForTurn();
@@ -321,8 +364,17 @@ public sealed class ChessGameController : MonoBehaviour
     {
         PieceView movingPiece = null;
         foreach (PieceView piece in boardView.Pieces)
-            if (piece.Square.Equals(move.From)) { movingPiece = piece; break; }
-        if (movingPiece == null) return false;
+        {
+            if (piece.Square.Equals(move.From))
+            {
+                movingPiece = piece;
+                break;
+            }
+        }
+        if (movingPiece == null)
+        {
+            return false;
+        }
         MoveResult moveResult = rules.TryMove(move);
 
         if (!moveResult.Success)
