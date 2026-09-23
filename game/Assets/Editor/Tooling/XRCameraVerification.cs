@@ -203,6 +203,7 @@ public static class XRCameraVerification
 
     private static bool TryMovePieceByGrab()
     {
+        gameController.StartLocalGame();
         PieceView pawn = boardView.Pieces.FirstOrDefault(p => p.Square.ToAlgebraic() == "a2");
         if (pawn == null)
         {

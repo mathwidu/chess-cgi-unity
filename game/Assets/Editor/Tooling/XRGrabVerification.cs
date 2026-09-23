@@ -116,6 +116,8 @@ public static class XRGrabVerification
             return;
         }
 
+        game.StartLocalGame();
+
         CheckRigAndPieces(offset);
 
         PieceView whitePawn = FindPiece(4, 2);

@@ -143,7 +143,7 @@ public static class XRHudVerification
         interactor = controllerObject != null ? controllerObject.GetComponent<NearFarInteractor>() : null;
 
         Transform buttonTransform = hud != null
-            ? hud.transform.Find("HudRoot/StartOverlay/StartCard/StartPlayButton")
+            ? hud.transform.Find("HudRoot/StartOverlay/MenuContent/StartCard/StartPlayButton")
             : null;
         startPlayButton = buttonTransform != null ? buttonTransform.gameObject : null;
         Transform overlayTransform = hud != null ? hud.transform.Find("HudRoot/StartOverlay") : null;

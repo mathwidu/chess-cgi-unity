@@ -65,3 +65,17 @@ game/Assets/New Mesh.prefab.meta
 
 # Node tooling for domainbook (the book itself is committed; deps are not)
 node_modules/
+
+# graphify-standard:start
+/graphify-out/
+/.graphify/*
+!/.graphify/config.json
+# graphify-standard:end
+
+# Local engine downloads; never package them into Assets
+/.local/
+
+# Impeccable local decision server and generated visual evidence
+/.impeccable/questions/
+/.impeccable/review/*.png
+/.impeccable/review/diff/

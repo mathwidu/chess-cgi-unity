@@ -1,6 +1,6 @@
 # Xadrez CGI
 
-Projeto de Computacao Grafica desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 3D local para duas pessoas, com regras completas, tabuleiro interativo, camera por turno, HUD em Canvas e personagens personalizados inspirados na turma.
+Projeto de Computacao Grafica desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 3D local para duas pessoas ou contra IA offline, com regras completas, tabuleiro interativo, camera por turno, HUD em Canvas e personagens personalizados inspirados na turma.
 
 ## Como Abrir
 
@@ -11,7 +11,7 @@ Projeto de Computacao Grafica desenvolvido em Unity 6.3 LTS. O jogo e um xadrez 
 5. Selecione a pasta `game` dentro deste repositorio.
 6. Abra o projeto.
 7. Abra a cena `Assets/Scenes/Main.unity`, caso ela nao abra automaticamente.
-8. Clique em `Play`.
+8. Clique em `Play`. Alternativamente, use **Chess CGI → Jogar no Editor** para abrir a cena principal e iniciar a partida. Não é necessário gerar uma build.
 
 A pasta correta para abrir como projeto Unity e `game`.
 
@@ -24,7 +24,9 @@ A pasta correta para abrir como projeto Unity e `game`.
 - Scroll: aproximar ou afastar a camera principal.
 - Aba lateral: ao selecionar uma peca, mostra o modelo 3D, permite girar com drag, aproximar/afastar com scroll e usar os botoes `+` e `-`.
 
-O jogo alterna automaticamente entre brancas e pretas. Quando o turno muda, a camera vira para o lado do jogador atual.
+O jogo alterna automaticamente entre brancas e pretas. No modo local a camera acompanha o turno; contra a IA ela permanece no lado humano.
+
+No menu, escolha **Contra IA**, o lado e a dificuldade. O Stockfish deve ser preparado uma vez neste dispositivo com `python3 tools/setup_stockfish.py`. O download fica fora dos assets e a partida funciona offline. Veja [configuração, testes e integração com VR](docs/ai-desktop.md).
 
 ## Funcionalidades
 
@@ -66,6 +68,17 @@ As fotos usadas como referencia ficam apenas localmente e nao entram no Git. Os 
     ├── Packages/
     └── ProjectSettings/
 ```
+
+## Código e documentação
+
+- [IA, organização dos fontes, testes e integração com VR](docs/ai-desktop.md).
+- [Regras e contratos do jogo](domainbook/domains/gameplay/index.md).
+- [Sistema visual aprovado](DESIGN.md) e [índice de referências da interface](.impeccable/README.md).
+
+Com o projeto fechado no Editor, `bash tools/test_unity.sh` executa EditMode e
+PlayMode e confere os relatórios em `TestResults/`. Para o adversário real,
+prepare antes o motor com `python3 tools/setup_stockfish.py`. Nenhuma build é
+necessária para esses testes ou para jogar pelo Editor.
 
 ## Build Jogavel
 

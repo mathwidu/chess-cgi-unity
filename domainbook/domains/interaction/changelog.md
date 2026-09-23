@@ -83,6 +83,8 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   mesma regra. Removida a verificação `XRControllerVerification`, que testava
   o fluxo antigo de apontar e puxar o gatilho; o `XRGrabVerification` a
   substitui.
+- Contra a IA, a câmera desktop permanece na perspectiva do lado humano.
+- O controlador central bloqueia seleções humanas no turno do computador, independentemente de mouse ou raio VR.
 
 ### Fixed
 
@@ -100,3 +102,4 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `Resources/XR/ControllerRayMaterial`, que entra na build, e o `XRRig`
   marca o rig como construído antes de montá-lo, para que uma falha não o
   reconstrua a cada frame.
+- Cliques sobre a interface não selecionam peças por trás do HUD; o atalho N fica inativo no menu.

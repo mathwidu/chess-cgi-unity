@@ -1,0 +1,11 @@
+{
+  "name": "ChessCgi.PlayModeTests",
+  "references": [
+    "ChessCgi.Runtime"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [],
+  "autoReferenced": false
+}

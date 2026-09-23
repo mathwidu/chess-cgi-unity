@@ -1,0 +1,13 @@
+{
+  "name": "ChessCgi.EditModeTests",
+  "references": [
+    "ChessCgi.Runtime"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": false
+}
