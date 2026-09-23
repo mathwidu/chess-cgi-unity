@@ -57,7 +57,7 @@ public sealed class ChessGameController : MonoBehaviour
 
         if (pieceFactory != null)
         {
-            pieceFactory.UsePrimitivePieces = PlayerPrefs.GetInt(PerformanceModeKey, 0) == 1;
+            pieceFactory.UsePrimitivePieces = PlayerPrefs.GetInt(PerformanceModeKey, 1) == 1;
         }
 
         if (hud == null)

@@ -14,4 +14,5 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   ajusta a fábrica de peças e, com uma partida em andamento, refaz as peças na
   hora com `BoardView.SyncPieces` para trocar peças personalizadas por peças
   clássicas sem reiniciar o jogo. A escolha é lida na inicialização e persistida
-  com `PlayerPrefs`; o padrão é desligado, preservando as peças personalizadas.
+  com `PlayerPrefs`; o padrão é ligado, e o jogador pode desmarcá-lo no menu
+  para voltar às peças personalizadas.
