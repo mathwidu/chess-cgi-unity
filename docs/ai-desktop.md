@@ -20,8 +20,9 @@ pensamento e pode recuperar uma falha sem perder a posição. O protocolo segue 
    depois de preparar o motor.
 
 Para um motor externo, `CHESS_STOCKFISH_PATH` pode apontar para seu executável.
-A resolução busca essa variável, `Application.persistentDataPath/Engines`, o
-motor local do checkout (Editor) e, por último, PATH. Não há download durante
+A resolução busca essa variável, o executável ao lado do jogo (na pasta do
+`XadrezCGI.exe`), `Application.persistentDataPath/Engines`, o motor local do
+checkout (Editor) e, por último, PATH. Não há download durante
 uma partida nem fallback silencioso para jogadas aleatórias.
 
 Uma build macOS local usa o motor em `Application.persistentDataPath/Engines`.

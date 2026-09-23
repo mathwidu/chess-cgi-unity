@@ -22,6 +22,11 @@ public static class ComputerOpponentFactory
         }
         string executable = Application.platform == RuntimePlatform.WindowsPlayer ||
             Application.platform == RuntimePlatform.WindowsEditor ? "stockfish.exe" : "stockfish";
+        string besideGame = Path.GetFullPath(Path.Combine(Application.dataPath, "..", executable));
+        if (File.Exists(besideGame))
+        {
+            return besideGame;
+        }
         // Local machine setup is outside Assets and cannot leak into a different platform's build.
         string installed = Path.Combine(Application.persistentDataPath, "Engines", executable);
         if (File.Exists(installed))

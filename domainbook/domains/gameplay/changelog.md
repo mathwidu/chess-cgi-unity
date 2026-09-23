@@ -30,6 +30,7 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 ### Changed
 
 - Organização da IA para revisão: dificuldade e resultado em arquivos próprios; inicialização UCI, configuração e leitura da resposta em rotinas nomeadas; observação de tarefas tardias usa `Task`. Contratos, perfis e cancelamento preservados.
+- A busca do executável do Stockfish passa a olhar primeiro a pasta do jogo (onde está o `XadrezCGI.exe`), antes de `persistentDataPath/Engines` e do PATH; assim uma build de Windows roda com o `stockfish.exe` ao lado do jogo, sem instalação.
 
 ### Fixed
 
