@@ -135,12 +135,14 @@ public static class XRGrabVerification
         {
             result.Check(game.SelectedPiece == whitePawn, "grabbing a piece should select it");
             result.Check(board.HighlightCount == 2, "grabbing e2 should highlight its 2 legal destinations");
+            result.Check(leftInteractor.GetComponentInChildren<ControllerHandPose>().Pinch > 0f, "the grabbing hand should close into the pinch pose");
             XRGrabInteractable white = whitePawn.GetComponent<XRGrabInteractable>();
             white.interactionManager.SelectExit((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)white);
         }));
         steps.Enqueue((0.3f, () =>
         {
             result.Check(game.SelectedPiece == null, "releasing on the origin square should deselect the piece");
+            result.Check(leftInteractor.GetComponentInChildren<ControllerHandPose>().Pinch == 0f, "releasing the piece should open the hand again");
             result.Check(game.CurrentTurn == ChessSide.White, "releasing on the origin square should not move");
         }));
 
@@ -207,7 +209,7 @@ public static class XRGrabVerification
             string selectPath = interactor.selectInput.inputActionPerformed.bindings[0].path;
 
             result.Check(interactor.enableNearCasting, $"{controllerName} should cast near for grabbing");
-            result.Check(selectPath.EndsWith("gripButton"), $"{controllerName} should select with the grip, got {selectPath}");
+            result.Check(selectPath.EndsWith("triggerButton"), $"{controllerName} should select with the index trigger, got {selectPath}");
             result.Check((far.raycastMask.value & (1 << PieceView.PhysicsLayer)) == 0 && far.raycastMask.value != 0, $"{controllerName} far ray should skip the pieces layer but still reach the HUD");
             result.Check(visual.curveInteractionDataProvider is UiOnlyCurveData, $"{controllerName} ray should only show over the HUD");
         }

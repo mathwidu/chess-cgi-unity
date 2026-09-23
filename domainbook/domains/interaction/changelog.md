@@ -85,6 +85,7 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   substitui.
 - Contra a IA, a câmera desktop permanece na perspectiva do lado humano.
 - O controlador central bloqueia seleções humanas no turno do computador, independentemente de mouse ou raio VR.
+- Agarrar uma peça com o [controle de movimento](glossary.md) passou do grip para o gatilho do indicador, o mesmo botão do clique de UI (o raio distante só age sobre o HUD, então os dois usos não se cruzam). Enquanto segura uma peça, o modelo de mão do controle fecha na pose de pinça, e reabre ao soltar; o `ControllerHandPose` faz essa transição sobre os ossos da mão.
 
 ### Fixed
 

@@ -216,17 +216,18 @@ public sealed class XRRig : MonoBehaviour
         }
     }
 
-    private static void BuildHandVisual(Transform parent, string resourceName)
+    private static GameObject BuildHandVisual(Transform parent, string resourceName)
     {
         GameObject prefab = Resources.Load<GameObject>($"XR/{resourceName}");
         if (prefab == null)
         {
             Debug.LogWarning($"XRRig could not find Resources/XR/{resourceName}; hand visuals will be unavailable.");
-            return;
+            return null;
         }
 
         GameObject instance = Object.Instantiate(prefab, parent);
         instance.name = resourceName;
+        return instance;
     }
 
     private static GameObject BuildController(Transform parent, string name, string hand, string handModelName)
@@ -270,7 +271,7 @@ public sealed class XRRig : MonoBehaviour
         {
             inputSourceMode = XRInputButtonReader.InputSourceMode.InputAction,
             inputActionPerformed = new InputAction(
-                $"XR {hand} Select", InputActionType.Button, $"<XRController>{{{hand}}}/gripButton"),
+                $"XR {hand} Select", InputActionType.Button, $"<XRController>{{{hand}}}/triggerButton"),
         };
         interactor.selectInput = selectInput;
 
@@ -282,7 +283,11 @@ public sealed class XRRig : MonoBehaviour
         };
         interactor.uiPressInput = uiPressInput;
 
-        BuildHandVisual(controllerObject.transform, handModelName);
+        GameObject handModel = BuildHandVisual(controllerObject.transform, handModelName);
+        if (handModel != null)
+        {
+            handModel.AddComponent<ControllerHandPose>().Configure(interactor, hand == "LeftHand");
+        }
 
         controllerObject.SetActive(true);
         return controllerObject;
