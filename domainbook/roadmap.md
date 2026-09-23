@@ -4,7 +4,6 @@ milestones:
   - { id: playable-delivery, name: Entrega jogável do xadrez personalizado, status: done }
   - { id: vr-conversion, name: Conversão para VR no HTC Vive e no Meta Quest 3, status: planned }
   - { id: adversario-computador, name: Adversário controlado pelo computador do desktop ao Quest standalone, status: planned }
-  
 ---
 
 # roteiro do chess-cgi-unity

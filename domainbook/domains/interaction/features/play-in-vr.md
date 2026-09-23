@@ -3,7 +3,7 @@ id: play-in-vr
 name: Jogar em VR
 status: draft
 owners: [mathwidu, RafaelAugustScherer]
-terms: [modo-vr, óculos-vr, controle-de-movimento, raio-de-seleção]
+terms: [modo-vr, óculos-vr, controle-de-movimento, raio-de-seleção, agarrar-e-soltar, rastreamento-de-mãos]
 ---
 
 ## Story
@@ -180,11 +180,10 @@ desempenho standalone para o Quest.
 
 7. **Refazer a perspectiva por turno para VR.** Decidir o que "a visão
    fica voltada para o lado a jogar" significa para um único jogador em um
-   headset (ver Open Questions). Provavelmente o rig do tabuleiro gira
-   180° entre os turnos, ou as peças/rótulos se reorientam, em vez de a
-   câmera se mover. Aposentar a órbita/zoom/giro do `CameraController` na
-   câmera do olho; o que sobreviver disso atua sobre o XR Origin ou o
-   tabuleiro, não sobre o HMD.
+   headset. Provavelmente o rig do tabuleiro gira 180° entre os turnos, ou
+   as peças/rótulos se reorientam, em vez de a câmera se mover. Aposentar a
+   órbita/zoom/giro do `CameraController` na câmera do olho; o que
+   sobreviver disso atua sobre o XR Origin ou o tabuleiro, não sobre o HMD.
 
 8. **Validar, compilar e testar no dispositivo.** Rodar novamente a
    validação do projeto, compilar o player Windows PC-VR e o player
@@ -204,18 +203,114 @@ Example: O headset comanda a visão
   Then a câmera do olho segue a pose do headset
   And o giro de câmera por turno não move mais a câmera do olho
 
-Example: Apontar para uma peça e puxar o gatilho a seleciona
+Example: Agarrar uma peça a seleciona
   Given é a vez do jogador no modo VR
-  When o jogador aponta o raio do controle para uma de suas peças e puxa o gatilho
+  When o jogador segura o grip com a mão perto de uma de suas peças
   Then essa peça é selecionada
   And seus destinos legais são destacados, como em um clique de mouse
 
-Example: A mesma camada de regras recebe os mesmos comandos
-  Given uma peça está selecionada no modo VR
-  When o jogador aponta para uma casa destacada e puxa o gatilho
+Example: Soltar sobre um destino legal faz a jogada
+  Given o jogador segura uma peça no modo VR
+  When solta o grip com a peça sobre uma casa destacada
   Then a jogada chega às regras pelo comando existente de escolha de destino
   And o resultado corresponde ao da build de desktop
+
+Example: Soltar em um lugar inválido devolve a peça
+  Given o jogador segura uma peça no modo VR
+  When solta o grip com a peça fora dos destinos legais, ou fora do tabuleiro
+  Then o jogo informa jogada inválida
+  And a peça volta à casa de origem, sem passar o turno
+
+Example: Só as peças de quem joga podem ser agarradas
+  Given é a vez das brancas no modo VR
+  When o jogador tenta agarrar uma peça preta
+  Then a peça não é agarrada
+
+Example: Rastreamento de mãos seleciona peças sem controle físico
+  Given o headset e o runtime relatam rastreamento de mãos ativo
+  When o jogador aponta ou belisca em direção a uma de suas peças com a mão livre
+  Then essa peça é selecionada, do mesmo jeito que apontar o controle e puxar o gatilho
+  And se o jogador voltar a segurar o controle, a seleção volta a vir do controle
 ```
+
+**Construído:** os três exemplos acima. `XRRig` constrói um XR Origin (VR) em
+tempo de execução quando um headset está presente — um Camera Offset segurando
+a câmera do olho, um Tracked Pose Driver vinculado ao dispositivo genérico
+`<XRHMD>` para rastrear tanto um headset real quanto o XR Device Simulator, o
+modo de tracking-origin Device, e um controle de recentralização sobre
+`XRInputSubsystem.TryRecenter`. O giro de câmera por turno é aposentado
+quando um headset está presente: `ChessGameController` deixa de chamar
+`CameraController.SetPerspective` a cada troca de turno nesse modo, já que o
+modo VR é de assento único (contra um futuro oponente de IA, não hot-seat) e
+não há um segundo lado para o qual virar a visão. As teclas de órbita (Q/E) e
+o zoom por scroll do `CameraController` continuam funcionando em VR, mas
+passam a girar e aproximar o XR Origin — `XRRig.Origin` — em vez da câmera do
+olho, que só o headset comanda; o jogador pode assim reposicionar seu assento
+ao redor do tabuleiro se quiser, dentro de uma faixa de distância própria
+para a escala de VR, mais perto do tabuleiro do que a órbita externa do
+desktop. O modo de desktop não é afetado quando nenhum headset está
+presente.
+
+`XRRig` também constrói um Near-Far Interactor em cada
+[controle de movimento](../glossary.md), rastreado da mesma forma genérica por
+meio de `<XRController>{LeftHand}` / `{RightHand}`. O alcance próximo (uma
+esfera de 6 cm ao redor da mão) [agarra](../glossary.md) as peças, vinculado
+ao botão de grip. O alcance distante virou o [raio de seleção](../glossary.md)
+do HUD: sua máscara exclui a layer das peças (`PieceView.PhysicsLayer`), então
+ele não atinge peças, e um `UiOnlyCurveData` só o desenha ao apontar para a UI;
+o gatilho continua sendo o clique de UI. `PieceFactory` dá a cada peça um XR
+Grab Interactable (com Rigidbody kinematic, sem rotação nem arremesso) quando
+um headset está presente; as casas deixaram de ser interactables. O
+`VrSelectionBridge` da peça filtra quem pode ser agarrado (só o lado do turno),
+chama `ChessGameController.GrabPiece` ao agarrar e `ReleasePiece` ao soltar; o
+`ReleasePiece` traduz a posição da peça em casa com
+`BoardView.TryGetSquareAt` e, se ela for um destino legal, usa o mesmo
+`SelectDestination` do clique de desktop, para que a camada de regras veja
+comandos idênticos nos dois modos. Cobre esses exemplos a verificação
+`XRGrabVerification` (simulador de XR, sem headset real): agarrar, soltar na
+própria casa, soltar num destino legal, soltar num destino inválido e fora do
+tabuleiro. O feeling do agarrar (raio de 6 cm, ponto de agarre na mão) só se
+confirma no Rift de verdade.
+
+O quarto exemplo, [rastreamento de mãos](../glossary.md), também está
+construído: o pacote `com.unity.xr.hands` e a feature OpenXR **Hand Tracking
+Subsystem** estão habilitados, e `XRRig` constrói um interactor de mão para
+cada lado a partir de um prefab extraído das amostras oficiais do XR
+Interaction Toolkit (Starter Assets + Hands Interaction Demo), que já traz um
+Near-Far Interactor e um Poke Interactor prontos, movidos pelas poses de
+apontar e beliscar da mão em vez da pose do controle. Um `XRInputModalityManager`
+por cima dos quatro interactors — dois de controle, dois de mão — decide qual
+par fica ativo a cada instante, favorecendo mãos rastreadas sobre um
+controle apenas quando o controle não está sendo segurado; como o interactor
+de mão dispara o mesmo XR Simple Interactable que o de controle, o
+`VrSelectionBridge` não precisa saber qual dos dois originou a seleção.
+Verificação automatizada cobre até aqui a montagem — os dois interactors de
+mão presentes, com Near-Far e Poke Interactor, e referenciados corretamente
+pelo `XRInputModalityManager` — e não uma seleção de peça por beliscar de
+verdade, que depende de um runtime com rastreamento de mãos de fato (headset
+com câmeras de mão, como o Vive Focus 3/XR Elite, ou um sensor como o
+Ultraleap; um Vive/Vive Pro comum só tem os controles).
+
+Além do interactor, `XRRig` também constrói um visual de mão para cada lado —
+uma malha rastreada em vez do modelo de controle — a partir do mesmo pacote
+`com.unity.xr.hands`. A malha é movida por três componentes do próprio
+pacote: `XRHandSkeletonDriver` posiciona os ossos a partir das poses de
+articulação rastreadas, `XRHandMeshController` mostra ou esconde a malha
+conforme o rastreamento está ou não válido, e `XRHandTrackingEvents` acha o
+subsistema de mãos sozinho — nenhum script customizado é necessário. Da
+amostra oficial `HandVisualizer` do XR Hands, só os cinco arquivos que essa
+malha de fato usa (os dois prefabs de mão rastreada, o material e os dois
+modelos FBX) foram mantidos, movidos para `Resources/XR` junto dos demais
+prefabs de XR carregados em tempo de execução; o restante da amostra — o
+visualizador de depuração com esferas de articulação e seus scripts — não é
+usado por nada que o jogo carregue e foi removido. O mesmo enxugamento foi
+aplicado às amostras Starter Assets e Hands Interaction Demo do XR
+Interaction Toolkit, das quais os interactors de mão foram extraídos:
+mantidos os 16 arquivos de fato alcançáveis a partir desses prefabs (fechamento
+de referências por GUID e por tipo C#), removendo cerca de 280 arquivos de
+demonstração não usados. Verificado manualmente no editor: em Play mode com o
+XR Interaction Simulator, a malha da mão aparece rastreada e articulada na
+Game View, sem novos erros no console.
 
 ## Rule: A interface vive no mundo, não na tela
 
@@ -231,6 +326,22 @@ Example: A promoção é escolhida com o controle
   When o pedido de promoção aparece em world space
   Then o jogador escolhe dama, torre, bispo ou cavalo com o raio do controle
 ```
+
+**Construído:** o primeiro exemplo acima. `GameHud` põe o render mode do seu
+Canvas em World Space quando um headset está presente, escalado e
+posicionado como um painel ao lado do tabuleiro, com um Tracked Device
+Graphic Raycaster no lugar do Graphic Raycaster de tela e o XR UI Input
+Module da interação no lugar do Input System UI Input Module do desktop; o
+Canvas usa a câmera do olho de `XRRig` como sua world camera, para que o
+raycast de UI resolva contra o mesmo ponto de vista que o jogador enxerga.
+Como o painel reaproveita o mesmo layout ancorado que o modo desktop já
+constrói, todo botão do HUD — incluindo o pedido de promoção do segundo
+exemplo — herda a mesma interação por raio sem trabalho por botão; só o
+primeiro exemplo tem uma checagem automatizada dedicada até aqui. Verificado
+via CLI batchmode Play mode: apontar o raio do controle direito para o botão
+"Jogar" da tela inicial e segurar o gatilho aciona o clique e oculta o
+overlay, do mesmo raycast world-space até o mesmo evento `onClick` que o
+clique de mouse do desktop usa.
 
 ## Rule: A mesma build atende HTC Vive e Meta Quest 3
 
@@ -249,22 +360,7 @@ Example: O Quest roda standalone dentro do seu orçamento de quadro
 
 ## Open Questions
 
-- **O que a perspectiva por turno se torna em VR?** Em uma tela
-  compartilhada, a câmera girava para o jogador a jogar. Com uma pessoa em
-  um headset, o tabuleiro gira entre os turnos, as peças/rótulos se
-  reorientam, ou a ideia se aposenta em favor de o jogador girar a cabeça?
-  Isso precisa de uma decisão de design antes de o passo 7 ser construído;
-  é a única decisão comportamental em aberto, e se resolve combinando a
-  experiência de turno pretendida em VR, não com mais pesquisa.
-- **Um assento único ou hot-seat passando o headset?** A build de desktop
-  é dois jogadores em uma tela. VR é um headset — o modo VR é de assento
-  único (um humano, ou contra uma futura IA), ou dois jogadores passam o
-  headset a cada turno? Isso delimita se o trabalho de perspectiva para
-  dois lados no passo 7 sequer é necessário.
-- **A qual framework de XR o projeto se compromete?** O plano assume o
-  OpenXR + XR Interaction Toolkit da Unity. Esse compromisso ganha um
-  registro de decisão quando combinado, com o SDK tudo-em-um da Meta
-  considerado e rejeitado como alternativa.
+Nenhuma.
 
 ### References
 

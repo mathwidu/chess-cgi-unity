@@ -6,6 +6,11 @@ public sealed class ScenePolish : MonoBehaviour
     private const string CollegeThemeName = "CollegeTheme";
     private const string LightingRigName = "LightingRig";
 
+    private static readonly Vector3 DesktopTablePosition = new Vector3(0f, -0.54f, 0f);
+    private static readonly Vector3 DesktopTableScale = new Vector3(12f, 0.8f, 12f);
+    private static readonly Vector3 VrTablePosition = new Vector3(0f, 0.387f, 0f);
+    private static readonly Vector3 VrTableScale = new Vector3(0.9f, 0.774f, 0.9f);
+
     [SerializeField] private bool applyOnAwake = true;
 
     public void ApplyPolish()
@@ -34,24 +39,18 @@ public sealed class ScenePolish : MonoBehaviour
     {
         ClearChildren(lightingRig);
 
-        Light key = CreateLight(lightingRig, "Key Light", LightType.Directional, new Vector3(0f, 4f, 0f));
-        key.transform.rotation = Quaternion.Euler(45f, -35f, 0f);
-        key.intensity = 1.45f;
-        key.color = new Color(1f, 0.93f, 0.82f);
+        Light key = CreateLight(lightingRig, "Key Light", LightType.Directional, new Vector3(0f, 2f, 0f));
+        key.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+        key.intensity = 1.2f;
+        key.color = new Color(1f, 0.95f, 0.86f);
         key.shadows = LightShadows.Soft;
-        key.shadowStrength = 0.72f;
+        key.shadowStrength = 0.6f;
 
-        Light fill = CreateLight(lightingRig, "Fill Light", LightType.Point, new Vector3(-5f, 5f, -4f));
-        fill.intensity = 95f;
-        fill.range = 13f;
-        fill.color = new Color(0.72f, 0.82f, 1f);
+        Light fill = CreateLight(lightingRig, "Fill Light", LightType.Directional, new Vector3(0f, 2f, 0f));
+        fill.transform.rotation = Quaternion.Euler(35f, 150f, 0f);
+        fill.intensity = 0.45f;
+        fill.color = new Color(0.78f, 0.85f, 1f);
         fill.shadows = LightShadows.None;
-
-        Light rim = CreateLight(lightingRig, "Rim Light", LightType.Point, new Vector3(4f, 4.5f, 5f));
-        rim.intensity = 60f;
-        rim.range = 10f;
-        rim.color = new Color(0.85f, 0.92f, 1f);
-        rim.shadows = LightShadows.None;
     }
 
     private void BuildCollegeTheme(Transform collegeTheme)
@@ -59,29 +58,14 @@ public sealed class ScenePolish : MonoBehaviour
         ClearChildren(collegeTheme);
 
         Material tableMaterial = CreateMaterial("Runtime_Table_Wood", new Color(0.42f, 0.27f, 0.17f), 0.38f, 0.48f);
-        Material wallMaterial = CreateMaterial("Runtime_Warm_Wall", new Color(0.62f, 0.58f, 0.51f), 0f, 0.55f);
-        Material boardMaterial = CreateMaterial("Runtime_Whiteboard", new Color(0.86f, 0.88f, 0.84f), 0f, 0.6f);
-        Material darkMaterial = CreateMaterial("Runtime_Dark_Prop", new Color(0.09f, 0.1f, 0.11f), 0f, 0.35f);
-        Material accentMaterial = CreateMaterial("Runtime_CGI_Accent", new Color(0.18f, 0.36f, 0.5f), 0f, 0.5f);
-        Material bookRed = CreateMaterial("Runtime_Book_Red", new Color(0.45f, 0.12f, 0.11f), 0f, 0.45f);
-        Material bookBlue = CreateMaterial("Runtime_Book_Blue", new Color(0.1f, 0.2f, 0.42f), 0f, 0.45f);
+        Material floorMaterial = CreateMaterial("Runtime_Floor", new Color(0.32f, 0.31f, 0.29f), 0f, 0.4f);
 
-        CreateCube(collegeTheme, "Floor", new Vector3(0f, -0.42f, 0f), new Vector3(15.5f, 0.08f, 27.5f), wallMaterial, false);
-        CreateCube(collegeTheme, "Table", new Vector3(0f, -0.22f, 0f), new Vector3(13.2f, 0.28f, 13.2f), tableMaterial, false);
-        CreateCube(collegeTheme, "NorthWall", new Vector3(0f, 2.4f, 12.85f), new Vector3(15.5f, 5.3f, 0.18f), wallMaterial, false);
-        CreateCube(collegeTheme, "SouthWall", new Vector3(0f, 2.4f, -12.85f), new Vector3(15.5f, 5.3f, 0.18f), wallMaterial, false);
-        CreateCube(collegeTheme, "LeftWall", new Vector3(-7.65f, 2.4f, 0f), new Vector3(0.18f, 5.3f, 25.8f), wallMaterial, false);
-        CreateCube(collegeTheme, "RightWall", new Vector3(7.65f, 2.4f, 0f), new Vector3(0.18f, 5.3f, 25.8f), wallMaterial, false);
-        CreateCube(collegeTheme, "NorthWhiteboard", new Vector3(0f, 3.15f, 12.72f), new Vector3(4.4f, 1.5f, 0.08f), boardMaterial, false);
-        CreateCube(collegeTheme, "SouthWhiteboard", new Vector3(0f, 3.15f, -12.72f), new Vector3(4.4f, 1.5f, 0.08f), boardMaterial, false);
-        CreateCube(collegeTheme, "CGIWhiteboardMarkNorth", new Vector3(-1.45f, 3.35f, 12.66f), new Vector3(1f, 0.08f, 0.04f), accentMaterial, false);
-        CreateCube(collegeTheme, "CGIWhiteboardMarkSouth", new Vector3(1.45f, 3.35f, -12.66f), new Vector3(1f, 0.08f, 0.04f), accentMaterial, false);
-        CreateCube(collegeTheme, "Notebook", new Vector3(-5.35f, 0.05f, -2.25f), new Vector3(1.05f, 0.08f, 0.75f), darkMaterial, false);
+        bool headsetPresent = XRRig.IsHeadsetPresent;
+        Vector3 tablePosition = headsetPresent ? VrTablePosition : DesktopTablePosition;
+        Vector3 tableScale = headsetPresent ? VrTableScale : DesktopTableScale;
 
-        Transform books = EnsureChild(collegeTheme, "Books");
-        CreateCube(books, "Book Red", new Vector3(5.15f, 0.04f, -1.6f), new Vector3(0.88f, 0.08f, 0.55f), bookRed, false);
-        CreateCube(books, "Book Blue", new Vector3(5.25f, 0.16f, -1.55f), new Vector3(0.82f, 0.08f, 0.5f), bookBlue, false);
-        CreateCube(books, "Book Dark", new Vector3(5.35f, 0.28f, -1.5f), new Vector3(0.76f, 0.08f, 0.46f), darkMaterial, false);
+        CreateCube(collegeTheme, "Floor", new Vector3(0f, -0.02f, 0f), new Vector3(4f, 0.04f, 4f), floorMaterial, false);
+        CreateCube(collegeTheme, "Table", tablePosition, tableScale, tableMaterial, false);
     }
 
     private void ApplyCameraDefaults()

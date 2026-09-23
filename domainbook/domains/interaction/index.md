@@ -9,6 +9,8 @@ owners: [mathwidu]
 code:
   - game/Assets/Scripts/Controllers/InputController.cs
   - game/Assets/Scripts/Controllers/CameraController.cs
+  - game/Assets/Scripts/Controllers/XRRig.cs
+  - game/Assets/Scripts/Controllers/VrSelectionBridge.cs
 relationships:
   - with: gameplay
     type: customer-supplier
@@ -33,7 +35,24 @@ do lado do jogador ativo.
   o comando correspondente ao gameplay.
 - Contexto de câmera: `CameraController` orbita e dá zoom na visão
   principal, e a gira para ficar voltada para o jogador a jogar quando o
-  turno muda.
+  turno muda. No modo VR, esse giro por turno é aposentado — o modo VR é de
+  assento único — mas a órbita e o zoom continuam disponíveis, agindo sobre
+  o XR Origin do rig de VR em vez da câmera do olho, dentro de uma faixa de
+  distância própria para a escala de VR; veja
+  [play-in-vr](features/play-in-vr.md).
+- Contexto do rig de VR: `XRRig` constrói um XR Origin em tempo de execução
+  quando um headset está presente — a câmera do olho, seu Tracked Pose
+  Driver e o controle de recentralização — e reaponta o `InputController`
+  para a câmera do olho em vez da câmera de desktop. Também constrói um
+  ray interactor em cada controle de movimento, vinculado ao gatilho para
+  selecionar, e um interactor de [rastreamento de mãos](features/play-in-vr.md)
+  para cada lado; um `XRInputModalityManager` decide qual dos dois — controle
+  ou mão — fica ativo a cada instante.
+- Contexto de seleção em VR: `VrSelectionBridge` mapeia o evento de seleção
+  de uma peça ou casa, vindo de um XR Simple Interactable, para os mesmos
+  comandos `SelectPiece` / `SelectSquare` que o caminho de clique de
+  desktop envia, para que o gameplay veja um único vocabulário de entrada
+  independentemente do modo.
 
 ## Inbound Communication
 
@@ -71,7 +90,9 @@ do lado do jogador ativo.
 
 - Exatamente uma câmera principal faz a seleção, e sua visão corresponde ao
   que o jogador vê.
-- O jogador usa mouse e teclado; não há caminho de toque ou gamepad.
+- No desktop, o jogador usa mouse e teclado; não há caminho de toque ou
+  gamepad. No modo VR, a entrada vem de um controle de movimento ou das mãos
+  rastreadas, nunca de mouse/teclado.
 - Os colliders da apresentação nas peças e casas são o que um raio pode
   atingir; a entrada os lê em vez de tentar adivinhar uma posição do
   tabuleiro a partir de coordenadas de tela.
@@ -80,8 +101,11 @@ do lado do jogador ativo.
 
 - Cliques que atingem uma peça ou casa mas chegam ao gameplay como o
   comando errado, ou como nenhum — deve ficar em zero.
-- Mudanças de turno em que a câmera não termina voltada para o jogador a
-  jogar.
+- Mudanças de turno, fora do modo VR, em que a câmera não termina voltada
+  para o jogador a jogar.
+- Mudanças de turno em modo VR que movem o XR Origin sem que o jogador
+  tenha orbitado ou dado zoom — deve ficar em zero, já que o giro por turno
+  é aposentado nesse modo.
 
 ## Open Questions
 

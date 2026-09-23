@@ -49,15 +49,37 @@ girar para o lado a jogar.
 ## Controle de movimento
 
 Um controle de mão rastreado que o jogador segura no modo VR, usado para
-apontar e escolher peças no lugar do mouse.
+agarrar peças e apontar para o HUD no lugar do mouse.
 
 - **Aliases:** Motion controller, Controle, Hand controller
 - **Status:** draft
 
 ## Raio de seleção
 
-Um raio que um controle de movimento projeta, e o jogador aponta para uma
-peça ou casa para selecioná-la, substituindo o raycast de tela do mouse.
+Um raio que um controle de movimento projeta e que só aparece ao apontar
+para o HUD, para clicar em seus botões com o gatilho. Não escolhe peças: elas
+são [agarradas e soltas](#agarrar-e-soltar) com a mão.
 
 - **Aliases:** Ray interactor, Pointer ray
+- **Status:** draft
+
+## Agarrar e soltar
+
+Escolher e jogar uma peça no modo VR com a mão, em vez de apontar. Segurar o
+grip perto de uma peça da vez a agarra (e seleciona, mostrando seus destinos
+legais); soltá-la sobre um destino legal faz a jogada. Soltar em qualquer
+outro lugar, inclusive fora do tabuleiro, é jogada inválida e a peça volta à
+casa de origem; soltar na própria casa apenas desfaz a seleção.
+
+- **Aliases:** Grab and release, Pegar e soltar
+- **Status:** draft
+
+## Rastreamento de mãos
+
+Uma forma alternativa de entrada no modo VR: o headset rastreia as mãos
+livres do jogador, sem exigir que ele segure um controle de movimento. O
+jogo alterna automaticamente entre controle e mãos, conforme qual dos dois
+o runtime relata como presente.
+
+- **Aliases:** Hand tracking, Mãos rastreadas
 - **Status:** draft

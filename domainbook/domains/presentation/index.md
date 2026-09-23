@@ -27,11 +27,18 @@ estado que o gameplay relata. É o que um jogador realmente olha e lê.
 - Contexto de view: `BoardView` constrói as casas e a moldura,
   `PieceFactory` constrói um objeto por peça, e ambos são reconstruídos a
   partir de uma lista nova de peças a cada jogada, em vez de sofrer
-  mutação no lugar.
+  mutação no lugar. No modo VR, ambos também adicionam um XR Simple
+  Interactable e um `VrSelectionBridge` junto do collider já existente,
+  para que o ray interactor da interação consiga selecionar o mesmo
+  objeto que o raycast de desktop já atinge.
 - Contexto de apresentação: `GameHud` constrói toda a interface em código
   — as linhas de turno e status, o histórico de jogadas, o pedido de
   promoção, a tela inicial e o painel que examina a peça selecionada em um
-  pequeno preview 3D.
+  pequeno preview 3D. No modo VR, o mesmo Canvas passa a world-space, vira
+  um painel na cena com um Tracked Device Graphic Raycaster e o XR UI Input
+  Module da interação, para que o raio do controle acione seus botões da
+  mesma forma que o mouse faz no desktop; veja
+  [play-in-vr](../interaction/features/play-in-vr.md).
 - Contexto de identidade: cada tipo de peça tem um modelo de personagem
   customizado; quando um modelo está ausente, uma peça é montada a partir
   de primitivas para que o tabuleiro nunca fique vazio

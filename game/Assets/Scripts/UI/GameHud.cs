@@ -4,9 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 
 public sealed class GameHud : MonoBehaviour
 {
+    private static readonly Vector3 VrPanelPosition = new Vector3(0f, 1.4f, 4f);
+    private const float VrPanelScale = 0.0032f;
+
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
 
@@ -50,6 +54,7 @@ public sealed class GameHud : MonoBehaviour
     private GameObject selectedPiecePreviewClone;
     private Vector3 selectedPiecePreviewFocusPoint;
     private PieceView previewedPiece;
+    private Canvas hudCanvas;
 
     public void Configure(ChessGameController controller)
     {
@@ -63,12 +68,20 @@ public sealed class GameHud : MonoBehaviour
         {
             gameController = Object.FindFirstObjectByType<ChessGameController>();
         }
+    }
 
+    private void Start()
+    {
         RebuildInterface();
     }
 
     private void Update()
     {
+        if (hudCanvas != null && hudCanvas.renderMode == RenderMode.WorldSpace && hudCanvas.worldCamera == null)
+        {
+            hudCanvas.worldCamera = XRRig.EyeCamera;
+        }
+
         RefreshInterface();
     }
 
@@ -132,6 +145,9 @@ public sealed class GameHud : MonoBehaviour
         CreateButton("StartPlayButton", startCard, "Jogar", new Vector2(160f, 128f), new Vector2(240f, 42f), actionColor, StartGame);
         startHowToPlayButtonText = CreateButton("StartHowToPlayButton", startCard, "Como jogar", new Vector2(180f, 182f), new Vector2(200f, 36f), neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
         startHowToPlayText = CreateText("StartHowToPlayText", startCard, BuildHowToPlayText(), 13, FontStyle.Normal, textColor, TextAnchor.UpperLeft, new Vector2(64f, -236f), new Vector2(432f, 118f)).rectTransform;
+
+        bool performanceMode = gameController != null && gameController.PerformanceMode;
+        CreateToggle("PerformanceModeToggle", startCard, "Modo desempenho", new Vector2(160f, 236f), new Vector2(240f, 28f), performanceMode, OnPerformanceModeChanged);
 
         RefreshInterface();
     }
@@ -201,6 +217,14 @@ public sealed class GameHud : MonoBehaviour
         }
 
         RefreshInterface();
+    }
+
+    private void OnPerformanceModeChanged(bool enabled)
+    {
+        if (gameController != null)
+        {
+            gameController.SetPerformanceMode(enabled);
+        }
     }
 
     private void ToggleHowToPlay()
@@ -483,6 +507,23 @@ public sealed class GameHud : MonoBehaviour
             canvas = gameObject.AddComponent<Canvas>();
         }
 
+        hudCanvas = canvas;
+
+        bool vrMode = XRRig.IsHeadsetPresent;
+        if (vrMode)
+        {
+            ConfigureWorldSpaceCanvas(canvas);
+        }
+        else
+        {
+            ConfigureScreenSpaceCanvas(canvas);
+        }
+
+        EnsureEventSystem(vrMode);
+    }
+
+    private void ConfigureScreenSpaceCanvas(Canvas canvas)
+    {
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;
         canvas.pixelPerfect = true;
@@ -493,21 +534,72 @@ public sealed class GameHud : MonoBehaviour
             scaler = gameObject.AddComponent<CanvasScaler>();
         }
 
+        scaler.enabled = true;
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = 0.5f;
         scaler.referencePixelsPerUnit = 100f;
 
+        TrackedDeviceGraphicRaycaster xrRaycaster = GetComponent<TrackedDeviceGraphicRaycaster>();
+        if (xrRaycaster != null)
+        {
+            DestroyUnityObject(xrRaycaster);
+        }
+
         if (GetComponent<GraphicRaycaster>() == null)
         {
             gameObject.AddComponent<GraphicRaycaster>();
         }
+    }
 
-        if (Object.FindFirstObjectByType<EventSystem>() == null)
+    private void ConfigureWorldSpaceCanvas(Canvas canvas)
+    {
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.sortingOrder = 0;
+
+        CanvasScaler scaler = GetComponent<CanvasScaler>();
+        if (scaler != null)
         {
-            GameObject eventSystemObject = new GameObject("EventSystem");
-            eventSystemObject.transform.SetParent(transform);
-            eventSystemObject.AddComponent<EventSystem>();
+            scaler.enabled = false;
+        }
+
+        RectTransform canvasRect = (RectTransform)transform;
+        canvasRect.pivot = new Vector2(0.5f, 0.5f);
+        canvasRect.anchorMin = new Vector2(0.5f, 0.5f);
+        canvasRect.anchorMax = new Vector2(0.5f, 0.5f);
+        canvasRect.sizeDelta = new Vector2(1920f, 1080f);
+        canvasRect.localScale = Vector3.one * VrPanelScale;
+        canvasRect.position = VrPanelPosition;
+        canvasRect.rotation = Quaternion.LookRotation(VrPanelPosition - XRRig.SeatEyePosition, Vector3.up);
+
+        GraphicRaycaster legacyRaycaster = GetComponent<GraphicRaycaster>();
+        if (legacyRaycaster != null)
+        {
+            DestroyUnityObject(legacyRaycaster);
+        }
+
+        if (GetComponent<TrackedDeviceGraphicRaycaster>() == null)
+        {
+            gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+        }
+    }
+
+    private void EnsureEventSystem(bool vrMode)
+    {
+        if (Object.FindFirstObjectByType<EventSystem>() != null)
+        {
+            return;
+        }
+
+        GameObject eventSystemObject = new GameObject("EventSystem");
+        eventSystemObject.transform.SetParent(transform);
+        eventSystemObject.AddComponent<EventSystem>();
+        if (vrMode)
+        {
+            eventSystemObject.AddComponent<XRUIInputModule>();
+        }
+        else
+        {
             eventSystemObject.AddComponent<InputSystemUIInputModule>();
         }
     }
@@ -634,6 +726,37 @@ public sealed class GameHud : MonoBehaviour
         Text buttonText = CreateText("Label", rect, label, 13, FontStyle.Bold, textColor, TextAnchor.MiddleCenter, Vector2.zero, sizeDelta);
         buttonText.raycastTarget = false;
         return button;
+    }
+
+    private Toggle CreateToggle(
+        string name,
+        Transform parent,
+        string label,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta,
+        bool isOn,
+        UnityEngine.Events.UnityAction<bool> action)
+    {
+        RectTransform rect = CreateRect(name, parent, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), anchoredPosition, sizeDelta);
+
+        Toggle toggle = rect.gameObject.AddComponent<Toggle>();
+
+        RectTransform boxRect = CreateRect("Box", rect, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(28f, 28f));
+        Image boxImage = boxRect.gameObject.AddComponent<Image>();
+        boxImage.color = neutralButtonColor;
+
+        RectTransform checkRect = CreateRect("Checkmark", boxRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(18f, 18f));
+        Image checkImage = checkRect.gameObject.AddComponent<Image>();
+        checkImage.color = accentColor;
+
+        toggle.targetGraphic = boxImage;
+        toggle.graphic = checkImage;
+        toggle.isOn = isOn;
+        toggle.onValueChanged.AddListener(action);
+
+        Text toggleLabel = CreateText("Label", rect, label, 13, FontStyle.Bold, textColor, TextAnchor.MiddleLeft, new Vector2(38f, 0f), new Vector2(sizeDelta.x - 38f, sizeDelta.y));
+        toggleLabel.raycastTarget = false;
+        return toggle;
     }
 
     private string FormatMoveHistory(IReadOnlyList<string> moveHistory)

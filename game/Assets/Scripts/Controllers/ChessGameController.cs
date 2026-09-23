@@ -10,6 +10,9 @@ public sealed class ChessGameController : MonoBehaviour
     [SerializeField] private CameraController cameraController;
     [SerializeField] private float moveDuration = 0.28f;
 
+    private const float ReturnDuration = 0.15f;
+    private const string PerformanceModeKey = "ChessCgi.PerformanceMode";
+
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
     private readonly List<BoardSquare> legalDestinations = new List<BoardSquare>();
     private readonly List<string> moveHistory = new List<string>();
@@ -24,6 +27,7 @@ public sealed class ChessGameController : MonoBehaviour
     public bool IsInputBlocked => inputBlocked || awaitingPromotion;
     public bool IsAwaitingPromotion => awaitingPromotion;
     public ChessSide CurrentTurn => rules.CurrentTurn;
+    public bool PerformanceMode => pieceFactory != null && pieceFactory.UsePrimitivePieces;
     public IReadOnlyList<string> MoveHistory => moveHistory;
     public string StatusMessage { get; private set; } = "Turno: Brancas";
 
@@ -50,6 +54,11 @@ public sealed class ChessGameController : MonoBehaviour
         if (pieceFactory == null)
         {
             pieceFactory = Object.FindFirstObjectByType<PieceFactory>();
+        }
+
+        if (pieceFactory != null)
+        {
+            pieceFactory.UsePrimitivePieces = PlayerPrefs.GetInt(PerformanceModeKey, 1) == 1;
         }
 
         if (hud == null)
@@ -94,6 +103,23 @@ public sealed class ChessGameController : MonoBehaviour
         UpdateCameraForTurn(true);
     }
 
+    public void SetPerformanceMode(bool enabled)
+    {
+        if (pieceFactory == null)
+        {
+            return;
+        }
+
+        pieceFactory.UsePrimitivePieces = enabled;
+        PlayerPrefs.SetInt(PerformanceModeKey, enabled ? 1 : 0);
+
+        if (boardView != null && boardView.Pieces.Count > 0)
+        {
+            ClearSelection();
+            boardView.SyncPieces(rules.GetPieces(), pieceFactory);
+        }
+    }
+
     public void SelectPiece(PieceView piece)
     {
         if (piece == null || IsInputBlocked || gameOver)
@@ -116,6 +142,55 @@ public sealed class ChessGameController : MonoBehaviour
         }
 
         SelectOwnPiece(piece);
+    }
+
+    public bool CanGrabPiece(PieceView piece)
+    {
+        return piece != null && !IsInputBlocked && !gameOver && piece.Side == CurrentTurn;
+    }
+
+    public void GrabPiece(PieceView piece)
+    {
+        if (CanGrabPiece(piece))
+        {
+            SelectOwnPiece(piece);
+        }
+    }
+
+    public void ReleasePiece(PieceView piece, Vector3 worldPosition)
+    {
+        if (piece == null)
+        {
+            return;
+        }
+
+        if (piece != selectedPiece)
+        {
+            ReturnToSquare(piece);
+            return;
+        }
+
+        bool onBoard = boardView.TryGetSquareAt(worldPosition, out BoardSquare destination);
+        if (onBoard && destination.Equals(piece.Square))
+        {
+            CancelSelection();
+            ReturnToSquare(piece);
+            return;
+        }
+
+        if (!onBoard || !legalDestinations.Contains(destination))
+        {
+            ClearSelection();
+            StatusMessage = "Movimento invalido.";
+            ReturnToSquare(piece);
+            return;
+        }
+
+        SelectDestination(destination);
+        if (awaitingPromotion)
+        {
+            piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(destination), ReturnDuration));
+        }
     }
 
     public void SelectSquare(SquareView square)
@@ -168,6 +243,11 @@ public sealed class ChessGameController : MonoBehaviour
         awaitingPromotion = false;
         ClearSelection();
         SetStatusForTurn();
+    }
+
+    private void ReturnToSquare(PieceView piece)
+    {
+        piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(piece.Square), ReturnDuration));
     }
 
     private void SelectOwnPiece(PieceView piece)
@@ -274,7 +354,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     private void UpdateCameraForTurn(bool instant)
     {
-        if (cameraController != null)
+        if (cameraController != null && !XRRig.IsHeadsetPresent)
         {
             cameraController.SetPerspective(CurrentTurn, instant);
         }

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public sealed class PieceView : MonoBehaviour
 {
+    public const int PhysicsLayer = 6;
+
     private const float SelectedScaleMultiplier = 1.07f;
     private const float MoveArcHeight = 0.18f;
 

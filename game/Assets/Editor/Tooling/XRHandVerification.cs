@@ -1,0 +1,159 @@
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.XR.Interaction.Toolkit.Inputs;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+
+[InitializeOnLoad]
+public static class XRHandVerification
+{
+    private const string ArmedKey = "ChessCgiXrHandCheckArmed";
+    private const string DoneKey = "ChessCgiXrHandCheckDone";
+    private const string ExitCodeKey = "ChessCgiXrHandCheckExitCode";
+    private const string MainScenePath = "Assets/Scenes/Main.unity";
+    private const int FramesToRun = 30;
+
+    private static int frameCount;
+    private static readonly XRVerificationResult result = new XRVerificationResult();
+
+    static XRHandVerification()
+    {
+        if (SessionState.GetBool(DoneKey, false) && !EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            SessionState.SetBool(DoneKey, false);
+            XRSimulatorSetup.SetAutomaticInstantiate(false);
+            EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
+            return;
+        }
+
+        if (SessionState.GetBool(ArmedKey, false))
+        {
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        }
+    }
+
+    [MenuItem("Chess CGI/VR/Run XR Hand Simulator Check")]
+    public static void RunSimulatorCheck()
+    {
+        EditorSceneManager.OpenScene(MainScenePath);
+        XRSimulatorSetup.SetAutomaticInstantiate(true);
+        SessionState.SetBool(ArmedKey, true);
+        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        EditorApplication.isPlaying = true;
+    }
+
+    private static void OnPlayModeStateChanged(PlayModeStateChange state)
+    {
+        if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(ArmedKey, false))
+        {
+            return;
+        }
+
+        EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+        frameCount = 0;
+        EditorApplication.update += Tick;
+    }
+
+    private static void Tick()
+    {
+        if (!EditorApplication.isPlaying)
+        {
+            EditorApplication.update -= Tick;
+            return;
+        }
+
+        frameCount++;
+        if (frameCount < FramesToRun)
+        {
+            return;
+        }
+
+        EditorApplication.update -= Tick;
+        ReportAndStop();
+    }
+
+    private static void ReportAndStop()
+    {
+        GameObject originObject = GameObject.Find("XR Origin (VR)");
+        Transform cameraOffset = originObject != null ? originObject.transform.Find("Camera Offset") : null;
+
+        GameObject leftHand = cameraOffset != null ? cameraOffset.Find("LeftHandInteractor")?.gameObject : null;
+        GameObject rightHand = cameraOffset != null ? cameraOffset.Find("RightHandInteractor")?.gameObject : null;
+        GameObject leftController = cameraOffset != null ? cameraOffset.Find("Left Controller")?.gameObject : null;
+        GameObject rightController = cameraOffset != null ? cameraOffset.Find("Right Controller")?.gameObject : null;
+        XRInputModalityManager modalityManager = cameraOffset != null ? cameraOffset.GetComponent<XRInputModalityManager>() : null;
+        int originCount = Object.FindObjectsByType<Unity.XR.CoreUtils.XROrigin>(FindObjectsSortMode.None).Length;
+        int leftControllerHandRenderers = CountRenderers(leftController, "LeftControllerHand");
+        int rightControllerHandRenderers = CountRenderers(rightController, "RightControllerHand");
+        LineRenderer leftRay = leftController != null ? leftController.GetComponent<LineRenderer>() : null;
+        bool leftRayHasShader = leftRay != null && leftRay.sharedMaterial != null && leftRay.sharedMaterial.shader != null;
+
+        NearFarInteractor leftHandNearFar = leftHand != null ? leftHand.GetComponentInChildren<NearFarInteractor>(true) : null;
+        XRPokeInteractor leftHandPoke = leftHand != null ? leftHand.GetComponentInChildren<XRPokeInteractor>(true) : null;
+
+        GameObject leftHandVisual = cameraOffset != null ? cameraOffset.Find("LeftHandVisual")?.gameObject : null;
+        GameObject rightHandVisual = cameraOffset != null ? cameraOffset.Find("RightHandVisual")?.gameObject : null;
+        int leftVisualRenderers = leftHandVisual != null ? leftHandVisual.GetComponentsInChildren<Renderer>(true).Length : 0;
+        int rightVisualRenderers = rightHandVisual != null ? rightHandVisual.GetComponentsInChildren<Renderer>(true).Length : 0;
+        TrackedPoseDriver leftControllerPose = leftController != null ? leftController.GetComponent<TrackedPoseDriver>() : null;
+        TrackedPoseDriver rightControllerPose = rightController != null ? rightController.GetComponent<TrackedPoseDriver>() : null;
+
+        Debug.Log("CHESS_CGI_XR_HAND_CHECK " +
+            $"leftHandFound={leftHand != null} rightHandFound={rightHand != null} " +
+            $"leftHandNearFarFound={leftHandNearFar != null} leftHandPokeFound={leftHandPoke != null} " +
+            $"modalityManagerFound={modalityManager != null} " +
+            $"leftHandVisualFound={leftHandVisual != null} rightHandVisualFound={rightHandVisual != null} " +
+            $"leftVisualRenderers={leftVisualRenderers} rightVisualRenderers={rightVisualRenderers} " +
+            $"leftControllerTracked={leftControllerPose != null} rightControllerTracked={rightControllerPose != null} " +
+            $"currentInputMode={XRInputModalityManager.currentInputMode.Value} originCount={originCount} " +
+            $"leftControllerHandRenderers={leftControllerHandRenderers} rightControllerHandRenderers={rightControllerHandRenderers} " +
+            $"leftRayHasShader={leftRayHasShader} leftControllerActive={leftController != null && leftController.activeInHierarchy}");
+
+        result.Check(leftHand != null, "LeftHandInteractor should be built under Camera Offset");
+        result.Check(rightHand != null, "RightHandInteractor should be built under Camera Offset");
+        result.Check(leftHandNearFar != null, "the left hand interactor should include a NearFarInteractor");
+        result.Check(leftHandPoke != null, "the left hand interactor should include an XRPokeInteractor");
+        result.Check(modalityManager != null, "an XRInputModalityManager should be present on Camera Offset");
+        result.Check(leftHandVisual != null, "a LeftHandVisual should be built so the left hand is visible");
+        result.Check(rightHandVisual != null, "a RightHandVisual should be built so the right hand is visible");
+        result.Check(leftVisualRenderers > 0, "the left hand visual should carry a renderer so it actually shows");
+        result.Check(rightVisualRenderers > 0, "the right hand visual should carry a renderer so it actually shows");
+        result.Check(leftControllerPose != null, "the left controller should have a TrackedPoseDriver so it tracks the controller pose");
+        result.Check(rightControllerPose != null, "the right controller should have a TrackedPoseDriver so it tracks the controller pose");
+        result.Check(modalityManager != null && modalityManager.leftHand == leftHand, "XRInputModalityManager.leftHand should reference the built left hand interactor");
+        result.Check(modalityManager != null && modalityManager.rightHand == rightHand, "XRInputModalityManager.rightHand should reference the built right hand interactor");
+        result.Check(modalityManager != null && modalityManager.leftController == leftController, "XRInputModalityManager.leftController should reference the built left controller");
+        result.Check(modalityManager != null && modalityManager.rightController == rightController, "XRInputModalityManager.rightController should reference the built right controller");
+        result.Check(originCount == 1, "exactly one XR Origin should be built");
+        result.Check(leftControllerHandRenderers > 0, "the left controller should carry a hand model so the hand shows without hand tracking");
+        result.Check(rightControllerHandRenderers > 0, "the right controller should carry a hand model so the hand shows without hand tracking");
+        result.Check(leftRayHasShader, "the controller ray should use a material with a shader");
+        result.Check(leftController != null && leftController.activeInHierarchy, "the left controller should be active once the simulated controller is tracked");
+
+        result.LogSummary("CHESS_CGI_XR_HAND_CHECK");
+        SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
+        SessionState.SetBool(ArmedKey, false);
+        SessionState.SetBool(DoneKey, true);
+        EditorApplication.isPlaying = false;
+        EditorApplication.update += WaitForEditModeThenExit;
+    }
+
+    private static int CountRenderers(GameObject controller, string handName)
+    {
+        Transform hand = controller != null ? controller.transform.Find(handName) : null;
+        return hand != null ? hand.GetComponentsInChildren<Renderer>(true).Length : 0;
+    }
+
+    private static void WaitForEditModeThenExit()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            return;
+        }
+
+        EditorApplication.update -= WaitForEditModeThenExit;
+        SessionState.SetBool(DoneKey, false);
+        EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
+    }
+}

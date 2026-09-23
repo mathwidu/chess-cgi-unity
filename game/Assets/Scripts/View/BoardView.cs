@@ -5,6 +5,12 @@ public sealed class BoardView : MonoBehaviour
 {
     [SerializeField] private float squareSize = 1.25f;
     [SerializeField] private float pieceBaseHeight = 0.08f;
+    [Header("Desktop")]
+    [SerializeField] private Vector3 desktopBoardPosition = Vector3.zero;
+    [SerializeField] private Vector3 desktopBoardScale = Vector3.one;
+    [Header("VR")]
+    [SerializeField] private Vector3 vrBoardPosition = new Vector3(0f, 0.78f, 0f);
+    [SerializeField] private Vector3 vrBoardScale = new Vector3(0.045f, 0.045f, 0.045f);
     [SerializeField] private Transform boardFrameRoot;
     [SerializeField] private Transform squaresRoot;
     [SerializeField] private Transform piecesRoot;
@@ -41,20 +47,40 @@ public sealed class BoardView : MonoBehaviour
 
     public Vector3 GetWorldPosition(BoardSquare square)
     {
-        float x = (square.FileIndex - 3.5f) * squareSize;
-        float z = (square.Rank - 4.5f) * squareSize;
-        return transform.TransformPoint(new Vector3(x, 0f, z));
+        return transform.TransformPoint(LocalSquarePosition(square, 0f));
     }
 
     public Vector3 GetPieceWorldPosition(BoardSquare square)
     {
-        Vector3 position = GetWorldPosition(square);
-        position.y += pieceBaseHeight;
-        return position;
+        return transform.TransformPoint(LocalSquarePosition(square, pieceBaseHeight));
+    }
+
+    public bool TryGetSquareAt(Vector3 worldPosition, out BoardSquare square)
+    {
+        Vector3 local = transform.InverseTransformPoint(worldPosition);
+        int fileIndex = Mathf.RoundToInt(local.x / squareSize + 3.5f);
+        int rank = Mathf.RoundToInt(local.z / squareSize + 4.5f);
+
+        if (fileIndex < 0 || fileIndex > 7 || rank < 1 || rank > 8)
+        {
+            square = default;
+            return false;
+        }
+
+        square = new BoardSquare(fileIndex, rank);
+        return true;
+    }
+
+    private Vector3 LocalSquarePosition(BoardSquare square, float localY)
+    {
+        float x = (square.FileIndex - 3.5f) * squareSize;
+        float z = (square.Rank - 4.5f) * squareSize;
+        return new Vector3(x, localY, z);
     }
 
     public void BuildBoard()
     {
+        ConfigureBoardTransformForMode();
         EnsureRoots();
         ClearChildren(boardFrameRoot);
         ClearChildren(squaresRoot);
@@ -107,7 +133,7 @@ public sealed class BoardView : MonoBehaviour
             GameObject highlight = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             highlight.name = $"Highlight {square.ToAlgebraic()}";
             highlight.transform.SetParent(highlightsRoot);
-            highlight.transform.position = GetWorldPosition(square) + new Vector3(0f, 0.095f, 0f);
+            highlight.transform.position = transform.TransformPoint(LocalSquarePosition(square, 0.095f));
             highlight.transform.localRotation = Quaternion.identity;
             highlight.transform.localScale = new Vector3(squareSize * 0.28f, 0.014f, squareSize * 0.28f);
 
@@ -131,6 +157,20 @@ public sealed class BoardView : MonoBehaviour
     {
         EnsureRoots();
         ClearChildren(highlightsRoot);
+    }
+
+    private void ConfigureBoardTransformForMode()
+    {
+        if (XRRig.IsHeadsetPresent)
+        {
+            transform.localPosition = vrBoardPosition;
+            transform.localScale = vrBoardScale;
+        }
+        else
+        {
+            transform.localPosition = desktopBoardPosition;
+            transform.localScale = desktopBoardScale;
+        }
     }
 
     private void EnsureRoots()

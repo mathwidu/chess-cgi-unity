@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 public sealed class CameraController : MonoBehaviour
 {
+    [Header("Desktop")]
     [SerializeField] private float orbitSpeed = 80f;
     [SerializeField] private float zoomSpeed = 6f;
     [SerializeField] private float minDistance = 7f;
@@ -19,34 +20,50 @@ public sealed class CameraController : MonoBehaviour
 
     private void Update()
     {
+        if (XRRig.IsHeadsetPresent)
+        {
+            return;
+        }
+
         Keyboard keyboard = Keyboard.current;
         Mouse mouse = Mouse.current;
 
+        float orbitDirection = 0f;
         if (keyboard != null && keyboard.qKey.isPressed)
         {
-            transform.RotateAround(target, Vector3.up, -orbitSpeed * Time.deltaTime);
-            transform.LookAt(target);
+            orbitDirection -= 1f;
         }
 
         if (keyboard != null && keyboard.eKey.isPressed)
         {
-            transform.RotateAround(target, Vector3.up, orbitSpeed * Time.deltaTime);
-            transform.LookAt(target);
+            orbitDirection += 1f;
         }
 
-        float scroll = mouse == null ? 0f : mouse.scroll.ReadValue().y * 0.01f;
-        if (Mathf.Abs(scroll) > 0.01f)
-        {
-            Vector3 direction = (transform.position - target).normalized;
-            float distance = Vector3.Distance(transform.position, target);
-            distance = Mathf.Clamp(distance - scroll * zoomSpeed, minDistance, maxDistance);
-            transform.position = target + direction * distance;
-            transform.LookAt(target);
-        }
+        float scrollDelta = mouse == null ? 0f : mouse.scroll.ReadValue().y * 0.01f;
+
+        ApplyOrbitAndZoom(orbitDirection, scrollDelta);
 
         if (keyboard != null && keyboard.rKey.wasPressedThisFrame)
         {
             SetPerspective(CurrentPerspective, true);
+        }
+    }
+
+    private void ApplyOrbitAndZoom(float orbitDirection, float scrollDelta)
+    {
+        if (Mathf.Abs(orbitDirection) > 0f)
+        {
+            transform.RotateAround(target, Vector3.up, orbitDirection * orbitSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.LookRotation(target - transform.position, Vector3.up);
+        }
+
+        if (Mathf.Abs(scrollDelta) > 0.01f)
+        {
+            Vector3 direction = (transform.position - target).normalized;
+            float distance = Vector3.Distance(transform.position, target);
+            distance = Mathf.Clamp(distance - scrollDelta * zoomSpeed, minDistance, maxDistance);
+            transform.position = target + direction * distance;
+            transform.rotation = Quaternion.LookRotation(target - transform.position, Vector3.up);
         }
     }
 
