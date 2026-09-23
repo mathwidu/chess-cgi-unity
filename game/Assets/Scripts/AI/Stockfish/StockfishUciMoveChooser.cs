@@ -21,7 +21,10 @@ public sealed class StockfishUciMoveChooser : IMoveChooser
     public async Task<ChessMove> ChooseMoveAsync(PositionSnapshot position, MoveSearchSettings settings,
         CancellationToken cancellationToken)
     {
-        if (Volatile.Read(ref disposed) != 0) throw new ObjectDisposedException(nameof(StockfishUciMoveChooser));
+        if (Volatile.Read(ref disposed) != 0)
+        {
+            throw new ObjectDisposedException(nameof(StockfishUciMoveChooser));
+        }
         using (var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, lifetime.Token))
         {
             await gate.WaitAsync(linked.Token).ConfigureAwait(false);
@@ -29,7 +32,10 @@ public sealed class StockfishUciMoveChooser : IMoveChooser
             {
                 return await Task.Run(() => Search(position, settings, linked.Token), linked.Token).ConfigureAwait(false);
             }
-            finally { gate.Release(); }
+            finally
+            {
+                gate.Release();
+            }
         }
     }
 
@@ -45,25 +51,11 @@ public sealed class StockfishUciMoveChooser : IMoveChooser
                 token.ThrowIfCancellationRequested();
                 if (fresh)
                 {
-                    Send(session, "uci");
-                    ReadUntil(session, line => line == "uciok", token);
-                    Send(session, "setoption name Threads value 1");
-                    Send(session, "setoption name Hash value 16");
-                    Send(session, "setoption name Ponder value false");
-                    Send(session, "setoption name UCI_LimitStrength value false");
-                    Send(session, "ucinewgame");
+                    InitializeSession(session, token);
                 }
-                Send(session, "setoption name Skill Level value " + settings.SkillLevel);
-                Send(session, "isready");
-                ReadUntil(session, line => line == "readyok", token);
-                // Keep move history so the engine can reason about repetitions.
-                Send(session, "position fen " + position.InitialFen +
-                    (string.IsNullOrEmpty(position.Moves) ? "" : " moves " + position.Moves));
-                Send(session, "go movetime " + settings.MoveTimeMilliseconds);
+                ConfigureSearch(session, position, settings, token);
                 string answer = ReadUntil(session, line => line.StartsWith("bestmove ", StringComparison.Ordinal), token);
-                string[] fields = answer.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (fields.Length < 2 || !ChessMove.TryParseUci(fields[1], out ChessMove move))
-                    throw new InvalidDataException("O motor devolveu uma jogada malformada ou sem movimento.");
+                ChessMove move = ParseBestMove(answer);
                 token.ThrowIfCancellationRequested();
                 return move;
             }
@@ -74,6 +66,37 @@ public sealed class StockfishUciMoveChooser : IMoveChooser
             token.ThrowIfCancellationRequested();
             throw;
         }
+    }
+
+    private static void InitializeSession(Process session, CancellationToken token)
+    {
+        Send(session, "uci");
+        ReadUntil(session, line => line == "uciok", token);
+        Send(session, "setoption name Threads value 1");
+        Send(session, "setoption name Hash value 16");
+        Send(session, "setoption name Ponder value false");
+        Send(session, "setoption name UCI_LimitStrength value false");
+        Send(session, "ucinewgame");
+    }
+
+    private static void ConfigureSearch(Process session, PositionSnapshot position,
+        MoveSearchSettings settings, CancellationToken token)
+    {
+        Send(session, "setoption name Skill Level value " + settings.SkillLevel);
+        Send(session, "isready");
+        ReadUntil(session, line => line == "readyok", token);
+        // Keep move history so the engine can reason about repetitions.
+        Send(session, "position fen " + position.InitialFen +
+            (string.IsNullOrEmpty(position.Moves) ? "" : " moves " + position.Moves));
+        Send(session, "go movetime " + settings.MoveTimeMilliseconds);
+    }
+
+    private static ChessMove ParseBestMove(string answer)
+    {
+        string[] fields = answer.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        if (fields.Length < 2 || !ChessMove.TryParseUci(fields[1], out ChessMove move))
+            throw new InvalidDataException("O motor devolveu uma jogada malformada ou sem movimento.");
+        return move;
     }
 
     private Process StartProcess()
@@ -102,7 +125,11 @@ public sealed class StockfishUciMoveChooser : IMoveChooser
             process = session;
             return session;
         }
-        catch { session.Dispose(); throw; }
+        catch
+        {
+            session.Dispose();
+            throw;
+        }
     }
 
     private static void Send(Process session, string command)
@@ -117,8 +144,14 @@ public sealed class StockfishUciMoveChooser : IMoveChooser
         {
             token.ThrowIfCancellationRequested();
             string line = session.StandardOutput.ReadLine();
-            if (line == null) throw new IOException("O motor de xadrez encerrou inesperadamente.");
-            if (predicate(line)) return line;
+            if (line == null)
+            {
+                throw new IOException("O motor de xadrez encerrou inesperadamente.");
+            }
+            if (predicate(line))
+            {
+                return line;
+            }
         }
     }
 
@@ -130,27 +163,46 @@ public sealed class StockfishUciMoveChooser : IMoveChooser
 
     private static void Close(Process session)
     {
-        if (session == null) return;
+        if (session == null)
+        {
+            return;
+        }
         try
         {
             if (!session.HasExited)
             {
-                try { Send(session, "stop"); Send(session, "quit"); }
+                try
+                {
+                    Send(session, "stop");
+                    Send(session, "quit");
+                }
                 catch (IOException) { }
-                if (!session.WaitForExit(250)) session.Kill();
+                if (!session.WaitForExit(250))
+                {
+                    session.Kill();
+                }
             }
         }
         catch (InvalidOperationException) { }
         catch (System.ComponentModel.Win32Exception) { }
-        finally { session.Dispose(); }
+        finally
+        {
+            session.Dispose();
+        }
     }
 
     public void Dispose()
     {
-        if (Interlocked.Exchange(ref disposed, 1) != 0) return;
+        if (Interlocked.Exchange(ref disposed, 1) != 0)
+        {
+            return;
+        }
         lifetime.Cancel();
         Process session = Interlocked.Exchange(ref process, null);
-        if (session != null) ThreadPool.QueueUserWorkItem(_ => Close(session));
+        if (session != null)
+        {
+            ThreadPool.QueueUserWorkItem(_ => Close(session));
+        }
         // Pending calls still use the CTS/semaphore; do not dispose them underneath a worker.
     }
 }

@@ -58,8 +58,8 @@ Roteiro manual, diretamente na aba **Game** da Unity:
 - Troque para **Dois jogadores** e confirme a alternância de turno e câmera.
 - Redimensione a aba Game: o menu deve permanecer inteiro e legível.
 
-`GameHud.Menu.cs` concentra a configuração e `GameHud.Match.cs` apresenta a
-partida. O ciclo de vida do Canvas e a integração XR permanecem em `GameHud.cs`.
+`GameHud.Menu.Layout.cs` constrói o menu; `GameHud.Menu.cs` mantém escolhas,
+foco e ajuste ao Canvas. `GameHud.Match.cs` constrói o HUD e os diálogos da partida. O ciclo de vida do Canvas e a integração XR permanecem em `GameHud.cs`.
 O menu segue a prévia **Mesa de partida**, aprovada pelo usuário por imagem:
 cenário com tabuleiro, livros e planta, professores 3D à esquerda e painel
 à direita. A marca Feevale é centralizada pelo conteúdo visível do PNG no
@@ -89,6 +89,34 @@ na câmera de evidência. O tabuleiro nessas imagens fica sem os efeitos de cor
 da câmera; a configuração da cena e do jogo não é salva ou alterada.
 
 ## Arquitetura e contratos de integração
+
+### Mapa de leitura do código
+
+| Responsabilidade | Fonte principal |
+| --- | --- |
+| Jogada e fotografia imutável da posição | `Domain/ChessMove.cs`, `Domain/PositionSnapshot.cs` |
+| Contrato de escolha de jogada | `AI/IMoveChooser.cs` |
+| Dificuldade e limites de busca | `AI/ComputerDifficulty.cs`, `AI/MoveSearchSettings.cs` |
+| Prazo, cancelamento e descarte de resultado antigo | `AI/ComputerTurnCoordinator.cs`, `AI/ComputerTurnResult.cs` |
+| Localização do executável e protocolo UCI | `AI/Stockfish/ComputerOpponentFactory.cs`, `AI/Stockfish/StockfishUciMoveChooser.cs` |
+| Aplicação da jogada humana ou automática na cena | `Controllers/ChessGameController.cs` |
+| Montagem visual do menu e ajuda | `UI/GameHud.Menu.Layout.cs` |
+| Escolhas, navegação e ajuste do menu ao Canvas | `UI/GameHud.Menu.cs` |
+| HUD da partida e diálogos de promoção/erro | `UI/GameHud.Match.cs` |
+| Professores isolados em RenderTexture | `UI/MenuCastPreview.cs` |
+| Geometria de controles e sombras | `UI/MenuSurface.cs`, `UI/MenuGroundShadow.cs` |
+
+Os caminhos acima partem de `game/Assets/Scripts/`. A construção da interface
+segue blocos nomeados, mantendo a hierarquia e as medidas da composição aprovada.
+A inicialização UCI, configuração da busca e leitura de `bestmove` ficam em
+rotinas separadas; a sincronização e o ciclo de vida do processo continuam no
+mesmo adaptador. Tipos públicos têm seus próprios arquivos. Métodos assíncronos
+retornam `Task`, inclusive a observação intencional de falhas tardias.
+
+`game/Assets/Editor/MenuReviewCapture.cs` reúne nome, dimensão, preparação e
+foco esperado de cada captura em um único registro. Os casos formam uma jornada
+ordenada; preparação de promoção e falha ficam restritas ao utilitário do Editor.
+Não há acesso mutável adicional às regras na interface pública do jogo.
 
 - `ChessMove` representa origem, destino e promoção, independentemente da cena.
 - `ChessRulesAdapter.GetSnapshot()` fornece FEN, lado, revisão monotônica e
@@ -123,6 +151,14 @@ entre a documentação da IA e da frente VR; a resolução está na branch de
 integração. A mesma branch adapta os harnesses antigos ao bloqueio do menu,
 ao centro do botão de iniciar e à espera da animação por tempo real.
 
+Em 22/09/2026, os PRs #14 (`vr/08-validation-fixes`) e #15
+(`vr/09-performance-mode`) também estavam abertos. Eles são posteriores à
+base de integração registrada acima e não fazem parte da validação desta IA.
+As branches #5–#11 receberam novos SHAs; entre `9ac1c3a` e
+`vr/07-tooling-fixes@2150b65` a diferença observada foi somente documental.
+A integração de #14/#15 precisa conciliar suas novas mudanças de HUD/controladores
+separadamente; este PR desktop continua independente da sequência VR.
+
 Preservar no merge:
 
 - A guarda `!XRRig.IsHeadsetPresent` em `UpdateCameraForTurn`: a IA escolhe o
@@ -150,39 +186,50 @@ Evidências locais, Unity 6000.3.16f1, macOS ARM64:
 
 | Verificação | Resultado e versão |
 | --- | --- |
-| EditMode, incluindo Stockfish real e falhas de processo | 36/36 aprovados anteriormente, antes da composição Mesa de partida; regras/motor não alterados nesta revisão |
-| PlayMode desktop, Mesa de partida, 22/09/2026 | 13/13 aprovados, nenhum ignorado; `TestResults/MenuStudyPlayMode.xml` |
-| PlayMode na combinação com VR, mesma revisão | 13/13 aprovados, nenhum ignorado; `.local/vr-integration/TestResults/MenuStudyPlayMode.xml` |
-| Interface da Unity | Cena Main aberta no checkout desktop e Play iniciado pelo menu Chess CGI; troca para Pretas/Difícil confirmada na aba Game |
-| Capturas nativas da cena Main | 14 estados/tamanhos exportados; `.impeccable/review/` |
+| EditMode após organização para PR, 22/09/2026 | 36/36 aprovados, nenhum ignorado; `TestResults/EditMode.xml`, incluindo Stockfish real e falhas de processo |
+| PlayMode desktop após organização para PR | 13/13 aprovados, nenhum ignorado; `TestResults/PlayMode.xml` |
+| EditMode e PlayMode na combinação com VR, após organização | 36/36 e 13/13 aprovados, nenhum ignorado; `.local/vr-integration/TestResults/EditMode.xml` e `PlayMode.xml` |
+| Interface da Unity, revisão visual anterior | Cena Main aberta no checkout desktop e Play iniciado pelo menu Chess CGI; troca para Pretas/Difícil confirmada na aba Game |
+| Capturas nativas após organização | 14 estados/tamanhos exportados após estabilização da transição; `TestResults/PrCleanupCapture.log` |
 | HUD com XR Interaction Simulator, mesma revisão | PASSED, exit 0; raio atingiu StartPlayButton e iniciou a partida |
-| Revisão visual independente pelo roteiro local Impeccable | F1–F3 resolvidos; `.impeccable/review/study-review.md` |
+| Revisão visual independente anterior, roteiro local Impeccable | F1–F3 resolvidos; `.impeccable/review/study-review.md` |
 | Build macOS | Anterior à reforma; nenhuma build gerada nesta revisão |
 
 A validação atual usa Play no Editor. As capturas do menu cobrem 1672×941,
 1280×800, 1024×768, 2560×1080 e 1223×704, além de estados em 1920×1080.
-São renders da cena real, não screenshots da interface do Editor. O teste de
+São renders da cena real, não screenshots da interface do Editor.
+O utilitário espera no mínimo 45 frames e 1,25 s após preparar cada estado: a
+transição usa tempo real e não deve ser fotografada ainda em andamento. O painel
+de configuração foi comparado com as capturas anteriores nas cinco dimensões;
+layout, rótulos e seleção foram preservados. O teste de
 texto inclui Canvas world-space e Intermediário selecionado; o teste de foco
 confirma navegação até Jogar. Também verifica proporção e centralização óptica
 da marca, geometria renderizada e alternância dos professores. O teste de
 partida comprova início com pretas, jogada real do motor, resposta ao humano,
 perspectiva fixa e retorno ao modo local.
 
-A revisão final ficou limitada às correções levantadas: contraste dos nomes,
+Execute testes de processo e capturas em sequência. Uma execução de EditMode
+na integração, concorrente com outro Editor capturando a cena, atingiu o prazo
+em quatro testes do motor simulado (250/1000 ms). A execução isolada passou
+36/36 sem alterar os prazos nem a implementação. Esse resultado registra
+sensibilidade da verificação ao ambiente; não demonstra estabilidade sob carga
+concorrente nem uma falha das regras do jogo.
+
+A revisão visual anterior ficou limitada às correções levantadas: contraste dos nomes,
 Intermediário no compacto e foco de Jogar. O comparador mecânico registra 88,54%
 (`match`), sem significar identidade visual ou substituir a inspeção. Os modelos
 reais, a marca original e Lato são adaptações deliberadas da referência. A
 validação nativa e a limitação do gate web do Impeccable estão em
 `.impeccable/review/study-verdict.md`.
 
-O log `.local/vr-integration/TestResults/MenuStudyXRHud.log` registra o clique
+O log `.local/vr-integration/TestResults/PrCleanupXRHud.log` registra o clique
 por raio e `CHESS_CGI_XR_HUD_CHECK PASSED`. Também registra
 `XR_ERROR_RUNTIME_UNAVAILABLE` (Mac sem runtime/headset), `Missing ILineRenderable / Ray Interactor`
 na inicialização dos visuais e uma exceção do indexador `UnityEditor.Search`.
 As asserções do harness passaram; isso não comprova uma sessão XR sem erros
 nem conforto/desempenho no headset. A auto-instanciação do simulador foi
 restaurada para desativada após a verificação. Os harnesses de seleção e câmera
-passaram na revisão anterior e não foram repetidos nesta alteração visual.
+passaram na revisão anterior e não foram repetidos nesta refatoração.
 
 O SHA-256 do executável macOS usado foi
 `bc0cac905ecdf2147fe22055c733bcd999b1e3f7c399fbaf7fb9055786563590`.

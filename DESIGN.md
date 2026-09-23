@@ -140,7 +140,7 @@ Os personagens próprios apresentam o xadrez da turma. A identidade Feevale, os 
 
 A composição aprovada **Mesa de partida** atualiza a expressão do menu: tabuleiro cenográfico, livros e planta acolhem as peças personalizadas, enquanto uma superfície verde concentra a configuração. A imagem aprovada é referência de composição; o cenário raster, os prefabs 3D e os controles Unity são camadas independentes. Essa composição pertence ao menu e não impõe um cenário ilustrado a todas as telas.
 
-Registro mesclado em 22/09/2026 a partir de `GameHud.cs`, `GameHud.Menu.cs`, `GameHud.Match.cs`, `MenuCastPreview.cs`, `MenuSurface.cs` e `MenuGroundShadow.cs`; referência visual em `.impeccable/mocks/approved/mesa-de-partida.png`. Os tokens descrevem a implementação atual. Aprovação da direção e inspeção de capturas não equivalem a aceite funcional ou a validação em dispositivo VR.
+Registro mesclado em 22/09/2026 a partir de `GameHud.cs`, `GameHud.Menu.cs`, `GameHud.Menu.Layout.cs`, `GameHud.Match.cs`, `MenuCastPreview.cs`, `MenuSurface.cs` e `MenuGroundShadow.cs`; referência visual em `.impeccable/mocks/approved/mesa-de-partida.png`. Os tokens descrevem a implementação atual. Aprovação da direção e inspeção de capturas não equivalem a aceite funcional ou a validação em dispositivo VR.
 
 **Key Characteristics:**
 - Professores existentes do projeto, renderizados em 3D, como presença principal.

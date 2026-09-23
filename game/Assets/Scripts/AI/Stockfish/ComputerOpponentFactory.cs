@@ -16,21 +16,36 @@ public static class ComputerOpponentFactory
     public static string FindExecutable()
     {
         string configured = Environment.GetEnvironmentVariable("CHESS_STOCKFISH_PATH");
-        if (!string.IsNullOrWhiteSpace(configured)) return configured;
+        if (!string.IsNullOrWhiteSpace(configured))
+        {
+            return configured;
+        }
         string executable = Application.platform == RuntimePlatform.WindowsPlayer ||
             Application.platform == RuntimePlatform.WindowsEditor ? "stockfish.exe" : "stockfish";
         // Local machine setup is outside Assets and cannot leak into a different platform's build.
         string installed = Path.Combine(Application.persistentDataPath, "Engines", executable);
-        if (File.Exists(installed)) return installed;
+        if (File.Exists(installed))
+        {
+            return installed;
+        }
 #if UNITY_EDITOR
         string local = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", ".local", "stockfish", executable));
-        if (File.Exists(local)) return local;
+        if (File.Exists(local))
+        {
+            return local;
+        }
 #endif
         foreach (string directory in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator))
         {
-            if (string.IsNullOrWhiteSpace(directory)) continue;
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                continue;
+            }
             string candidate = Path.Combine(directory, executable);
-            if (File.Exists(candidate)) return candidate;
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
         }
         return installed;
     }

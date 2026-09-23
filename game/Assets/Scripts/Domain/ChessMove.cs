@@ -21,14 +21,20 @@ public readonly struct ChessMove
     public static bool TryParseUci(string value, out ChessMove move)
     {
         move = default;
-        if (value == null || (value.Length != 4 && value.Length != 5)) return false;
+        if (value == null || (value.Length != 4 && value.Length != 5))
+        {
+            return false;
+        }
         try
         {
             move = new ChessMove(BoardSquare.FromAlgebraic(value.Substring(0, 2)),
                 BoardSquare.FromAlgebraic(value.Substring(2, 2)), value.Length == 5 ? value[4] : (char?)null);
             return true;
         }
-        catch (ArgumentException) { return false; }
+        catch (ArgumentException)
+        {
+            return false;
+        }
     }
 
     public string ToUci() => From.ToAlgebraic() + To.ToAlgebraic() +

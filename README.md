@@ -69,6 +69,17 @@ As fotos usadas como referencia ficam apenas localmente e nao entram no Git. Os 
     └── ProjectSettings/
 ```
 
+## Código e documentação
+
+- [IA, organização dos fontes, testes e integração com VR](docs/ai-desktop.md).
+- [Regras e contratos do jogo](domainbook/domains/gameplay/index.md).
+- [Sistema visual aprovado](DESIGN.md) e [índice de referências da interface](.impeccable/README.md).
+
+Com o projeto fechado no Editor, `bash tools/test_unity.sh` executa EditMode e
+PlayMode e confere os relatórios em `TestResults/`. Para o adversário real,
+prepare antes o motor com `python3 tools/setup_stockfish.py`. Nenhuma build é
+necessária para esses testes ou para jogar pelo Editor.
+
 ## Build Jogavel
 
 Para gerar uma versao jogavel fora do Editor:

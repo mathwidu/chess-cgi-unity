@@ -363,6 +363,7 @@
       "sources": [
         "game/Assets/Scripts/UI/GameHud.cs",
         "game/Assets/Scripts/UI/GameHud.Menu.cs",
+        "game/Assets/Scripts/UI/GameHud.Menu.Layout.cs",
         "game/Assets/Scripts/UI/GameHud.Match.cs",
         "game/Assets/Scripts/UI/MenuCastPreview.cs",
         "game/Assets/Scripts/UI/MenuSurface.cs",

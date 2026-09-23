@@ -2,14 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-public readonly struct ComputerTurnResult
-{
-    public ChessMove Move { get; }
-    public string Error { get; }
-    public bool Success => Error == null;
-    public ComputerTurnResult(ChessMove move, string error) { Move = move; Error = error; }
-}
-
 // Poll completion on the main thread; engine continuations never touch the scene.
 public sealed class ComputerTurnCoordinator : IDisposable
 {
@@ -27,7 +19,10 @@ public sealed class ComputerTurnCoordinator : IDisposable
 
     public void Begin(PositionSnapshot position, MoveSearchSettings settings)
     {
-        if (pending != null) throw new InvalidOperationException("A computer turn is already pending.");
+        if (pending != null)
+        {
+            throw new InvalidOperationException("A computer turn is already pending.");
+        }
         requested = position;
         cancellation = new CancellationTokenSource();
         pending = SearchAsync(position, settings, cancellation.Token);
@@ -36,7 +31,10 @@ public sealed class ComputerTurnCoordinator : IDisposable
     public bool TryTakeResult(PositionSnapshot current, out ComputerTurnResult result)
     {
         result = default;
-        if (pending == null || !pending.IsCompleted) return false;
+        if (pending == null || !pending.IsCompleted)
+        {
+            return false;
+        }
         result = pending.GetAwaiter().GetResult();
         pending = null;
         cancellation.Dispose();
@@ -76,21 +74,33 @@ public sealed class ComputerTurnCoordinator : IDisposable
             {
                 deadline.Cancel();
                 // A faulty provider may ignore cancellation and finish after timeout/reset.
-                if (search != null) ObserveCompletion(search);
+                if (search != null)
+                {
+                    _ = ObserveCompletionAsync(search);
+                }
             }
         }
     }
 
-    private static async void ObserveCompletion(Task task)
+    private static async Task ObserveCompletionAsync(Task task)
     {
-        try { await task.ConfigureAwait(false); }
-        catch (Exception) { /* The outcome is already reported or invalidated. */ }
+        try
+        {
+            await task.ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            // The outcome is already reported or invalidated; observe late failures.
+        }
     }
 
     public void Cancel()
     {
         pending = null;
-        if (cancellation == null) return;
+        if (cancellation == null)
+        {
+            return;
+        }
         cancellation.Cancel();
         cancellation.Dispose();
         cancellation = null;
