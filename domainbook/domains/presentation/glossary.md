@@ -40,6 +40,34 @@ selecionada.
 - **Aliases:** Highlight
 - **Status:** validated
 
+## Marca do último lance
+
+As duas casas do último lance que pousou (origem e destino), tingidas de
+amarelo suave sobre a cor da própria casa. Só o lance mais recente fica
+marcado; uma nova partida limpa as marcas.
+
+- **Aliases:** Last move highlight, MarkLastMove
+- **Status:** validated
+
+## Rei em xeque
+
+A casa do rei do lado a jogar tinge de vermelho enquanto ele está em xeque,
+inclusive no xeque-mate. O vermelho prevalece sobre a marca do último lance e
+some quando o xeque é respondido.
+
+- **Aliases:** Check highlight, MarkCheck
+- **Status:** validated
+
+## Sons do tabuleiro
+
+Sons curtos para o que acontece no tabuleiro: um toque de madeira para cada
+lance, um toque duplo para a captura, um carrilhão para o xeque, um sinal
+suave quando a IA devolve a vez e uma frase no fim da partida (vitória,
+derrota ou empate). Sintetizados em código, saem do tabuleiro em 3D no VR.
+
+- **Aliases:** Board sounds, BoardSounds
+- **Status:** validated
+
 ## Preview da peça selecionada
 
 O painel que mostra a peça selecionada sozinha, renderizada por uma câmera

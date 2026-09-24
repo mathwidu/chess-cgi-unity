@@ -10,6 +10,21 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Marca do último lance](glossary.md) e [rei em xeque](glossary.md)
+  ([feature](features/sentir-cada-lance.md)): `BoardView.MarkLastMove` tinge
+  de amarelo suave as casas de origem e destino do último lance, e
+  `BoardView.MarkCheck` tinge de vermelho a casa do rei em xeque. A tinta é
+  misturada à cor da própria casa com um `MaterialPropertyBlock`, sem
+  materiais novos. O controlador marca quando o lance pousa, e as marcas
+  somem numa nova partida.
+- [Sons do tabuleiro](glossary.md): `BoardSounds`, montado pelo `BoardView`,
+  toca um som quando cada lance pousa, avisado pelo evento
+  `ChessGameController.MoveApplied`. São toque (lance), toque duplo (captura),
+  carrilhão (xeque), sinal suave (a IA devolveu a vez) e frases de vitória,
+  derrota ou empate. Os clipes são sintetizados em código no primeiro uso,
+  sem arquivos de áudio nem licenças. No VR o som é 3D e sai do tabuleiro; no
+  desktop é 2D.
+
 - [Peças capturadas](glossary.md) ao lado do tabuleiro
   ([feature](features/ver-as-pecas-capturadas.md)):
   - `CapturedPiecesView`, montado pelo `BoardView` em unidades locais do

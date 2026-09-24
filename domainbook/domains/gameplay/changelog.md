@@ -10,6 +10,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- `ChessGameController` expõe `LastMove` e `CheckedKing` (a casa do rei que o
+  último lance deixou em xeque) e dispara `MoveApplied` uma vez por lance,
+  depois que ele pousa e o estado da partida (turno, xeque, resultado) foi
+  atualizado. `ReleasePiece` passa a devolver se a peça solta foi aceita
+  (lance feito ou seleção desfeita na própria casa) ou recusada.
+  `ChessRulesAdapter.FindKing` localiza o rei de um lado. Nenhuma regra de
+  xadrez mudou.
+
 - `ChessGameController` ganha `CanGrabPiece`, `GrabPiece` e `ReleasePiece`
   para o [agarrar e soltar](../interaction/glossary.md) do VR. Agarrar uma
   peça do lado do turno a seleciona; soltar sobre um destino legal faz a
