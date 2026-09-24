@@ -119,6 +119,21 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- Raio do VR grudando no HUD do fundo:
+  - O `TrackedDeviceGraphicRaycaster` do HUD passa a checar oclusão 3D em
+    todas as camadas.
+  - Em VR, só os controles do HUD da partida recebem o raio. Os painéis
+    decorativos e o preview da peça deixam de ser alvo.
+  - O tampo da mesa ganha um collider para barrar o raio.
+  - O painel VR do HUD sobe de 1,4 para 1,75 m, com a borda de baixo no chão,
+    para a barra de ações não ficar atrás da mesa.
+  - `XRHudVerification` confere essa configuração e, de ponta a ponta, que um
+    collider entre a mão e o HUD impede o raio de chegar a Nova partida. Ao
+    sair, ele também devolve a configuração do XR Simulator.
+- A sala era montada no `Awake`, e o XR Simulator só liga o headset depois
+  disso. Assim, a mesa ficava na escala do desktop dentro do VR simulado.
+  Agora o `ScenePolish` remonta a sala quando o modo muda.
+
 - O tabuleiro de desktop voltou a aparecer emoldurado pela câmera. Ele havia
   virado um ponto minúsculo e descentralizado porque a cena guardava a escala
   e a posição de mesa do modo VR no root compartilhado do tabuleiro; agora
