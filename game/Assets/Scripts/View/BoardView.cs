@@ -21,6 +21,7 @@ public sealed class BoardView : MonoBehaviour
 
     private readonly List<SquareView> squares = new List<SquareView>();
     private readonly List<PieceView> pieces = new List<PieceView>();
+    private float surfaceOffset;
 
     public float SquareSize => squareSize;
     public float PieceBaseHeight => pieceBaseHeight;
@@ -43,6 +44,29 @@ public sealed class BoardView : MonoBehaviour
         lightSquareMaterial = lightMaterial;
         darkSquareMaterial = darkMaterial;
         highlightMaterial = legalMoveMaterial;
+    }
+
+    // Raises or lowers the board with the table under it; world units of the current mode.
+    public void SetSurfaceOffset(float worldOffset)
+    {
+        surfaceOffset = worldOffset;
+        ConfigureBoardTransformForMode();
+    }
+
+    // The room is modelled in VR meters around the VR board. On the desktop the same room is
+    // scaled and moved so it sits under the desktop board exactly as it does in VR.
+    public void FitVrRoomToMode(Transform room)
+    {
+        if (XRRig.IsHeadsetPresent)
+        {
+            room.localPosition = Vector3.zero;
+            room.localScale = Vector3.one;
+            return;
+        }
+
+        float scale = desktopBoardScale.y / vrBoardScale.y;
+        room.localScale = Vector3.one * scale;
+        room.localPosition = desktopBoardPosition - vrBoardPosition * scale;
     }
 
     public Vector3 GetWorldPosition(BoardSquare square)
@@ -163,12 +187,12 @@ public sealed class BoardView : MonoBehaviour
     {
         if (XRRig.IsHeadsetPresent)
         {
-            transform.localPosition = vrBoardPosition;
+            transform.localPosition = vrBoardPosition + Vector3.up * surfaceOffset;
             transform.localScale = vrBoardScale;
         }
         else
         {
-            transform.localPosition = desktopBoardPosition;
+            transform.localPosition = desktopBoardPosition + Vector3.up * surfaceOffset;
             transform.localScale = desktopBoardScale;
         }
     }
