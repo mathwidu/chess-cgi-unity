@@ -10,6 +10,19 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Indicador de turno](glossary.md)
+  ([feature](features/ver-de-quem-e-a-vez.md)):
+  - `TurnIndicatorView`, montado pelo `BoardView` em unidades locais do
+    tabuleiro, acende uma luz fina na borda do lado a jogar. A luz corre uma
+    vez do centro para fora, sem animação contínua, e é amarela na vez do
+    jogador e clara e neutra na vez da IA.
+  - Uma etiqueta no tampo ("Sua vez", "Vez das brancas", "Vez das pretas",
+    "IA pensando...") aparece e some após cerca de 3 s; a da IA fica enquanto
+    ela pensa. A etiqueta fica de pé para quem está sentado e não tem
+    raycaster, então não pega o raio.
+  - O indicador some no menu e no fim da partida.
+  - No desktop, onde o HUD já nomeia o turno, a luz é mais fina.
+
 - [Mesa](glossary.md) de verdade sob o tabuleiro, no lugar do cubo, com altura
   regulável ([feature](features/regular-a-altura-da-mesa.md),
   [ADR-0002](decisions/0002-modelar-a-sala-em-metros-do-vr-e-escalar-para-o-desktop.md)).
