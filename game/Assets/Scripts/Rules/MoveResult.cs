@@ -9,6 +9,8 @@ public readonly struct MoveResult
     public bool IsDraw { get; }
     public string Message { get; }
     public MatchOutcome Outcome { get; }
+    // The piece taken by this move, on the square it stood (differs from To for en passant).
+    public VisualPieceState? Captured { get; }
 
     public MoveResult(
         bool success,
@@ -19,7 +21,8 @@ public readonly struct MoveResult
         bool isCheckmate,
         bool isDraw,
         string message,
-        MatchOutcome outcome = MatchOutcome.InProgress)
+        MatchOutcome outcome = MatchOutcome.InProgress,
+        VisualPieceState? captured = null)
     {
         Success = success;
         From = from;
@@ -30,6 +33,7 @@ public readonly struct MoveResult
         IsDraw = isDraw;
         Message = message;
         Outcome = outcome;
+        Captured = captured;
     }
 
     public static MoveResult Failed(BoardSquare from, BoardSquare to, string message)

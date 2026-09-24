@@ -77,8 +77,17 @@ public sealed class ChessRulesAdapter
             return MoveResult.Failed(from, to, "Movimento invalido.");
         }
 
+        // En passant takes a pawn that is not on the destination, which was empty before the move.
+        bool destinationWasEmpty = game.GetPieceAt(ToPosition(to)) == null;
         Piece capturedPiece;
         MoveType moveType = game.MakeMove(move, true, out capturedPiece);
+        VisualPieceState? captured = null;
+        if (capturedPiece != null)
+        {
+            BoardSquare capturedSquare = destinationWasEmpty ? new BoardSquare(to.FileIndex, from.Rank) : to;
+            captured = new VisualPieceState(capturedSquare, ToSide(capturedPiece.Owner), ToKind(capturedPiece));
+        }
+
         moves.Add(new ChessMove(from, to, promotion).ToUci());
         revision++;
         bool isCheck = game.IsInCheck(game.WhoseTurn);
@@ -96,7 +105,21 @@ public sealed class ChessRulesAdapter
             isCheckmate,
             isDraw,
             BuildMessage(moveType, isCheck, outcome),
-            outcome);
+            outcome,
+            captured);
+    }
+
+    // Material on the board, White minus Black; promotions count as the piece they became.
+    public int GetMaterialBalance()
+    {
+        int balance = 0;
+        foreach (VisualPieceState piece in GetPieces())
+        {
+            int value = ChessPieceValue.Of(piece.Kind);
+            balance += piece.Side == ChessSide.White ? value : -value;
+        }
+
+        return balance;
     }
 
     public VisualPieceState? GetPieceAt(BoardSquare square)

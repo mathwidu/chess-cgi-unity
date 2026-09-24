@@ -80,6 +80,17 @@ oculto no menu e no fim da partida.
 - **Aliases:** Turn indicator, TurnIndicatorView, Luz de turno
 - **Status:** validated
 
+## Peças capturadas
+
+As peças já tomadas, em miniatura sobre uma faixa de feltro ao lado do
+tabuleiro, à direita de quem está sentado. A metade perto do jogador guarda o
+que ele capturou, e a metade de lá guarda o que o adversário capturou. As
+peças mais valiosas vêm primeiro. Um "+N" marca o lado à frente na
+[vantagem de material](../gameplay/glossary.md).
+
+- **Aliases:** Captured pieces, CapturedPiecesView, Peças comidas
+- **Status:** validated
+
 ## Tela de resultado
 
 O diálogo do HUD que anuncia o [resultado da partida](../gameplay/glossary.md)

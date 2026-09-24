@@ -26,6 +26,15 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   para voltar às peças personalizadas.
 - Adversário offline no desktop, com escolha de lado, três dificuldades e validação local de toda candidata.
 - Cancelamento e timeout de busca, descarte de respostas antigas e recuperação por nova tentativa ou menu.
+- [Capturas e vantagem de material](glossary.md):
+  - `ChessRulesAdapter` informa em `MoveResult.Captured` a peça tomada, com a
+    casa onde ela estava; no en passant, é a casa do peão ao lado.
+  - `ChessRulesAdapter.GetMaterialBalance` calcula a diferença de material no
+    tabuleiro, com os valores de `ChessPieceValue`.
+  - `ChessGameController` guarda `CapturedPieces` em ordem e mantém
+    `MaterialBalance` atualizado a cada lance; os dois zeram numa nova
+    partida. `IsAnimatingMove` informa quando o lance ainda está se movendo.
+  - Nenhuma regra de xadrez mudou.
 - [Resultado da partida](glossary.md): `ChessRulesAdapter` classifica a
   jogada que encerra a partida em `MatchOutcome` (xeque-mate, afogamento,
   material insuficiente ou outro empate) e o devolve em `MoveResult.Outcome`.

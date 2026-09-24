@@ -23,6 +23,7 @@ public sealed class BoardView : MonoBehaviour
     private readonly List<PieceView> pieces = new List<PieceView>();
     private float surfaceOffset;
     private TurnIndicatorView turnIndicator;
+    private CapturedPiecesView capturedPieces;
 
     public float SquareSize => squareSize;
     public float PieceBaseHeight => pieceBaseHeight;
@@ -31,6 +32,7 @@ public sealed class BoardView : MonoBehaviour
     public int HighlightCount => highlightsRoot == null ? 0 : highlightsRoot.childCount;
     public Transform BoardFrameRoot => boardFrameRoot;
     public TurnIndicatorView TurnIndicator => turnIndicator;
+    public CapturedPiecesView CapturedPieces => capturedPieces;
 
     public void Configure(
         Transform squaresParent,
@@ -115,6 +117,7 @@ public sealed class BoardView : MonoBehaviour
 
         BuildBoardFrame();
         EnsureTurnIndicator();
+        EnsureCapturedPieces();
 
         for (int rank = 1; rank <= 8; rank++)
         {
@@ -221,6 +224,22 @@ public sealed class BoardView : MonoBehaviour
         {
             turnIndicator = root.gameObject.AddComponent<TurnIndicatorView>();
             turnIndicator.Build(squareSize);
+        }
+    }
+
+    private void EnsureCapturedPieces()
+    {
+        if (capturedPieces != null)
+        {
+            return;
+        }
+
+        Transform root = EnsureChildRoot(null, "CapturedPieces");
+        capturedPieces = root.GetComponent<CapturedPiecesView>();
+        if (capturedPieces == null)
+        {
+            capturedPieces = root.gameObject.AddComponent<CapturedPiecesView>();
+            capturedPieces.Build(this);
         }
     }
 

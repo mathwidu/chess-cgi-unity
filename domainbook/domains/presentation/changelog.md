@@ -10,6 +10,20 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Peças capturadas](glossary.md) ao lado do tabuleiro
+  ([feature](features/ver-as-pecas-capturadas.md)):
+  - `CapturedPiecesView`, montado pelo `BoardView` em unidades locais do
+    tabuleiro, põe miniaturas das peças tomadas sobre duas faixas de feltro à
+    direita de quem está sentado.
+  - Suas capturas ficam na metade perto de você, e as do adversário na de lá,
+    em 3 × 5 lugares, com as mais valiosas primeiro.
+  - A peça capturada voa da casa até o lugar dela quando o lance termina.
+  - Um "+N" amarelo marca quem está à frente em material.
+  - As miniaturas vêm de `PieceFactory.CreateDisplayPiece`: sem collider,
+    `PieceView` ou interação de VR, e trocam para peças clássicas no modo
+    desempenho.
+  - O conjunto troca de lado com o jogador e sobe e desce com a mesa.
+
 - [Indicador de turno](glossary.md)
   ([feature](features/ver-de-quem-e-a-vez.md)):
   - `TurnIndicatorView`, montado pelo `BoardView` em unidades locais do
@@ -83,6 +97,10 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - Nova partida mantém as opções escolhidas.
 
 ### Changed
+
+- A etiqueta do [indicador de turno](glossary.md) aparece só no VR. No
+  desktop, o painel de turno já nomeia a vez, e a etiqueta chegava a aparecer
+  grande na borda de baixo em telas 16:10.
 
 - Em VR, as peças ganham um XR Grab Interactable (com Rigidbody kinematic) e
   ficam na layer `PieceView.PhysicsLayer` (nomeada "ChessPieces" no
