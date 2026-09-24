@@ -3,7 +3,7 @@ status: accepted
 date: 2026-09-24
 ---
 
-# Modelar a sala em metros do VR e escalá-la para o desktop
+# Modelar a sala em metros do VR e escalar para o desktop
 
 ## Context and Problem Statement
 
