@@ -8,7 +8,8 @@ using UnityEngine.XR.Interaction.Toolkit.UI;
 
 public sealed partial class GameHud : MonoBehaviour
 {
-    private static readonly Vector3 VrPanelPosition = new Vector3(0f, 1.4f, 4f);
+    // Bottom edge at floor level, so the action bar is not hidden behind the table.
+    private static readonly Vector3 VrPanelPosition = new Vector3(0f, 1.75f, 4f);
     private const float VrPanelScale = 0.0032f;
 
     [SerializeField] private ChessGameController gameController;
@@ -104,8 +105,25 @@ public sealed partial class GameHud : MonoBehaviour
         BuildMatchInterface();
         BuildStartMenu();
         BuildHelpDialog();
+        if (hudCanvas.renderMode == RenderMode.WorldSpace)
+        {
+            LimitRayTargetsToControls(matchInterface);
+        }
 
         RefreshInterface();
+    }
+
+    // The VR HUD hangs far behind the board. Only its controls may take the ray; decorative
+    // panels would otherwise catch it whenever the player points ahead.
+    private static void LimitRayTargetsToControls(RectTransform root)
+    {
+        foreach (Graphic graphic in root.GetComponentsInChildren<Graphic>(true))
+        {
+            if (graphic.GetComponentInParent<Selectable>() == null)
+            {
+                graphic.raycastTarget = false;
+            }
+        }
     }
 
     public void RefreshInterface()
@@ -581,10 +599,16 @@ public sealed partial class GameHud : MonoBehaviour
             DestroyUnityObject(legacyRaycaster);
         }
 
-        if (GetComponent<TrackedDeviceGraphicRaycaster>() == null)
+        TrackedDeviceGraphicRaycaster xrRaycaster = GetComponent<TrackedDeviceGraphicRaycaster>();
+        if (xrRaycaster == null)
         {
-            gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+            xrRaycaster = gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
         }
+
+        // Board, pieces and table stand between the player and the HUD: a ray aimed at them
+        // must stop there instead of pressing a HUD button behind the board.
+        xrRaycaster.checkFor3DOcclusion = true;
+        xrRaycaster.blockingMask = ~0;
     }
 
     private void PlaceWorldPanel(RectTransform canvasRect)

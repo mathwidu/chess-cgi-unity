@@ -10,6 +10,19 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Indicador de turno](glossary.md)
+  ([feature](features/ver-de-quem-e-a-vez.md)):
+  - `TurnIndicatorView`, montado pelo `BoardView` em unidades locais do
+    tabuleiro, acende uma luz fina na borda do lado a jogar. A luz corre uma
+    vez do centro para fora, sem animação contínua, e é amarela na vez do
+    jogador e clara e neutra na vez da IA.
+  - Uma etiqueta no tampo ("Sua vez", "Vez das brancas", "Vez das pretas",
+    "IA pensando...") aparece e some após cerca de 3 s; a da IA fica enquanto
+    ela pensa. A etiqueta fica de pé para quem está sentado e não tem
+    raycaster, então não pega o raio.
+  - O indicador some no menu e no fim da partida.
+  - No desktop, onde o HUD já nomeia o turno, a luz é mais fina.
+
 - [Mesa](glossary.md) de verdade sob o tabuleiro, no lugar do cubo, com altura
   regulável ([feature](features/regular-a-altura-da-mesa.md),
   [ADR-0002](decisions/0002-modelar-a-sala-em-metros-do-vr-e-escalar-para-o-desktop.md)).
@@ -118,6 +131,21 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - O painel do HUD em world-space acompanha o assento de VR: quando o jogador joga de pretas contra a IA, o painel passa para o lado oposto do tabuleiro e continua de frente para ele.
 
 ### Fixed
+
+- Raio do VR grudando no HUD do fundo:
+  - O `TrackedDeviceGraphicRaycaster` do HUD passa a checar oclusão 3D em
+    todas as camadas.
+  - Em VR, só os controles do HUD da partida recebem o raio. Os painéis
+    decorativos e o preview da peça deixam de ser alvo.
+  - O tampo da mesa ganha um collider para barrar o raio.
+  - O painel VR do HUD sobe de 1,4 para 1,75 m, com a borda de baixo no chão,
+    para a barra de ações não ficar atrás da mesa.
+  - `XRHudVerification` confere essa configuração e, de ponta a ponta, que um
+    collider entre a mão e o HUD impede o raio de chegar a Nova partida. Ao
+    sair, ele também devolve a configuração do XR Simulator.
+- A sala era montada no `Awake`, e o XR Simulator só liga o headset depois
+  disso. Assim, a mesa ficava na escala do desktop dentro do VR simulado.
+  Agora o `ScenePolish` remonta a sala quando o modo muda.
 
 - O tabuleiro de desktop voltou a aparecer emoldurado pela câmera. Ele havia
   virado um ponto minúsculo e descentralizado porque a cena guardava a escala
