@@ -3,7 +3,7 @@ id: ver-as-pecas-capturadas
 name: Ver as peças capturadas
 status: ready
 owners: [mathwidu]
-terms: [pecas-capturadas]
+terms: [peças-capturadas]
 ---
 
 ## Story
@@ -19,8 +19,7 @@ Example: As brancas capturam um peão
   Given uma partida em andamento, e o jogador senta do lado das brancas
   When as brancas tomam um peão preto
   Then o lance termina no tabuleiro
-  And o peão voa da casa dele até a faixa ao lado do tabuleiro, na metade
-    perto do jogador
+  And o peão voa da casa dele até a metade da faixa perto do jogador
   And ele fica ali em miniatura, sem poder ser clicado nem agarrado
 
 Example: Cada lado guarda o que tomou
