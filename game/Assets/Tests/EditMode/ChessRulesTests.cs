@@ -81,13 +81,38 @@ public class ChessRulesTests
     {
         var rules = new ChessRulesAdapter();
         foreach (string move in new[] { "f2f3", "e7e5", "g2g4" }) rules.TryMove(Move(move));
-        Assert.That(rules.TryMove(Move("d8h4")).IsCheckmate, Is.True);
+        MoveResult mate = rules.TryMove(Move("d8h4"));
+        Assert.That(mate.IsCheckmate, Is.True);
+        Assert.That(mate.Outcome, Is.EqualTo(MatchOutcome.Checkmate));
     }
 
     [Test]
     public void StalemateIsReported()
     {
         var rules = new ChessRulesAdapter("7k/5K2/8/6Q1/8/8/8/8 w - - 0 1");
-        Assert.That(rules.TryMove(Move("g5g6")).IsDraw, Is.True);
+        MoveResult stalemate = rules.TryMove(Move("g5g6"));
+        Assert.That(stalemate.IsDraw, Is.True);
+        Assert.That(stalemate.Outcome, Is.EqualTo(MatchOutcome.Stalemate));
+        Assert.That(stalemate.Message, Is.EqualTo("Empate por afogamento."));
+    }
+
+    [Test]
+    public void CapturingTheLastPieceIsADrawByInsufficientMaterial()
+    {
+        var rules = new ChessRulesAdapter("7k/8/8/8/8/8/6r1/7K w - - 0 1");
+        MoveResult draw = rules.TryMove(Move("h1g2"));
+        Assert.That(draw.IsDraw, Is.True);
+        Assert.That(draw.Outcome, Is.EqualTo(MatchOutcome.InsufficientMaterial));
+    }
+
+    [Test]
+    public void OrdinaryMovesAndChecksKeepTheMatchInProgress()
+    {
+        var rules = new ChessRulesAdapter();
+        Assert.That(rules.TryMove(Move("e2e4")).Outcome, Is.EqualTo(MatchOutcome.InProgress));
+        rules.Reset("4k3/8/8/8/8/8/8/R3K3 w - - 0 1");
+        MoveResult check = rules.TryMove(Move("a1a8"));
+        Assert.That(check.IsCheck, Is.True);
+        Assert.That(check.Outcome, Is.EqualTo(MatchOutcome.InProgress));
     }
 }

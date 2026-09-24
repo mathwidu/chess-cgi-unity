@@ -110,7 +110,33 @@ public class ComputerGameTests
         yield return WaitFor(() => controller.IsGameOver);
         Assert.That(controller.MoveHistory.Count, Is.EqualTo(4));
         Assert.That(controller.StatusMessage, Does.StartWith("Xeque-mate"));
+        Assert.That(controller.Outcome, Is.EqualTo(MatchOutcome.Checkmate));
+        Assert.That(controller.Winner, Is.EqualTo(ChessSide.Black));
         Assert.That(chooser.Calls, Is.EqualTo(2));
+        HumanMove("e2", "e4");
+        Assert.That(controller.MoveHistory.Count, Is.EqualTo(4), "No move is accepted after checkmate.");
+    }
+
+    [UnityTest]
+    public IEnumerator HumanCheckmateNamesTheHumanAsWinnerAndNewGameClearsIt()
+    {
+        var chooser = new ScriptedMoveChooser("f7f6", "g7g5", "f7f6");
+        controller.SetMoveChooserFactory(() => chooser);
+        controller.StartComputerGame(ChessSide.White, ComputerDifficulty.Hard);
+        HumanMove("e2", "e4");
+        yield return WaitFor(() => controller.MoveHistory.Count == 2 && !controller.IsInputBlocked);
+        HumanMove("d2", "d4");
+        yield return WaitFor(() => controller.MoveHistory.Count == 4 && !controller.IsInputBlocked);
+        HumanMove("d1", "h5");
+        yield return WaitFor(() => controller.IsGameOver && !controller.IsInputBlocked);
+        Assert.That(controller.Outcome, Is.EqualTo(MatchOutcome.Checkmate));
+        Assert.That(controller.Winner, Is.EqualTo(ChessSide.White));
+        Assert.That(controller.IsComputerTurn, Is.False);
+        Assert.That(controller.MoveHistory.Last(), Does.EndWith("#"));
+        controller.NewGame();
+        Assert.That(controller.Outcome, Is.EqualTo(MatchOutcome.InProgress));
+        Assert.That(controller.Winner, Is.Null);
+        Assert.That(controller.IsGameOver, Is.False);
     }
 
     [UnityTest]

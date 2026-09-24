@@ -124,6 +124,7 @@ public sealed partial class GameHud
         }
         RectTransform scope = showHowToPlay ? howToPlayPanel :
             computerErrorPanel.gameObject.activeSelf ? computerErrorPanel :
+            IsResultShown ? gameOverPanel :
             promotionPanel.gameObject.activeSelf ? promotionPanel :
             showStartScreen ? menuContent : matchInterface;
         GameObject current = events.currentSelectedGameObject;
@@ -174,7 +175,7 @@ public sealed partial class GameHud
         if (matchControls != null)
         {
             bool matchNeedsChoice = gameController != null &&
-                (gameController.IsAwaitingPromotion || gameController.HasComputerError);
+                (gameController.IsAwaitingPromotion || gameController.HasComputerError || IsResultShown);
             matchControls.interactable = !showHowToPlay && !matchNeedsChoice;
         }
 
