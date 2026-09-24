@@ -25,6 +25,8 @@ public static class XRCameraVerification
         VerifyOrbitAndZoom,
         WaitForMove,
         VerifyTurnDidNotMoveCamera,
+        VerifyBlackSeat,
+        VerifyMenuSeat,
     }
 
     private static Stage stage;
@@ -38,6 +40,7 @@ public static class XRCameraVerification
     private static BoardSquare destinationSquare;
     private static Vector3 preMovePosition;
     private static Quaternion preMoveRotation;
+    private static Vector3 whiteSeatPosition;
     private static readonly XRVerificationResult result = new XRVerificationResult();
 
     static XRCameraVerification()
@@ -131,6 +134,32 @@ public static class XRCameraVerification
 
             case Stage.VerifyTurnDidNotMoveCamera:
                 ReportTurnCameraResult();
+                whiteSeatPosition = XRRig.Origin.position;
+                gameController.SetMoveChooserFactory(() => throw new System.InvalidOperationException("no engine in the camera check"));
+                gameController.StartComputerGame(ChessSide.Black, ComputerDifficulty.Beginner);
+                Advance(Stage.VerifyBlackSeat);
+                return;
+
+            case Stage.VerifyBlackSeat:
+                if (frameCount - holdStartSimFrame < 5)
+                {
+                    return;
+                }
+
+                ReportSeatResult(true);
+                gameController.ReturnToMenu();
+                Advance(Stage.VerifyMenuSeat);
+                return;
+
+            case Stage.VerifyMenuSeat:
+                if (frameCount - holdStartSimFrame < 5)
+                {
+                    return;
+                }
+
+                ReportSeatResult(false);
+                result.LogSummary("CHESS_CGI_XR_CAMERA_CHECK");
+                SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
                 EditorApplication.update -= Tick;
                 SessionState.SetBool(ArmedKey, false);
                 SessionState.SetBool(DoneKey, true);
@@ -203,6 +232,7 @@ public static class XRCameraVerification
 
     private static bool TryMovePieceByGrab()
     {
+        gameController.StartLocalGame();
         PieceView pawn = boardView.Pieces.FirstOrDefault(p => p.Square.ToAlgebraic() == "a2");
         if (pawn == null)
         {
@@ -235,8 +265,26 @@ public static class XRCameraVerification
         result.Check(!originRotatedByTurn, "the XR Origin should not rotate on a turn-only change");
         result.Check(cameraController.CurrentPerspective == ChessSide.White, "the retired per-turn flip should leave CurrentPerspective at White");
 
-        result.LogSummary("CHESS_CGI_XR_CAMERA_CHECK");
-        SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
+    }
+
+    private static void ReportSeatResult(bool asBlack)
+    {
+        Vector3 expected = asBlack ? new Vector3(-whiteSeatPosition.x, whiteSeatPosition.y, -whiteSeatPosition.z) : whiteSeatPosition;
+        float seatOffset = Vector3.Distance(XRRig.Origin.position, expected);
+        Vector3 toBoard = BoardTarget - XRRig.Origin.position;
+        toBoard.y = 0f;
+        Vector3 flatForward = Vector3.ProjectOnPlane(XRRig.Origin.forward, Vector3.up).normalized;
+        bool facesBoard = Vector3.Dot(flatForward, toBoard.normalized) > 0.9f;
+        Transform hud = Object.FindFirstObjectByType<GameHud>().transform;
+        bool hudInFront = Vector3.Dot(hud.position - XRRig.Origin.position, toBoard.normalized) > 1f;
+
+        Debug.Log("CHESS_CGI_XR_CAMERA_CHECK " +
+            $"asBlack={asBlack} seatedAsBlack={XRRig.SeatedAsBlack} seatOffset={seatOffset:F3} facesBoard={facesBoard} hudInFront={hudInFront}");
+
+        result.Check(XRRig.SeatedAsBlack == asBlack, $"SeatedAsBlack should be {asBlack}");
+        result.Check(seatOffset < 0.01f, "the seat should be at the mirrored position when playing Black and back at the white seat in the menu");
+        result.Check(facesBoard, "the seat should face the board");
+        result.Check(hudInFront, "the HUD panel should stay in front of the player");
     }
 
     private static void FailAndStop(string reason)

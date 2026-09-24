@@ -116,6 +116,8 @@ public static class XRGrabVerification
             return;
         }
 
+        game.StartLocalGame();
+
         CheckRigAndPieces(offset);
 
         PieceView whitePawn = FindPiece(4, 2);
@@ -127,18 +129,22 @@ public static class XRGrabVerification
             XRGrabInteractable black = blackPawn.GetComponent<XRGrabInteractable>();
             result.Check(((IXRSelectInteractable)white).IsSelectableBy(leftInteractor), "the current side's piece should be grabbable");
             result.Check(!((IXRSelectInteractable)black).IsSelectableBy(leftInteractor), "the other side's piece should not be grabbable");
+            CheckGrabHighlight(white, black);
             white.interactionManager.SelectEnter((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)white);
+            result.Check(!whitePawn.GetComponent<PieceGrabHighlight>().IsLit, "grabbing a piece should turn its highlight off");
         }));
         steps.Enqueue((0.1f, () =>
         {
             result.Check(game.SelectedPiece == whitePawn, "grabbing a piece should select it");
             result.Check(board.HighlightCount == 2, "grabbing e2 should highlight its 2 legal destinations");
+            result.Check(leftInteractor.GetComponentInChildren<ControllerHandPose>().Pinch > 0f, "the grabbing hand should close into the pinch pose");
             XRGrabInteractable white = whitePawn.GetComponent<XRGrabInteractable>();
             white.interactionManager.SelectExit((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)white);
         }));
         steps.Enqueue((0.3f, () =>
         {
             result.Check(game.SelectedPiece == null, "releasing on the origin square should deselect the piece");
+            result.Check(leftInteractor.GetComponentInChildren<ControllerHandPose>().Pinch == 0f, "releasing the piece should open the hand again");
             result.Check(game.CurrentTurn == ChessSide.White, "releasing on the origin square should not move");
         }));
 
@@ -178,6 +184,40 @@ public static class XRGrabVerification
         }));
     }
 
+    private static void CheckGrabHighlight(XRGrabInteractable white, XRGrabInteractable black)
+    {
+        PieceGrabHighlight whiteHighlight = white.GetComponent<PieceGrabHighlight>();
+        PieceGrabHighlight blackHighlight = black.GetComponent<PieceGrabHighlight>();
+        IXRHoverInteractor hand = leftInteractor;
+
+        result.Check(!whiteHighlight.IsLit && !blackHighlight.IsLit, "no piece should be highlighted before a hand is in reach");
+
+        white.interactionManager.HoverEnter(hand, (IXRHoverInteractable)white);
+        result.Check(whiteHighlight.IsLit, "hovering the current side's piece should highlight it");
+        result.Check(HasActiveOutline(white.transform), "the highlight should show an outline shell on the piece");
+        white.interactionManager.HoverExit(hand, (IXRHoverInteractable)white);
+        result.Check(!whiteHighlight.IsLit && !HasActiveOutline(white.transform), "moving the hand away should remove the highlight");
+
+        black.interactionManager.HoverEnter(hand, (IXRHoverInteractable)black);
+        result.Check(!blackHighlight.IsLit && !HasActiveOutline(black.transform), "hovering the other side's piece should not highlight it");
+        black.interactionManager.HoverExit(hand, (IXRHoverInteractable)black);
+
+        white.interactionManager.HoverEnter(hand, (IXRHoverInteractable)white);
+    }
+
+    private static bool HasActiveOutline(Transform piece)
+    {
+        foreach (MeshRenderer renderer in piece.GetComponentsInChildren<MeshRenderer>())
+        {
+            if (renderer.gameObject.name == "GrabOutline" && renderer.gameObject.activeSelf)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static void CheckRigAndPieces(Transform offset)
     {
         int grabbable = 0;
@@ -205,7 +245,7 @@ public static class XRGrabVerification
             string selectPath = interactor.selectInput.inputActionPerformed.bindings[0].path;
 
             result.Check(interactor.enableNearCasting, $"{controllerName} should cast near for grabbing");
-            result.Check(selectPath.EndsWith("gripButton"), $"{controllerName} should select with the grip, got {selectPath}");
+            result.Check(selectPath.EndsWith("triggerButton"), $"{controllerName} should select with the index trigger, got {selectPath}");
             result.Check((far.raycastMask.value & (1 << PieceView.PhysicsLayer)) == 0 && far.raycastMask.value != 0, $"{controllerName} far ray should skip the pieces layer but still reach the HUD");
             result.Check(visual.curveInteractionDataProvider is UiOnlyCurveData, $"{controllerName} ray should only show over the HUD");
         }

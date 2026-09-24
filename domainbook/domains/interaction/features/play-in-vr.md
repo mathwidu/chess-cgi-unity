@@ -205,19 +205,20 @@ Example: O headset comanda a visão
 
 Example: Agarrar uma peça a seleciona
   Given é a vez do jogador no modo VR
-  When o jogador segura o grip com a mão perto de uma de suas peças
+  When o jogador segura o gatilho do indicador com a mão perto de uma de suas peças
   Then essa peça é selecionada
   And seus destinos legais são destacados, como em um clique de mouse
+  And a mão do controle fecha na pose de pinça enquanto segura a peça e reabre ao soltá-la
 
 Example: Soltar sobre um destino legal faz a jogada
   Given o jogador segura uma peça no modo VR
-  When solta o grip com a peça sobre uma casa destacada
+  When solta o gatilho com a peça sobre uma casa destacada
   Then a jogada chega às regras pelo comando existente de escolha de destino
   And o resultado corresponde ao da build de desktop
 
 Example: Soltar em um lugar inválido devolve a peça
   Given o jogador segura uma peça no modo VR
-  When solta o grip com a peça fora dos destinos legais, ou fora do tabuleiro
+  When solta o gatilho com a peça fora dos destinos legais, ou fora do tabuleiro
   Then o jogo informa jogada inválida
   And a peça volta à casa de origem, sem passar o turno
 
@@ -255,10 +256,12 @@ presente.
 [controle de movimento](../glossary.md), rastreado da mesma forma genérica por
 meio de `<XRController>{LeftHand}` / `{RightHand}`. O alcance próximo (uma
 esfera de 6 cm ao redor da mão) [agarra](../glossary.md) as peças, vinculado
-ao botão de grip. O alcance distante virou o [raio de seleção](../glossary.md)
+ao gatilho do indicador. O alcance distante virou o [raio de seleção](../glossary.md)
 do HUD: sua máscara exclui a layer das peças (`PieceView.PhysicsLayer`), então
 ele não atinge peças, e um `UiOnlyCurveData` só o desenha ao apontar para a UI;
-o gatilho continua sendo o clique de UI. `PieceFactory` dá a cada peça um XR
+o mesmo gatilho continua sendo o clique de UI. `ControllerHandPose` fecha o
+modelo de mão do controle na pose de pinça (polegar e indicador se tocando, os
+outros dedos dobrados) enquanto o interactor segura uma peça. `PieceFactory` dá a cada peça um XR
 Grab Interactable (com Rigidbody kinematic, sem rotação nem arremesso) quando
 um headset está presente; as casas deixaram de ser interactables. O
 `VrSelectionBridge` da peça filtra quem pode ser agarrado (só o lado do turno),
@@ -269,8 +272,10 @@ chama `ChessGameController.GrabPiece` ao agarrar e `ReleasePiece` ao soltar; o
 comandos idênticos nos dois modos. Cobre esses exemplos a verificação
 `XRGrabVerification` (simulador de XR, sem headset real): agarrar, soltar na
 própria casa, soltar num destino legal, soltar num destino inválido e fora do
-tabuleiro. O feeling do agarrar (raio de 6 cm, ponto de agarre na mão) só se
-confirma no Rift de verdade.
+tabuleiro. A peça ao alcance da mão, se puder ser agarrada, ganha um contorno
+laranja (`PieceGrabHighlight`, no contexto de apresentação) que some ao
+agarrá-la; a verificação `XRGrabVerification` também cobre isso. O feeling do
+agarrar (raio de 6 cm, ponto de agarre na mão) só se confirma no Rift de verdade.
 
 O quarto exemplo, [rastreamento de mãos](../glossary.md), também está
 construído: o pacote `com.unity.xr.hands` e a feature OpenXR **Hand Tracking

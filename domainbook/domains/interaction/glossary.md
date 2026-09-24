@@ -66,7 +66,7 @@ são [agarradas e soltas](#agarrar-e-soltar) com a mão.
 ## Agarrar e soltar
 
 Escolher e jogar uma peça no modo VR com a mão, em vez de apontar. Segurar o
-grip perto de uma peça da vez a agarra (e seleciona, mostrando seus destinos
+gatilho do indicador perto de uma peça da vez a agarra (e seleciona, mostrando seus destinos
 legais); soltá-la sobre um destino legal faz a jogada. Soltar em qualquer
 outro lugar, inclusive fora do tabuleiro, é jogada inválida e a peça volta à
 casa de origem; soltar na própria casa apenas desfaz a seleção.

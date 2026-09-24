@@ -59,6 +59,7 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `VrSelectionBridge` agora liga o evento de agarrar e soltar de um XR Grab
   Interactable a `ChessGameController.GrabPiece` / `ReleasePiece`; veja
   [play-in-vr](features/play-in-vr.md).
+- Contra a IA jogando de pretas, o assento de VR gira 180° em torno do tabuleiro, para o jogador ver a partida do lado das pretas; ao voltar ao menu ou jogar a dois, volta ao lado das brancas. O `XRRig` acompanha o estado do controlador e preserva a órbita e o zoom já feitos.
 
 ### Changed
 
@@ -83,6 +84,9 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   mesma regra. Removida a verificação `XRControllerVerification`, que testava
   o fluxo antigo de apontar e puxar o gatilho; o `XRGrabVerification` a
   substitui.
+- Contra a IA, a câmera desktop permanece na perspectiva do lado humano.
+- O controlador central bloqueia seleções humanas no turno do computador, independentemente de mouse ou raio VR.
+- Agarrar uma peça com o [controle de movimento](glossary.md) passou do grip para o gatilho do indicador, o mesmo botão do clique de UI (o raio distante só age sobre o HUD, então os dois usos não se cruzam). Enquanto segura uma peça, o modelo de mão do controle fecha na pose de pinça, e reabre ao soltar; o `ControllerHandPose` faz essa transição sobre os ossos da mão.
 
 ### Fixed
 
@@ -100,3 +104,4 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `Resources/XR/ControllerRayMaterial`, que entra na build, e o `XRRig`
   marca o rig como construído antes de montá-lo, para que uma falha não o
   reconstrua a cada frame.
+- Cliques sobre a interface não selecionam peças por trás do HUD; o atalho N fica inativo no menu.

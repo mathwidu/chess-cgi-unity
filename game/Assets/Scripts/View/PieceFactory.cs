@@ -75,6 +75,7 @@ public sealed class PieceFactory : MonoBehaviour
         {
             AddGrabInteractable(root);
             root.AddComponent<VrSelectionBridge>();
+            root.AddComponent<PieceGrabHighlight>();
         }
 
         return pieceView;
