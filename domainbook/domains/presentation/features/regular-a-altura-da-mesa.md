@@ -51,8 +51,7 @@ Example: A altura sobrevive a uma nova partida e a uma nova sessão
 Example: A placa acompanha o lado de quem joga
   Given o jogador joga de brancas
   Then a placa fica no tampo, à esquerda do tabuleiro, inclinada para ele
-  When o jogador passa a jogar de pretas — o assento VR gira contra a IA
-    ou a câmera desktop vira para o turno das pretas
+  When o jogador passa a jogar de pretas, no assento VR ou na câmera desktop
   Then a placa passa para a esquerda desse jogador
 
 Example: A placa responde ao mouse e ao raio do controle
