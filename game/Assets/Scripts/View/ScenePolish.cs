@@ -6,11 +6,6 @@ public sealed class ScenePolish : MonoBehaviour
     private const string CollegeThemeName = "CollegeTheme";
     private const string LightingRigName = "LightingRig";
 
-    private static readonly Vector3 DesktopTablePosition = new Vector3(0f, -0.54f, 0f);
-    private static readonly Vector3 DesktopTableScale = new Vector3(12f, 0.8f, 12f);
-    private static readonly Vector3 VrTablePosition = new Vector3(0f, 0.387f, 0f);
-    private static readonly Vector3 VrTableScale = new Vector3(0.9f, 0.774f, 0.9f);
-
     [SerializeField] private bool applyOnAwake = true;
 
     public void ApplyPolish()
@@ -57,15 +52,19 @@ public sealed class ScenePolish : MonoBehaviour
     {
         ClearChildren(collegeTheme);
 
-        Material tableMaterial = CreateMaterial("Runtime_Table_Wood", new Color(0.42f, 0.27f, 0.17f), 0.38f, 0.48f);
+        // Floor and table are modelled in VR meters; the board fits the room to the current mode.
+        BoardView board = Object.FindFirstObjectByType<BoardView>();
+        if (board != null)
+        {
+            board.FitVrRoomToMode(collegeTheme);
+        }
+
         Material floorMaterial = CreateMaterial("Runtime_Floor", new Color(0.32f, 0.31f, 0.29f), 0f, 0.4f);
-
-        bool headsetPresent = XRRig.IsHeadsetPresent;
-        Vector3 tablePosition = headsetPresent ? VrTablePosition : DesktopTablePosition;
-        Vector3 tableScale = headsetPresent ? VrTableScale : DesktopTableScale;
-
         CreateCube(collegeTheme, "Floor", new Vector3(0f, -0.02f, 0f), new Vector3(4f, 0.04f, 4f), floorMaterial, false);
-        CreateCube(collegeTheme, "Table", tablePosition, tableScale, tableMaterial, false);
+
+        GameObject table = new GameObject("Table");
+        table.transform.SetParent(collegeTheme, false);
+        table.AddComponent<TableView>().Build();
     }
 
     private void ApplyCameraDefaults()
@@ -117,7 +116,7 @@ public sealed class ScenePolish : MonoBehaviour
         return light;
     }
 
-    private static GameObject CreateCube(
+    internal static GameObject CreateCube(
         Transform parent,
         string name,
         Vector3 localPosition,
@@ -143,7 +142,7 @@ public sealed class ScenePolish : MonoBehaviour
         return cube;
     }
 
-    private static Material CreateMaterial(string name, Color color, float metallic, float smoothness)
+    internal static Material CreateMaterial(string name, Color color, float metallic, float smoothness)
     {
         Shader shader = Shader.Find("Universal Render Pipeline/Lit");
         if (shader == null)
@@ -186,6 +185,8 @@ public sealed class ScenePolish : MonoBehaviour
             GameObject child = parent.GetChild(i).gameObject;
             if (Application.isPlaying)
             {
+                // Destroy is deferred; an inactive leftover never runs Start beside its replacement.
+                child.SetActive(false);
                 Object.Destroy(child);
             }
             else

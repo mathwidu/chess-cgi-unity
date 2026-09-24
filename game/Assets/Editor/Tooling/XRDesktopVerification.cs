@@ -102,12 +102,15 @@ public static class XRDesktopVerification
 
         Vector3 scale = boardView.transform.lossyScale;
         Vector3 position = boardView.transform.position;
+        // The player may have raised or lowered the table; the board rides on it.
+        TableView table = Object.FindFirstObjectByType<TableView>();
+        Vector3 expected = Vector3.up * (table != null ? table.BoardOffset : 0f);
         bool scaleIsOne = Vector3.Distance(scale, Vector3.one) < 0.01f;
-        bool atOrigin = position.magnitude < 0.01f;
+        bool atOrigin = Vector3.Distance(position, expected) < 0.01f;
 
-        Debug.Log($"CHESS_CGI_DESKTOP_CHECK boardScale={scale.ToString("F3")} boardPosition={position.ToString("F3")}");
+        Debug.Log($"CHESS_CGI_DESKTOP_CHECK boardScale={scale.ToString("F3")} boardPosition={position.ToString("F3")} tableOffset={expected.y:F3}");
         result.Check(scaleIsOne, "the desktop board should render at world scale 1");
-        result.Check(atOrigin, "the desktop board should sit at the world origin");
+        result.Check(atOrigin, "the desktop board should sit at the world origin, on the table's current height");
     }
 
     private static void CheckCameraFramesBoard()
