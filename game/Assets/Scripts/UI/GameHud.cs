@@ -58,6 +58,7 @@ public sealed partial class GameHud : MonoBehaviour
     private Vector3 selectedPiecePreviewFocusPoint;
     private PieceView previewedPiece;
     private Canvas hudCanvas;
+    private bool panelSeatedAsBlack;
 
     public void Configure(ChessGameController controller)
     {
@@ -83,6 +84,11 @@ public sealed partial class GameHud : MonoBehaviour
         if (hudCanvas != null && hudCanvas.renderMode == RenderMode.WorldSpace && hudCanvas.worldCamera == null)
         {
             hudCanvas.worldCamera = XRRig.EyeCamera;
+        }
+
+        if (hudCanvas != null && hudCanvas.renderMode == RenderMode.WorldSpace && panelSeatedAsBlack != XRRig.SeatedAsBlack)
+        {
+            PlaceWorldPanel((RectTransform)transform);
         }
 
         RefreshInterface();
@@ -552,8 +558,7 @@ public sealed partial class GameHud : MonoBehaviour
         canvasRect.anchorMax = new Vector2(0.5f, 0.5f);
         canvasRect.sizeDelta = new Vector2(1920f, 1080f);
         canvasRect.localScale = Vector3.one * VrPanelScale;
-        canvasRect.position = VrPanelPosition;
-        canvasRect.rotation = Quaternion.LookRotation(VrPanelPosition - XRRig.SeatEyePosition, Vector3.up);
+        PlaceWorldPanel(canvasRect);
 
         GraphicRaycaster legacyRaycaster = GetComponent<GraphicRaycaster>();
         if (legacyRaycaster != null)
@@ -565,6 +570,14 @@ public sealed partial class GameHud : MonoBehaviour
         {
             gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
         }
+    }
+
+    private void PlaceWorldPanel(RectTransform canvasRect)
+    {
+        panelSeatedAsBlack = XRRig.SeatedAsBlack;
+        Vector3 panelPosition = XRRig.SeatAwarePoint(VrPanelPosition);
+        canvasRect.position = panelPosition;
+        canvasRect.rotation = Quaternion.LookRotation(panelPosition - XRRig.SeatAwarePoint(XRRig.SeatEyePosition), Vector3.up);
     }
 
     private void EnsureEventSystem(bool vrMode)

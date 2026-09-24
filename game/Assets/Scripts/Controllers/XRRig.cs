@@ -26,6 +26,12 @@ public sealed class XRRig : MonoBehaviour
     public static readonly Vector3 SeatEyePosition = SeatPosition + Vector3.up * EyeHeight;
     public static Camera EyeCamera { get; private set; }
     public static Transform Origin { get; private set; }
+    public static bool SeatedAsBlack { get; private set; }
+
+    public static Vector3 SeatAwarePoint(Vector3 point)
+    {
+        return SeatedAsBlack ? new Vector3(-point.x, point.y, -point.z) : point;
+    }
 
     private InputController inputController;
     private ChessGameController gameController;
@@ -67,6 +73,8 @@ public sealed class XRRig : MonoBehaviour
             return;
         }
 
+        UpdateSeatSide();
+
         Keyboard keyboard = Keyboard.current;
         Mouse mouse = Mouse.current;
 
@@ -91,6 +99,24 @@ public sealed class XRRig : MonoBehaviour
         ApplyOrbitAndZoom(Origin, orbitDirection, scrollDelta);
     }
 
+    private void UpdateSeatSide()
+    {
+        if (gameController == null)
+        {
+            gameController = FindFirstObjectByType<ChessGameController>();
+            return;
+        }
+
+        bool asBlack = gameController.IsAgainstComputer && !gameController.IsMenuOpen && gameController.HumanSide == ChessSide.Black;
+        if (asBlack == SeatedAsBlack)
+        {
+            return;
+        }
+
+        SeatedAsBlack = asBlack;
+        Origin.RotateAround(BoardTarget, Vector3.up, 180f);
+    }
+
     private void ApplyOrbitAndZoom(Transform subject, float orbitDirection, float scrollDelta)
     {
         if (Mathf.Abs(orbitDirection) > 0f)
@@ -112,6 +138,7 @@ public sealed class XRRig : MonoBehaviour
     private void BuildRig()
     {
         rigBuilt = true;
+        SeatedAsBlack = false;
         bool usingSimulator = InputSystem.GetDevice<XRHMD>() is XRSimulatedHMD;
 
         GameObject originObject = new GameObject("XR Origin (VR)");

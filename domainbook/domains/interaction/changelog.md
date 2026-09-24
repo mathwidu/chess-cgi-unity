@@ -59,6 +59,7 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `VrSelectionBridge` agora liga o evento de agarrar e soltar de um XR Grab
   Interactable a `ChessGameController.GrabPiece` / `ReleasePiece`; veja
   [play-in-vr](features/play-in-vr.md).
+- Contra a IA jogando de pretas, o assento de VR gira 180° em torno do tabuleiro, para o jogador ver a partida do lado das pretas; ao voltar ao menu ou jogar a dois, volta ao lado das brancas. O `XRRig` acompanha o estado do controlador e preserva a órbita e o zoom já feitos.
 
 ### Changed
 
