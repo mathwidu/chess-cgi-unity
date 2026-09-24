@@ -51,6 +51,11 @@ public sealed class ChessGameController : MonoBehaviour
     // Material on the board, White minus Black.
     public int MaterialBalance { get; private set; }
     public bool IsAnimatingMove => animatingMove.HasValue;
+    // The last move that landed on the board, and the king it left in check, if any.
+    public ChessMove? LastMove { get; private set; }
+    public BoardSquare? CheckedKing { get; private set; }
+    // Raised once per move, after it lands and the match state (turn, check, outcome) is updated.
+    public event System.Action<MoveResult> MoveApplied;
     public string StatusMessage { get; private set; } = "Turno: Brancas";
 
     public void Configure(BoardView board, PieceFactory factory, GameHud gameHud, CameraController camera = null)
@@ -166,6 +171,8 @@ public sealed class ChessGameController : MonoBehaviour
         matchStarted = true;
         Outcome = MatchOutcome.InProgress;
         Winner = null;
+        LastMove = null;
+        CheckedKing = null;
         inputBlocked = false;
         awaitingPromotion = false;
         selectedPiece = null;
@@ -329,17 +336,18 @@ public sealed class ChessGameController : MonoBehaviour
         }
     }
 
-    public void ReleasePiece(PieceView piece, Vector3 worldPosition)
+    // Returns false when the drop was refused (off the board or not a legal destination).
+    public bool ReleasePiece(PieceView piece, Vector3 worldPosition)
     {
         if (piece == null)
         {
-            return;
+            return false;
         }
 
         if (piece != selectedPiece)
         {
             ReturnToSquare(piece);
-            return;
+            return false;
         }
 
         bool onBoard = boardView.TryGetSquareAt(worldPosition, out BoardSquare destination);
@@ -347,7 +355,7 @@ public sealed class ChessGameController : MonoBehaviour
         {
             CancelSelection();
             ReturnToSquare(piece);
-            return;
+            return true;
         }
 
         if (!onBoard || !legalDestinations.Contains(destination))
@@ -355,7 +363,7 @@ public sealed class ChessGameController : MonoBehaviour
             ClearSelection();
             StatusMessage = "Movimento invalido.";
             ReturnToSquare(piece);
-            return;
+            return false;
         }
 
         SelectDestination(destination);
@@ -363,6 +371,8 @@ public sealed class ChessGameController : MonoBehaviour
         {
             piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(destination), ReturnDuration));
         }
+
+        return true;
     }
 
     public void SelectSquare(SquareView square)
@@ -508,6 +518,18 @@ public sealed class ChessGameController : MonoBehaviour
 
     private void ApplyMoveResult(MoveResult moveResult)
     {
+        UpdateAfterMove(moveResult);
+        MoveApplied?.Invoke(moveResult);
+    }
+
+    private void UpdateAfterMove(MoveResult moveResult)
+    {
+        // Mark the move once it has landed, so the highlight arrives with the piece.
+        LastMove = new ChessMove(moveResult.From, moveResult.To);
+        CheckedKing = moveResult.IsCheck ? rules.FindKing(CurrentTurn) : null;
+        boardView.MarkLastMove(moveResult.From, moveResult.To);
+        boardView.MarkCheck(CheckedKing);
+
         // The provider survives human turns, but each completed search is consumed once.
         if (moveResult.Outcome != MatchOutcome.InProgress)
         {

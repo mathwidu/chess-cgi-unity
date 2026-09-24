@@ -6,6 +6,7 @@ using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Attachment;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
@@ -309,6 +310,14 @@ public sealed class XRRig : MonoBehaviour
                 $"XR {hand} UI Press", InputActionType.Button, $"<XRController>{{{hand}}}/triggerButton"),
         };
         interactor.uiPressInput = uiPressInput;
+
+        // The rig is built in code with no input action asset, so bind the controller's
+        // OpenXR haptic output directly; the interactor finds this player when it vibrates.
+        HapticImpulsePlayer haptics = controllerObject.AddComponent<HapticImpulsePlayer>();
+        haptics.hapticOutput = new XRInputHapticImpulseProvider($"XR {hand} Haptic", inputSourceMode: XRInputHapticImpulseProvider.InputSourceMode.InputAction)
+        {
+            inputAction = new InputAction($"XR {hand} Haptic", InputActionType.PassThrough, $"<XRController>{{{hand}}}/{{Haptic}}"),
+        };
 
         GameObject handModel = BuildHandVisual(controllerObject.transform, handModelName);
         if (handModel != null)
