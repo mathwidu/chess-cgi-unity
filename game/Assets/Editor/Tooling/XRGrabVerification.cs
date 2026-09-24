@@ -129,7 +129,9 @@ public static class XRGrabVerification
             XRGrabInteractable black = blackPawn.GetComponent<XRGrabInteractable>();
             result.Check(((IXRSelectInteractable)white).IsSelectableBy(leftInteractor), "the current side's piece should be grabbable");
             result.Check(!((IXRSelectInteractable)black).IsSelectableBy(leftInteractor), "the other side's piece should not be grabbable");
+            CheckGrabHighlight(white, black);
             white.interactionManager.SelectEnter((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)white);
+            result.Check(!whitePawn.GetComponent<PieceGrabHighlight>().IsLit, "grabbing a piece should turn its highlight off");
         }));
         steps.Enqueue((0.1f, () =>
         {
@@ -180,6 +182,40 @@ public static class XRGrabVerification
             result.Check(game.StatusMessage == "Movimento invalido.", "releasing off the board should report an invalid move");
             result.Check(game.SelectedPiece == null, "releasing off the board should clear the selection");
         }));
+    }
+
+    private static void CheckGrabHighlight(XRGrabInteractable white, XRGrabInteractable black)
+    {
+        PieceGrabHighlight whiteHighlight = white.GetComponent<PieceGrabHighlight>();
+        PieceGrabHighlight blackHighlight = black.GetComponent<PieceGrabHighlight>();
+        IXRHoverInteractor hand = leftInteractor;
+
+        result.Check(!whiteHighlight.IsLit && !blackHighlight.IsLit, "no piece should be highlighted before a hand is in reach");
+
+        white.interactionManager.HoverEnter(hand, (IXRHoverInteractable)white);
+        result.Check(whiteHighlight.IsLit, "hovering the current side's piece should highlight it");
+        result.Check(HasActiveOutline(white.transform), "the highlight should show an outline shell on the piece");
+        white.interactionManager.HoverExit(hand, (IXRHoverInteractable)white);
+        result.Check(!whiteHighlight.IsLit && !HasActiveOutline(white.transform), "moving the hand away should remove the highlight");
+
+        black.interactionManager.HoverEnter(hand, (IXRHoverInteractable)black);
+        result.Check(!blackHighlight.IsLit && !HasActiveOutline(black.transform), "hovering the other side's piece should not highlight it");
+        black.interactionManager.HoverExit(hand, (IXRHoverInteractable)black);
+
+        white.interactionManager.HoverEnter(hand, (IXRHoverInteractable)white);
+    }
+
+    private static bool HasActiveOutline(Transform piece)
+    {
+        foreach (MeshRenderer renderer in piece.GetComponentsInChildren<MeshRenderer>())
+        {
+            if (renderer.gameObject.name == "GrabOutline" && renderer.gameObject.activeSelf)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void CheckRigAndPieces(Transform offset)

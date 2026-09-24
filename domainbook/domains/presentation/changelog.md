@@ -10,6 +10,16 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Em VR, a peça ao alcance da mão (a que o gatilho do indicador agarraria)
+  ganha um contorno laranja: `PieceFactory` acrescenta um `PieceGrabHighlight`
+  a cada peça quando um headset está presente. Ele mostra, sobre cada malha da
+  peça, uma cópia com as faces voltadas para dentro, um pouco inflada, num
+  material sem iluminação (`Resources/XR/GrabOutlineMaterial`, shader
+  `ChessCgi/GrabOutline`), o que custa quase nada em GPUs modestas e vale
+  para as peças personalizadas e para as clássicas do modo desempenho. O
+  contorno só aparece quando `ChessGameController.CanGrabPiece` permite e
+  some ao agarrar a peça ou tirar a mão do alcance. Sem mudança no modo
+  desktop. Não é o [destaque](glossary.md) de destino legal.
 - Modo desempenho: `PieceFactory` ganha uma flag `usePrimitivePieces` que faz
   `CreatePiece` construir peças clássicas mesmo quando há um prefab de peça
   personalizada definido, um ganho em GPUs modestas. O `GameHud` acrescenta uma

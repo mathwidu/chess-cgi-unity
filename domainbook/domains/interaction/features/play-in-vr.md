@@ -272,8 +272,10 @@ chama `ChessGameController.GrabPiece` ao agarrar e `ReleasePiece` ao soltar; o
 comandos idênticos nos dois modos. Cobre esses exemplos a verificação
 `XRGrabVerification` (simulador de XR, sem headset real): agarrar, soltar na
 própria casa, soltar num destino legal, soltar num destino inválido e fora do
-tabuleiro. O feeling do agarrar (raio de 6 cm, ponto de agarre na mão) só se
-confirma no Rift de verdade.
+tabuleiro. A peça ao alcance da mão, se puder ser agarrada, ganha um contorno
+laranja (`PieceGrabHighlight`, no contexto de apresentação) que some ao
+agarrá-la; a verificação `XRGrabVerification` também cobre isso. O feeling do
+agarrar (raio de 6 cm, ponto de agarre na mão) só se confirma no Rift de verdade.
 
 O quarto exemplo, [rastreamento de mãos](../glossary.md), também está
 construído: o pacote `com.unity.xr.hands` e a feature OpenXR **Hand Tracking
