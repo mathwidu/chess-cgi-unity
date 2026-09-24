@@ -149,7 +149,8 @@ public sealed class TurnIndicatorView : MonoBehaviour
         labelText.text = text;
         labelText.color = color;
         strip.gameObject.SetActive(true);
-        label.gameObject.SetActive(text.Length > 0);
+        // The desktop HUD already names the turn; the label is for the far-away VR HUD.
+        label.gameObject.SetActive(text.Length > 0 && XRRig.IsHeadsetPresent);
     }
 
     private void Animate(float elapsed)

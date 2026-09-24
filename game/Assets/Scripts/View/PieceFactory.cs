@@ -64,11 +64,7 @@ public sealed class PieceFactory : MonoBehaviour
 
         PieceView pieceView = root.AddComponent<PieceView>();
         AddCollider(root);
-        Material sideMaterial = state.Side == ChessSide.White ? whiteMaterial : blackMaterial;
-        if (usePrimitivePieces || !BuildCustomShape(root.transform, state.Kind, state.Side, sideMaterial))
-        {
-            BuildPrimitiveShape(root.transform, state.Kind, sideMaterial);
-        }
+        BuildShape(root.transform, state.Kind, state.Side);
         pieceView.Initialize(state);
 
         if (XRRig.IsHeadsetPresent)
@@ -79,6 +75,30 @@ public sealed class PieceFactory : MonoBehaviour
         }
 
         return pieceView;
+    }
+
+    // A look-alike for display only (captured pieces): no collider, PieceView or XR grab.
+    public GameObject CreateDisplayPiece(ChessSide side, ChessPieceKind kind, Transform parent)
+    {
+        GameObject root = new GameObject($"{side} {kind}");
+        root.transform.SetParent(parent, false);
+        BuildShape(root.transform, kind, side);
+        // Primitive colliders are destroyed at the end of the frame; custom models may carry their own.
+        foreach (Collider collider in root.GetComponentsInChildren<Collider>())
+        {
+            collider.enabled = false;
+        }
+
+        return root;
+    }
+
+    private void BuildShape(Transform root, ChessPieceKind kind, ChessSide side)
+    {
+        Material sideMaterial = side == ChessSide.White ? whiteMaterial : blackMaterial;
+        if (usePrimitivePieces || !BuildCustomShape(root, kind, side, sideMaterial))
+        {
+            BuildPrimitiveShape(root, kind, sideMaterial);
+        }
     }
 
     private static void AddGrabInteractable(GameObject root)
