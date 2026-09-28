@@ -17,6 +17,7 @@ Para que eu leia o tabuleiro a partir do meu próprio lado sem mudar de lugar
 ```gherkin
 Example: A visão gira para o lado a jogar
   Given passa a ser a vez das Pretas
+  And o jogador está na vista do tabuleiro
   When a mudança de turno é aplicada
   Then a câmera termina voltada para o tabuleiro a partir do lado das Pretas
 
@@ -25,6 +26,10 @@ Example: Uma nova partida define a visão de imediato para o primeiro jogador
   When o tabuleiro é montado
   Then a câmera já está voltada para o lado das Brancas, sem transição
 ```
+
+Enquanto [olha ao redor](olhar-ao-redor-no-desktop.md), o jogador mantém a
+direção escolhida quando o turno muda. Voltar com R ou pelo HUD usa o lado
+atual da partida. Uma nova partida continua definindo a perspectiva de imediato.
 
 ## Rule: O jogador pode orbitar e dar zoom sem mudar de quem é o turno
 

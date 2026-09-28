@@ -43,8 +43,8 @@ selecionada.
 ## Preview da peça selecionada
 
 O painel que mostra a peça selecionada sozinha, renderizada por uma câmera
-pequena em uma textura, que o jogador pode orbitar e dar zoom para ler o
-personagem.
+pequena em uma textura, que o jogador pode orbitar, deslocar no enquadramento
+e aproximar para ler o personagem.
 
 - **Aliases:** Selected-piece preview, Painel da peça
 - **Status:** validated

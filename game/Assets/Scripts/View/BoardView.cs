@@ -101,7 +101,11 @@ public sealed class BoardView : MonoBehaviour
                 squareObject.transform.localScale = new Vector3(squareSize, 0.08f, squareSize);
 
                 Renderer renderer = squareObject.GetComponent<Renderer>();
-                renderer.sharedMaterial = (fileIndex + rank) % 2 == 0 ? darkSquareMaterial : lightSquareMaterial;
+                // The solid frame casts the board silhouette. Coplanar veneer
+                // tiles only receive piece shadows, avoiding self-shadow bands in VR.
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                // Standard orientation: a1 is dark and h1 is light.
+                renderer.sharedMaterial = (fileIndex + rank) % 2 == 1 ? darkSquareMaterial : lightSquareMaterial;
 
                 SquareView squareView = squareObject.AddComponent<SquareView>();
                 squareView.Initialize(square);
@@ -184,6 +188,16 @@ public sealed class BoardView : MonoBehaviour
     private void BuildBoardFrame()
     {
         float boardWidth = squareSize * 8f;
+        GameObject framePrefab = Resources.Load<GameObject>("Environment/ChessBoardFrame");
+        if (framePrefab != null)
+        {
+            GameObject frame = Object.Instantiate(framePrefab, boardFrameRoot, false);
+            frame.name = "BoardBase";
+            float horizontalScale = squareSize / 1.25f;
+            frame.transform.localScale = new Vector3(horizontalScale, 1f, horizontalScale);
+            return;
+        }
+
         Material rimMaterial = darkSquareMaterial != null ? darkSquareMaterial : lightSquareMaterial;
         Material baseMaterial = lightSquareMaterial != null ? lightSquareMaterial : darkSquareMaterial;
 
@@ -191,8 +205,8 @@ public sealed class BoardView : MonoBehaviour
         ConfigureDecorativePart(
             baseObject,
             "BoardBase",
-            new Vector3(0f, -0.08f, 0f),
-            new Vector3(boardWidth + 0.5f, 0.12f, boardWidth + 0.5f),
+            new Vector3(0f, -0.29f, 0f),
+            new Vector3(boardWidth + 1.28f, 0.5f, boardWidth + 1.28f),
             baseMaterial);
 
         GameObject rimObject = GameObject.CreatePrimitive(PrimitiveType.Cube);

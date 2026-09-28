@@ -312,7 +312,9 @@ public sealed partial class GameHud
         MenuLabel("HelpText", card, "01   Escolha uma peça do seu lado.\n02   Selecione uma casa destacada para mover.\n03   Proteja seu rei e busque o xeque-mate.", 24, textColor, 48, 184, 764, 138);
         MenuRule(card, 48, 344, 764);
         MenuLabel("CameraHelp", card, "CÂMERA", 15, accentColor, 48, 376, 300, 28, true);
-        MenuLabel("CameraShortcuts", card, "Q / E para girar\nScroll para aproximar", 22, mutedTextColor, 48, 417, 356, 68);
+        MenuLabel("CameraShortcuts", card, XRRig.IsHeadsetPresent
+            ? "Mova a cabeça para olhar\nQ / E: girar · Scroll: aproximar"
+            : "Botão direito + mouse: olhar\nR: voltar ao tabuleiro\nQ / E: girar · Scroll: aproximar", 20, mutedTextColor, 48, 410, 386, 98);
         MenuLabel("ActionHelp", card, "PARTIDA", 15, accentColor, 450, 376, 330, 28, true);
         MenuLabel("ActionShortcuts", card, "Esc cancela a seleção\nN inicia uma nova partida", 22, mutedTextColor, 450, 417, 364, 68);
         MenuButton("CloseHelpButton", card, "Entendi", 48, 524, 764, 58, actionColor, ToggleHowToPlay);

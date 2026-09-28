@@ -23,6 +23,7 @@ public sealed class MenuCastPreview : MonoBehaviour
 
     private readonly List<Material> materials = new List<Material>();
     private readonly List<Light> sceneLights = new List<Light>();
+    private readonly List<Light> studioLights = new List<Light>();
     private readonly List<bool> lightStates = new List<bool>();
     private GameObject stage;
     private Figure white;
@@ -115,8 +116,8 @@ public sealed class MenuCastPreview : MonoBehaviour
     {
         stage = new GameObject("MenuCastStage");
         stage.transform.position = new Vector3(1400, 1400, 1400);
-        white = AddFigure("CustomPieces/Queen_Marta", "WhiteProfessor", new Color32(221, 227, 214, 255));
-        black = AddFigure("CustomPieces/King_Ricardo_Carioca", "BlackProfessor", new Color32(24, 32, 27, 255));
+        white = AddFigure("CustomPieces/Queen_Marta", "WhiteProfessor", new Color32(221, 227, 214, 255), ChessSide.White);
+        black = AddFigure("CustomPieces/King_Ricardo_Carioca", "BlackProfessor", new Color32(24, 32, 27, 255), ChessSide.Black);
 
         texture = new RenderTexture(1290, 1176, 24, RenderTextureFormat.ARGB32)
         {
@@ -131,7 +132,8 @@ public sealed class MenuCastPreview : MonoBehaviour
         previewCamera.backgroundColor = Color.clear;
         previewCamera.cullingMask = 1 << PreviewLayer;
         previewCamera.orthographic = true;
-        previewCamera.orthographicSize = 1.29f;
+        // Include the authored plinths even when a professor moves forward.
+        previewCamera.orthographicSize = 1.7f;
         previewCamera.nearClipPlane = 0.1f;
         previewCamera.farClipPlane = 20;
         previewCamera.targetTexture = texture;
@@ -143,13 +145,10 @@ public sealed class MenuCastPreview : MonoBehaviour
         FindSceneLights();
     }
 
-    private Figure AddFigure(string path, string name, Color baseColor)
+    private Figure AddFigure(string path, string name, Color baseColor, ChessSide side)
     {
         var figure = new Figure { Root = new GameObject(name).transform };
         figure.Root.SetParent(stage.transform, false);
-        Material baseMaterial = MakeMaterial(baseColor);
-        Cylinder(figure.Root, "TeamBase", new Vector3(0, 0.045f, 0), new Vector3(1.02f, 0.045f, 1.02f), baseMaterial);
-        Cylinder(figure.Root, "BaseRim", new Vector3(0, 0.006f, 0), new Vector3(1.04f, 0.006f, 1.04f), MakeMaterial(new Color32(130, 123, 89, 255)));
         GameObject prefab = Resources.Load<GameObject>(path);
         if (prefab == null)
         {
@@ -159,6 +158,17 @@ public sealed class MenuCastPreview : MonoBehaviour
         character.name = "Menu_" + prefab.name;
         character.transform.localPosition = Vector3.zero;
         character.transform.localRotation = Quaternion.identity;
+        CustomPieceAppearance appearance = character.GetComponentInChildren<CustomPieceAppearance>();
+        if (appearance != null)
+        {
+            appearance.ApplySide(side);
+        }
+        else
+        {
+            Material baseMaterial = MakeMaterial(baseColor);
+            Cylinder(figure.Root, "TeamBase", new Vector3(0, 0.045f, 0), new Vector3(1.02f, 0.045f, 1.02f), baseMaterial);
+            Cylinder(figure.Root, "BaseRim", new Vector3(0, 0.006f, 0), new Vector3(1.04f, 0.006f, 1.04f), MakeMaterial(new Color32(130, 123, 89, 255)));
+        }
         foreach (Collider collider in character.GetComponentsInChildren<Collider>())
         {
             collider.enabled = false;
@@ -172,18 +182,18 @@ public sealed class MenuCastPreview : MonoBehaviour
         {
             return figure;
         }
-        FitCharacterToBase(character.transform, figure.Root, renderers);
+        FitCharacterToBase(character.transform, figure.Root, renderers, appearance != null ? 0f : 0.09f);
         CloneFigureMaterials(figure, renderers);
         return figure;
     }
 
-    private static void FitCharacterToBase(Transform character, Transform baseTransform, Renderer[] renderers)
+    private static void FitCharacterToBase(Transform character, Transform baseTransform, Renderer[] renderers, float baseOffset)
     {
         Bounds bounds = BoundsOf(renderers);
         character.localScale *= 2.35f / Mathf.Max(0.01f, bounds.size.y);
         bounds = BoundsOf(renderers);
         Vector3 foot = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
-        character.position += baseTransform.TransformPoint(Vector3.up * 0.09f) - foot;
+        character.position += baseTransform.TransformPoint(Vector3.up * baseOffset) - foot;
     }
 
     private void CloneFigureMaterials(Figure figure, Renderer[] renderers)
@@ -200,7 +210,7 @@ public sealed class MenuCastPreview : MonoBehaviour
                 Material clone = new Material(clones[i]);
                 clones[i] = clone;
                 materials.Add(clone);
-                string property = clone.HasProperty("_BaseColor") ? "_BaseColor" : clone.HasProperty("_BaseColorFactor") ? "_BaseColorFactor" : null;
+                string property = clone.HasProperty("_BaseColor") ? "_BaseColor" : clone.HasProperty("baseColorFactor") ? "baseColorFactor" : null;
                 if (property != null) figure.Surfaces.Add(new Surface { Material = clone, ColorProperty = property, Color = clone.GetColor(property) });
             }
             renderer.sharedMaterials = clones;
@@ -236,10 +246,14 @@ public sealed class MenuCastPreview : MonoBehaviour
         }
         try
         {
+            foreach (Light light in studioLights) light.enabled = true;
             previewCamera.Render();
         }
         finally
         {
+            // A directional light can affect URP objects outside its culling
+            // mask. Keep the studio dark between its synchronous render passes.
+            foreach (Light light in studioLights) light.enabled = false;
             for (int i = 0; i < sceneLights.Count; i++)
                 if (sceneLights[i] != null)
                 {
@@ -288,6 +302,8 @@ public sealed class MenuCastPreview : MonoBehaviour
         light.intensity = intensity;
         light.color = color;
         light.cullingMask = 1 << PreviewLayer;
+        light.enabled = false;
+        studioLights.Add(light);
     }
 
     private void OnDestroy()

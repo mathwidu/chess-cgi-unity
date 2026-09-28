@@ -1,7 +1,8 @@
 {
   "name": "ChessCgi.PlayModeTests",
   "references": [
-    "ChessCgi.Runtime"
+    "ChessCgi.Runtime",
+    "Unity.InputSystem"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"

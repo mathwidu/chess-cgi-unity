@@ -6,6 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
@@ -13,6 +14,50 @@ public class MenuPresentationTests
 {
     private GameHud hud;
     private ChessGameController controller;
+
+    [UnityTest]
+    public IEnumerator PreviewLightDoesNotChangeTheBoardRender()
+    {
+        yield return Click("LocalModeButton");
+        yield return Click("StartPlayButton");
+        yield return null;
+        Light preview = GameObject.Find("SelectedPiecePreviewLight").GetComponent<Light>();
+        Camera camera = Camera.main;
+        var target = new RenderTexture(320, 180, 24);
+        target.Create();
+        var pixels = new Texture2D(320, 180, TextureFormat.RGB24, false);
+        RenderTexture previous = RenderTexture.active;
+        bool enabled = preview.enabled;
+        try
+        {
+            Color32[] Capture()
+            {
+                RenderPipeline.SubmitRenderRequest(camera, new RenderPipeline.StandardRequest { destination = target });
+                RenderTexture.active = target;
+                pixels.ReadPixels(new Rect(0, 0, 320, 180), 0, 0);
+                pixels.Apply();
+                return pixels.GetPixels32();
+            }
+            preview.enabled = true;
+            Color32[] withPreview = Capture();
+            preview.enabled = false;
+            Color32[] withoutPreview = Capture();
+            int changed = 0;
+            for (int i = 0; i < withPreview.Length; i++)
+                if (Mathf.Abs(withPreview[i].r - withoutPreview[i].r) > 2
+                    || Mathf.Abs(withPreview[i].g - withoutPreview[i].g) > 2
+                    || Mathf.Abs(withPreview[i].b - withoutPreview[i].b) > 2) changed++;
+            Assert.That(changed, Is.LessThan(8), "The selected-piece preview changes the board lighting: " + changed + " pixels");
+        }
+        finally
+        {
+            preview.enabled = enabled;
+            RenderTexture.active = previous;
+            target.Release();
+            Object.DestroyImmediate(target);
+            Object.DestroyImmediate(pixels);
+        }
+    }
 
     [UnitySetUp]
     public IEnumerator SetUp()
@@ -131,10 +176,12 @@ public class MenuPresentationTests
         Assert.That(white.Find("Menu_Queen_Marta"), Is.Not.Null);
         Assert.That(black.Find("Menu_King_Ricardo_Carioca"), Is.Not.Null);
         Assert.That(white.localScale.x, Is.GreaterThan(black.localScale.x));
+        AssertProfessorsFitPreview(white, black);
         yield return Click("BlackSideButton");
         yield return new WaitForSecondsRealtime(0.6f);
         Assert.That(black.localScale.x, Is.GreaterThan(white.localScale.x));
         Assert.That(black.localPosition.z, Is.LessThan(white.localPosition.z));
+        AssertProfessorsFitPreview(white, black);
         Assert.That(GameObject.Find("CastName").GetComponent<Text>().text, Is.EqualTo("Professor Ricardo"));
         Assert.That(controller.IsMenuOpen, Is.True);
         yield return Click("WhiteSideButton");
@@ -143,6 +190,7 @@ public class MenuPresentationTests
         yield return Click("LocalModeButton");
         yield return new WaitForSecondsRealtime(0.8f);
         Assert.That(white.localScale.x, Is.EqualTo(black.localScale.x).Within(0.002f));
+        AssertProfessorsFitPreview(white, black);
     }
 
     [UnityTest]
@@ -175,6 +223,24 @@ public class MenuPresentationTests
             }
         }
         yield return null;
+    }
+
+    private static void AssertProfessorsFitPreview(params Transform[] figures)
+    {
+        Camera camera = GameObject.Find("MenuCastCamera").GetComponent<Camera>();
+        foreach (Transform figure in figures)
+        foreach (MeshFilter filter in figure.GetComponentsInChildren<MeshFilter>())
+        {
+            Bounds bounds = filter.sharedMesh.bounds;
+            for (int corner = 0; corner < 8; corner++)
+            {
+                Vector3 sign = new Vector3((corner & 1) == 0 ? -1 : 1, (corner & 2) == 0 ? -1 : 1, (corner & 4) == 0 ? -1 : 1);
+                Vector3 world = filter.transform.TransformPoint(bounds.center + Vector3.Scale(bounds.extents, sign));
+                Vector3 viewport = camera.WorldToViewportPoint(world);
+                Assert.That(viewport.x, Is.InRange(0f, 1f), figure.name + ": side of model/base clipped");
+                Assert.That(viewport.y, Is.InRange(0f, 1f), figure.name + ": top/bottom of model/base clipped");
+            }
+        }
     }
 
     private IEnumerator Click(string name)

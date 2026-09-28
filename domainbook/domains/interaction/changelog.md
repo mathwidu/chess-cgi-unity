@@ -10,6 +10,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Olhar ao redor no desktop](features/olhar-ao-redor-no-desktop.md): botão
+  direito gira a visão no assento; R/Esc ou o botão do HUD volta ao tabuleiro.
+  O cursor é liberado ao soltar, perder foco ou sair do componente. Observar
+  a sala não provoca seleção acidental nem é interrompido pela troca de turno.
+
 - Pacotes de XR (XR Plugin Management, OpenXR Plugin, XR Interaction Toolkit)
   resolvidos no projeto para a fase de conversão para VR no HTC Vive; veja
   [ADR-0001](decisions/0001-usar-openxr-e-o-xr-interaction-toolkit-para-o-modo-vr.md).

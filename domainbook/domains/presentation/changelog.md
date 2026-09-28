@@ -10,6 +10,37 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Acabamento do tabuleiro e mesa: moldura de nogueira com quinas suaves,
+  coordenadas dos dois lados, casas com mapas de madeira e tampo com veios
+  mais discretos. Luz lateral acompanha as janelas e o reflexo da sala é
+  calculado na inicialização. A altura das casas e peças permanece igual;
+  tampo rebaixado mantém contato com a base mais espessa. Veja
+  [acabamento-do-tabuleiro](features/acabamento-do-tabuleiro.md).
+
+- Controles explícitos no preview da peça: giro para os dois lados, zoom com
+  percentual e limites, restauração e instrução de arraste. O arraste vertical
+  muda o ângulo de observação; a interação fica restrita ao preview. Imagem e
+  câmera passam a usar a mesma proporção, e os botões ficam fora do personagem.
+  Nome, tipo e casa ficam no cabeçalho; os dados do perfil não repetem o nome.
+  Veja [preview-the-selected-piece](features/preview-the-selected-piece.md).
+
+- Sala inspirada no Laboratório de Redes (102, prédio Verde): tampos de
+  madeira clara, mapas de normal/rugosidade, pintura e tecidos com textura,
+  janelas à direita, nichos coloridos e oclusão de contato na exportação.
+  Ajuste da luz principal e preenchimento; HUD e ajuda explicam como olhar
+  ao redor no PC. Veja [laboratorio-feevale](features/laboratorio-feevale.md).
+
+- Direção 02 aplicada aos seis personagens: roupas brancas/pretas com a mesma
+  geometria, texturas de identidade preservadas, logo Feevale nas costas,
+  espada curta para o peão, báculo para o bispo e cetro para o rei. Bases com
+  símbolos clássicos voltados para cima substituem os grandes chapéus do
+  estudo descartado. Prefabs preservam os GUIDs e os GLBs originais permanecem
+  disponíveis. `CustomPieceAppearance` seleciona materiais compartilhados no
+  tabuleiro e no menu; o preview herda a aparência e mostra a frente nos dois
+  lados. Há fonte Blender, capturas Unity e testes de escala desktop/VR;
+  validação e desempenho em headset continuam pendentes. Veja
+  [identificar-pecas-personalizadas](features/identificar-pecas-personalizadas.md).
+
 - Em VR, a peça ao alcance da mão (a que o gatilho do indicador agarraria)
   ganha um contorno laranja: `PieceFactory` acrescenta um `PieceGrabHighlight`
   a cada peça quando um headset está presente. Ele mostra, sobre cada malha da
@@ -89,6 +120,22 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- Zoom máximo do preview mantém margem acima da cabeça e dos acessórios.
+  O jogador pode reposicionar a imagem com arraste direito/do meio ou com
+  os botões Mover ↑/↓, mantendo zoom e orientação. Restaurar também desfaz
+  o deslocamento, e o ajuste não interfere no tabuleiro nem na câmera da sala.
+  Veja [preview-the-selected-piece](features/preview-the-selected-piece.md).
+
+- Revisão dos personagens da direção 02: cabeça original do Ricardo restaurada,
+  contatos dos bastões e da espada ajustados e aplicações Feevale separadas da
+  textura do corpo. Símbolos clássicos completos passam a ocupar áreas livres
+  da base; torre e cavalo preservam sua geometria inferior. Texturas recebem
+  maior resolução de bake, relevo de tecido e importação consistente. Corrigida
+  a classificação de ruído escuro da roupa como pele, que produzia manchas nas
+  variantes brancas. O menu enquadra as bases completas dos dois professores.
+  Auditoria geométrica e closes no Unity complementam os
+  testes de escala e materiais; avaliação em headset permanece pendente.
+
 - O tabuleiro de desktop voltou a aparecer emoldurado pela câmera. Ele havia
   virado um ponto minúsculo e descentralizado porque a cena guardava a escala
   e a posição de mesa do modo VR no root compartilhado do tabuleiro; agora
@@ -108,3 +155,44 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   dimensionar a mesa por modo: no desktop ela vira uma plataforma larga logo
   abaixo do tabuleiro em escala 1, e em VR mantém o bloco em escala de mesa sob
   o tabuleiro reduzido.
+
+- Revisão dos tecidos: corrigidas regiões de cor antiga na barra do rei,
+  no cardigan da rainha, na calça do peão e ao redor dos fones do bispo.
+  Novo UV de produção, com separação de regiões sobrepostas, evita que braços
+  recebam textura da camisa e reduz vazamento entre cores na filtragem à
+  distância; o UV de origem é preservado no Blender. Feevale passa a aparecer
+  somente nas costas; letras antigas também são limpas do relevo. Painel
+  e capturas passam a incluir closes brancos e pretos dos seis personagens.
+- Revisão específica do cavalo: removido o corte horizontal que deixava os
+  punhos e a metade inferior do moletom pretos. A máscara acompanha a cintura
+  sentada e inclui a borda do capuz, preservando pele e montaria. A auditoria
+  agora amostra essas quatro regiões e compara mãos/montaria com a origem.
+  A avaliação visual de menu, partida, seleção e elenco está registrada em
+  `art/character-variants/visual-review-20260925/`; as propostas gerais ainda
+  não foram aplicadas. O diagnóstico separa a falha de cor da sombra na calça.
+
+- Rodada de acabamento: corrigidas a cintura da cargo do peão branco e a
+  gola/punho da torre; dedos dos acessórios com proporções variadas; bases com
+  lateral suave e topo plano; PNG Feevale transparente somente nas costas.
+  O preview passou a usar luz pontual e camada própria, evitando iluminar o
+  tabuleiro e substituir a luz principal do URP. Key/fill equilibradas e sombras
+  suaves no perfil PC; Mobile preservado. Verificação: 32 testes PlayMode,
+  22 casos de tecido e auditorias de UV/geometria aprovados, com 33 capturas.
+  Comparação e avaliação atual: `art/character-variants/finishing-review-20260925/`.
+- Descoberta seguinte orientada a VR: estudo Blender de sala inspirada na Feevale,
+  com tabuleiro de 45 cm sobre uma mesa, carteiras, janelas e quadro. Registro em
+  `art/character-variants/classroom-discovery-20260925/`; proposta de composição,
+  ainda fora da Main. Próximas prioridades: mesa/tabuleiro, seleção sem cobrir
+  casas, leitura dos símbolos, ambiente e medição em headset.
+- Laboratório de informática: evolução da sala a partir das fotos oficiais de
+  Projetos de TI e Redes da Feevale, com bancadas claras, desktops, cadeiras
+  escuras, persianas e piso amadeirado. Prefab carregado na Main pelo
+  `ScenePolish`, alinhado à posição e escala do tabuleiro, com mesa central e
+  circulação para os dois lados. Fonte Blender preservado; geometria agrupada
+  em 26 renderers, sem colisores decorativos. Detalhes, limites e evidências em
+  `features/laboratorio-feevale.md` e `art/character-variants/feevale-lab-20260925/`.
+  O HUD VR foi aproximado e reduzido para permanecer à frente das bancadas,
+  sem monitores cobrindo as opções do menu; o desktop mantém seu layout.
+  Luzes do estúdio dos professores isoladas no tempo de render, para não
+  iluminar a sala. Bias da luz principal ajustado somente na escala VR após
+  comparação visual identificar faixas de auto-sombra no tampo.

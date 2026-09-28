@@ -8,8 +8,11 @@ using UnityEngine.XR.Interaction.Toolkit.UI;
 
 public sealed partial class GameHud : MonoBehaviour
 {
-    private static readonly Vector3 VrPanelPosition = new Vector3(0f, 1.4f, 4f);
-    private const float VrPanelScale = 0.0032f;
+    private const int SelectedPiecePreviewLayer = 29;
+    // Keep the world panel in the clear central aisle, above the board and
+    // before the computer benches, so furniture cannot cover its controls.
+    private static readonly Vector3 VrPanelPosition = new Vector3(0f, 1.6f, 1.35f);
+    private const float VrPanelScale = 0.0012f;
 
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
@@ -97,6 +100,7 @@ public sealed partial class GameHud : MonoBehaviour
     public void RebuildInterface()
     {
         EnsureCanvasInfrastructure();
+        ClearSelectedPiecePreviewClone();
         ClearExistingRoot();
 
         hudRoot = CreateRect("HudRoot", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero);
@@ -119,6 +123,7 @@ public sealed partial class GameHud : MonoBehaviour
         bool awaitingPromotion = hasController && gameController.IsAwaitingPromotion;
 
         RefreshStartMenu();
+        RefreshRoomViewControls();
         SetActive(matchInterface, !showStartScreen);
         SetActive(computerErrorPanel, hasController && gameController.HasComputerError && !showStartScreen);
         SetActive(startOverlay, showStartScreen);
@@ -283,7 +288,10 @@ public sealed partial class GameHud : MonoBehaviour
 
         if (selectedPieceKindText != null)
         {
-            selectedPieceKindText.text = $"{PieceKindName(selectedPiece.Kind)} {SideAdjective(selectedPiece.Side)}";
+            string side = SideAdjective(selectedPiece.Side);
+            if (selectedPiece.Kind == ChessPieceKind.Queen || selectedPiece.Kind == ChessPieceKind.Rook)
+                side = selectedPiece.Side == ChessSide.White ? "branca" : "preta";
+            selectedPieceKindText.text = $"{PieceKindName(selectedPiece.Kind)} {side}";
         }
 
         if (selectedPieceSquareText != null)
@@ -316,11 +324,9 @@ public sealed partial class GameHud : MonoBehaviour
         {
             if (selectedPiecePreviewInput != null)
             {
-                selectedPiecePreviewInput.Configure(
-                    selectedPiecePreviewClone != null ? selectedPiecePreviewClone.transform : null,
-                    selectedPiecePreviewCamera,
-                    selectedPiecePreviewFocusPoint);
-                selectedPiecePreviewInput.NormalizeCameraDistance();
+                previewZoomText.text = selectedPiecePreviewInput.ZoomPercent + "%";
+                previewZoomInButton.interactable = selectedPiecePreviewInput.CanZoomIn;
+                previewZoomOutButton.interactable = selectedPiecePreviewInput.CanZoomOut;
             }
 
             selectedPiecePreviewCamera.Render();
@@ -331,7 +337,8 @@ public sealed partial class GameHud : MonoBehaviour
     {
         if (selectedPiecePreviewTexture == null)
         {
-            selectedPiecePreviewTexture = new RenderTexture(768, 640, 24)
+            // Match the 368 × 220 display exactly; a different aspect stretches the character.
+            selectedPiecePreviewTexture = new RenderTexture(1104, 660, 24)
             {
                 name = "SelectedPiecePreviewTexture",
                 antiAliasing = 4,
@@ -358,10 +365,12 @@ public sealed partial class GameHud : MonoBehaviour
             selectedPiecePreviewCamera.fieldOfView = 32f;
             selectedPiecePreviewCamera.nearClipPlane = 0.03f;
             selectedPiecePreviewCamera.farClipPlane = 12f;
+            selectedPiecePreviewCamera.cullingMask = 1 << SelectedPiecePreviewLayer;
+            selectedPiecePreviewCamera.enabled = false;
             selectedPiecePreviewCamera.targetTexture = selectedPiecePreviewTexture;
         }
 
-        selectedPiecePreviewCamera.aspect = 768f / 640f;
+        selectedPiecePreviewCamera.aspect = 368f / 220f;
         selectedPiecePreviewCamera.transform.localPosition = new Vector3(0f, 0.9f, -3.8f);
         selectedPiecePreviewCamera.transform.LookAt(selectedPiecePreviewStage.position + new Vector3(0f, 0.78f, 0f));
 
@@ -370,12 +379,16 @@ public sealed partial class GameHud : MonoBehaviour
             GameObject lightObject = new GameObject("SelectedPiecePreviewLight");
             lightObject.transform.SetParent(selectedPiecePreviewStage, false);
             selectedPiecePreviewLight = lightObject.AddComponent<Light>();
-            selectedPiecePreviewLight.type = LightType.Directional;
-            selectedPiecePreviewLight.intensity = 1.6f;
-            selectedPiecePreviewLight.color = new Color(1f, 0.95f, 0.86f, 1f);
+            // A directional light affects the whole scene and can replace
+            // the board's shadow-casting main light in URP, even offscreen.
+            selectedPiecePreviewLight.type = LightType.Point;
+            selectedPiecePreviewLight.range = 5f;
+            selectedPiecePreviewLight.cullingMask = 1 << SelectedPiecePreviewLayer;
+            selectedPiecePreviewLight.intensity = 3f;
+            selectedPiecePreviewLight.color = new Color(1f, 0.975f, 0.93f, 1f);
         }
 
-        selectedPiecePreviewLight.transform.localRotation = Quaternion.Euler(38f, -28f, 0f);
+        selectedPiecePreviewLight.transform.localPosition = new Vector3(-1.2f, 2f, -2f);
     }
 
     private void BuildSelectedPiecePreview(PieceView selectedPiece)
@@ -386,8 +399,11 @@ public sealed partial class GameHud : MonoBehaviour
         selectedPiecePreviewClone = Object.Instantiate(selectedPiece.gameObject, selectedPiecePreviewStage);
         selectedPiecePreviewClone.name = "SelectedPiecePreviewClone";
         selectedPiecePreviewClone.transform.localPosition = Vector3.zero;
-        selectedPiecePreviewClone.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        // Custom visuals already turn black pieces toward the opposite board side.
+        selectedPiecePreviewClone.transform.localRotation = Quaternion.Euler(0f, selectedPiece.Side == ChessSide.White ? 180f : 0f, 0f);
         selectedPiecePreviewClone.transform.localScale = Vector3.one;
+        foreach (Transform child in selectedPiecePreviewClone.GetComponentsInChildren<Transform>())
+            child.gameObject.layer = SelectedPiecePreviewLayer;
 
         DisablePreviewInteractionComponents(selectedPiecePreviewClone);
         FitPreviewClone(selectedPiecePreviewClone.transform);
@@ -401,6 +417,7 @@ public sealed partial class GameHud : MonoBehaviour
 
     private void ClearSelectedPiecePreviewClone()
     {
+        if (selectedPiecePreviewInput != null) selectedPiecePreviewInput.Configure(null, null);
         if (selectedPiecePreviewClone != null)
         {
             DestroyUnityObject(selectedPiecePreviewClone);
@@ -467,14 +484,23 @@ public sealed partial class GameHud : MonoBehaviour
 
         Bounds bounds = CalculateBounds(renderers);
         float aspect = Mathf.Max(0.1f, selectedPiecePreviewCamera.aspect);
-        float verticalExtent = Mathf.Max(bounds.extents.y, bounds.extents.x / aspect);
-        float distance = verticalExtent / Mathf.Tan(selectedPiecePreviewCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
-        distance = Mathf.Clamp(distance * 1.38f, 2.25f, 5.2f);
-
         Vector3 target = bounds.center + Vector3.up * Mathf.Max(0.02f, bounds.size.y * 0.04f);
+        Vector3 direction = new Vector3(0f, 0.06f, -1f).normalized;
+        Quaternion rotation = Quaternion.LookRotation(-direction);
+        Quaternion inverseRotation = Quaternion.Inverse(rotation);
+        float tangent = Mathf.Tan(selectedPiecePreviewCamera.fieldOfView * 0.5f * Mathf.Deg2Rad) * 0.9f;
+        float distance = 2.25f;
+        // Fit every corner in camera space, including the front edge of a deep base or accessory.
+        // The 0.9 factor reserves a 5% margin on each image edge.
+        for (int i = 0; i < 8; i++)
+        {
+            Vector3 sign = new Vector3((i & 1) == 0 ? -1f : 1f, (i & 2) == 0 ? -1f : 1f, (i & 4) == 0 ? -1f : 1f);
+            Vector3 corner = inverseRotation * (bounds.center + Vector3.Scale(bounds.extents, sign) - target);
+            distance = Mathf.Max(distance, Mathf.Abs(corner.y) / tangent - corner.z,
+                Mathf.Abs(corner.x) / (tangent * aspect) - corner.z);
+        }
         selectedPiecePreviewFocusPoint = target;
-        selectedPiecePreviewCamera.transform.position = target + new Vector3(0f, bounds.size.y * 0.06f, -distance);
-        selectedPiecePreviewCamera.transform.LookAt(target);
+        selectedPiecePreviewCamera.transform.SetPositionAndRotation(target + direction * distance, rotation);
     }
 
     private static Bounds CalculateBounds(Renderer[] renderers)
@@ -789,9 +815,9 @@ public sealed partial class GameHud : MonoBehaviour
 
     private static string BuildPieceProfileText(PieceView piece)
     {
-        return $"Nome: {GetPieceFullName(piece)}\n" +
-            $"Categoria: {GetPieceCategory(piece.Kind)}\n" +
-            $"Registro: {GetPieceRegistry(piece.Kind)}";
+        if (piece.Kind == ChessPieceKind.Queen || piece.Kind == ChessPieceKind.King)
+            return $"{GetPieceCategory(piece.Kind)} de Ciências da Computação\nUniversidade Feevale";
+        return $"{GetPieceCategory(piece.Kind)}\n{GetPieceRegistry(piece.Kind).Replace("Matricula", "Matrícula")}";
     }
 
     private static string BuildPieceDescription(PieceView piece)
@@ -860,7 +886,7 @@ public sealed partial class GameHud : MonoBehaviour
         switch (kind)
         {
             case ChessPieceKind.Pawn:
-                return "Peao";
+                return "Peão";
             case ChessPieceKind.Rook:
                 return "Torre";
             case ChessPieceKind.Knight:

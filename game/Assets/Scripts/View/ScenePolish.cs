@@ -1,17 +1,30 @@
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 [ExecuteAlways]
 public sealed class ScenePolish : MonoBehaviour
 {
     private const string CollegeThemeName = "CollegeTheme";
     private const string LightingRigName = "LightingRig";
+    private const string ClassroomResource = "Environment/FeevaleComputerLab";
+    // The authored room uses metres; BoardView uses 1.25 units per square.
+    private const float BoardMetresPerUnit = 0.045f;
+    private const float AuthoredBoardHeight = 0.78f;
 
-    private static readonly Vector3 DesktopTablePosition = new Vector3(0f, -0.54f, 0f);
+    private static readonly Vector3 DesktopTablePosition = new Vector3(0f, -0.94f, 0f);
     private static readonly Vector3 DesktopTableScale = new Vector3(12f, 0.8f, 12f);
-    private static readonly Vector3 VrTablePosition = new Vector3(0f, 0.387f, 0f);
-    private static readonly Vector3 VrTableScale = new Vector3(0.9f, 0.774f, 0.9f);
+    private static readonly Vector3 VrTablePosition = new Vector3(0f, 0.37785f, 0f);
+    private static readonly Vector3 VrTableScale = new Vector3(0.9f, 0.7557f, 0.9f);
 
     [SerializeField] private bool applyOnAwake = true;
+    private Transform classroom;
+    private BoardView board;
+    private UniversalAdditionalLightData keyLightData;
+    private readonly Light[] indoorFill = new Light[2];
+    private ReflectionProbe roomReflection;
+    private Matrix4x4 reflectionRoomPose;
+    private int reflectionDelayFrames;
 
     public void ApplyPolish()
     {
@@ -22,9 +35,9 @@ public sealed class ScenePolish : MonoBehaviour
         BuildCollegeTheme(collegeTheme);
         ApplyCameraDefaults();
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
-        RenderSettings.ambientSkyColor = new Color(0.62f, 0.68f, 0.75f);
-        RenderSettings.ambientEquatorColor = new Color(0.42f, 0.39f, 0.35f);
-        RenderSettings.ambientGroundColor = new Color(0.2f, 0.18f, 0.16f);
+        RenderSettings.ambientSkyColor = new Color(0.48f, 0.53f, 0.60f);
+        RenderSettings.ambientEquatorColor = new Color(0.30f, 0.29f, 0.26f);
+        RenderSettings.ambientGroundColor = new Color(0.13f, 0.11f, 0.09f);
     }
 
     private void Awake()
@@ -35,27 +48,124 @@ public sealed class ScenePolish : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        // Follow the actual board pose, including a headset connected after Awake.
+        // This also keeps the table aligned when the board's serialized pose changes.
+        AlignClassroomToBoard();
+        // Cache the static room once after its pose settles, not every frame.
+        if (Application.isPlaying && roomReflection != null && reflectionDelayFrames > 0
+            && --reflectionDelayFrames == 0)
+            roomReflection.RenderProbe();
+    }
+
+    private void AlignClassroomToBoard()
+    {
+        if (classroom == null) return;
+        if (board == null) board = Object.FindFirstObjectByType<BoardView>();
+        if (board == null) return;
+        Transform boardTransform = board.transform;
+        classroom.SetPositionAndRotation(
+            boardTransform.TransformPoint(Vector3.down * (AuthoredBoardHeight / BoardMetresPerUnit)),
+            boardTransform.rotation);
+        Vector3 scale = boardTransform.lossyScale / BoardMetresPerUnit;
+        Vector3 parentScale = classroom.parent.lossyScale;
+        classroom.localScale = new Vector3(scale.x / parentScale.x, scale.y / parentScale.y, scale.z / parentScale.z);
+        if (keyLightData != null)
+            keyLightData.usePipelineSettings = boardTransform.lossyScale.x > .1f;
+        float roomScale = Mathf.Abs(classroom.lossyScale.x);
+        for (int i = 0; i < indoorFill.Length; i++)
+        {
+            if (indoorFill[i] == null) continue;
+            indoorFill[i].enabled = true;
+            indoorFill[i].transform.position = classroom.TransformPoint(new Vector3(0, 2.85f, i == 0 ? -2.1f : 2.3f));
+            indoorFill[i].transform.rotation = classroom.rotation * Quaternion.Euler(90f, 0f, 0f);
+            indoorFill[i].range = 5.8f * roomScale;
+            // URP point attenuation uses squared world distance. Preserve the
+            // same illumination when the desktop room is enlarged with the board.
+            indoorFill[i].intensity = 1.25f * roomScale * roomScale;
+        }
+        if (roomReflection != null && reflectionRoomPose != classroom.localToWorldMatrix)
+        {
+            reflectionRoomPose = classroom.localToWorldMatrix;
+            roomReflection.transform.SetPositionAndRotation(classroom.TransformPoint(new Vector3(0, 1.15f, 0)), classroom.rotation);
+            roomReflection.size = new Vector3(6.8f, 3.3f, 9.4f) * roomScale;
+            roomReflection.center = new Vector3(0, .5f, .1f) * roomScale;
+            roomReflection.nearClipPlane = .08f * roomScale;
+            roomReflection.farClipPlane = 12f * roomScale;
+            roomReflection.blendDistance = .3f * roomScale;
+            reflectionDelayFrames = 2;
+        }
+    }
+
     private void BuildLightingRig(Transform lightingRig)
     {
         ClearChildren(lightingRig);
 
         Light key = CreateLight(lightingRig, "Key Light", LightType.Directional, new Vector3(0f, 2f, 0f));
-        key.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
-        key.intensity = 1.2f;
-        key.color = new Color(1f, 0.95f, 0.86f);
+        // Side daylight follows the right-hand windows; ceiling fill stays soft.
+        key.transform.rotation = Quaternion.Euler(48f, -55f, 0f);
+        key.intensity = 1.15f;
+        key.color = new Color(1f, 0.97f, 0.91f);
         key.shadows = LightShadows.Soft;
-        key.shadowStrength = 0.6f;
+        key.shadowStrength = 0.76f;
+        // The desktop pipeline's 0.1 depth bias causes self-shadow stripes on
+        // the metre-scale table. Override this light only at tabletop scale.
+        key.shadowBias = 1f;
+        key.shadowNormalBias = .5f;
+        keyLightData = key.GetUniversalAdditionalLightData();
 
         Light fill = CreateLight(lightingRig, "Fill Light", LightType.Directional, new Vector3(0f, 2f, 0f));
-        fill.transform.rotation = Quaternion.Euler(35f, 150f, 0f);
-        fill.intensity = 0.45f;
-        fill.color = new Color(0.78f, 0.85f, 1f);
+        fill.transform.rotation = Quaternion.Euler(35f, 125f, 0f);
+        fill.intensity = 0.22f;
+        fill.color = new Color(0.88f, 0.93f, 1f);
         fill.shadows = LightShadows.None;
+
+        for (int i = 0; i < indoorFill.Length; i++)
+        {
+            indoorFill[i] = CreateLight(lightingRig, "Ceiling Fill " + (i + 1), LightType.Spot, Vector3.zero);
+            indoorFill[i].enabled = false;
+            indoorFill[i].color = new Color(1f, .95f, .86f);
+            indoorFill[i].shadows = LightShadows.None;
+            indoorFill[i].spotAngle = 150f;
+            indoorFill[i].innerSpotAngle = 90f;
+        }
+
+        var reflectionObject = new GameObject("Room Reflection");
+        reflectionObject.transform.SetParent(lightingRig, false);
+        roomReflection = reflectionObject.AddComponent<ReflectionProbe>();
+        roomReflection.mode = ReflectionProbeMode.Realtime;
+        roomReflection.refreshMode = ReflectionProbeRefreshMode.ViaScripting;
+        roomReflection.timeSlicingMode = ReflectionProbeTimeSlicingMode.IndividualFaces;
+        roomReflection.resolution = 128;
+        roomReflection.hdr = false;
+        roomReflection.boxProjection = true;
+        roomReflection.intensity = .65f;
+        roomReflection.clearFlags = ReflectionProbeClearFlags.SolidColor;
+        roomReflection.backgroundColor = new Color(.40f, .45f, .5f);
+        // The environment alone is on Ignore Raycast (built-in layer 2).
+        // Exclude moving pieces, world-space HUD and the isolated preview studio.
+        roomReflection.cullingMask = 1 << 2;
+        reflectionRoomPose = Matrix4x4.zero;
+        reflectionDelayFrames = 0;
     }
 
     private void BuildCollegeTheme(Transform collegeTheme)
     {
         ClearChildren(collegeTheme);
+
+        GameObject prefab = Resources.Load<GameObject>(ClassroomResource);
+        if (prefab != null)
+        {
+            classroom = Object.Instantiate(prefab, collegeTheme, false).transform;
+            classroom.name = "FeevaleComputerLab";
+            foreach (Transform part in classroom.GetComponentsInChildren<Transform>(true))
+                part.gameObject.layer = 2;
+            AlignClassroomToBoard();
+            return;
+        }
+
+        classroom = null;
 
         Material tableMaterial = CreateMaterial("Runtime_Table_Wood", new Color(0.42f, 0.27f, 0.17f), 0.38f, 0.48f);
         Material floorMaterial = CreateMaterial("Runtime_Floor", new Color(0.32f, 0.31f, 0.29f), 0f, 0.4f);
@@ -81,9 +191,12 @@ public sealed class ScenePolish : MonoBehaviour
             return;
         }
 
-        camera.fieldOfView = 42f;
+        // Leave space for the coordinates above the desktop action bar.
+        camera.fieldOfView = XRRig.IsHeadsetPresent ? 42f : 50f;
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = new Color(0.36f, 0.34f, 0.31f);
+        // The desktop board is enlarged; its room uses the same scale.
+        camera.farClipPlane = Mathf.Max(camera.farClipPlane, 250f);
     }
 
     private Transform EnsureChildRoot(string rootName)
@@ -184,6 +297,7 @@ public sealed class ScenePolish : MonoBehaviour
         for (int i = parent.childCount - 1; i >= 0; i--)
         {
             GameObject child = parent.GetChild(i).gameObject;
+            child.SetActive(false);
             if (Application.isPlaying)
             {
                 Object.Destroy(child);
