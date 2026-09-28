@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xadrez CGI — Tabuleiro, mesa e luz</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif;color:#eff4ee;background:#0b1712}
+*{box-sizing:border-box}body{margin:0}main{max-width:1440px;margin:auto;padding:40px 28px 64px}
+header{display:flex;justify-content:space-between;align-items:start;gap:24px;margin-bottom:28px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:#bfcdbe;text-transform:uppercase}h1{font-size:clamp(28px,4vw,46px);letter-spacing:-.04em;line-height:1.15;margin:12px 0}
+p{max-width:800px;color:#b8c7bd;line-height:1.65;margin:8px 0}small{color:#b8c7bd;font-size:13px}.status{border:1px solid #355849;color:#d2e8d7;border-radius:6px;padding:10px 14px;white-space:nowrap;font-size:13px}
+nav,.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}nav{margin:28px 0 16px}button{font:inherit;background:#192d23;border:1px solid #3b5246;color:inherit;padding:10px 16px;border-radius:6px;cursor:pointer}
+button:hover{background:#294637}button[aria-pressed=true]{background:#e6d97b;color:#172017;border-color:#e6d97b}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #f5e775;outline-offset:4px}
+.compare{position:relative;aspect-ratio:16/9;background:#17241c;overflow:hidden;border-radius:8px;border:1px solid #425747}
+.compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.before{clip-path:inset(0 calc(100% - var(--split,50%)) 0 0)}
+.divider{position:absolute;inset:0 auto 0 var(--split,50%);width:2px;background:#fff;box-shadow:0 0 7px #0008;pointer-events:none}
+.divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:12px 8px;border-radius:8px;background:#fff;color:#15251c;font-size:20px}
+.labels{position:absolute;inset:14px 14px auto;display:flex;justify-content:space-between;pointer-events:none}.labels span{background:#0b1712db;padding:6px 10px;border-radius:4px;font-size:12px}
+.controls{display:flex;gap:20px;align-items:center;margin:16px 0}.controls label{display:flex;gap:12px;align-items:center;flex:1;max-width:460px;color:#c3d0c7;font-size:13px}.controls input{width:100%;accent-color:#e6d97b}
+.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;border-top:1px solid #34493b;padding:24px 0;margin:28px 0}.notes h2{font-size:18px;margin:0 0 10px}.notes p{font-size:14px}
+.desktop{display:grid;grid-template-columns:1fr 1fr;gap:20px}.desktop figure{margin:0}.desktop img{display:block;width:100%;border-radius:6px;border:1px solid #34493b}.desktop figcaption{padding-top:8px;color:#bdcbbf;font-size:14px}
+a{color:#e6d97b}footer{margin-top:32px;font-size:13px;color:#a7b8ac;line-height:1.7}
+@media(max-width:750px){main{padding:24px 16px}header{display:block}.status{display:inline-block;margin-top:12px}.notes,.desktop{grid-template-columns:1fr}.controls{align-items:start;flex-direction:column}.controls label{width:100%;max-width:none}button{padding:9px 12px;font-size:14px}.labels{inset:8px 8px auto}}
+</style>
+<main>
+<header><div><div class="eyebrow">Xadrez CGI · Feevale · Etapa 01</div><h1>Tabuleiro, mesa e luz.</h1><p>Capturas reais da Main no Unity. Compare o acabamento da madeira, a espessura da moldura e a iluminação da sala.</p></div><span class="status">Integrado no projeto local</span></header>
+<nav aria-label="Ponto de vista"><button data-view="vr-table-detail" aria-pressed="true">Detalhe do tabuleiro</button><button data-view="vr-table" aria-pressed="false">Vista do jogador</button><button data-view="vr-overview" aria-pressed="false">Laboratório</button></nav>
+<div class="compare" id="compare"><img id="after" src="unity/vr-table-detail.png" alt="Versão atual: tabuleiro de madeira sobre a mesa do laboratório"><img id="before" class="before" src="before/vr-table-detail.png" alt="Versão anterior no mesmo enquadramento"><div class="divider" id="divider"><span>↔</span></div><div class="labels"><span id="before-label">ANTES</span><span id="after-label">ATUAL</span></div></div>
+<div class="controls"><div class="actions"><button data-split="100">Antes</button><button data-split="50">Comparar</button><button data-split="0">Atual</button></div><label>Comparação <input id="slider" aria-label="Porcentagem da versão anterior visível" type="range" min="0" max="100" value="50"></label></div>
+<small>Mesmo enquadramento nas duas versões. VR simulado, sem pós-processamento; revisão em headset físico pendente.</small>
+<div class="notes"><section><h2>Madeira e proporção</h2><p>Moldura de nogueira com quinas suaves, filete discreto e 26,1 mm de espessura no VR. Casas claras e escuras com mapas de superfície e acabamento acetinado.</p></section><section><h2>Leitura do jogo</h2><p>Coordenadas A–H e 1–8 para os dois jogadores. A1 escura e H1 clara. A área de jogo, as posições das peças e os controles de seleção foram preservados.</p></section><section><h2>Luz e contato</h2><p>Madeira da mesa mais discreta, luz lateral pelas janelas e sombras mais presentes. O tampo acompanha a nova espessura da base, sem deixar o tabuleiro suspenso.</p></section></div>
+<h2>Também no desktop</h2><div class="desktop"><figure><a href="unity/desktop-match.png"><img loading="lazy" src="unity/desktop-match.png" alt="Início da partida no desktop, perspectiva das brancas"></a><figcaption>Início da partida · Brancas</figcaption></figure><figure><a href="unity/desktop-move.png"><img loading="lazy" src="unity/desktop-move.png" alt="Lance e2–e4 concluído e perspectiva das pretas"></a><figcaption>Após e2–e4 · Pretas</figcaption></figure></div>
+<footer>Personagens, roupas e interface mantidos nesta etapa. O HUD, a leitura dos lances e os detalhes de uso da sala são as próximas frentes da avaliação. <a href="README.md">Registro técnico e verificações</a>.</footer>
+</main>
+<script>
+const compare=document.querySelector('#compare'),slider=document.querySelector('#slider');
+function split(value){slider.value=value;compare.style.setProperty('--split',value+'%');document.querySelector('#divider').hidden=value==0||value==100;document.querySelector('#before-label').hidden=value==0;document.querySelector('#after-label').hidden=value==100;document.querySelectorAll('[data-split]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.split==value));}
+slider.addEventListener('input',()=>split(slider.value));document.querySelectorAll('[data-split]').forEach(b=>b.addEventListener('click',()=>split(b.dataset.split)));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelector('#before').src='before/'+b.dataset.view+'.png';document.querySelector('#after').src='unity/'+b.dataset.view+'.png';document.querySelectorAll('[data-view]').forEach(n=>n.setAttribute('aria-pressed',n===b));}));split(50);
+</script>
+</html>

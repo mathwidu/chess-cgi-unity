@@ -1,0 +1,51 @@
+{
+  "date": "2026-09-28",
+  "branch": "codex/visual-feevale",
+  "base_commit": "81bea194e6b4a24adfaf3c24b235709660829c8e",
+  "unity": "6000.3.16f1",
+  "urp": "17.3.0",
+  "test_command": "bash tools/test_unity.sh",
+  "tests": {
+    "EditMode": {
+      "result": "Passed",
+      "total": "36",
+      "passed": "36",
+      "failed": "0",
+      "skipped": "0",
+      "start-time": "2026-09-28 11:34:02Z",
+      "end-time": "2026-09-28 11:34:05Z",
+      "duration": "3.2917286",
+      "report_sha256": "09d9bce77c1b322416ca09335a92210824070ccf75fc0bb6cd005f7b160e89e0"
+    },
+    "PlayMode": {
+      "result": "Passed",
+      "total": "62",
+      "passed": "62",
+      "failed": "0",
+      "skipped": "0",
+      "start-time": "2026-09-28 11:34:13Z",
+      "end-time": "2026-09-28 11:34:30Z",
+      "duration": "17.0991868",
+      "report_sha256": "d93fc1a6d0c4cd17f9a90997cc29788cd28fb000c6e93cbd04f9288972aa1ff5"
+    }
+  },
+  "checks": {
+    "game_files_unchanged_during_packaging": true,
+    "last_ui_experiment_remains_reverted": true,
+    "new_assets_have_meta": true,
+    "duplicate_asset_guids": 0,
+    "unresolved_serialized_dependencies": 0,
+    "python_authoring_sources_parse": true,
+    "local_documentation_links_resolve": true,
+    "domainbook_check": "2 domains checked, nothing stale"
+  },
+  "limits": {
+    "new_visual_captures": false,
+    "player_build": false,
+    "physical_headset": false,
+    "vr_performance_measured": false
+  },
+  "approved_capture_directory": "character-variants/tabletop-polish-20260926/unity",
+  "local_reports": "TestResults/",
+  "excluded_local_study": "game/Assets/AnimationStudies/A003"
+}

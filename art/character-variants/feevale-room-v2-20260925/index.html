@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feevale · sala 102, materiais e câmera</title>
+<style>
+:root{color-scheme:dark;--bg:#151b19;--panel:#202925;--line:#435147;--text:#eeeade;--muted:#bac4ba;--accent:#d5e7b2}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,sans-serif}main{max-width:1440px;margin:auto;padding:42px 32px 64px}header{max-width:950px;margin-bottom:28px}h1{font-size:clamp(30px,4vw,56px);line-height:1.1;letter-spacing:-.045em;margin:12px 0 20px}h2{font-size:25px;margin:40px 0 16px}p{color:var(--muted);margin:10px 0}.eyebrow{color:var(--accent);font-size:13px;letter-spacing:.14em;text-transform:uppercase}.status{display:flex;gap:10px;flex-wrap:wrap}.status span{font-size:13px;border:1px solid var(--line);border-radius:4px;padding:5px 10px}.viewer{background:#0d110f;border:1px solid var(--line);border-radius:8px;overflow:hidden}.toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:16px 20px;flex-wrap:wrap}select{max-width:100%;background:var(--panel);color:var(--text);border:1px solid #718172;border-radius:4px;padding:10px;font:inherit}select:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}figure{margin:0}figure img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#101411}figcaption{padding:16px 20px;color:var(--muted)}a{color:var(--accent);text-underline-offset:4px}.facts,.references{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:24px 0}.facts article{padding:20px;background:var(--panel);border:1px solid var(--line);border-radius:6px}.facts h3{margin:0;font-size:18px}.references{grid-template-columns:repeat(2,1fr)}.references article{border:1px solid var(--line);border-radius:6px;overflow:hidden}.references img{display:block;width:100%;aspect-ratio:1200/580;object-fit:contain;background:#101411}.references .body{padding:20px}.references h3{margin:0 0 8px}footer{padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.note{max-width:1000px}@media(max-width:700px){main{padding:24px 16px}.facts,.references{grid-template-columns:1fr}.toolbar{align-items:flex-start;flex-direction:column}}
+</style>
+<main>
+<header>
+<div class="eyebrow">Xadrez CGI · ambiente Feevale</div>
+<h1>Sala 102 como referência.<br>Liberdade para olhar ao redor.</h1>
+<p>Madeira clara nas mesas, pintura e tecidos com textura, janelas à direita e sombras de contato. No PC, observe o ambiente do seu assento e volte ao tabuleiro quando quiser.</p>
+<div class="status"><span>Integrado à Main local</span><span>Capturas reais do Unity</span><span>VR simulado · headset pendente</span></div>
+</header>
+<section class="viewer" aria-label="Revisão da sala no jogo">
+<div class="toolbar"><label for="view">Vista do jogo</label><select id="view">
+<option value="vr-overview">Visão geral do laboratório</option>
+<option value="before-overview">Antes · sala da primeira etapa</option>
+<option value="vr-right-windows">Janelas da parede direita</option>
+<option value="vr-table-detail">Madeira e acabamento da mesa</option>
+<option value="desktop-look-room">PC · botão Olhar ao redor</option>
+<option value="desktop-look-right">PC · olhando para as janelas</option>
+<option value="desktop-return-board">PC · volta ao tabuleiro</option>
+<option value="before-table">Antes · mesa branca</option>
+<option value="vr-room">Sala na altura do usuário sentado</option>
+<option value="vr-table">Tabuleiro na posição VR</option>
+<option value="vr-play">Partida VR com interface</option>
+<option value="vr-menu">Menu dentro da sala</option>
+<option value="vr-black-side">Vista a partir do lado das pretas</option>
+<option value="desktop-match">Partida no desktop</option>
+<option value="desktop-move">Desktop após e2–e4</option>
+<option value="desktop-menu">Menu no desktop</option>
+</select><a id="full" href="unity/vr-overview.png" target="_blank">Abrir imagem completa ↗</a></div>
+<figure><img id="capture" src="unity/vr-overview.png" alt="Visão geral do laboratório integrado ao Unity"><figcaption id="caption">Main em Play Mode, com HMD simulado. Câmera deslocada para conferir o ambiente; interface e controles sem rastreamento ocultos nesta vista.</figcaption></figure>
+</section>
+<section class="facts" aria-label="O que mudou">
+<article><h3>Olhe sem sair do assento</h3><p>Clique em <strong>Olhar ao redor</strong> ou segure o botão direito e mova o mouse. Soltar devolve o cursor. <strong>R</strong>, Esc ou o botão de retorno leva à partida.</p></article>
+<article><h3>Materiais com variação</h3><p>Os tampos têm madeira clara e acabamento fosco. Textura de pintura, tecido e sombras nos encontros dos móveis dão profundidade à sala.</p></article>
+<article><h3>Mais detalhes na direita</h3><p>Três conjuntos de janelas com caixilhos, bandeiras superiores, fechos e peitoris. O vidro fosco ganha tons suaves de luz externa; as persianas da esquerda permanecem.</p></article>
+</section>
+<h2>As referências reais</h2>
+<p class="note">A página oficial identifica o Laboratório de Redes como <strong>sala 102 do prédio Verde, Câmpus II</strong>. A foto orientou mesas amadeiradas, cadeiras escuras e nichos coloridos. Medidas, distribuição e janelas são adaptações para o jogo; a imagem não comprova uma réplica do estado atual da sala.</p>
+<section class="references">
+<article><img loading="lazy" src="https://www.feevale.br/Comum/midias/cc66f7a5-cd9c-4416-ad2f-4396075d1c48/1200x580/Lab-de-Projetos-de-TI.jpg" alt="Foto oficial do laboratório de Projetos de TI da Feevale"><div class="body"><h3>Laboratório de Projetos de TI</h3><p>Referência complementar para os desktops, persianas e piso amadeirado. A página identifica este laboratório como sala 206 do prédio Verde.</p><a href="https://www.feevale.br/pos-graduacao/stricto-sensu/mestrado--profissional-em-industria-criativa/infraestrutura" target="_blank" rel="noreferrer">Fonte oficial da Feevale ↗</a></div></article>
+<article><img loading="lazy" src="https://www.feevale.br/Comum/midias/c194f139-57e8-4031-a958-e40f7b19dc67/1200x580/Lab-de-redes.jpg" alt="Foto oficial do laboratório de Redes da Feevale"><div class="body"><h3>Sala 102 · Laboratório de Redes</h3><p>Referência principal desta etapa: madeira clara, cadeiras escuras, persianas e pequenos nichos com cor sob a janela.</p><a href="https://www.feevale.br/pos-graduacao/stricto-sensu/mestrado--profissional-em-industria-criativa/infraestrutura" target="_blank" rel="noreferrer">Fonte oficial da Feevale ↗</a></div></article>
+</section>
+<h2>O que ainda depende do headset</h2>
+<p class="note">As imagens verificam a integração e a composição no Editor. Alcance das mãos, conforto, legibilidade em estéreo e desempenho ainda precisam ser avaliados no dispositivo alvo. O tabuleiro ainda usa os materiais anteriores; seus detalhes podem ser o próximo foco, após sua avaliação desta sala.</p>
+<footer><a href="README.md">Registro técnico e referências</a> · <a href="FeevaleComputerLab.blend">Fonte editável Blender</a> · <a href="../classroom-discovery-20260925/classroom-overview.png">Estudo anterior de sala</a> · <a href="../finishing-review-20260925/index.html">Revisão dos personagens</a></footer>
+</main>
+<script>
+const descriptions={
+'before-overview':'Antes: laboratório da primeira etapa, na mesma posição de câmera. Comparação com a versão atual em Visão geral.',
+'before-table':'Antes: tampo branco da primeira etapa. Compare com Tabuleiro na posição VR e Madeira e acabamento da mesa.',
+'vr-right-windows':'Vista sentada para a parede direita. Janelas modeladas com vidro fosco e caixilhos; layout adaptado à sala do jogo.',
+'vr-table-detail':'Detalhe da mesa na Unity: veios de madeira, borda, normal e rugosidade, com os personagens reais.',
+'desktop-look-room':'O botão real do HUD ativa Olhar ao redor, nivela a câmera no assento e amplia o campo de visão.',
+'desktop-look-right':'A visão gira sem transladar a câmera. Segure o botão direito no jogo para olhar; solte para recuperar o cursor.',
+'desktop-return-board':'O botão de retorno restaura a câmera para o lado atual. Captura após e2–e4: perspectiva das pretas em partida local.',
+'vr-overview':'Main em Play Mode, com HMD simulado. Câmera deslocada para conferir o ambiente; interface e controles sem rastreamento ocultos nesta vista.',
+'vr-room':'Altura de olhos de 1,20 m, olhando para a sala. Tabuleiro e personagens são os assets reais do jogo. Interface oculta para revisar o ambiente.',
+'vr-table':'Vista sentada sobre o tabuleiro de 45 cm, acionada pelo caminho VR da Main. Interface oculta para conferir o apoio sobre a mesa.',
+'vr-play':'Partida com a interface World Space do jogo. A simulação verifica a composição; não comprova conforto ou desempenho em um headset.',
+'vr-menu':'Menu World Space dentro da sala. O painel foi aproximado para que os móveis não ocultem as opções e o botão Jogar.',
+'vr-black-side':'Câmera na posição do lado das pretas, olhando para o outro lado da sala. Interface oculta para conferir o espaço atrás do jogador.',
+'desktop-match':'Partida desktop com os 32 personagens, a mesa do laboratório e a interface existente.',
+'desktop-move':'Captura depois da jogada e2–e4, concluída no controlador real da Main.',
+'desktop-menu':'Menu desktop preservado. O laboratório aparece durante a partida.'};
+document.getElementById('view').addEventListener('change',e=>{const key=e.target.value,url=key==='before-overview'?'../feevale-lab-20260925/unity/vr-overview.png':key==='before-table'?'../feevale-lab-20260925/unity/vr-table.png':'unity/'+key+'.png';document.getElementById('capture').src=url;document.getElementById('capture').alt=e.target.selectedOptions[0].text;document.getElementById('full').href=url;document.getElementById('caption').textContent=descriptions[key];});
+</script>
+</html>

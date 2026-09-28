@@ -1,0 +1,49 @@
+{
+  "checks": [
+    {
+      "kind": "Bishop",
+      "overlapping_triangle_pairs": 646,
+      "overlap_area": 0.0004652829849106967,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "King",
+      "overlapping_triangle_pairs": 230,
+      "overlap_area": 4.029332028969391e-05,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Knight",
+      "overlapping_triangle_pairs": 223,
+      "overlap_area": 6.759594951008204e-05,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Pawn",
+      "overlapping_triangle_pairs": 519,
+      "overlap_area": 0.00021190803953703014,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Queen",
+      "overlapping_triangle_pairs": 3049,
+      "overlap_area": 0.0047190641052371335,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Rook",
+      "overlapping_triangle_pairs": 3383,
+      "overlap_area": 0.0015595238556627665,
+      "source_uv_preserved": true
+    }
+  ],
+  "failures": [
+    "Bishop: overlapping production UV triangles",
+    "King: overlapping production UV triangles",
+    "Knight: overlapping production UV triangles",
+    "Pawn: overlapping production UV triangles",
+    "Queen: overlapping production UV triangles",
+    "Rook: overlapping production UV triangles"
+  ],
+  "passed": false
+}

@@ -1,0 +1,91 @@
+{
+  "checks": [
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "lower_hoodie",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0226,
+      "first_bad_points": [],
+      "dark_patch_fraction": 1.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "left_cuff",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0314,
+      "first_bad_points": [],
+      "dark_patch_fraction": 1.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "hood_rim_back",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0304,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.99951
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "hoodie_waist_back",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0314,
+      "first_bad_points": [],
+      "dark_patch_fraction": 1.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "hands_preserved",
+      "samples": 2000,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3255,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "mount_preserved",
+      "samples": 1889,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.4118,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "Black",
+      "region": "hands_preserved",
+      "samples": 2000,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3255,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "Black",
+      "region": "mount_preserved",
+      "samples": 1889,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.4118,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    }
+  ],
+  "failures": [
+    "Knight lower_hoodie: black material cuts across the white hoodie",
+    "Knight left_cuff: black material cuts across the white hoodie",
+    "Knight hood_rim_back: black material cuts across the white hoodie",
+    "Knight hoodie_waist_back: black material cuts across the white hoodie"
+  ],
+  "passed": false
+}

@@ -1,0 +1,207 @@
+{
+  "verified_at_utc": "2026-09-25T13:59:43.376577+00:00",
+  "base_main": "81bea194e6b4a24adfaf3c24b235709660829c8e",
+  "branch": "codex/character-variants",
+  "unity_version": "6000.3.16f1",
+  "blender_version": "5.2.1 LTS",
+  "playmode_tests": {
+    "total": "32",
+    "passed": "32",
+    "failed": "0",
+    "skipped": "0",
+    "end-time": "2026-09-25 13:58:24Z"
+  },
+  "geometry_audit": {
+    "passed": true,
+    "report": "geometry-audit.json",
+    "prior_regressions": "../production/geometry-audit-before.json",
+    "brand_applications": 6
+  },
+  "captures": {
+    "menu": {
+      "path": "after/menu.png",
+      "sha256": "28e9782043d79b812c7b332e6347744f93828d78efed568ac14409727212940b"
+    },
+    "board": {
+      "path": "after/board.png",
+      "sha256": "381ed6de66735f024ea53c6707d6f7b19180bab5356b13ca3b1c0643bbcc0000"
+    },
+    "selected-white": {
+      "path": "after/selected-white.png",
+      "sha256": "67e40c9a98f1812288dc1c6a89dfe82716cf15e046ac40f23fb53b863ff28856"
+    },
+    "move": {
+      "path": "after/move.png",
+      "sha256": "008d2938f96fd6aad1749e58eacbc2852072209dde72c49f6181b7b389a01fa1"
+    },
+    "selected-black": {
+      "path": "after/selected-black.png",
+      "sha256": "92b05244fde913ef8a060de09b043dd13dcf3e69dc2638fbb15730714c0c1c68"
+    },
+    "board-top": {
+      "path": "after/board-top.png",
+      "sha256": "82fb92f81a408beec5b113dcd5876d919596d7a278384c92efa2ac058e9eab11"
+    },
+    "cast-front": {
+      "path": "after/cast-front.png",
+      "sha256": "b5a8b6aebe80231e4f7e8f379e29491eb9c6bfda01a2539a6d51b93ef7cc0ed6"
+    },
+    "cast-top": {
+      "path": "after/cast-top.png",
+      "sha256": "a5867caf0fc8ecc279fddff907748090d3d5890044323a216f311a398dfcef8b"
+    },
+    "detail-pawn": {
+      "path": "after/detail-pawn.png",
+      "sha256": "2966159d7eeef42c6e8c1e12c6c087f61be4a69ac36df5fd9990543bb039d513"
+    },
+    "detail-rook": {
+      "path": "after/detail-rook.png",
+      "sha256": "3c2b9525522d8ac396705080bb35a79dd16ee38082a4ac78df30638cc37b5598"
+    },
+    "detail-knight": {
+      "path": "after/detail-knight.png",
+      "sha256": "916ead6aece901fb381aec8b5edec4c76fa1597f840df9e6289be4f21a32dc84"
+    },
+    "detail-bishop": {
+      "path": "after/detail-bishop.png",
+      "sha256": "8597c57eed6bcf9b4d2db318f71fd9cff15a4303426f79016fc9b188bbb9387b"
+    },
+    "detail-queen": {
+      "path": "after/detail-queen.png",
+      "sha256": "524d25cf5f8cce3ef291b0bad124554b128f3e3ddf480708a5b87fb15d5e0566"
+    },
+    "detail-king": {
+      "path": "after/detail-king.png",
+      "sha256": "ebde8eebad2dd27c05862e28d080722cb7efcf9464f4677ad98e2e37911777ae"
+    },
+    "back-pawn": {
+      "path": "after/back-pawn.png",
+      "sha256": "f3c49985168278bf1d9b1865f63be2cc7c378780ae7d1af75d5572b5784383b9"
+    },
+    "back-rook": {
+      "path": "after/back-rook.png",
+      "sha256": "27305d8f57988fdcca5d159070ee389da1bee0824e87d9b14645c56488b8b81c"
+    },
+    "back-knight": {
+      "path": "after/back-knight.png",
+      "sha256": "451ea6b73f981a5599da33e51079ae19da9a33ff8a2706e1ea70eb086f9bfe76"
+    },
+    "back-bishop": {
+      "path": "after/back-bishop.png",
+      "sha256": "9099b546f644108244fb89a398bb7051bd432afb8fcca269a4671b3cacad5503"
+    },
+    "back-queen": {
+      "path": "after/back-queen.png",
+      "sha256": "7071334fa2b174d24f085f86e515f9cfde9ef4750a927a2d3a369363bbded2ca"
+    },
+    "back-king": {
+      "path": "after/back-king.png",
+      "sha256": "45b6d6f081d6f78a13c97f2f06c54c574bb8afa289f2799278bcb52926b1cbbc"
+    },
+    "cast-back": {
+      "path": "after/cast-back.png",
+      "sha256": "8d4b3f8e7c5c485eba87a0a13b076ef2069d48bdbea179930e40963eadef29a0"
+    },
+    "detail-black-pawn": {
+      "path": "after/detail-black-pawn.png",
+      "sha256": "e3913e3dcc9a8167d895906951468601371cc6a0babdfaf51e63fcc2a23574c0"
+    },
+    "detail-black-rook": {
+      "path": "after/detail-black-rook.png",
+      "sha256": "7df6ff72516b53ee959251220829885096a66882b43a93332e86f650f982e8c9"
+    },
+    "detail-black-knight": {
+      "path": "after/detail-black-knight.png",
+      "sha256": "bb3a9dc805069787eb084a2baa4f1cde293481286d767ffc84408c7d69b57edd"
+    },
+    "detail-black-bishop": {
+      "path": "after/detail-black-bishop.png",
+      "sha256": "5f117f280c49a9d282a317f64fe3d604319eb2bb9347c4fbaad14966cdf96047"
+    },
+    "detail-black-queen": {
+      "path": "after/detail-black-queen.png",
+      "sha256": "8363c0f233d189ba2ffc0b7ea713ef4034fc1affd8de3c1a6924579f02911c64"
+    },
+    "detail-black-king": {
+      "path": "after/detail-black-king.png",
+      "sha256": "247b78e0432fea8a6662a34a0cb8870c06f2115271b276b51127cec3ac9522be"
+    },
+    "back-black-pawn": {
+      "path": "after/back-black-pawn.png",
+      "sha256": "a3faa81a23be45ced54b2db57c786d961fa25d6f80e9f8c49a09874213f164d5"
+    },
+    "back-black-rook": {
+      "path": "after/back-black-rook.png",
+      "sha256": "dd60a8ed9e22553c25ff9b71cebc9480b7ca64b54da18867dd594ac2998fdd2f"
+    },
+    "back-black-knight": {
+      "path": "after/back-black-knight.png",
+      "sha256": "07acd41de052783efbc689dba3382304b523b20b9a8fdb5253d2ac0abf874053"
+    },
+    "back-black-bishop": {
+      "path": "after/back-black-bishop.png",
+      "sha256": "dfb2048ed90791d7fb49ee14047411594dd4018917db18caf6e93d33c9375a54"
+    },
+    "back-black-queen": {
+      "path": "after/back-black-queen.png",
+      "sha256": "424a082abd158d458ef221647962bdca36ecb4c0c0a9e0afbd3b0f00bb0db3d4"
+    },
+    "back-black-king": {
+      "path": "after/back-black-king.png",
+      "sha256": "e17b68cded9ba78facf2f5f2834a9b8145d51b401bc4447cb90f3d3f73f86ab1"
+    }
+  },
+  "generated_models": {
+    "Pawn": "58712eaef808743ca690e2d8d7a0ae82ad32b542f06ec07f90c992de2a9c98a6",
+    "Rook": "e27466ce5410514c3ada6fe0a24ff94d046b736582a143a4e94ff873ca1fa19e",
+    "Knight": "9643d870f87e4c61f10a98f5bd51ba8633a9689f313fa602d69da183717c6d53",
+    "Bishop": "e57ab7812c4e5b528d2b2b080b2709550bad951a6fcfd7c439c2a08f54d1633b",
+    "Queen": "a6b5a577cb23b613aaa193633d2d4a351d1d6629b81dc69decb5fa0f8330a5a3",
+    "King": "baa41951b0b0eb7f791072942a151ebd8156f8f3d828c98220f194c6dcc739d7"
+  },
+  "original_glbs_unchanged": {
+    "game/Assets/Resources/CustomPieces/Bishop_Rafael_Assets/selected.glb": "ae3398139795265cccb546868625ba387f90b0baaf94e9d7479ddafb66d26700",
+    "game/Assets/Resources/CustomPieces/Queen_Marta_Assets/selected.glb": "56455a9ce068d6f40aa1478b0309bc6a358b4f43424275c8c4c585e43e0a024b",
+    "game/Assets/Resources/CustomPieces/Knight_Gustavo_Assets/selected.glb": "080fbb91520daf9d9446eae720c69ea8bf548890e470a5e253f497f124952bd1",
+    "game/Assets/Resources/CustomPieces/Rook_Alex_Assets/selected.glb": "af1be1fde616e84b56fd754c7b9d7ea9876857787fc88cafe2d3fdca6dbdcfc7",
+    "game/Assets/Resources/CustomPieces/King_Ricardo_Carioca_Assets/selected.glb": "ea52e01652a23b4cfabccdd36ac418810773ee2f9954a1f5b517e4021d81c8c1",
+    "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead_Assets/selected.glb": "bba51921b1c534fa67f3c4f2c5fa693ea6836b16c7d16129391ccc3cd52ccf1b",
+    "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead_v2_Assets/selected.glb": "be7d90fa5a0ef829f0b644914eb00daee0345350ede9000a85739058eee65717"
+  },
+  "prefab_meta_unchanged": 6,
+  "preexisting_animation_study_files_unchanged": 26,
+  "board_triangles": 1345592,
+  "headset_validated": false,
+  "player_build_created": false,
+  "published": false,
+  "texture_limit": "4K color bakes preserve new finishing; original 2K face detail remains the ceiling. Android body maps capped at 2K.",
+  "fabric_audit": {
+    "passed": true,
+    "report": "fabric-audit.json",
+    "prior_regressions": "../production/fabric-audit-before.json",
+    "cases": 22
+  },
+  "uv_audit": {
+    "passed": true,
+    "report": "uv-audit.json",
+    "prior_regressions": "../production/uv-audit-before.json"
+  },
+  "branding": "one Feevale application per character, back only",
+  "export_uv": "ProductionUV, TEXCOORD_0 only",
+  "visual_review": "index.html",
+  "gustavo_regression": {
+    "before": "gustavo-audit-before.json",
+    "after": "fabric-audit.json",
+    "diagnosis": "garment mask corrected in prior revision; hard trouser shadow softened in PC profile in this finishing revision"
+  },
+  "finishing_revision": {
+    "preview_light": "isolated point light, verified by pixel comparison in Main",
+    "cloth": "22 fabric checks, including Pawn waist and Rook collar/cuff",
+    "branding": "original transparent PNG, continuous alpha, back only",
+    "plinth": "smooth lathed rim; flat top; same footprint",
+    "soft_shadows": "PC profile only; Mobile unchanged",
+    "classroom": "offline composition study, not integrated or headset-tested"
+  },
+  "capture_conditions": "Main and gallery captured through URP with postprocessing suppressed for neutral review output; scene postprocessing profile unchanged",
+  "finishing_preserved_files": 40
+}

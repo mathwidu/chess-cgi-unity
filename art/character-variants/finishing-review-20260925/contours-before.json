@@ -1,0 +1,88 @@
+{
+  "checks": [
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "shirt",
+      "samples": 2018,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "distant_texture_color_bleed_fraction": 0.0
+    },
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "cargo",
+      "samples": 1553,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": []
+    },
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "free_hand",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3765,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    },
+    {
+      "kind": "Pawn",
+      "side": "White",
+      "region": "waist_cargo_preserved",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.2078,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.98272
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "collar_cloth",
+      "samples": 1143,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.098,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.05862
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "sleeve_edges",
+      "samples": 1907,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0157,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "seated_forearm",
+      "samples": 836,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3176,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "Black",
+      "region": "seated_forearm",
+      "samples": 836,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3176,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    }
+  ],
+  "failures": [
+    "Pawn White waist_cargo_preserved: recoloring changes a protected surface",
+    "Rook collar_cloth: old dark material remains along the white garment"
+  ],
+  "passed": false
+}

@@ -1,0 +1,221 @@
+{
+  "checks": [
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "shirt",
+      "samples": 2018,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "distant_texture_color_bleed_fraction": 0.0
+    },
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "cargo",
+      "samples": 1553,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": []
+    },
+    {
+      "kind": "King",
+      "side": "Black",
+      "region": "hoodie_hem",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": []
+    },
+    {
+      "kind": "Queen",
+      "side": "Black",
+      "region": "right_shoulder",
+      "samples": 1968,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": []
+    },
+    {
+      "kind": "Queen",
+      "side": "Black",
+      "region": "left_shoulder",
+      "samples": 1922,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": []
+    },
+    {
+      "kind": "Queen",
+      "side": "Black",
+      "region": "cardigan_between_scarf_tails",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": []
+    },
+    {
+      "kind": "Bishop",
+      "side": "White",
+      "region": "fabric_below_headphones",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0157,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "free_hand",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3765,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    },
+    {
+      "kind": "Pawn",
+      "side": "White",
+      "region": "waist_cargo_preserved",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.2314,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "collar_cloth",
+      "samples": 1143,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0157,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "sleeve_edges",
+      "samples": 1907,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0157,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "right_cuff",
+      "samples": 1551,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "seated_forearm",
+      "samples": 836,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3176,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "Black",
+      "region": "seated_forearm",
+      "samples": 836,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3176,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "lower_hoodie",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.00148
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "left_cuff",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "hood_rim_back",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "hoodie_waist_back",
+      "samples": 2025,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "hands_preserved",
+      "samples": 2000,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3255,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "White",
+      "region": "mount_preserved",
+      "samples": 1889,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.4118,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "Black",
+      "region": "hands_preserved",
+      "samples": 2000,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3255,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    },
+    {
+      "kind": "Knight",
+      "side": "Black",
+      "region": "mount_preserved",
+      "samples": 1889,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.4118,
+      "first_bad_points": [],
+      "source_color_changed_fraction": 0.0
+    }
+  ],
+  "failures": [],
+  "passed": true
+}

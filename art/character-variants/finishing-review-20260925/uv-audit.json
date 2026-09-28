@@ -1,0 +1,42 @@
+{
+  "checks": [
+    {
+      "kind": "Bishop",
+      "overlapping_triangle_pairs": 0,
+      "overlap_area": 0,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "King",
+      "overlapping_triangle_pairs": 0,
+      "overlap_area": 0,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Knight",
+      "overlapping_triangle_pairs": 0,
+      "overlap_area": 0,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Pawn",
+      "overlapping_triangle_pairs": 0,
+      "overlap_area": 0,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Queen",
+      "overlapping_triangle_pairs": 0,
+      "overlap_area": 0,
+      "source_uv_preserved": true
+    },
+    {
+      "kind": "Rook",
+      "overlapping_triangle_pairs": 0,
+      "overlap_area": 0,
+      "source_uv_preserved": true
+    }
+  ],
+  "failures": [],
+  "passed": true
+}

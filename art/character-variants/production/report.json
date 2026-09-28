@@ -1,0 +1,114 @@
+{
+  "source_commit": "81bea194e6b4a24adfaf3c24b235709660829c8e",
+  "blender": "5.2.1 LTS",
+  "kind": "native 3D production candidates",
+  "revision": "garment contours, tapered grips, satin plinths and printed back branding 2026-09-25",
+  "branding": "back only",
+  "source_uv": "SourceUV",
+  "export_uv": "ProductionUV",
+  "color_texture_size": 4096,
+  "normal_texture_size": 2048,
+  "brand_atlas_size": [
+    950,
+    369
+  ],
+  "base_radius": 0.556,
+  "characters": [
+    {
+      "kind": "Pawn",
+      "prefab": "Pawn_Mathwidu_Redhead_v2",
+      "name": "MATHEUS",
+      "height": 1.15,
+      "source_sha256": "be7d90fa5a0ef829f0b644914eb00daee0345350ede9000a85739058eee65717",
+      "cloth_luminance_median": 0.3888417642578483,
+      "grip_center_authoring_space": [
+        -0.20032,
+        -0.32267,
+        1.25
+      ],
+      "authored_objects": 18,
+      "export_renderers": 8,
+      "mesh_triangles": 39424,
+      "same_meshes_for_sides": true,
+      "body_black_texture": "Assets/Art/Characters/Direction02/Pawn/Body_Black.png"
+    },
+    {
+      "kind": "Rook",
+      "prefab": "Rook_Alex",
+      "name": "ALEX",
+      "height": 1.31,
+      "source_sha256": "af1be1fde616e84b56fd754c7b9d7ea9876857787fc88cafe2d3fdca6dbdcfc7",
+      "cloth_luminance_median": 0.027001911920309065,
+      "grip_center_authoring_space": null,
+      "authored_objects": 8,
+      "export_renderers": 6,
+      "mesh_triangles": 36780,
+      "same_meshes_for_sides": true,
+      "body_black_texture": "Assets/Art/Characters/Direction02/Rook/Body_Black.png"
+    },
+    {
+      "kind": "Knight",
+      "prefab": "Knight_Gustavo",
+      "name": "GUSTAVO",
+      "height": 1.31,
+      "source_sha256": "080fbb91520daf9d9446eae720c69ea8bf548890e470a5e253f497f124952bd1",
+      "cloth_luminance_median": 0.040232962033152575,
+      "grip_center_authoring_space": null,
+      "authored_objects": 8,
+      "export_renderers": 6,
+      "mesh_triangles": 44708,
+      "same_meshes_for_sides": true,
+      "body_black_texture": "Assets/Art/Characters/Direction02/Knight/Body_Black.png"
+    },
+    {
+      "kind": "Bishop",
+      "prefab": "Bishop_Rafael",
+      "name": "RAFAEL",
+      "height": 1.31,
+      "source_sha256": "ae3398139795265cccb546868625ba387f90b0baaf94e9d7479ddafb66d26700",
+      "cloth_luminance_median": 0.024126464528776703,
+      "grip_center_authoring_space": [
+        -0.26354,
+        -0.01626,
+        0.80443
+      ],
+      "authored_objects": 22,
+      "export_renderers": 7,
+      "mesh_triangles": 45610,
+      "same_meshes_for_sides": true,
+      "body_black_texture": "Assets/Art/Characters/Direction02/Bishop/Body_Black.png"
+    },
+    {
+      "kind": "Queen",
+      "prefab": "Queen_Marta",
+      "name": "MARTA",
+      "height": 1.43,
+      "source_sha256": "56455a9ce068d6f40aa1478b0309bc6a358b4f43424275c8c4c585e43e0a024b",
+      "cloth_luminance_median": 0.38671879885196686,
+      "grip_center_authoring_space": null,
+      "authored_objects": 8,
+      "export_renderers": 6,
+      "mesh_triangles": 52452,
+      "same_meshes_for_sides": true,
+      "body_black_texture": "Assets/Art/Characters/Direction02/Queen/Body_Black.png"
+    },
+    {
+      "kind": "King",
+      "prefab": "King_Ricardo_Carioca",
+      "name": "RICARDO",
+      "height": 1.43,
+      "source_sha256": "ea52e01652a23b4cfabccdd36ac418810773ee2f9954a1f5b517e4021d81c8c1",
+      "cloth_luminance_median": 0.18760511453747747,
+      "grip_center_authoring_space": [
+        -0.3245,
+        -0.29794,
+        0.69148
+      ],
+      "authored_objects": 23,
+      "export_renderers": 7,
+      "mesh_triangles": 50756,
+      "same_meshes_for_sides": true,
+      "body_black_texture": "Assets/Art/Characters/Direction02/King/Body_Black.png"
+    }
+  ]
+}

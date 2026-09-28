@@ -1,0 +1,110 @@
+{
+  "checks": [
+    {
+      "kind": "Bishop",
+      "detached_old_hand_fragments": [],
+      "shaft_body_intersections": {
+        "count": 0,
+        "first_points": []
+      },
+      "role_symbol_visible_from_above": [
+        1.0,
+        1.0
+      ],
+      "brand_patches": [
+        {
+          "patch": "Bishop_FeevaleBack",
+          "complete_uv_area": 1.0,
+          "min_surface_gap": 0.00068,
+          "max_surface_gap": 0.00186
+        }
+      ]
+    },
+    {
+      "kind": "King",
+      "detached_old_hand_fragments": [],
+      "original_head_max_deviation": 0.00948,
+      "original_head_mean_deviation": 0.00162,
+      "shaft_body_intersections": {
+        "count": 0,
+        "first_points": []
+      },
+      "role_symbol_visible_from_above": [
+        1.0,
+        1.0
+      ],
+      "brand_patches": [
+        {
+          "patch": "King_FeevaleBack",
+          "complete_uv_area": 1.0,
+          "min_surface_gap": 0.00113,
+          "max_surface_gap": 0.00208
+        }
+      ]
+    },
+    {
+      "kind": "Knight",
+      "white_cloth_samples": 4416,
+      "white_cloth_min_value": 0.3059,
+      "role_symbol_visible_from_above": [
+        1.0,
+        1.0
+      ],
+      "brand_patches": [
+        {
+          "patch": "Knight_FeevaleBack",
+          "complete_uv_area": 1.0,
+          "min_surface_gap": 0.00091,
+          "max_surface_gap": 0.00153
+        }
+      ]
+    },
+    {
+      "kind": "Pawn",
+      "role_symbol_visible_from_above": [
+        1.0,
+        1.0
+      ],
+      "brand_patches": [
+        {
+          "patch": "Pawn_FeevaleBack",
+          "complete_uv_area": 1.0,
+          "min_surface_gap": 0.00036,
+          "max_surface_gap": 0.00154
+        }
+      ]
+    },
+    {
+      "kind": "Queen",
+      "role_symbol_visible_from_above": [
+        1.0,
+        1.0
+      ],
+      "brand_patches": [
+        {
+          "patch": "Queen_FeevaleBack",
+          "complete_uv_area": 1.0,
+          "min_surface_gap": 0.00119,
+          "max_surface_gap": 0.00244
+        }
+      ]
+    },
+    {
+      "kind": "Rook",
+      "role_symbol_visible_from_above": [
+        1.0,
+        1.0
+      ],
+      "brand_patches": [
+        {
+          "patch": "Rook_FeevaleBack",
+          "complete_uv_area": 1.0,
+          "min_surface_gap": 0.00105,
+          "max_surface_gap": 0.00157
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "passed": true
+}

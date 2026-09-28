@@ -1,0 +1,28 @@
+{
+  "date": "2026-09-26",
+  "unity": "6000.3.16f1",
+  "reviewSteps": 4,
+  "newCaptures": 12,
+  "reviewedFiles": [
+    "king-max-zoom.png",
+    "king-repositioned.png",
+    "king-restored.png",
+    "knight-max-zoom.png",
+    "vr-black-side.png",
+    "vr-menu.png",
+    "vr-overview.png",
+    "vr-play.png",
+    "vr-right-windows.png",
+    "vr-room.png",
+    "vr-table-detail.png",
+    "vr-table.png"
+  ],
+  "protectedFileCount": 188,
+  "changedProtectedFiles": [],
+  "sourceChanges": false,
+  "headsetValidation": false,
+  "captureLogs": [
+    ".local/visual-audit-20260926/vr-capture.log",
+    ".local/visual-audit-20260926/pc-capture.log"
+  ]
+}
