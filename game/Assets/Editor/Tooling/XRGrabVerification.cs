@@ -249,6 +249,7 @@ public static class XRGrabVerification
             result.Check(selectPath.EndsWith("triggerButton"), $"{controllerName} should select with the index trigger, got {selectPath}");
             result.Check((far.raycastMask.value & (1 << PieceView.PhysicsLayer)) == 0 && far.raycastMask.value != 0, $"{controllerName} far ray should skip the pieces layer but still reach the HUD");
             result.Check(visual.curveInteractionDataProvider is UiOnlyCurveData, $"{controllerName} ray should only show over the HUD");
+            CheckRayIsNotMagnetic(controllerName, far, visual);
             HapticImpulsePlayer haptics = controller.GetComponent<HapticImpulsePlayer>();
             string hapticPath = haptics != null && haptics.hapticOutput.inputAction != null && haptics.hapticOutput.inputAction.bindings.Count > 0
                 ? haptics.hapticOutput.inputAction.bindings[0].path : "none";
@@ -262,7 +263,20 @@ public static class XRGrabVerification
             Transform hand = offset.Find(handName);
             CurveVisualController visual = hand == null ? null : hand.GetComponentInChildren<CurveVisualController>(true);
             result.Check(visual == null || visual.curveInteractionDataProvider is UiOnlyCurveData, $"{handName} ray should only show over the HUD");
+            NearFarInteractor interactor = hand == null ? null : hand.GetComponentInChildren<NearFarInteractor>(true);
+            if (interactor != null && visual != null)
+            {
+                CheckRayIsNotMagnetic(handName, interactor.farInteractionCaster as CurveInteractionCaster, visual);
+            }
         }
+    }
+
+    private static void CheckRayIsNotMagnetic(string owner, CurveInteractionCaster far, CurveVisualController visual)
+    {
+        result.Check(far != null && far.hitDetectionType == CurveInteractionCaster.HitDetectionType.Raycast,
+            $"{owner} far ray should hit only what it points at, got {far?.hitDetectionType}");
+        result.Check(!visual.snapToSelectedAttachIfAvailable && !visual.snapToSnapVolumeIfAvailable,
+            $"{owner} ray line should not snap to targets");
     }
 
     private static PieceView FindPiece(int fileIndex, int rank)

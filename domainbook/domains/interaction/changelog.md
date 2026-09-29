@@ -76,6 +76,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- O raio dos controles e das mãos no VR deixou de ser magnético: o
+  `CurveInteractionCaster` usa `Raycast` em vez do `ConeCast` padrão do XRI
+  (3° nos controles, 6° nos prefabs de mão), e o `CurveVisualController` não
+  encaixa mais a ponta da linha no alvo selecionado nem em snap volumes. O raio
+  só acerta o que está exatamente na mira e a linha fica reta. O
+  `XRGrabVerification` confere isso nos dois controles e nas duas mãos.
+
 - O assento de VR foi reposicionado para uma vista de mesa: `XRRig` senta o
   jogador logo à frente e acima de um tabuleiro em escala de mesa, em vez de
   colocá-lo dentro de um tabuleiro em escala de sala. O modo desktop permanece

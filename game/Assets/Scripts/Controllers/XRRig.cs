@@ -235,13 +235,21 @@ public sealed class XRRig : MonoBehaviour
         if (farCaster != null)
         {
             farCaster.raycastMask = ~(1 << PieceView.PhysicsLayer);
+            farCaster.hitDetectionType = CurveInteractionCaster.HitDetectionType.Raycast;
         }
 
         CurveVisualController curveVisual = interactorObject.GetComponentInChildren<CurveVisualController>(true);
         if (curveVisual != null)
         {
             curveVisual.curveInteractionDataProvider = new UiOnlyCurveData(interactor);
+            KeepRayStraight(curveVisual);
         }
+    }
+
+    private static void KeepRayStraight(CurveVisualController curveVisual)
+    {
+        curveVisual.snapToSelectedAttachIfAvailable = false;
+        curveVisual.snapToSnapVolumeIfAvailable = false;
     }
 
     private static GameObject BuildHandVisual(Transform parent, string resourceName)
@@ -279,6 +287,7 @@ public sealed class XRRig : MonoBehaviour
         nearCaster.castRadius = GrabRadius;
         CurveInteractionCaster farCaster = controllerObject.AddComponent<CurveInteractionCaster>();
         farCaster.raycastMask = ~(1 << PieceView.PhysicsLayer);
+        farCaster.hitDetectionType = CurveInteractionCaster.HitDetectionType.Raycast;
         InteractionAttachController attachController = controllerObject.AddComponent<InteractionAttachController>();
 
         LineRenderer lineRenderer = controllerObject.AddComponent<LineRenderer>();
@@ -294,6 +303,7 @@ public sealed class XRRig : MonoBehaviour
         CurveVisualController curveVisual = controllerObject.AddComponent<CurveVisualController>();
         curveVisual.lineRenderer = lineRenderer;
         curveVisual.curveInteractionDataProvider = new UiOnlyCurveData(interactor);
+        KeepRayStraight(curveVisual);
 
         XRInputButtonReader selectInput = new XRInputButtonReader("Select")
         {
