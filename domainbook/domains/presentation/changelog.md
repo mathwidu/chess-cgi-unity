@@ -10,6 +10,16 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Peça solta](glossary.md) no VR: qualquer peça solta fora de um lance,
+  no tabuleiro ou nas [peças capturadas](glossary.md), cai sob a física, pode
+  ser arremessada e volta ao lugar depois de 3 segundos soltas
+  ([feature](features/ver-as-pecas-capturadas.md)). O novo `ThrowablePiece`,
+  um `XRGrabInteractable`, deixa a peça sob a física ao agarrar (para o XRI
+  aplicar o arremesso ao soltar) e desliza a peça ao lugar depois do atraso.
+  `PieceFactory.CreateDisplayPiece` dá às miniaturas collider e
+  `ThrowablePiece` quando há headset. A partida não é afetada, e a miniatura
+  não pode ser agarrada durante o voo da captura.
+
 - [Marca do último lance](glossary.md) e [rei em xeque](glossary.md)
   ([feature](features/sentir-cada-lance.md)): `BoardView.MarkLastMove` tinge
   de amarelo suave as casas de origem e destino do último lance, e

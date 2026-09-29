@@ -76,6 +76,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- [Agarrar e soltar](glossary.md): soltar uma peça fora de um destino legal
+  não a devolve mais à casa na hora. O `VrSelectionBridge` congela a peça só
+  quando a solta começa um lance; nos outros casos ela fica solta, sob a
+  física, e volta depois de 3 segundos.
+
 - O raio dos controles e das mãos no VR deixou de ser magnético: o
   `CurveInteractionCaster` usa `Raycast` em vez do `ConeCast` padrão do XRI
   (3° nos controles, 6° nos prefabs de mão), e o `CurveVisualController` não

@@ -173,16 +173,27 @@ public sealed class CapturedPiecesView : MonoBehaviour
             piece.transform.localPosition = place;
             piece.transform.localScale = Vector3.one * DisplayScale;
             shownPieces.Add(piece);
+            piece.TryGetComponent(out ThrowablePiece grab);
+            if (grab != null)
+            {
+                grab.SetRest(place);
+            }
+
             if (captures[slot] == newest)
             {
                 Vector3 square = piecesRoot.InverseTransformPoint(board.GetPieceWorldPosition(captured.Square));
-                StartCoroutine(Fly(piece.transform, square, place));
+                StartCoroutine(Fly(piece.transform, square, place, grab));
             }
         }
     }
 
-    private IEnumerator Fly(Transform piece, Vector3 from, Vector3 to)
+    private IEnumerator Fly(Transform piece, Vector3 from, Vector3 to, ThrowablePiece grab)
     {
+        if (grab != null)
+        {
+            grab.enabled = false;
+        }
+
         for (float t = 0f; t < 1f; t += Time.deltaTime / FlySeconds)
         {
             float eased = Mathf.SmoothStep(0f, 1f, t);
@@ -193,6 +204,10 @@ public sealed class CapturedPiecesView : MonoBehaviour
 
         piece.localPosition = to;
         piece.localScale = Vector3.one * DisplayScale;
+        if (grab != null)
+        {
+            grab.enabled = true;
+        }
     }
 
     private void RefreshBalance(ChessSide viewerSide)

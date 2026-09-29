@@ -16,6 +16,7 @@ public sealed class VrSelectionBridge : MonoBehaviour
 
     private ChessGameController gameController;
     private PieceView pieceView;
+    private ThrowablePiece throwable;
     private XRGrabInteractable interactable;
     private XRSelectFilterDelegate grabFilter;
 
@@ -23,6 +24,7 @@ public sealed class VrSelectionBridge : MonoBehaviour
     {
         gameController = FindFirstObjectByType<ChessGameController>();
         pieceView = GetComponent<PieceView>();
+        throwable = GetComponent<ThrowablePiece>();
         interactable = GetComponent<XRGrabInteractable>();
         grabFilter = new XRSelectFilterDelegate((interactor, grabbed) => gameController != null && gameController.CanGrabPiece(pieceView));
     }
@@ -64,7 +66,12 @@ public sealed class VrSelectionBridge : MonoBehaviour
     {
         if (gameController != null)
         {
-            bool accepted = gameController.ReleasePiece(pieceView, transform.position);
+            bool accepted = gameController.ReleasePiece(pieceView, transform.position, out bool moveStarted);
+            if (moveStarted)
+            {
+                throwable.Freeze();
+            }
+
             Vibrate(args.interactorObject, accepted ? DropAmplitude : RefusedAmplitude, accepted ? DropSeconds : RefusedSeconds);
         }
     }

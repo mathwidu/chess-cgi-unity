@@ -20,7 +20,8 @@ Example: As brancas capturam um peão
   When as brancas tomam um peão preto
   Then o lance termina no tabuleiro
   And o peão voa da casa dele até a metade da faixa perto do jogador
-  And ele fica ali em miniatura, sem poder ser clicado nem agarrado
+  And ele fica ali em miniatura, sem poder ser clicado
+  And no VR, o jogador pode agarrá-lo, arremessá-lo, e ele volta ao lugar depois de 3 segundos solto
 
 Example: Cada lado guarda o que tomou
   Given as brancas tomaram um peão
@@ -63,6 +64,11 @@ As faixas são montadas pelo `BoardView` em unidades locais do tabuleiro, por
 isso sobem e descem com a mesa. As miniaturas são da mesma família das peças
 do tabuleiro (personagens, ou peças clássicas no modo desempenho) e são
 ordenadas por valor.
+
+No VR, cada miniatura leva `ThrowablePiece`. Agarrar não muda nada na partida,
+porque a miniatura não tem `PieceView`. Ao soltar, ela cai sob a física, pode
+ser arremessada, e 3 segundos depois desliza de volta ao lugar. Durante o voo
+da captura, ela não pode ser agarrada.
 
 ## Open Questions
 

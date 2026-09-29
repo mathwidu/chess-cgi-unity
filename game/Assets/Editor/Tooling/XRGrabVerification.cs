@@ -21,6 +21,8 @@ public static class XRGrabVerification
     private const int FramesBeforeStart = 30;
     private const float MoveWait = 0.8f;
     private const float HeldTiltDegrees = 40f;
+    private const float ReturnWait = 3.6f;
+    private const float DropLift = 0.25f;
 
     private static readonly XRVerificationResult result = new XRVerificationResult();
     private static readonly Queue<(float delay, Action run)> steps = new Queue<(float, Action)>();
@@ -153,19 +155,27 @@ public static class XRGrabVerification
             white.interactionManager.SelectExit((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)white);
             leftInteractor.GetComponent<TrackedPoseDriver>().enabled = true;
         }));
-        steps.Enqueue((0.3f, () =>
+        steps.Enqueue((ReturnWait, () =>
         {
-            float tilt = Vector3.Angle(whitePawn.transform.up, board.transform.up);
-            result.Check(tilt < 0.5f, $"a released piece should stand upright on its square again, tilted {tilt:F1} degrees");
+            Rigidbody body = whitePawn.GetComponent<Rigidbody>();
+            result.Check(!body.isKinematic && body.useGravity, "a released piece should be loose, under physics");
             result.Check(game.SelectedPiece == null, "releasing on the origin square should deselect the piece");
             result.Check(leftInteractor.GetComponentInChildren<ControllerHandPose>().Pinch == 0f, "releasing the piece should open the hand again");
             result.Check(game.CurrentTurn == ChessSide.White, "releasing on the origin square should not move");
+        }));
+        steps.Enqueue((0.1f, () =>
+        {
+            float tilt = Vector3.Angle(whitePawn.transform.up, board.transform.up);
+            Vector3 expected = board.GetPieceWorldPosition(new BoardSquare(4, 2));
+            result.Check(tilt < 0.5f, $"a piece loose for 3 seconds should stand upright again, tilted {tilt:F1} degrees");
+            result.Check(Vector3.Distance(whitePawn.transform.position, expected) < 0.001f, "a piece loose for 3 seconds should be back on its square");
+            result.Check(whitePawn.GetComponent<Rigidbody>().isKinematic, "a returned piece should stop being physical");
         }));
 
         steps.Enqueue((MoveWait, () =>
         {
             game.GrabPiece(FindPiece(4, 2));
-            game.ReleasePiece(FindPiece(4, 2), board.GetPieceWorldPosition(new BoardSquare(4, 4)));
+            game.ReleasePiece(FindPiece(4, 2), board.GetPieceWorldPosition(new BoardSquare(4, 4)), out _);
         }));
         steps.Enqueue((0.1f, () =>
         {
@@ -173,26 +183,46 @@ public static class XRGrabVerification
             result.Check(FindPiece(4, 4) != null && FindPiece(4, 2) == null, "the pawn should end on e4");
         }));
 
-        steps.Enqueue((MoveWait, () =>
+        steps.Enqueue((0.1f, () =>
         {
-            game.GrabPiece(FindPiece(4, 7));
-            game.ReleasePiece(FindPiece(4, 7), board.GetPieceWorldPosition(new BoardSquare(4, 4)));
+            PieceView piece = FindPiece(4, 7);
+            XRGrabInteractable grab = piece.GetComponent<XRGrabInteractable>();
+            grab.interactionManager.SelectEnter((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)grab);
+        }));
+        steps.Enqueue((0.2f, () =>
+        {
+            leftInteractor.GetComponent<TrackedPoseDriver>().enabled = false;
+            Vector3 target = board.GetPieceWorldPosition(new BoardSquare(4, 3)) + Vector3.up * DropLift;
+            leftInteractor.transform.position += target - FindPiece(4, 7).transform.position;
+        }));
+        steps.Enqueue((0.5f, () =>
+        {
+            XRGrabInteractable grab = FindPiece(4, 7).GetComponent<XRGrabInteractable>();
+            grab.interactionManager.SelectExit((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)grab);
+            leftInteractor.GetComponent<TrackedPoseDriver>().enabled = true;
             result.Check(game.StatusMessage == "Movimento invalido.", "releasing on an illegal square should report an invalid move");
             result.Check(game.SelectedPiece == null, "an invalid release should clear the selection");
             result.Check(game.CurrentTurn == ChessSide.Black, "an invalid release should not pass the turn");
         }));
-        steps.Enqueue((0.4f, () =>
+        steps.Enqueue((ReturnWait, () =>
+        {
+            PieceView loose = FindPiece(4, 7);
+            Vector3 home = board.GetPieceWorldPosition(new BoardSquare(4, 7));
+            result.Check(!loose.GetComponent<Rigidbody>().isKinematic, "a refused drop should leave the piece loose");
+            result.Check(Vector3.Distance(loose.transform.position, home) > 0.005f, "a refused drop should not put the piece back at once");
+        }));
+        steps.Enqueue((ReturnWait, () =>
         {
             PieceView returned = FindPiece(4, 7);
             Vector3 expected = board.GetPieceWorldPosition(new BoardSquare(4, 7));
-            result.Check(Vector3.Distance(returned.transform.position, expected) < 0.001f, "an invalid release should return the piece to its square");
+            result.Check(Vector3.Distance(returned.transform.position, expected) < 0.001f, "a refused drop should return the piece to its square after 3 seconds");
         }));
 
         steps.Enqueue((0.1f, () =>
         {
             PieceView piece = FindPiece(3, 7);
             game.GrabPiece(piece);
-            game.ReleasePiece(piece, board.GetPieceWorldPosition(new BoardSquare(3, 7)) + new Vector3(50f, 0f, 50f));
+            game.ReleasePiece(piece, board.GetPieceWorldPosition(new BoardSquare(3, 7)) + new Vector3(50f, 0f, 50f), out _);
             result.Check(game.StatusMessage == "Movimento invalido.", "releasing off the board should report an invalid move");
             result.Check(game.SelectedPiece == null, "releasing off the board should clear the selection");
         }));

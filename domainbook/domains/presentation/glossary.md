@@ -121,6 +121,16 @@ peças mais valiosas vêm primeiro. Um "+N" marca o lado à frente na
 - **Aliases:** Captured pieces, CapturedPiecesView, Peças comidas
 - **Status:** validated
 
+## Peça solta
+
+Peça que o jogador largou no VR sem fazer um lance: cai, quica e pode ser
+arremessada pela física da cena. Depois de 3 segundos solta, ela desliza de
+volta ao lugar de origem (a casa, ou o lugar na faixa das
+[peças capturadas](#peças-capturadas)). Agarrá-la de novo cancela a volta.
+
+- **Aliases:** Loose piece, ThrowablePiece, Peça arremessada
+- **Status:** draft
+
 ## Tela de resultado
 
 O diálogo do HUD que anuncia o [resultado da partida](../gameplay/glossary.md)

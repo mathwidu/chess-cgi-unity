@@ -69,7 +69,7 @@ public sealed class PieceFactory : MonoBehaviour
 
         if (XRRig.IsHeadsetPresent)
         {
-            AddGrabInteractable(root);
+            AddGrabInteractable(root).SetRest(root.transform.localPosition);
             root.AddComponent<VrSelectionBridge>();
             root.AddComponent<PieceGrabHighlight>();
         }
@@ -77,7 +77,7 @@ public sealed class PieceFactory : MonoBehaviour
         return pieceView;
     }
 
-    // A look-alike for display only (captured pieces): no collider, PieceView or XR grab.
+    // A look-alike for captured pieces: no PieceView, so the rules never see it; grabbable only in VR.
     public GameObject CreateDisplayPiece(ChessSide side, ChessPieceKind kind, Transform parent)
     {
         GameObject root = new GameObject($"{side} {kind}");
@@ -87,6 +87,13 @@ public sealed class PieceFactory : MonoBehaviour
         foreach (Collider collider in root.GetComponentsInChildren<Collider>())
         {
             collider.enabled = false;
+        }
+
+        if (XRRig.IsHeadsetPresent)
+        {
+            root.layer = PieceView.PhysicsLayer;
+            AddCollider(root);
+            AddGrabInteractable(root);
         }
 
         return root;
@@ -101,17 +108,18 @@ public sealed class PieceFactory : MonoBehaviour
         }
     }
 
-    private static void AddGrabInteractable(GameObject root)
+    private static ThrowablePiece AddGrabInteractable(GameObject root)
     {
         Rigidbody body = root.AddComponent<Rigidbody>();
         body.isKinematic = true;
         body.useGravity = false;
 
-        XRGrabInteractable grab = root.AddComponent<XRGrabInteractable>();
+        ThrowablePiece grab = root.AddComponent<ThrowablePiece>();
         grab.movementType = XRBaseInteractable.MovementType.Instantaneous;
         grab.trackRotation = true;
-        grab.throwOnDetach = false;
+        grab.throwOnDetach = true;
         grab.useDynamicAttach = true;
+        return grab;
     }
 
     private static void AddCollider(GameObject root)

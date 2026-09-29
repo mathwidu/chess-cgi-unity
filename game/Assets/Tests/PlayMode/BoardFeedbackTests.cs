@@ -141,11 +141,13 @@ public class BoardFeedbackTests
         yield return null;
         PieceView pawn = board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("e2")));
         controller.GrabPiece(pawn);
-        Assert.That(controller.ReleasePiece(pawn, board.GetPieceWorldPosition(BoardSquare.FromAlgebraic("e5"))), Is.False);
+        Assert.That(controller.ReleasePiece(pawn, board.GetPieceWorldPosition(BoardSquare.FromAlgebraic("e5")), out bool refusedMoved), Is.False);
+        Assert.That(refusedMoved, Is.False);
         yield return WaitFor(() => !controller.IsInputBlocked);
 
         controller.GrabPiece(pawn);
-        Assert.That(controller.ReleasePiece(pawn, board.GetPieceWorldPosition(BoardSquare.FromAlgebraic("e4"))), Is.True);
+        Assert.That(controller.ReleasePiece(pawn, board.GetPieceWorldPosition(BoardSquare.FromAlgebraic("e4")), out bool acceptedMoved), Is.True);
+        Assert.That(acceptedMoved, Is.True);
         yield return WaitFor(() => controller.MoveHistory.Count == 1);
     }
 }

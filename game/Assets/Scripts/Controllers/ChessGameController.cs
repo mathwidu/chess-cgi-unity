@@ -337,8 +337,10 @@ public sealed class ChessGameController : MonoBehaviour
     }
 
     // Returns false when the drop was refused (off the board or not a legal destination).
-    public bool ReleasePiece(PieceView piece, Vector3 worldPosition)
+    // moveStarted is true only when the drop began a move; otherwise the piece is left where it fell.
+    public bool ReleasePiece(PieceView piece, Vector3 worldPosition, out bool moveStarted)
     {
+        moveStarted = false;
         if (piece == null)
         {
             return false;
@@ -346,7 +348,6 @@ public sealed class ChessGameController : MonoBehaviour
 
         if (piece != selectedPiece)
         {
-            ReturnToSquare(piece);
             return false;
         }
 
@@ -354,7 +355,6 @@ public sealed class ChessGameController : MonoBehaviour
         if (onBoard && destination.Equals(piece.Square))
         {
             CancelSelection();
-            ReturnToSquare(piece);
             return true;
         }
 
@@ -362,10 +362,10 @@ public sealed class ChessGameController : MonoBehaviour
         {
             ClearSelection();
             StatusMessage = "Movimento invalido.";
-            ReturnToSquare(piece);
             return false;
         }
 
+        moveStarted = true;
         SelectDestination(destination);
         if (awaitingPromotion)
         {
@@ -429,11 +429,6 @@ public sealed class ChessGameController : MonoBehaviour
         awaitingPromotion = false;
         ClearSelection();
         SetStatusForTurn();
-    }
-
-    private void ReturnToSquare(PieceView piece)
-    {
-        piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(piece.Square), ReturnDuration));
     }
 
     private void SelectOwnPiece(PieceView piece)

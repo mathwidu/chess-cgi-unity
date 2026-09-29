@@ -241,7 +241,7 @@ public static class XRCameraVerification
 
         destinationSquare = BoardSquare.FromAlgebraic("a3");
         gameController.GrabPiece(pawn);
-        gameController.ReleasePiece(pawn, boardView.GetPieceWorldPosition(destinationSquare));
+        gameController.ReleasePiece(pawn, boardView.GetPieceWorldPosition(destinationSquare), out _);
         return true;
     }
 
