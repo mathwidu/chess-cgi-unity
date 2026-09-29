@@ -10,7 +10,8 @@ fontes, referências e evidências das etapas de criação.
 | Frente | Documentação e evidências | Fonte editável |
 | --- | --- | --- |
 | Seis personagens, variantes brancas/pretas, acessórios e marca nas costas | [Produção](production/README.md), [acabamento](finishing-review-20260925/README.md) | [characters.blend](production/characters.blend) |
-| Laboratório Feevale, materiais, mesa, tabuleiro e iluminação | [Acabamento atual](tabletop-polish-20260926/README.md), [comparação](tabletop-polish-20260926/index.html) | [Sala](tabletop-polish-20260926/lab-source/FeevaleComputerLab.blend), [tabuleiro](tabletop-polish-20260926/board-source/ChessBoard.blend) |
+| Sala real Feevale, mesas, materiais e iluminação | [Sala v3](feevale-room-v3-20260928/README.md), [comparação](feevale-room-v3-20260928/index.html) | [Sala](feevale-room-v3-20260928/lab-source/FeevaleComputerLab.blend) |
+| Acabamento do tabuleiro | [Tabuleiro e evidências](tabletop-polish-20260926/README.md) | [Tabuleiro](tabletop-polish-20260926/board-source/ChessBoard.blend) |
 | Olhar ao redor no PC | [Regras da interação](../../domainbook/domains/interaction/features/olhar-ao-redor-no-desktop.md) | `game/Assets/Scripts/Controllers/CameraController.cs` |
 | Girar, ampliar e reposicionar a peça no painel | [Controles](preview-controls-20260925/README.md), [enquadramento e reposicionamento](preview-pan-20260925/README.md) | `game/Assets/Scripts/UI/SelectedPiecePreviewInput.cs` e `GameHud.cs` |
 
@@ -25,7 +26,7 @@ executar Blender ou reconstruir os prefabs para jogar.
 - [Direção 02](direction-v2/README.md): referências e conceito aprovado;
   imagens conceituais não são capturas do jogo.
 - `classroom-discovery-20260925/`: proposta inicial da sala. O laboratório
-  integrado está nas fontes de `tabletop-polish-20260926/`.
+  integrado está nas fontes de `feevale-room-v3-20260928/`.
 - `feevale-lab-20260925/` e `feevale-room-v2-20260925/`: versões anteriores
   do laboratório, com referências reais e evolução dos materiais.
 - `visual-review-20260925/`, `finishing-review-20260925/` e `production/`:
@@ -44,8 +45,10 @@ no dispositivo continuam pendentes.
 
 - `build_characters.py` e `uv_layout.py`: exportações de personagens em
   `game/Assets/Art/Characters/Direction02/`; auditorias `audit_*.py`.
-- `build_feevale_lab.py` e `build_chess_board.py`: exportações em
-  `game/Assets/Art/Environment/` e fontes em `tabletop-polish-20260926/`.
+- `build_feevale_lab.py`: exportação da sala em `game/Assets/Art/Environment/`
+  e fonte em `feevale-room-v3-20260928/lab-source/`.
+- `build_chess_board.py`: tabuleiro no mesmo diretório de assets, com fonte
+  em `tabletop-polish-20260926/board-source/`.
 - `generate_study.py` e `build_classroom_study.py`: geradores históricos,
   sem necessidade de execução para usar o resultado aprovado.
 - `fonts/`: fonte dos símbolos clássicos e sua licença.

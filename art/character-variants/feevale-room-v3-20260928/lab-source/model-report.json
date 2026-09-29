@@ -1,0 +1,44 @@
+{
+  "reference": "User-provided IMG_2844.MOV and tabletop photograph with a 30 cm ruler; originals remain local",
+  "basis": [
+    "Video: blue/grey walls, tall windows with ochre surround, blinds, storage, ceiling beams and suspended tubes",
+    "Photo: light oak laminate, thin edge band, black grommets and silver T-legs"
+  ],
+  "reference_timecodes_s": [
+    24.5,
+    42.5,
+    54.5,
+    66.5,
+    72.5
+  ],
+  "known_measure_m": 0.3,
+  "measured_room_dimensions": false,
+  "right_window_bays": 3,
+  "desk_groups": 4,
+  "student_desks": 16,
+  "notebooks": 17,
+  "student_facing": "blinds or windows; projection board at the side (user confirmed)",
+  "ceiling_luminaires": 18,
+  "tubes_per_luminaire": 1,
+  "luminaire_axis": "Y, parallel to blinds and window walls",
+  "additional_shadow_lights": 0,
+  "surface_maps": "Shared albedo, tangent normal and roughness; oak desks 2048 px, paint/fabrics 1024 px",
+  "contact_occlusion": "20 hemisphere rays per unique surface vertex; vertex colour, max distance 0.55m",
+  "replica": false,
+  "room_m": [
+    6.8,
+    9.4,
+    3.3
+  ],
+  "chairs": 19,
+  "table_top_m": 0.7557,
+  "board_anchor_m": 0.78,
+  "playing_area_m": 0.45,
+  "environment_triangles": 187352,
+  "render_meshes": 31,
+  "characters_in_environment_asset": 0,
+  "colliders_in_environment_asset": 0,
+  "source_up": "Z",
+  "unity_import_rotation_y": 180,
+  "headset_tested": false
+}

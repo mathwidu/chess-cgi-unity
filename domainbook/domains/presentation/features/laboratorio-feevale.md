@@ -14,11 +14,16 @@ Para perceber a escala e reconhecer o ambiente do meu curso
 
 ## Rule: O laboratório usa referências reais e acompanha a escala do tabuleiro
 
-O jogador encontra o tabuleiro sobre uma mesa dentro de um laboratório inspirado
-em fotografias oficiais da Feevale. A direção acompanha a experiência do usuário
-com laboratórios de informática no curso. A segunda etapa usa a foto oficial
-do Laboratório de Redes, identificado pela Feevale como sala 102 do prédio
-Verde. O layout e as medidas são adaptados; não é uma réplica medida da sala.
+O jogador encontra o tabuleiro sobre uma mesa dentro de um laboratório da
+Feevale. A versão atual usa o vídeo da sala real enviado pelo usuário e uma
+foto do tampo com uma régua de 30 cm. As fotos institucionais da sala 102 do
+prédio Verde orientaram as versões anteriores. A gravação fornecida passa a
+ser a referência principal de composição, materiais e condição de luz.
+
+A régua fornece uma referência conhecida de 0,30 m no plano do tampo, mas
+não estabelece dimensões completas da mesa ou da sala: parte das bordas está
+oculta ou fora da foto. O envelope de 6,8 × 9,4 × 3,3 m e a disposição dos
+móveis são estimados e adaptados ao jogo, não um levantamento métrico.
 
 `ScenePolish` carrega `Resources/Environment/FeevaleComputerLab` na Main. O modelo
 é autorado em metros e acompanha posição, rotação e escala reais de `BoardView`.
@@ -32,8 +37,8 @@ modo sem precisar reconstruir a geometria do ambiente.
 O prefab contém somente o cenário. As peças personalizadas, peças clássicas,
 HUD e regras permanecem sob seus componentes atuais. O cenário não tem
 colisores de decoração e não interfere no raycast das casas. O asset usa
-31 renderers com materiais agrupados; teto e paredes não projetam sombras que
-bloqueiem a iluminação direcional. A iluminação do preview continua isolada.
+31 renderers com materiais agrupados, dentro do limite existente de 48.
+Teto e paredes não projetam sombras que bloqueiem a iluminação direcional. A iluminação do preview continua isolada.
 O laminado fino dos tampos recebe sombras, mas sua borda e estrutura projetam
 a sombra da mesa. Evitar o laminado como caster reduz as marcas de auto-sombra
 sem remover as sombras dos objetos colocados sobre ele.
@@ -61,17 +66,21 @@ Os tampos agora têm madeira clara com mapas de cor, normal e rugosidade em
 2048 px. Pintura, tecido das cadeiras e persianas usam mapas compartilhados
 de 1024 px. Mipmaps e filtragem anisotrópica 8× preservam a leitura em ângulos
 rasantes. A cópia de exportação recebe oclusão de contato em cor de vértice;
-não requer sombras adicionais em tempo real. Três conjuntos de janelas com
-caixilhos, bandeiras superiores e peitoris detalham a direita. O vidro fosco
-usa um mapa opaco de luz externa, evitando custo e ordenação de transparências.
-Nichos coloridos sob as persianas remetem aos detalhes da foto da sala 102.
+não requer sombras adicionais em tempo real. Três conjuntos de janelas altas têm
+caixilhos claros subdivididos, bandeiras superiores e faixas ocre. O vidro
+escuro opaco usa a reflexão do ambiente e segue a condição noturna do vídeo,
+sem uma segunda cena externa nem ordenação de transparências.
 
-A luz principal vem da direita, alinhada com as janelas, com intensidade 1,15
-e sombra 0,76; o preenchimento oposto usa 0,22. O ambiente equatorial é
-levemente quente, com menos luz uniforme para separar os materiais.
+A luz principal representa o teto, com inclinação de 68 graus, intensidade
+0,72, cor branca levemente fria e sombra 0,64. O preenchimento oposto usa
+0,95. A luz de sombra é explicitamente a principal, mesmo com preenchimento
+mais intenso. As 18 luminárias lineares têm uma única lâmpada e seguem o comprimento
+da sala, paralelas às paredes de persianas/janelas, conforme correção do usuário.
+São geometria emissiva; não criam 18 luzes.
 As duas luzes direcionais recebem dois preenchimentos de cone largo junto ao
-teto, voltados para baixo e sem sombras adicionais. Alcance acompanha a escala da sala, e intensidade
-acompanha seu quadrado para compensar a atenuação por distância no desktop.
+teto, voltados para baixo e sem sombras adicionais. A intensidade em metros é
+2,1; alcance acompanha a escala da sala, e intensidade acompanha seu
+quadrado para compensar a atenuação por distância no desktop.
 Um reflection probe de 128 px por face registra somente o laboratório, na
 camada Ignore Raycast, após a pose estabilizar. A atualização distribui o
 trabalho por frames e ocorre na inicialização, reconstrução ou troca da pose
@@ -82,17 +91,37 @@ pós-processamento. O custo e o conforto devem ser medidos no headset alvo.
 O botão **Olhar ao redor** e os atalhos
 ficam no HUD de desktop; a versão VR continua com o painel no espaço.
 
-O acabamento de setembro de 2026 está em
-`art/character-variants/tabletop-polish-20260926/`, com fontes e materiais
-regeneráveis. Os veios dos tampos têm menor contraste e escala mais fina;
-as superfícies continuam com mapas de cor, normal e rugosidade em 2048 px.
-Veja [acabamento-do-tabuleiro](acabamento-do-tabuleiro.md).
+## Rule: A composição prioriza os elementos reconhecíveis da gravação
 
-O fonte Blender, as referências, as medidas propostas e as capturas da Main
-estão em `art/character-variants/feevale-room-v2-20260925/`; a primeira etapa
-permanece em `feevale-lab-20260925/`. O gerador é
-`art/character-variants/build_feevale_lab.py` e o importador do Editor é
-`FeevaleLabImport.Build`. Reimportar o cenário não altera os personagens.
+A parede do fundo é azul e tem quadro branco e porta clara; a parede da
+projeção é cinza e tem um segundo quadro. Vigas aparentes, eletrocalhas,
+suportes metálicos e luminárias de tubos reconstroem o ritmo do teto. O
+ar-condicionado largo fica junto às janelas e o projetor permanece suspenso.
+As persianas cinza têm pesos e correntes inferiores. Abaixo delas ficam
+armários brancos com nichos abertos, portas coloridas e três equipamentos
+genéricos de laboratório.
+
+Quatro grupos reúnem 16 mesas individuais. Os conjuntos são girados em 90 graus:
+alunos e notebooks ficam voltados às persianas ou janelas, com o quadro de
+projeção ao lado, conforme correção confirmada pelo usuário. Há 17 notebooks,
+incluindo o da mesa do professor, e 19 cadeiras contando os dois jogadores. A quantidade é
+uma adaptação: o vídeo não demonstra a contagem completa. As mesas usam
+laminado claro, bordas finas, passa-cabos pretos e pés metálicos em T. Os
+notebooks têm variações abertas/fechadas e conteúdo abstrato nas telas.
+A mesa central fica livre, com as âncoras anteriores do tabuleiro e jogador.
+
+Os arquivos pessoais da referência permanecem em armazenamento local,
+fora do asset e dos diretórios destinados ao Git. Pessoas e conteúdo das
+telas da gravação não são reproduzidos no cenário.
+
+O fonte Blender, mapas e capturas desta versão estão em
+`art/character-variants/feevale-room-v3-20260928/`. O gerador é
+`art/character-variants/build_feevale_lab.py`; `FeevaleLabImport.Build` atualiza
+o prefab preservando os GUIDs. `RunReferenceDesktop` e `RunReferenceVr` de
+`FeevaleLabReviewCapture` salvam a nova evidência sem sobrescrever as anteriores.
+A sala anterior permanece em `tabletop-polish-20260926/lab-source/`; o
+acabamento do tabuleiro dessa rodada continua ativo. Veja
+[acabamento-do-tabuleiro](acabamento-do-tabuleiro.md).
 
 Verificação proporcional: contato entre mesa e base nos dois tamanhos, 32 peças
 sem duplicação, seleção livre de colisores decorativos, reaplicação sem duplicar

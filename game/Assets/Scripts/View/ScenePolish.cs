@@ -35,9 +35,9 @@ public sealed class ScenePolish : MonoBehaviour
         BuildCollegeTheme(collegeTheme);
         ApplyCameraDefaults();
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
-        RenderSettings.ambientSkyColor = new Color(0.48f, 0.53f, 0.60f);
-        RenderSettings.ambientEquatorColor = new Color(0.30f, 0.29f, 0.26f);
-        RenderSettings.ambientGroundColor = new Color(0.13f, 0.11f, 0.09f);
+        RenderSettings.ambientSkyColor = new Color(0.51f, 0.53f, 0.55f);
+        RenderSettings.ambientEquatorColor = new Color(0.39f, 0.40f, 0.42f);
+        RenderSettings.ambientGroundColor = new Color(0.17f, 0.15f, 0.12f);
     }
 
     private void Awake()
@@ -83,7 +83,7 @@ public sealed class ScenePolish : MonoBehaviour
             indoorFill[i].range = 5.8f * roomScale;
             // URP point attenuation uses squared world distance. Preserve the
             // same illumination when the desktop room is enlarged with the board.
-            indoorFill[i].intensity = 1.25f * roomScale * roomScale;
+            indoorFill[i].intensity = 2.1f * roomScale * roomScale;
         }
         if (roomReflection != null && reflectionRoomPose != classroom.localToWorldMatrix)
         {
@@ -103,29 +103,32 @@ public sealed class ScenePolish : MonoBehaviour
         ClearChildren(lightingRig);
 
         Light key = CreateLight(lightingRig, "Key Light", LightType.Directional, new Vector3(0f, 2f, 0f));
-        // Side daylight follows the right-hand windows; ceiling fill stays soft.
-        key.transform.rotation = Quaternion.Euler(48f, -55f, 0f);
-        key.intensity = 1.15f;
-        key.color = new Color(1f, 0.97f, 0.91f);
+        // The recorded room is lit by overhead tubes at night. One shared
+        // shadow light represents them; individual fixtures remain emissive.
+        key.transform.rotation = Quaternion.Euler(68f, -35f, 0f);
+        key.intensity = 0.72f;
+        key.color = new Color(0.97f, 0.985f, 1f);
         key.shadows = LightShadows.Soft;
-        key.shadowStrength = 0.76f;
+        key.shadowStrength = 0.64f;
         // The desktop pipeline's 0.1 depth bias causes self-shadow stripes on
         // the metre-scale table. Override this light only at tabletop scale.
         key.shadowBias = 1f;
         key.shadowNormalBias = .5f;
         keyLightData = key.GetUniversalAdditionalLightData();
+        // Keep the shadow source stable even when diffuse room fill is brighter.
+        RenderSettings.sun = key;
 
         Light fill = CreateLight(lightingRig, "Fill Light", LightType.Directional, new Vector3(0f, 2f, 0f));
         fill.transform.rotation = Quaternion.Euler(35f, 125f, 0f);
-        fill.intensity = 0.22f;
-        fill.color = new Color(0.88f, 0.93f, 1f);
+        fill.intensity = 0.95f;
+        fill.color = new Color(0.94f, 0.97f, 1f);
         fill.shadows = LightShadows.None;
 
         for (int i = 0; i < indoorFill.Length; i++)
         {
             indoorFill[i] = CreateLight(lightingRig, "Ceiling Fill " + (i + 1), LightType.Spot, Vector3.zero);
             indoorFill[i].enabled = false;
-            indoorFill[i].color = new Color(1f, .95f, .86f);
+            indoorFill[i].color = new Color(.97f, .985f, 1f);
             indoorFill[i].shadows = LightShadows.None;
             indoorFill[i].spotAngle = 150f;
             indoorFill[i].innerSpotAngle = 90f;

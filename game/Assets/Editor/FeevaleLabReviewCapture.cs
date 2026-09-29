@@ -19,8 +19,10 @@ public static class FeevaleLabReviewCapture
 {
     private const string ActiveKey = "ChessCGI.LabCapture";
     private const string VrKey = "ChessCGI.LabCapture.VR";
+    private const string ReferenceKey = "ChessCGI.LabCapture.ReferenceRoom";
     private static readonly string[] DesktopNames = { "desktop-menu", "desktop-match", "desktop-move", "desktop-look-room", "desktop-look-right", "desktop-return-board" };
     private static readonly string[] VrNames = { "vr-menu", "vr-play", "vr-table", "vr-overview", "vr-room", "vr-black-side", "vr-right-windows", "vr-table-detail" };
+    private static readonly string[] ReferenceVrNames = { "vr-menu", "vr-play", "vr-table", "vr-overview", "vr-room", "vr-black-side", "vr-right-windows", "vr-table-detail", "vr-blue-wall", "vr-blinds-storage", "vr-ceiling", "room-layout" };
     private static int index, frames;
     private static bool loadedVr;
     private static RenderTexture target;
@@ -40,6 +42,16 @@ public static class FeevaleLabReviewCapture
     // Review existing imports without regenerating prefabs or replacing older evidence.
     public static void RunTabletopDesktop() => StartTabletop(false);
     public static void RunTabletopVr() => StartTabletop(true);
+
+    public static void RunReferenceDesktop() => StartReference(false);
+    public static void RunReferenceVr() => StartReference(true);
+
+    private static void StartReference(bool vr)
+    {
+        SessionState.SetBool(ReferenceKey, true);
+        SessionState.SetString("ChessCGI.LabCapture.Output", "../../art/character-variants/feevale-room-v3-20260928/unity");
+        Start(vr);
+    }
 
     private static void StartTabletop(bool vr)
     {
@@ -83,7 +95,8 @@ public static class FeevaleLabReviewCapture
             }
             camera = vr ? XRRig.EyeCamera : Camera.main;
             if (camera == null) return;
-            string name = (vr ? VrNames : DesktopNames)[index];
+            string[] names = vr ? (SessionState.GetBool(ReferenceKey, false) ? ReferenceVrNames : VrNames) : DesktopNames;
+            string name = names[index];
             if (target == null)
             {
                 Prepare(hud, vr);
@@ -124,7 +137,7 @@ public static class FeevaleLabReviewCapture
             }
             Debug.Log("LAB_CAPTURE_OK " + name);
             frames = 0;
-            if (++index == (vr ? VrNames.Length : DesktopNames.Length)) Exit(0);
+            if (++index == names.Length) Exit(0);
         }
         catch (Exception error) { Debug.LogException(error); Exit(1); }
     }
@@ -197,13 +210,19 @@ public static class FeevaleLabReviewCapture
             case 5: position = new Vector3(0, 1.2f, .6f); look = new Vector3(0, 1.1f, -4.6f); break;
             case 6: look = new Vector3(3.4f, 1.85f, .1f); break;
             case 7: position = new Vector3(.57f, 1.06f, -.43f); look = new Vector3(.05f, .80f, 0); camera.fieldOfView = 65; break;
+            case 8: position = new Vector3(2.85f, 1.65f, .85f); look = new Vector3(-.20f, 1.40f, -4.5f); break;
+            case 9: position = new Vector3(-1.65f, 1.50f, -3.75f); look = new Vector3(-3.15f, 1.40f, 2.8f); break;
+            case 10: position = new Vector3(-2.35f, 1.55f, -3.55f); look = new Vector3(2.65f, 2.45f, 3.75f); break;
+            case 11: position = new Vector3(0, 2.78f, .1f); look = new Vector3(0, 0, .1f); camera.orthographic = true; camera.orthographicSize = 5.05f; break;
         }
-        camera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(look - position));
+        Quaternion rotation = index == 11 ? Quaternion.Euler(90, 0, 0) : Quaternion.LookRotation(look - position);
+        camera.transform.SetPositionAndRotation(position, rotation);
     }
 
     private static void Exit(int code)
     {
         SessionState.SetBool(ActiveKey, false);
+        SessionState.EraseBool(ReferenceKey);
         SessionState.EraseString("ChessCGI.LabCapture.Output");
         EditorApplication.isPlaying = false;
         EditorApplication.Exit(code);

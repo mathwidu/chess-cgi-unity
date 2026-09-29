@@ -1,6 +1,7 @@
 # Entrega visual Feevale
 
-Consolidação de 28/09/2026 na branch `codex/visual-feevale`, sobre a base
+Consolidação de 28/09/2026, atualizada em 29/09 com a sala baseada no vídeo
+do usuário, na branch `codex/visual-feevale`, sobre a base
 `81bea194e6b4a24adfaf3c24b235709660829c8e` da `main`. Essa base já inclui
 IA e portabilidade para VR. A entrega mantém as versões do Unity
 6000.3.16f1, URP 17.3.0 e os pacotes existentes.
@@ -10,9 +11,11 @@ IA e portabilidade para VR. A entrega mantém as versões do Unity
 - Seis personagens e 12 variantes de lado, roupas brancas/pretas, logo Feevale
   nas costas, acessórios, bases e símbolos. Modelos originais e GUIDs dos
   prefabs preservados; texturas e modelos de produção em `Assets/Art/Characters`.
-- Laboratório inspirado nas referências Feevale, incluindo a sala 102 do
-  prédio Verde; computadores, mobiliário, persianas, janelas e materiais.
-  É uma adaptação para o jogo, não uma réplica medida.
+- Laboratório orientado pelo vídeo da sala real e pela foto do tampo com
+  uma régua de 30 cm, após as referências institucionais da sala 102 do prédio
+  Verde. Mesas e notebooks ficam voltados às persianas/janelas; as luminárias
+  têm uma lâmpada e acompanham essas paredes. Paredes, armários, teto,
+  materiais e iluminação também seguem a gravação. As dimensões são estimadas.
 - Tabuleiro de madeira, moldura, coordenadas, acabamento da mesa, sombras
   e iluminação. Os prefabs do ambiente ficam em `Assets/Resources/Environment`.
 - Olhar ao redor no desktop e controles do preview da peça, incluindo
@@ -64,9 +67,18 @@ bash tools/test_unity.sh
 - Resultado portátil em [art/verification-20260928.json](../art/verification-20260928.json).
   XML e logs completos ficam localmente em `TestResults/`.
 
-As [capturas do acabamento aprovado](../art/character-variants/tabletop-polish-20260926/README.md)
-foram feitas em 26/09. Não são novas capturas da consolidação. Não houve
-build de player, teste com headset físico nem medição de desempenho em VR.
+Na atualização da sala, a suíte foi executada novamente em 28/09, às 21h54
+(Brasília), com 36 EditMode e 62 PlayMode aprovados. A importação confirmou
+31 renderers e 187.352 triângulos; foram geradas 18 capturas da Main, seis
+do PC e 12 pelo caminho com HMD simulado e câmeras de revisão. O registro
+[verification.json da sala v3](../art/character-variants/feevale-room-v3-20260928/verification.json)
+preserva os resultados, horários e hashes anteriores à publicação. O fonte
+Blender, mapas, reprodução e limites estão no
+[guia da sala v3](../art/character-variants/feevale-room-v3-20260928/README.md).
+
+As [capturas do acabamento anterior](../art/character-variants/tabletop-polish-20260926/README.md)
+permanecem como histórico de 26/09. Não houve build de player, teste com
+headset físico nem medição de desempenho em VR.
 
 ## Integração posterior com a equipe
 
@@ -92,6 +104,6 @@ Não resolver conflitos escolhendo uma versão inteira dos arquivos compartilhad
 
 ## Referências visuais
 
-![Partida com tabuleiro e cenário aprovados](../art/character-variants/tabletop-polish-20260926/unity/desktop-match.png)
+![Partida com a sala baseada na referência real](../art/character-variants/feevale-room-v3-20260928/unity/desktop-match.png)
 
-![Mesa e laboratório pelo caminho VR simulado](../art/character-variants/tabletop-polish-20260926/unity/vr-table-detail.png)
+![Mesa e laboratório pelo caminho VR simulado](../art/character-variants/feevale-room-v3-20260928/unity/vr-overview.png)

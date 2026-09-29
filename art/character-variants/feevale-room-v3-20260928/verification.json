@@ -1,0 +1,215 @@
+{
+  "checked_at_utc": "2026-09-29T00:56:36.810191+00:00",
+  "branch": "codex/visual-feevale",
+  "base_commit": "5603c22b6180e27f0c06817561538e8b60d57e61",
+  "local_changes_only": true,
+  "published_this_iteration": false,
+  "reference": {
+    "primary": "User classroom video and photo with 30 cm ruler",
+    "measured_room": false,
+    "student_orientation_confirmed": "Students face blinds/windows; projection board at side",
+    "light_correction": "Single lamps parallel to blinds/windows; rotated 90 degrees from first draft"
+  },
+  "unity_version": "6000.3.16f1",
+  "tests": {
+    "EditMode": {
+      "result": "Passed",
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0,
+      "start_time": "2026-09-29 00:54:26Z",
+      "end_time": "2026-09-29 00:54:29Z",
+      "xml_sha256": "92b5cc75a31884ff5c1f4b1f28b22d02d47c3674424a0f8b56c9a63daed40138"
+    },
+    "PlayMode": {
+      "result": "Passed",
+      "passed": 62,
+      "failed": 0,
+      "skipped": 0,
+      "start_time": "2026-09-29 00:54:37Z",
+      "end_time": "2026-09-29 00:54:54Z",
+      "xml_sha256": "21e381dbb30825595a973448cb930211c5f8ac83a327e7a08a04c627851f6f72"
+    }
+  },
+  "model": {
+    "reference": "User-provided IMG_2844.MOV and tabletop photograph with a 30 cm ruler; originals remain local",
+    "basis": [
+      "Video: blue/grey walls, tall windows with ochre surround, blinds, storage, ceiling beams and suspended tubes",
+      "Photo: light oak laminate, thin edge band, black grommets and silver T-legs"
+    ],
+    "reference_timecodes_s": [
+      24.5,
+      42.5,
+      54.5,
+      66.5,
+      72.5
+    ],
+    "known_measure_m": 0.3,
+    "measured_room_dimensions": false,
+    "right_window_bays": 3,
+    "desk_groups": 4,
+    "student_desks": 16,
+    "notebooks": 17,
+    "student_facing": "blinds or windows; projection board at the side (user confirmed)",
+    "ceiling_luminaires": 18,
+    "tubes_per_luminaire": 1,
+    "luminaire_axis": "Y, parallel to blinds and window walls",
+    "additional_shadow_lights": 0,
+    "surface_maps": "Shared albedo, tangent normal and roughness; oak desks 2048 px, paint/fabrics 1024 px",
+    "contact_occlusion": "20 hemisphere rays per unique surface vertex; vertex colour, max distance 0.55m",
+    "replica": false,
+    "room_m": [
+      6.8,
+      9.4,
+      3.3
+    ],
+    "chairs": 19,
+    "table_top_m": 0.7557,
+    "board_anchor_m": 0.78,
+    "playing_area_m": 0.45,
+    "environment_triangles": 187352,
+    "render_meshes": 31,
+    "characters_in_environment_asset": 0,
+    "colliders_in_environment_asset": 0,
+    "source_up": "Z",
+    "unity_import_rotation_y": 180,
+    "headset_tested": false
+  },
+  "glb_sha256": "a5ed1e84a650f98c654feb6d1ab878391c31d3c65008c00e8d2989dcc69c9d02",
+  "preservation": {
+    "changed_assets": [
+      "game/Assets/Art/Environment/FeevaleLab/FeevaleComputerLab.glb",
+      "game/Assets/Resources/Environment/FeevaleComputerLab.prefab",
+      "game/Assets/Scripts/View/ScenePolish.cs",
+      "game/Assets/Editor/FeevaleLabReviewCapture.cs"
+    ],
+    "missing_original_assets": [],
+    "original_meta_files_unchanged": true,
+    "characters_board_rules_hud_vr_rig_animation_studies_unchanged": true
+  },
+  "captures": [
+    {
+      "file": "unity/desktop-menu.png",
+      "sha256": "75cf13361355f87bf32e54d8c2eda7f3375df33949b02711af4bc73a659c6927",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/desktop-match.png",
+      "sha256": "8a4095e4f66a33e4108769d30d3db002a4bb63f20c2db97d0212a31e37ff6cf7",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/desktop-move.png",
+      "sha256": "b7929f0df6e98625324dcf8bb9a5413b38d33257e3c81d2e775180bafcfc3702",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/desktop-look-room.png",
+      "sha256": "ee014a941845cd02325e2c2084df022de460d0e4fb862dd369b234ec599260a2",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/desktop-look-right.png",
+      "sha256": "4fc833576d1c75fe8edce955438ec49ddd231ac1f573fe243532567027d14eed",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/desktop-return-board.png",
+      "sha256": "b7929f0df6e98625324dcf8bb9a5413b38d33257e3c81d2e775180bafcfc3702",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-menu.png",
+      "sha256": "6a1c97de1ce893fd51eb4f00dae6196b49f5ee75942540861502930300af2d15",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-play.png",
+      "sha256": "e7c8f1ea998a7592ecc32c3c2064936ada612817ecf5dcea5b4f2b7c76763743",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-table.png",
+      "sha256": "e6fe6312703adceeb6df53b24f3df42143c3a92a0a6e54676ce2b68ea829d8ed",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-overview.png",
+      "sha256": "1f9fff8d6d277addccc8f1c7abd6000564de33ef004b6cb58eb61e79388827bf",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-room.png",
+      "sha256": "40dc93b7422d5cc0a8356c3a90f6624fc294beffad437fd734a114290418fe8c",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-black-side.png",
+      "sha256": "428e952fe14b1dca124380bfe157c7066133a8f8283e0bdfc40d52bcf1a02ed9",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-right-windows.png",
+      "sha256": "7e2cd3ef672bdcfe793ba5a2a3843cda5fc8c03c103cede105b0b6642b53104f",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-table-detail.png",
+      "sha256": "540d8cb0e5893bab04aa2c68f7f4e7693cdfcb243de4625e627814539e7ba1ae",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-blue-wall.png",
+      "sha256": "2c6c81136348c04c0372ced95d66e4e2c30bd2965c4956ed2f716befe6bebb1c",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-blinds-storage.png",
+      "sha256": "7f801d09691ed6ab11727a009c3b4b0ec841f4371c04b90f1644632068558d02",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/vr-ceiling.png",
+      "sha256": "40a41d743ff61b49f5eab6acc0b1c9c2845e99788b79151e89fefe6b7fb874e9",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "unity/room-layout.png",
+      "sha256": "61f17d7cfd32379d55d60a4e0265fc569c89446a2b526ed77e621c025801dcf2",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "physical_headset_tested": false,
+  "player_build_tested": false,
+  "fps_measured": false,
+  "visual_review": [
+    "Corrected desk and luminaire orientation",
+    "Single light tube per fixture",
+    "Table veneer above structural body without coplanar faces",
+    "PC menu, match, move e2-e4, look around and return",
+    "Simulated headset startup, table contact, all room sides and top-down layout"
+  ],
+  "known_limits": [
+    "Room dimensions, furniture count and distances are approximations",
+    "Room reflections use a low-resolution shared probe; not a measured reproduction",
+    "Headset comfort, stereo readability and performance remain untested"
+  ]
+}

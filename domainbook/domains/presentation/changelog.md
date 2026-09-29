@@ -72,6 +72,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- Laboratório reconstruído a partir do vídeo e da foto do tampo fornecidos
+  pelo usuário: paredes azul/cinza, janelas com faixas ocre, vigas e luminárias
+  suspensas, armários sob as persianas e mesas agrupadas com notebooks.
+  Iluminação passa a representar a condição interna noturna da gravação.
+  O tabuleiro mantém contato com o tampo e as âncoras anteriores em PC/VR;
+  dimensões completas e quantidade de móveis continuam estimadas. Veja
+  [laboratorio-feevale](features/laboratorio-feevale.md).
+
 - Em VR, as peças ganham um XR Grab Interactable (com Rigidbody kinematic) e
   ficam na layer `PieceView.PhysicsLayer` (nomeada "ChessPieces" no
   TagManager), que o raio distante dos controles ignora; as casas deixaram de
