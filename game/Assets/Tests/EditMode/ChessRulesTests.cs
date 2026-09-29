@@ -149,4 +149,25 @@ public class ChessRulesTests
         Assert.That(check.IsCheck, Is.True);
         Assert.That(check.Outcome, Is.EqualTo(MatchOutcome.InProgress));
     }
+
+    [Test]
+    public void CapturableSquaresListTheEnemyPiecesTheSelectedPieceCanTake()
+    {
+        var rules = new ChessRulesAdapter();
+        rules.Reset("4k3/8/8/3p1p2/4P3/8/8/4K3 w - - 0 1");
+        CollectionAssert.AreEquivalent(
+            new[] { BoardSquare.FromAlgebraic("d5"), BoardSquare.FromAlgebraic("f5") },
+            rules.GetCapturableSquares(BoardSquare.FromAlgebraic("e4")));
+        Assert.That(rules.GetCapturableSquares(BoardSquare.FromAlgebraic("e1")), Is.Empty);
+    }
+
+    [Test]
+    public void CapturableSquaresIncludeThePawnTakenEnPassant()
+    {
+        var rules = new ChessRulesAdapter();
+        rules.Reset("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1");
+        CollectionAssert.AreEqual(
+            new[] { BoardSquare.FromAlgebraic("d5") },
+            rules.GetCapturableSquares(BoardSquare.FromAlgebraic("e5")));
+    }
 }

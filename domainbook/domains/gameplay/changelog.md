@@ -10,6 +10,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- `ChessRulesAdapter.GetCapturableSquares` lista as casas das peças adversárias
+  que a peça em uma casa pode capturar, incluindo o peão tomado en passant, e
+  o controlador as entrega ao tabuleiro ao selecionar uma peça. Nenhuma regra
+  de xadrez mudou.
+
 - `ChessGameController` expõe `LastMove` e `CheckedKing` (a casa do rei que o
   último lance deixou em xeque) e dispara `MoveApplied` uma vez por lance,
   depois que ele pousa e o estado da partida (turno, xeque, resultado) foi

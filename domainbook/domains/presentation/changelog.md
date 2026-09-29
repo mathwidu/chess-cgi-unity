@@ -10,6 +10,15 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Rei em xeque](glossary.md) ganha um brilho vermelho translúcido ao redor da
+  peça, além da casa vermelha. O brilho usa o mesmo shader da
+  [aura de captura](glossary.md), acompanha o rei e é refeito quando as peças
+  são recriadas.
+- [Aura de captura](glossary.md): ao selecionar uma peça, cada peça adversária
+  que ela pode capturar ganha um brilho verde translúcido (esfera com borda
+  luminosa, `ChessCgi/CaptureAura`) além do ponto verde do destino.
+  `BoardView.HighlightSquares` recebe as casas capturáveis como segundo
+  argumento.
 - [Peça solta](glossary.md) no VR: qualquer peça solta fora de um lance,
   no tabuleiro ou nas [peças capturadas](glossary.md), cai sob a física, pode
   ser arremessada e volta ao lugar depois de 3 segundos soltas

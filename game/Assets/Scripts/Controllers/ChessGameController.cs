@@ -438,7 +438,7 @@ public sealed class ChessGameController : MonoBehaviour
         selectedPiece.SetSelected(true);
         legalDestinations.Clear();
         legalDestinations.AddRange(rules.GetLegalDestinations(piece.Square));
-        boardView.HighlightSquares(legalDestinations);
+        boardView.HighlightSquares(legalDestinations, rules.GetCapturableSquares(piece.Square));
 
         if (legalDestinations.Count == 0)
         {

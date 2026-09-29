@@ -40,6 +40,15 @@ selecionada.
 - **Aliases:** Highlight
 - **Status:** validated
 
+## Aura de captura
+
+Um brilho verde translúcido ao redor de cada peça adversária que a peça
+selecionada pode capturar, inclusive o peão tomado en passant. Aparece junto
+com os [destaques](glossary.md) e some com eles.
+
+- **Aliases:** Capture aura
+- **Status:** validated
+
 ## Marca do último lance
 
 As duas casas do último lance que pousou (origem e destino), tingidas de
@@ -52,8 +61,9 @@ marcado; uma nova partida limpa as marcas.
 ## Rei em xeque
 
 A casa do rei do lado a jogar tinge de vermelho enquanto ele está em xeque,
-inclusive no xeque-mate. O vermelho prevalece sobre a marca do último lance e
-some quando o xeque é respondido.
+inclusive no xeque-mate, e um brilho vermelho translúcido envolve o próprio
+rei, seguindo-o se for agarrado. O vermelho prevalece sobre a marca do último
+lance e tudo some quando o xeque é respondido.
 
 - **Aliases:** Check highlight, MarkCheck
 - **Status:** validated

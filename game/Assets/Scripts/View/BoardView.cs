@@ -9,6 +9,9 @@ public sealed class BoardView : MonoBehaviour
     private const float LastMoveWeight = 0.35f;
     private static readonly Color CheckTint = new Color(0.92f, 0.12f, 0.08f);
     private const float CheckWeight = 0.65f;
+    private const string CaptureAuraMaterialPath = "Materials/CaptureAuraMaterial";
+    private const string CheckAuraMaterialPath = "Materials/CheckAuraMaterial";
+    private const float AuraSizeMultiplier = 1.5f;
 
     [SerializeField] private float squareSize = 1.25f;
     [SerializeField] private float pieceBaseHeight = 0.08f;
@@ -35,6 +38,8 @@ public sealed class BoardView : MonoBehaviour
     private BoardSquare? lastMoveFrom;
     private BoardSquare? lastMoveTo;
     private BoardSquare? checkSquare;
+    private Transform checkAuraRoot;
+    private PieceView checkAuraTarget;
 
     public float SquareSize => squareSize;
     public float PieceBaseHeight => pieceBaseHeight;
@@ -133,6 +138,7 @@ public sealed class BoardView : MonoBehaviour
         lastMoveFrom = null;
         lastMoveTo = null;
         checkSquare = null;
+        RefreshCheckAura();
 
         BuildBoardFrame();
         EnsureTurnIndicator();
@@ -175,9 +181,11 @@ public sealed class BoardView : MonoBehaviour
             PieceView piece = factory.CreatePiece(state, GetPieceWorldPosition(state.Square), piecesRoot);
             pieces.Add(piece);
         }
+
+        RefreshCheckAura();
     }
 
-    public void HighlightSquares(IEnumerable<BoardSquare> highlightedSquares)
+    public void HighlightSquares(IEnumerable<BoardSquare> highlightedSquares, IEnumerable<BoardSquare> capturableSquares)
     {
         EnsureRoots();
         ClearChildren(highlightsRoot);
@@ -205,6 +213,112 @@ public sealed class BoardView : MonoBehaviour
                 highlight.GetComponent<Renderer>().sharedMaterial = highlightMaterial;
             }
         }
+
+        foreach (BoardSquare square in capturableSquares)
+        {
+            AddCaptureAura(square);
+        }
+    }
+
+    private void AddCaptureAura(BoardSquare square)
+    {
+        PieceView target = FindPieceAt(square);
+        if (target != null)
+        {
+            CreateAura(target, CaptureAuraMaterialPath, $"CaptureAura {square.ToAlgebraic()}", highlightsRoot);
+        }
+    }
+
+    private PieceView FindPieceAt(BoardSquare square)
+    {
+        foreach (PieceView piece in pieces)
+        {
+            if (piece.Square.Equals(square))
+            {
+                return piece;
+            }
+        }
+
+        return null;
+    }
+
+    private GameObject CreateAura(PieceView target, string materialPath, string auraName, Transform parent)
+    {
+        Material aura = Resources.Load<Material>(materialPath);
+        Renderer[] renderers = target.GetComponentsInChildren<Renderer>();
+        if (aura == null || renderers.Length == 0)
+        {
+            return null;
+        }
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        GameObject auraObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        auraObject.name = auraName;
+        auraObject.transform.SetParent(parent);
+        auraObject.transform.position = bounds.center;
+        auraObject.transform.localRotation = Quaternion.identity;
+        auraObject.transform.localScale = bounds.size * AuraSizeMultiplier / transform.lossyScale.x;
+
+        Collider collider = auraObject.GetComponent<Collider>();
+        if (Application.isPlaying)
+        {
+            Object.Destroy(collider);
+        }
+        else
+        {
+            Object.DestroyImmediate(collider);
+        }
+
+        Renderer renderer = auraObject.GetComponent<Renderer>();
+        renderer.sharedMaterial = aura;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        return auraObject;
+    }
+
+    private void RefreshCheckAura()
+    {
+        checkAuraRoot = EnsureChildRoot(checkAuraRoot, "CheckAura");
+        ClearChildren(checkAuraRoot);
+        checkAuraTarget = null;
+
+        if (!checkSquare.HasValue)
+        {
+            return;
+        }
+
+        PieceView king = FindPieceAt(checkSquare.Value);
+        if (king != null && CreateAura(king, CheckAuraMaterialPath, $"CheckAura {checkSquare.Value.ToAlgebraic()}", checkAuraRoot) != null)
+        {
+            checkAuraTarget = king;
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (checkAuraTarget == null || checkAuraRoot == null || checkAuraRoot.childCount == 0)
+        {
+            return;
+        }
+
+        Renderer[] renderers = checkAuraTarget.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            return;
+        }
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        checkAuraRoot.GetChild(0).position = bounds.center;
     }
 
     public void MarkLastMove(BoardSquare from, BoardSquare to)
@@ -218,6 +332,7 @@ public sealed class BoardView : MonoBehaviour
     {
         checkSquare = king;
         RefreshSquareTints();
+        RefreshCheckAura();
     }
 
     private void RefreshSquareTints()

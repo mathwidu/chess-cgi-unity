@@ -65,6 +65,27 @@ public sealed class ChessRulesAdapter
         return destinations;
     }
 
+    public List<BoardSquare> GetCapturableSquares(BoardSquare from)
+    {
+        Piece mover = game.GetPieceAt(ToPosition(from));
+        List<BoardSquare> capturable = new List<BoardSquare>();
+
+        foreach (Move move in game.GetValidMoves(ToPosition(from)))
+        {
+            BoardSquare destination = FromPosition(move.NewPosition);
+            if (game.GetPieceAt(move.NewPosition) != null)
+            {
+                capturable.Add(destination);
+            }
+            else if (mover is Pawn && destination.FileIndex != from.FileIndex)
+            {
+                capturable.Add(new BoardSquare(destination.FileIndex, from.Rank));
+            }
+        }
+
+        return capturable;
+    }
+
     public MoveResult TryMove(BoardSquare from, BoardSquare to, char? promotion)
     {
         if (from.Rank < 1 || to.Rank < 1 || from.Equals(to) ||

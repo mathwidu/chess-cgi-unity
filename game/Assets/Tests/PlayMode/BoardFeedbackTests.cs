@@ -88,6 +88,9 @@ public class BoardFeedbackTests
         Assert.That(board.Squares.Any(s => s.GetComponent<Renderer>().HasPropertyBlock()), Is.False);
     }
 
+    private string[] CheckAuras() =>
+        board.transform.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("CheckAura ")).Select(t => t.name).ToArray();
+
     [UnityTest]
     public IEnumerator AKingInCheckGlowsRedUntilTheCheckIsAnswered()
     {
@@ -99,10 +102,30 @@ public class BoardFeedbackTests
         SquareRenderer("e8").GetPropertyBlock(properties);
         Color tint = properties.GetColor("_BaseColor");
         Assert.That(tint.r, Is.GreaterThan(tint.g + 0.2f), "The king's square turns red.");
+        Assert.That(CheckAuras(), Is.EqualTo(new[] { "CheckAura e8" }));
+        Bounds king = board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("e8"))).GetComponentInChildren<Renderer>().bounds;
+        Assert.That(board.transform.Find("CheckAura").GetChild(0).GetComponent<Renderer>().bounds.Contains(king.center), Is.True);
 
         yield return Play("g7g6");
         Assert.That(controller.CheckedKing, Is.Null);
         Assert.That(board.CheckSquare, Is.Null);
+        Assert.That(CheckAuras(), Is.Empty);
+    }
+
+    [UnityTest]
+    public IEnumerator SelectingAPieceWrapsTheEnemiesItCanTakeInAnAura()
+    {
+        controller.StartLocalGame();
+        yield return Play("e2e4", "d7d5");
+        controller.SelectPiece(board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("e4"))));
+        var auras = board.transform.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("CaptureAura")).ToList();
+        Assert.That(auras.Select(a => a.name), Is.EqualTo(new[] { "CaptureAura d5" }));
+        Bounds target = board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("d5"))).GetComponentInChildren<Renderer>().bounds;
+        Assert.That(auras[0].GetComponent<Renderer>().bounds.Contains(target.center), Is.True);
+
+        controller.CancelSelection();
+        yield return null;
+        Assert.That(board.HighlightCount, Is.EqualTo(0));
     }
 
     [UnityTest]
