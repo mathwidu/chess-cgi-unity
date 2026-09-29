@@ -1,0 +1,58 @@
+{
+  "checks": [
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "collar_cloth",
+      "samples": 1143,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0157,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "sleeve_edges",
+      "samples": 1907,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0157,
+      "first_bad_points": [],
+      "dark_patch_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "right_cuff",
+      "samples": 1551,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.1176,
+      "first_bad_points": [],
+      "dark_patch_fraction": 1.0
+    },
+    {
+      "kind": "Rook",
+      "side": "White",
+      "region": "seated_forearm",
+      "samples": 836,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3176,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    },
+    {
+      "kind": "Rook",
+      "side": "Black",
+      "region": "seated_forearm",
+      "samples": 836,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.3176,
+      "first_bad_points": [],
+      "skin_recolored_as_clothing_fraction": 0.0
+    }
+  ],
+  "failures": [
+    "Rook right_cuff: old dark material remains along the white garment"
+  ],
+  "passed": false
+}

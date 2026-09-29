@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-25",
+  "unity": "6000.3.16f1",
+  "scope": "Preview da peça selecionada: zoom e deslocamento",
+  "reproduction": {
+    "log": ".local/preview-pan-20260925/red-framing.xml",
+    "passed": 6,
+    "failed": 2,
+    "kingHeadViewportYBeforeFix": 1.08558655,
+    "kingHeadViewportYAfterAttemptedPanBeforeFix": 1.08558655
+  },
+  "playMode": {
+    "result": "Passed",
+    "total": "59",
+    "passed": "59",
+    "failed": "0",
+    "duration": "16.5287963"
+  },
+  "testResults": ".local/preview-pan-20260925/tests.xml",
+  "verification": [
+    "Eventos do Input System: arraste direito diagonal reposiciona sem girar ou mudar zoom/partida/câmera da sala",
+    "Projeção dos seis personagens dos dois lados no zoom máximo",
+    "Botões Mover, giro após deslocamento e Restaurar",
+    "Controles World Space com XRHMD simulado",
+    "Quatro capturas da Main inspecionadas"
+  ],
+  "captures": [
+    "king-max-zoom.png",
+    "king-repositioned.png",
+    "king-restored.png",
+    "knight-max-zoom.png"
+  ],
+  "protectedFiles": 185,
+  "changedProtectedFiles": [],
+  "domainbook": "valid; 3 domains, 13 features, 4 decisions, 33 terms",
+  "limitations": [
+    "Headset físico não verificado",
+    "Capturas usam Screen Space Camera para incluir HUD; desktop utiliza Screen Space Overlay"
+  ],
+  "backups": ".local/preview-pan-20260925/before/"
+}

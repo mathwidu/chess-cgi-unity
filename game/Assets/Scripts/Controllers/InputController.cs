@@ -6,11 +6,13 @@ public sealed class InputController : MonoBehaviour
 {
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private Camera raycastCamera;
+    private CameraController desktopCameraController;
 
     public void Configure(ChessGameController controller, Camera camera)
     {
         gameController = controller;
         raycastCamera = camera;
+        desktopCameraController = camera != null ? camera.GetComponent<CameraController>() : null;
     }
 
     private void Awake()
@@ -24,11 +26,12 @@ public sealed class InputController : MonoBehaviour
         {
             raycastCamera = Camera.main;
         }
+        desktopCameraController = raycastCamera != null ? raycastCamera.GetComponent<CameraController>() : null;
     }
 
     private void Update()
     {
-        if (gameController == null)
+        if (gameController == null || (desktopCameraController != null && desktopCameraController.BlocksBoardPointer))
         {
             return;
         }

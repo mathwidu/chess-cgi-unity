@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Acabamento e sala em VR · Chess CGI</title><link rel="stylesheet" href="review.css"></head>
+<body><a class="skip" href="#elenco">Ir para as comparações</a><main>
+<p class="eyebrow">Chess CGI · Revisão local · 25.09.2026</p>
+<h1>Acabamento do elenco.<br>Uma sala de aula para a próxima partida.</h1>
+<p class="lede">Roupas mais contínuas, sombras mais suaves, bases uniformes e a Feevale impressa nas costas. A nova descoberta visual olha para o tabuleiro, a mesa e o espaço ao redor do jogador em VR.</p>
+<span class="status">Personagens e luz · aplicados no Unity</span><span class="status study">Sala de aula · estudo 3D, ainda fora do jogo</span>
+<nav aria-label="Seções da revisão"><a href="#elenco">Antes e depois</a><a href="#jogo">Partida atual</a><a href="#sala">Sala em VR</a><a href="#verificacao">Verificação</a><a href="README.md">Registro completo</a></nav>
+<figure class="wide"><a href="after/cast-front.png"><img src="after/cast-front.png" alt="Os seis personagens nas roupas brancas e pretas, capturados no Unity"></a><figcaption>As 12 variantes mantêm os mesmos personagens e as particularidades de cada roupa.</figcaption></figure>
+
+<section id="elenco"><h2>01 · Compare cada personagem</h2>
+<p>As câmeras são as mesmas. O “depois” inclui os ajustes de materiais e iluminação desta rodada. Clique em uma imagem para abrir o close completo.</p>
+<div class="controls">
+<label>Personagem <select id="person"><option value="knight">Gustavo · cavalo</option><option value="pawn">Matheus · peão</option><option value="rook">Alex · torre</option><option value="bishop">Rafael · bispo</option><option value="queen">Marta · rainha</option><option value="king">Ricardo · rei</option></select></label>
+<label>Lado <select id="side"><option value="">Brancas</option><option value="black-">Pretas</option></select></label>
+<label>Vista <select id="view"><option value="detail">Frente</option><option value="back">Costas</option></select></label></div>
+<div class="two close"><figure><a id="before-link" href="before/detail-knight.png"><img id="before-img" src="before/detail-knight.png" alt="Gustavo branco de frente, antes desta rodada"></a><figcaption>Antes desta rodada</figcaption></figure><figure><a id="after-link" href="after/detail-knight.png"><img id="after-img" src="after/detail-knight.png" alt="Gustavo branco de frente, após esta rodada"></a><figcaption>Depois · prefab importado no Unity</figcaption></figure></div>
+<div class="panel card-note" aria-live="polite"><h3 id="person-name">Gustavo · cavalo</h3><p id="changed"></p><p class="notes"><strong>Ainda melhorar:</strong> <span id="remaining"></span></p></div>
+<details><summary>O que mudou em todo o conjunto</summary>
+<ul><li><strong>Bases:</strong> laterais suavizadas e topo plano, removendo a aparência estriada. Símbolos e dimensões de encaixe preservados.</li><li><strong>Feevale:</strong> PNG oficial transparente, sem retângulo ou moldura. A marca acompanha a roupa e fica somente nas costas, com letras adequadas a cada fundo.</li><li><strong>Mãos dos acessórios:</strong> dedos com comprimentos e pontas menos uniformes; contato dos bastões mantido fora dos braços. Anatomia e textura da pele ainda pedem trabalho localizado.</li><li><strong>Roupa:</strong> corrigida a faixa clara que invadia a cargo do Matheus e os resíduos de cor na gola e no punho do Alex. A correção anterior do moletom do Gustavo foi preservada.</li></ul>
+<a href="after/cast-back.png"><img src="after/cast-back.png" loading="lazy" alt="Marca Feevale integrada às costas dos doze personagens"></a>
+</details></section>
+
+<section id="jogo"><h2>02 · A luz do preview estava afetando a partida</h2>
+<p>A luz usada no retrato da peça era direcional e também iluminava o tabuleiro. Agora ela é local e isolada. A luz principal voltou a produzir sombras, e o perfil PC permite sombras suaves. As roupas brancas conservam mais volume.</p>
+<div class="two"><figure><a href="before/board.png"><img src="before/board.png" loading="lazy" alt="Tabuleiro anterior, com interferência da luz do preview"></a><figcaption>Antes · luz adicional sobre toda a cena</figcaption></figure><figure><a href="after/board.png"><img src="after/board.png" loading="lazy" alt="Tabuleiro atualizado com luz do preview isolada e sombras de contato"></a><figcaption>Depois · luz local do preview e sombras do tabuleiro</figcaption></figure></div>
+<p class="notes">Capturas de revisão com pós-processamento suprimido, antes e depois, para manter interface e cores comparáveis. O perfil de pós-processamento da Main não foi alterado. O perfil Mobile também permanece como estava.</p>
+<details><summary>Ensaio adicional com o pós-processamento da Main</summary><div class="two"><figure><a href="lighting/before-0.png"><img src="lighting/before-0.png" loading="lazy" alt="Ensaio anterior da iluminação com pós-processamento ativo"></a><figcaption>Diagnóstico anterior</figcaption></figure><figure><a href="lighting/after-0.png"><img src="lighting/after-0.png" loading="lazy" alt="Ensaio após o isolamento do preview, com pós-processamento ativo"></a><figcaption>Após o ajuste da luz</figcaption></figure></div><p class="notes">Ensaio da cena 3D com a mesma câmera e o pós-processamento ativo. Nesta captura técnica, o HUD foi convertido para a câmera e também recebe tonemapping; essa cor da interface não representa o HUD normal do jogo. O ensaio antecede apenas o último ajuste do punho do Alex e da transparência da marca.</p></details>
+<h2>03 · Nova avaliação do percurso</h2><div id="steps"></div>
+</section>
+
+<section id="sala"><h2>04 · Dentro de uma sala de aula da Feevale</h2>
+<p class="lede">Mesa de laminado claro, estrutura fosca, cadeiras verdes, janelas laterais e quadro com a marca. O tabuleiro continua sendo o centro da experiência.</p>
+<span class="status study">Proposta de composição · render offline do Blender</span>
+<p>Uma sala inspirada na universidade, sem reproduzir uma sala específica. Os personagens são os assets reais. Mobiliário, medidas da sala e iluminação são propostas para a próxima implementação.</p>
+<div class="image-buttons" aria-label="Vistas do estudo"><button type="button" id="overview" aria-pressed="true">Ver a sala</button><button type="button" id="eye" aria-pressed="false">Olhar sentado para o tabuleiro</button></div>
+<figure><a id="room-link" href="../classroom-discovery-20260925/classroom-overview.png"><img id="room-img" src="../classroom-discovery-20260925/classroom-overview.png" loading="lazy" alt="Estudo de sala de aula com carteiras, janelas, quadro Feevale e tabuleiro sobre a mesa"></a><figcaption id="room-caption">Vista do ambiente · estudo de proporção e composição, ainda não integrado à Main.</figcaption></figure>
+<div class="panel facts"><p><strong>45 × 45 cm</strong><span class="muted">Área de jogo atual em VR</span></p><p><strong>1,20 m</strong><span class="muted">Altura de referência dos olhos</span></p><p><strong>1,30 × 0,90 m</strong><span class="muted">Mesa proposta no estudo</span></p></div>
+<p class="callout">Na vista sentado, os símbolos ficam pequenos e as casas distantes exigem avaliar alcance. Esses dois pontos orientam a próxima etapa: leitura e interação antes de acrescentar muitos objetos à sala.</p>
+<div class="table-scroll"><table><thead><tr><th>Ordem</th><th>Próxima melhoria</th><th>Como aceitar</th></tr></thead><tbody>
+<tr><td>1</td><td>Mesa e tabuleiro: tampo, pernas, borda chanfrada, materiais foscos e coordenadas.</td><td>Apoio convincente, peças assentadas e casas legíveis.</td></tr>
+<tr><td>2</td><td>Seleção sem cobrir casas; símbolos e destinos distinguíveis também por forma.</td><td>Reconhecer tipo e jogada na distância real, nos dois lados.</td></tr>
+<tr><td>3</td><td>Construir a sala com paredes, janelas, quadro e mobiliário.</td><td>Contexto de sala ao virar a cabeça, sem obstruir o espaço do jogador.</td></tr>
+<tr><td>4</td><td>Traduzir luz e materiais para URP, medindo os 32 personagens junto do ambiente.</td><td>Frame time, memória, conforto e alcance verificados no headset.</td></tr>
+</tbody></table></div>
+<p><a href="../classroom-discovery-20260925/README.md">Descoberta completa, medidas e critérios</a> · <a href="../classroom-discovery-20260925/classroom-study.blend">Abrir a fonte Blender</a></p>
+</section>
+
+<section id="verificacao"><h2>05 · O que foi verificado</h2><div class="panel">
+<div class="facts"><p><strong>32 / 32</strong><span class="muted">Testes PlayMode aprovados</span></p><p><strong>22 / 22</strong><span class="muted">Casos de tecido aprovados</span></p><p><strong>33</strong><span class="muted">Capturas finais no Unity</span></p></div>
+<p>Auditorias de UV e geometria aprovadas: símbolos completos, marca nas costas, cabeça original e ausência das interseções testadas entre bastões e corpo. GLBs originais, GUIDs e estudos de animação preexistentes preservados.</p>
+<p class="notes">Os testes cobrem regressões técnicas. Eles não encerram a avaliação artística. Dedos, transições entre tecidos e pele, coroa, cabelo e detalhes das fontes ainda merecem refinamento. Não foram medidos FPS, alcance ou reconhecimento em headset.</p>
+<a href="verification.json">Verificação e hashes dos assets</a></div></section>
+<footer><p>Unity 6000.3.16f1 · URP · 1920 × 1080 para a partida e 1100 × 1400 para os closes. Galeria com luz própria. Alterações locais na branch codex/character-variants; sem publicação.</p><p>As referências institucionais e a documentação oficial do Unity estão no <a href="../classroom-discovery-20260925/README.md#referências-consultadas-e-limites">registro da descoberta</a>. <a href="../visual-review-20260925/index.html">Revisão anterior</a> · <a href="../direction-v2/index.html">Painel da direção aprovada</a></p></footer>
+</main><script src="review.js"></script></body></html>

@@ -1,0 +1,228 @@
+{
+  "checks": [
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "shirt",
+      "samples": 2018,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": [],
+      "distant_texture_color_bleed_fraction": 0.01536
+    },
+    {
+      "kind": "Pawn",
+      "side": "Black",
+      "region": "cargo",
+      "samples": 1553,
+      "old_color_fraction": 0.0,
+      "chroma_99_percentile": 0.0118,
+      "first_bad_points": []
+    },
+    {
+      "kind": "King",
+      "side": "Black",
+      "region": "hoodie_hem",
+      "samples": 2025,
+      "old_color_fraction": 0.35556,
+      "chroma_99_percentile": 0.4549,
+      "first_bad_points": [
+        [
+          -0.17,
+          0.75,
+          0.235,
+          0.443,
+          0.655
+        ],
+        [
+          -0.162,
+          0.75,
+          0.235,
+          0.443,
+          0.655
+        ],
+        [
+          -0.155,
+          0.75,
+          0.224,
+          0.447,
+          0.655
+        ],
+        [
+          -0.147,
+          0.75,
+          0.227,
+          0.451,
+          0.659
+        ],
+        [
+          -0.139,
+          0.75,
+          0.227,
+          0.451,
+          0.659
+        ],
+        [
+          -0.131,
+          0.75,
+          0.227,
+          0.451,
+          0.659
+        ],
+        [
+          -0.124,
+          0.75,
+          0.227,
+          0.451,
+          0.659
+        ],
+        [
+          -0.116,
+          0.75,
+          0.227,
+          0.451,
+          0.659
+        ]
+      ]
+    },
+    {
+      "kind": "Queen",
+      "side": "Black",
+      "region": "right_shoulder",
+      "samples": 1968,
+      "old_color_fraction": 0.79675,
+      "chroma_99_percentile": 0.1281,
+      "first_bad_points": [
+        [
+          0.16,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ],
+        [
+          0.161,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ],
+        [
+          0.162,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ],
+        [
+          0.163,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ],
+        [
+          0.164,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ],
+        [
+          0.165,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ],
+        [
+          0.166,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ],
+        [
+          0.167,
+          1.24,
+          0.792,
+          0.761,
+          0.718
+        ]
+      ]
+    },
+    {
+      "kind": "Queen",
+      "side": "Black",
+      "region": "left_shoulder",
+      "samples": 1922,
+      "old_color_fraction": 0.76951,
+      "chroma_99_percentile": 0.0941,
+      "first_bad_points": [
+        [
+          -0.205,
+          1.24,
+          0.769,
+          0.729,
+          0.682
+        ],
+        [
+          -0.204,
+          1.24,
+          0.769,
+          0.729,
+          0.686
+        ],
+        [
+          -0.203,
+          1.24,
+          0.769,
+          0.737,
+          0.694
+        ],
+        [
+          -0.202,
+          1.24,
+          0.773,
+          0.741,
+          0.698
+        ],
+        [
+          -0.201,
+          1.24,
+          0.773,
+          0.741,
+          0.698
+        ],
+        [
+          -0.2,
+          1.24,
+          0.773,
+          0.741,
+          0.698
+        ],
+        [
+          -0.199,
+          1.24,
+          0.776,
+          0.745,
+          0.702
+        ],
+        [
+          -0.198,
+          1.24,
+          0.776,
+          0.745,
+          0.702
+        ]
+      ]
+    }
+  ],
+  "failures": [
+    "Pawn shirt: adjacent skin/hair colors bleed into clothing at distance",
+    "King hoodie_hem: old garment colors retained",
+    "Queen right_shoulder: old garment colors retained",
+    "Queen left_shoulder: old garment colors retained"
+  ],
+  "passed": false
+}

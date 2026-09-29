@@ -1,0 +1,106 @@
+{
+  "unity": "6000.3.16f1",
+  "blender": "5.2.1",
+  "scope": "Tabuleiro, mesa e iluminacao; integrado na Main local",
+  "tests": {
+    "result": "Passed",
+    "total": "62",
+    "passed": "62",
+    "failed": "0",
+    "skipped": "0",
+    "duration": "17.0114902"
+  },
+  "protected_files": 197,
+  "protected_changes": [],
+  "captures": [
+    {
+      "file": "desktop-look-right.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "dba19348e4b99417cb2d646c43cf5fa77ab6c854c10dcab5d5b7565f7c814aff"
+    },
+    {
+      "file": "desktop-look-room.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "345eb41ff59a848e9a1f0e7dd50645ee23761d4e0687df43517d8a12acb7a1dc"
+    },
+    {
+      "file": "desktop-match.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "e5978dcd29e16b13b4b8e1f29415f6ecba8549b7506af1ad513ff0e083ca969f"
+    },
+    {
+      "file": "desktop-menu.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "26e7df7439009aa9fc36da514d3fd811e93e7c11331a6a576d7aa465deac6ec5"
+    },
+    {
+      "file": "desktop-move.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "594851ccd720aff90536a120b362f95ac4045f078416274378be73e3074a7dee"
+    },
+    {
+      "file": "desktop-return-board.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "594851ccd720aff90536a120b362f95ac4045f078416274378be73e3074a7dee"
+    },
+    {
+      "file": "vr-black-side.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "59afc58147b67bac9f4f44ecd303adcf5046a044874a7eed081c8a77d454a25c"
+    },
+    {
+      "file": "vr-menu.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "26f9fd4ce7faa4d0fb6c43a4d7653ac41df51f45eec6e70364984e62b83426df"
+    },
+    {
+      "file": "vr-overview.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "e4a3424d5843111f80cba5c6ee39dad6af32956180798fdc38b155f306a4b2e4"
+    },
+    {
+      "file": "vr-play.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "52d5a030086bc39fa48a4b900bd885aec805fd9939644a81b2419bd218c24633"
+    },
+    {
+      "file": "vr-right-windows.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "d35abd587ea8e5c7eb91ab5abc86f85aaf30b77f29a72949618654a45253bf0e"
+    },
+    {
+      "file": "vr-room.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "38a75e8d7150edd837db23e2c1d1907b1d1065f00eed233f617148b12f27763e"
+    },
+    {
+      "file": "vr-table-detail.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "84e811ecac455c527267e67a52845e041861a8f29d56c85f36566c51ab56a399"
+    },
+    {
+      "file": "vr-table.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "7a5a414ed183e4e45a5b10915a56a18ef75490bac25023b22e9ef60599250f55"
+    }
+  ],
+  "headset_tested": false,
+  "performance_profiled": false,
+  "published": false,
+  "comparison": "http://127.0.0.1:8768/tabletop-polish-20260926/index.html",
+  "verified_at": "2026-09-26T19:25:53.275662+00:00"
+}

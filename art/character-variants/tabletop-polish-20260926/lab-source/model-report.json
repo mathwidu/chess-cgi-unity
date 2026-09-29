@@ -1,0 +1,28 @@
+{
+  "reference": "https://www.feevale.br/pos-graduacao/stricto-sensu/mestrado--profissional-em-industria-criativa/infraestrutura",
+  "basis": [
+    "Laborat\u00f3rio de Redes, sala 102 do pr\u00e9dio Verde",
+    "Laborat\u00f3rio de Projetos de TI"
+  ],
+  "right_window_bays": 3,
+  "surface_maps": "Shared albedo, tangent normal and roughness; ash desks 2048 px, paint/fabrics 1024 px",
+  "contact_occlusion": "20 hemisphere rays per unique surface vertex; vertex colour, max distance 0.55m",
+  "replica": false,
+  "room_m": [
+    6.8,
+    9.4,
+    3.3
+  ],
+  "workstations": 12,
+  "chairs": 14,
+  "table_top_m": 0.7557,
+  "board_anchor_m": 0.78,
+  "playing_area_m": 0.45,
+  "environment_triangles": 118407,
+  "render_meshes": 31,
+  "characters_in_environment_asset": 0,
+  "colliders_in_environment_asset": 0,
+  "source_up": "Z",
+  "unity_import_rotation_y": 180,
+  "headset_tested": false
+}

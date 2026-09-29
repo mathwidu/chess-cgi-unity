@@ -1,0 +1,2 @@
+https://github.com/google/fonts/tree/main/ofl/notosanssymbols2
+Retrieved 2026-09-24. Noto Sans Symbols 2; SIL Open Font License 1.1 (OFL.txt).

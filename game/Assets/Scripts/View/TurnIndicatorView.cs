@@ -14,11 +14,12 @@ public sealed class TurnIndicatorView : MonoBehaviour
     // The desktop HUD already names the turn, so the light is only a thin accent there.
     private const float VrStripDepth = 0.12f;
     private const float DesktopStripDepth = 0.05f;
-    // BoardView's rim tops out at 0.025 and reaches 0.425 beyond the squares; its base
-    // bottom, where the table surface is, sits at -0.14.
-    private const float RimTop = 0.025f;
-    private const float RimWidth = 0.425f;
-    private const float TableSurface = -0.14f;
+    // The board frame's rails top out at 0.04 and reach 0.64 beyond the squares, with the
+    // coordinates along their middle; its base bottom, where the table surface is, sits at -0.54.
+    private const float RimTop = 0.04f;
+    private const float RimWidth = 0.64f;
+    private const float StripBeyondSquares = 0.57f;
+    private const float TableSurface = -0.54f;
 
     private static readonly Color AccentColor = new Color32(255, 221, 0, 255);
     private static readonly Color MutedColor = new Color32(202, 228, 211, 255);
@@ -49,7 +50,7 @@ public sealed class TurnIndicatorView : MonoBehaviour
         float halfBoard = squareSize * 4f;
         stripLength = squareSize * 4.8f;
         stripDepth = XRRig.IsHeadsetPresent ? VrStripDepth : DesktopStripDepth;
-        stripOffset = halfBoard + RimWidth * 0.5f;
+        stripOffset = halfBoard + StripBeyondSquares;
         labelOffset = halfBoard + RimWidth + 0.55f;
 
         strip = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;

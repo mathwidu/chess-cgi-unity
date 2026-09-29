@@ -130,14 +130,22 @@ public sealed class PieceFactory : MonoBehaviour
             return false;
         }
 
-        AddCylinder(parent, "TeamBase", new Vector3(0f, 0.06f, 0f), new Vector3(0.74f, 0.12f, 0.74f), sideMaterial);
-
         GameObject visual = Object.Instantiate(prefab, parent);
         visual.name = "CustomVisual";
         visual.transform.localPosition = Vector3.zero;
         visual.transform.localRotation = Quaternion.Euler(0f, side == ChessSide.Black ? 180f : 0f, 0f);
         visual.transform.localScale = Vector3.one;
-        FitCustomVisual(visual.transform, GetCustomVisualHeight(kind));
+        CustomPieceAppearance appearance = visual.GetComponentInChildren<CustomPieceAppearance>();
+        if (appearance != null)
+        {
+            appearance.ApplySide(side);
+        }
+        else
+        {
+            AddCylinder(parent, "TeamBase", new Vector3(0f, 0.06f, 0f), new Vector3(0.74f, 0.12f, 0.74f), sideMaterial);
+        }
+        // Direction 02 prefabs already contain their base and horizontal role symbols.
+        FitCustomVisual(visual.transform, GetCustomVisualHeight(kind), appearance != null ? 0f : customVisualBaseOffset);
         return true;
     }
 
@@ -178,12 +186,12 @@ public sealed class PieceFactory : MonoBehaviour
         }
     }
 
-    private void FitCustomVisual(Transform visual, float targetHeight)
+    private void FitCustomVisual(Transform visual, float targetHeight, float baseOffset)
     {
         Renderer[] renderers = visual.GetComponentsInChildren<Renderer>();
         if (renderers.Length == 0)
         {
-            visual.localPosition = new Vector3(0f, customVisualBaseOffset, 0f);
+            visual.localPosition = new Vector3(0f, baseOffset, 0f);
             return;
         }
 
@@ -197,7 +205,7 @@ public sealed class PieceFactory : MonoBehaviour
 
         bounds = CalculateBounds(renderers);
         float localBottom = visual.parent.InverseTransformPoint(bounds.min).y;
-        visual.localPosition += new Vector3(0f, customVisualBaseOffset - localBottom, 0f);
+        visual.localPosition += new Vector3(0f, baseOffset - localBottom, 0f);
     }
 
     private static Bounds CalculateBounds(Renderer[] renderers)

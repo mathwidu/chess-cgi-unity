@@ -28,6 +28,15 @@ independentemente de quem está jogando.
 - **Aliases:** Orbit, Girar câmera
 - **Status:** validated
 
+## Olhar ao redor
+
+Girar a visão a partir do assento atual para observar a sala no desktop,
+mantendo a posição da câmera. O botão direito controla a direção; R ou o
+botão de retorno restaura a perspectiva do tabuleiro.
+
+- **Aliases:** Room view, Visão da sala
+- **Status:** validated
+
 ## Modo VR
 
 O jogo renderizado para um headset e controlado com controles de movimento em

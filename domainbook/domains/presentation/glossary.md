@@ -71,8 +71,8 @@ derrota ou empate). Sintetizados em código, saem do tabuleiro em 3D no VR.
 ## Preview da peça selecionada
 
 O painel que mostra a peça selecionada sozinha, renderizada por uma câmera
-pequena em uma textura, que o jogador pode orbitar e dar zoom para ler o
-personagem.
+pequena em uma textura, que o jogador pode orbitar, deslocar no enquadramento
+e aproximar para ler o personagem.
 
 - **Aliases:** Selected-piece preview, Painel da peça
 - **Status:** validated
@@ -92,7 +92,9 @@ A mesa de madeira sobre a qual o tabuleiro fica: tampo, friso, saia, quatro
 pés e ponteiras metálicas, modelada em metros do VR e escalada para o desktop.
 Uma placa de controle no tampo, à esquerda do jogador, regula a altura: a
 mesa sobe ou desce com o tabuleiro em cima, entre um limite mínimo e um
-máximo, e a escolha é persistida. A câmera nunca acompanha a mesa.
+máximo, e a escolha é persistida. A câmera nunca acompanha a mesa. No
+laboratório Feevale, a mesa regulada é a mesa de xadrez do próprio
+laboratório.
 
 - **Aliases:** Table, TableView, Altura da mesa, Table height
 - **Status:** validated

@@ -1,0 +1,18 @@
+{
+  "consulted_at": "2026-09-24",
+  "source": "https://www.feevale.br/Comum/midias/66f425e9-38b1-4a3f-ac91-5211841bb529/UniversidadeFeevale_Logos2020_PNG.zip",
+  "archive_sha256": "440ce01f6ca55348c13f35a8a6d0d21ef8638a4f74ddcc3b9258bba213cefa2f",
+  "edits": "none; extracted official PNG bytes unchanged",
+  "assets": [
+    {
+      "file": "feevale-color-dark-type.png",
+      "archive_path": "_PNG/SEM_SLOGAN_HORIZONTAL/UniversidadeFeevale_Logos2020_Horizontal_Color_semdecodificador.png",
+      "sha256": "cacf6c5e9e258a6dab92b52bd34ce216d4c0604e4f463ccb691bb1d348cd8f80"
+    },
+    {
+      "file": "feevale-color-white-type.png",
+      "archive_path": "_PNG/SEM_SLOGAN_HORIZONTAL/UniversidadeFeevale_Logos2020_Horizontal_ColorBranco_semdecodificador.png",
+      "sha256": "c8d54fe6c87867454ef07733e7933c1a6eb2015cf156b1d2eb15cc00f26be7fd"
+    }
+  ]
+}

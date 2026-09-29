@@ -18,6 +18,12 @@ public sealed partial class GameHud
     private Text gameOverDetails;
     private bool resultDismissed;
     private float resultRevealAt = -1f;
+    private RectTransform roomViewPanel;
+    private UnityEngine.UI.Text roomViewButtonText;
+    private UnityEngine.UI.Text roomViewHint;
+    private CameraController desktopView;
+    private UnityEngine.UI.Text previewZoomText;
+    private UnityEngine.UI.Button previewZoomInButton, previewZoomOutButton;
 
     private void BuildMatchInterface()
     {
@@ -27,6 +33,7 @@ public sealed partial class GameHud
         BuildTurnAndHistory();
         BuildSelectedPieceDetails();
         BuildMatchActions();
+        BuildRoomViewControls();
         BuildPromotionDialog();
         BuildComputerErrorDialog();
         BuildGameOverDialog();
@@ -53,20 +60,39 @@ public sealed partial class GameHud
     private void BuildSelectedPieceDetails()
     {
         selectedPiecePanel = CreatePanel("SelectedPiecePanel", matchInterface, Vector2.one, Vector2.one, Vector2.one, new Vector2(-24, -404), new Vector2(408, 534), panelStrongColor);
-        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(24, -24), new Vector2(360, 232), Color.white);
+        selectedPieceNameText = MenuLabel("SelectedPieceNameText", selectedPiecePanel, "", 23, textColor, 20, 16, 368, 54, true);
+        selectedPieceKindText = MenuLabel("SelectedPieceKindText", selectedPiecePanel, "", 18, accentColor, 20, 72, 236, 26, true);
+        selectedPieceSquareText = MenuLabel("SelectedPieceSquareText", selectedPiecePanel, "", 16, mutedTextColor, 268, 74, 120, 24);
+        selectedPieceSquareText.alignment = TextAnchor.UpperRight;
+        selectedPieceSideText = null; // The team is already part of the piece label.
+        selectedPiecePreviewImage = CreateRawImage("SelectedPiecePreview", selectedPiecePanel, new Vector2(20, -104), new Vector2(368, 220), Color.white);
         selectedPiecePreviewInput = selectedPiecePreviewImage.gameObject.AddComponent<SelectedPiecePreviewInput>();
-        MenuButton("PreviewZoomOutButton", selectedPiecePanel, "−", 274, 206, 48, 40, neutralButtonColor, ZoomSelectedPiecePreviewOut);
-        MenuButton("PreviewZoomInButton", selectedPiecePanel, "+", 328, 206, 48, 40, actionColor, ZoomSelectedPiecePreviewIn);
-        selectedPieceNameText = MenuLabel("SelectedPieceNameText", selectedPiecePanel, "", 24, textColor, 24, 270, 360, 58, true);
-        selectedPieceKindText = MenuLabel("SelectedPieceKindText", selectedPiecePanel, "", 19, accentColor, 24, 330, 360, 28, true);
-        selectedPieceSquareText = MenuLabel("SelectedPieceSquareText", selectedPiecePanel, "", 17, mutedTextColor, 24, 368, 170, 26);
-        selectedPieceSideText = MenuLabel("SelectedPieceSideText", selectedPiecePanel, "", 17, mutedTextColor, 210, 368, 174, 26);
-        selectedPieceProfileText = MenuLabel("SelectedPieceProfileText", selectedPiecePanel, "", 17, textColor, 24, 406, 360, 116);
-        // The name, role and record already identify the person; keep the redundant long bio out of the compact HUD.
+        var hint = MenuLabel("PreviewGestureHint", selectedPiecePanel,
+            XRRig.IsHeadsetPresent ? "Use os botões para ajustar a vista" : "Esquerdo: girar · Direito: mover",
+            14, mutedTextColor, 20, 332, 296, 24);
+        hint.alignment = TextAnchor.MiddleLeft;
+        previewZoomText = MenuLabel("PreviewZoomText", selectedPiecePanel, "100%", 17, textColor, 328, 332, 60, 24, true);
+        previewZoomText.alignment = TextAnchor.MiddleRight;
+        PreviewButton("PreviewRotateLeftButton", "← Girar", 20, 368, 82, () => selectedPiecePreviewInput.RotatePreview(30f));
+        PreviewButton("PreviewRotateRightButton", "Girar →", 110, 368, 82, () => selectedPiecePreviewInput.RotatePreview(-30f));
+        PreviewButton("PreviewMoveUpButton", "Mover ↑", 200, 368, 90, () => selectedPiecePreviewInput.PanPreview(Vector2.up * .12f));
+        PreviewButton("PreviewMoveDownButton", "Mover ↓", 298, 368, 90, () => selectedPiecePreviewInput.PanPreview(Vector2.down * .12f));
+        previewZoomOutButton = PreviewButton("PreviewZoomOutButton", "− Afastar", 20, 420, 112, ZoomSelectedPiecePreviewOut);
+        PreviewButton("PreviewResetButton", "Restaurar", 148, 420, 112, () => selectedPiecePreviewInput.ResetView());
+        previewZoomInButton = PreviewButton("PreviewZoomInButton", "+ Zoom", 276, 420, 112, ZoomSelectedPiecePreviewIn);
+        MenuRule(selectedPiecePanel, 20, 474, 368);
+        selectedPieceProfileText = MenuLabel("SelectedPieceProfileText", selectedPiecePanel, "", 14, mutedTextColor, 20, 486, 368, 40);
         selectedPieceDescriptionText = null;
         EnsureSelectedPiecePreviewResources();
         selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
         selectedPiecePreviewInput.Configure(null, selectedPiecePreviewCamera);
+    }
+
+    private UnityEngine.UI.Button PreviewButton(string name, string label, float x, float y, float width, UnityEngine.Events.UnityAction action)
+    {
+        var button = MenuButton(name, selectedPiecePanel, label, x, y, width, 42, neutralButtonColor, action);
+        button.GetComponentInChildren<UnityEngine.UI.Text>().fontSize = 16;
+        return button;
     }
 
     private void BuildMatchActions()
@@ -76,6 +102,31 @@ public sealed partial class GameHud
         cancelButtonText = MenuButton("CancelButton", actions, "Cancelar", 222, 16, 148, 50, neutralButtonColor, CancelSelection).GetComponentInChildren<Text>();
         howToPlayButtonText = MenuButton("HowToPlayButton", actions, "Como jogar", 382, 16, 166, 50, neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
         MenuButton("MenuButton", actions, "Menu", 560, 16, 132, 50, neutralButtonColor, ShowMenu);
+    }
+
+    private void BuildRoomViewControls()
+    {
+        if (XRRig.IsHeadsetPresent) return;
+        desktopView = Object.FindFirstObjectByType<CameraController>();
+        roomViewPanel = CreatePanel("RoomViewPanel", matchInterface, new Vector2(1, 0), new Vector2(1, 0),
+            new Vector2(1, 0), new Vector2(-24, 24), new Vector2(408, 100), panelColor);
+        roomViewButtonText = MenuButton("RoomViewButton", roomViewPanel, "Olhar ao redor", 16, 12, 376, 42,
+            neutralButtonColor, () =>
+            {
+                if (desktopView == null) return;
+                if (desktopView.IsLookingAround) desktopView.ReturnToBoard();
+                else desktopView.LookAround();
+            }).GetComponentInChildren<UnityEngine.UI.Text>();
+        roomViewHint = MenuLabel("RoomViewHint", roomViewPanel, "", 15, mutedTextColor, 16, 64, 376, 22);
+    }
+
+    private void RefreshRoomViewControls()
+    {
+        if (roomViewPanel == null) return;
+        SetActive(roomViewPanel, !XRRig.IsHeadsetPresent);
+        bool looking = desktopView != null && desktopView.IsLookingAround;
+        roomViewButtonText.text = looking ? "Voltar ao tabuleiro  ·  R" : "Olhar ao redor";
+        roomViewHint.text = looking ? "Arraste com o botão direito para olhar" : "Q/E: girar  ·  Scroll: zoom  ·  R: voltar";
     }
 
     private void BuildPromotionDialog()

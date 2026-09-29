@@ -1,0 +1,90 @@
+{
+  "unity_scene": "Assets/Scenes/Main.unity",
+  "unity_version": "6000.3.16f1",
+  "playmode_tests": {
+    "passed": 50,
+    "failed": 0,
+    "started": "2026-09-25 17:54:51Z",
+    "ended": "2026-09-25 17:55:05Z"
+  },
+  "preserved_files": 175,
+  "changed_protected_files": [],
+  "environment_renderers": 31,
+  "environment_triangles": 118407,
+  "embedded_images": 15,
+  "meshes_with_baked_contact_occlusion": 24,
+  "captures": {
+    "desktop-menu": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/desktop-menu.png",
+      "sha256": "cb727f7428002d2a2917113b76aff237c2cb8b55bd104a50ac10e26b35e9fcb2"
+    },
+    "desktop-match": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/desktop-match.png",
+      "sha256": "dcfa2a410b79496411168eb219bdbdaa83e0ba51bbb74a403ea66a253f5d4fd8"
+    },
+    "desktop-move": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/desktop-move.png",
+      "sha256": "83a04f6651b9b7867d25f4816aeeedbb4aa197a5f6c26bc7c21b2ef341fceafe"
+    },
+    "desktop-look-room": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/desktop-look-room.png",
+      "sha256": "d39171bb7a01bba336c6c17dee53f8188252d0edb678d26144059e930dda0475"
+    },
+    "desktop-look-right": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/desktop-look-right.png",
+      "sha256": "1ef70add78f52714b99f831dac895a43d3113ea0b94e2e5d5e58aa8e9c722655"
+    },
+    "desktop-return-board": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/desktop-return-board.png",
+      "sha256": "83a04f6651b9b7867d25f4816aeeedbb4aa197a5f6c26bc7c21b2ef341fceafe"
+    },
+    "vr-menu": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-menu.png",
+      "sha256": "b9de25885c6feebc0ff165401ee3ecd5fbad5635532ade06180635631910ee2a"
+    },
+    "vr-play": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-play.png",
+      "sha256": "25a2c069c1fc70b2d394203838cb0a084d51c389bab131d2f44394d86afd63bc"
+    },
+    "vr-table": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-table.png",
+      "sha256": "a24bbba527a1fb63fdd028ab9c109b59b4c525944723101dd0db128233e0db9b"
+    },
+    "vr-overview": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-overview.png",
+      "sha256": "b29a04e0cd605c8e933dd7a803a891e9359b1946aa334c938710b933baf1f5c7"
+    },
+    "vr-room": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-room.png",
+      "sha256": "2bd6769746f27a55a8b6d7f794614424e8bfcce279ab7abb0fb2dcb988821666"
+    },
+    "vr-black-side": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-black-side.png",
+      "sha256": "068f8d65a46697c4631fb6f562e2e0b987f27c9f2b69b7dbc3e6801083c81628"
+    },
+    "vr-right-windows": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-right-windows.png",
+      "sha256": "1dea29ee08a704a9a906ffbcd3b231e0b4233924052ed1190a05820d497ab19e"
+    },
+    "vr-table-detail": {
+      "file": "art/character-variants/feevale-room-v2-20260925/unity/vr-table-detail.png",
+      "sha256": "51b3e28caf03073ad5d24720024300448700297dfb382080e3e1c06b2c50def5"
+    }
+  },
+  "source_hashes": {
+    "game/Assets/Art/Environment/FeevaleLab/FeevaleComputerLab.glb": "20a65ac5de734bcae03adf964e34af270b369df3af9c20321a988a3411e8b8fe",
+    "game/Assets/Resources/Environment/FeevaleComputerLab.prefab": "49556408b003a1f2956e54ba2d670ed591e13f7b857969936db2e546872aaa57",
+    "game/Assets/Editor/FeevaleLabImport.cs": "8417fdd59537974d08292c1007cfa7387819e8be65d2963d9a22f960c83522a6",
+    "game/Assets/Editor/FeevaleLabReviewCapture.cs": "a342183169f6043783bfd1e8b09d9d2f34b00b6d29bf07758ac80c9c96149256",
+    "game/Assets/Tests/PlayMode/DesktopRoomViewTests.cs": "c25c7021aa1e839d7d0944f6fec6bd3a4cf46701ea72785df62a288badf4bfcd"
+  },
+  "headset_tested": false,
+  "vr_evidence": "XRSimulatedHMD startup in Main; monoscopic Editor renders; no physical headset performance claim",
+  "interactive_editor_check": {
+    "scene": "Main",
+    "mode": "Dois jogadores",
+    "look_around_hud_button": "passed",
+    "r_returns_to_board": "passed",
+    "left_open": "Game view, board perspective"
+  }
+}

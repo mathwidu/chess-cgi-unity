@@ -1,0 +1,57 @@
+{
+  "date": "2026-09-24",
+  "scope": "Pesquisa e conceito visual 2D; nenhuma alteracao de modelos de producao",
+  "head": "81bea194e6b4a24adfaf3c24b235709660829c8e",
+  "source_glbs_unchanged": [
+    {
+      "path": "game/Assets/Resources/CustomPieces/Pawn_Mathwidu_Redhead_v2_Assets/selected.glb",
+      "sha256": "be7d90fa5a0ef829f0b644914eb00daee0345350ede9000a85739058eee65717"
+    },
+    {
+      "path": "game/Assets/Resources/CustomPieces/Rook_Alex_Assets/selected.glb",
+      "sha256": "af1be1fde616e84b56fd754c7b9d7ea9876857787fc88cafe2d3fdca6dbdcfc7"
+    },
+    {
+      "path": "game/Assets/Resources/CustomPieces/Knight_Gustavo_Assets/selected.glb",
+      "sha256": "080fbb91520daf9d9446eae720c69ea8bf548890e470a5e253f497f124952bd1"
+    },
+    {
+      "path": "game/Assets/Resources/CustomPieces/Bishop_Rafael_Assets/selected.glb",
+      "sha256": "ae3398139795265cccb546868625ba387f90b0baaf94e9d7479ddafb66d26700"
+    },
+    {
+      "path": "game/Assets/Resources/CustomPieces/Queen_Marta_Assets/selected.glb",
+      "sha256": "56455a9ce068d6f40aa1478b0309bc6a358b4f43424275c8c4c585e43e0a024b"
+    },
+    {
+      "path": "game/Assets/Resources/CustomPieces/King_Ricardo_Carioca_Assets/selected.glb",
+      "sha256": "ea52e01652a23b4cfabccdd36ac418810773ee2f9954a1f5b517e4021d81c8c1"
+    }
+  ],
+  "existing_animation_study_files_unchanged": 26,
+  "official_brand_files_match_provenance": true,
+  "local_document_and_panel_links_exist": true,
+  "production_game_diff_from_origin_main_empty": true,
+  "concept": {
+    "file": "concepts/pawn-king.png",
+    "sha256": "d61b288b39f02c6c38c9ec1840c84f7969065e6638ee8c21d1b82b87f9a22f2e",
+    "generator": "built-in imagegen",
+    "type": "2D concept; not native 3D or game screenshot"
+  },
+  "not_validated": [
+    "reconstructed meshes",
+    "Unity import",
+    "piece recognition by players",
+    "headset legibility",
+    "VR performance"
+  ],
+  "browser_check": {
+    "url": "http://127.0.0.1:8768/direction-v2/",
+    "all_five_initial_images_loaded": true,
+    "three_comparison_tabs_change_image_and_caption": true,
+    "original_width": 1800,
+    "study_01_width": 2200,
+    "concept_width": 1536,
+    "visual_reference_cards_inspected": true
+  }
+}

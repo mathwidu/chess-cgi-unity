@@ -1,0 +1,59 @@
+{
+  "unity_scene": "Assets/Scenes/Main.unity",
+  "playmode_tests": {
+    "passed": 44,
+    "failed": 0
+  },
+  "preserved_character_and_animation_files": 170,
+  "changed_preserved_files": [],
+  "environment_renderers": 26,
+  "environment_triangles": 101639,
+  "embedded_images": 2,
+  "captures": {
+    "desktop-menu": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/desktop-menu.png",
+      "sha256": "28e9782043d79b812c7b332e6347744f93828d78efed568ac14409727212940b"
+    },
+    "desktop-match": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/desktop-match.png",
+      "sha256": "a348c06fd2805601abe57186e1dafbcb97669e623af2461031a2596ecbc2ca73"
+    },
+    "desktop-move": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/desktop-move.png",
+      "sha256": "2579db7e5f912000f2d644c5d03f9603a1e17c457271e8a3b149428a2a235a27"
+    },
+    "vr-menu": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/vr-menu.png",
+      "sha256": "674a387d475e9795968de3edf2b353c5b7c2b531db23061c00b688763ec3542c"
+    },
+    "vr-play": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/vr-play.png",
+      "sha256": "d5dd564e662e050c7601f0ddf911a8163c5681ec23cb5f528c685761b1264ce0"
+    },
+    "vr-table": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/vr-table.png",
+      "sha256": "cb584877f9bf3d26017bef6c03925d254fb82ea2dace9a6afca50b0ff74b0871"
+    },
+    "vr-overview": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/vr-overview.png",
+      "sha256": "816dd670a6a46e61c982ace5cf7d606c154d5b0521047b742aad3de147fe5e3f"
+    },
+    "vr-room": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/vr-room.png",
+      "sha256": "e5681786836895e854d3facf507ebe3f24abba0a8b2a334f6ac6ed50ec9928c7"
+    },
+    "vr-black-side": {
+      "file": "art/character-variants/feevale-lab-20260925/unity/vr-black-side.png",
+      "sha256": "2a5a47eca9e3ea75942ef4ac82507842dc96e7515331dc9d21e25517a222dfdd"
+    }
+  },
+  "source_hashes": {
+    "game/Assets/Art/Environment/FeevaleLab/FeevaleComputerLab.glb": "6df0d8482697948b3f31b6800149114b2782cb79f807ab0d7e5423f5a03deedd",
+    "game/Assets/Resources/Environment/FeevaleComputerLab.prefab": "09314966bb116756135cf555d03f375391d7f2c09ac9c4c7cbc899999c0eecf2",
+    "game/Assets/Editor/FeevaleLabImport.cs": "e320a2acdb0b6f0748fa345c7987ac1cfbbcf97e716027ffa313b5a55fc94e82",
+    "game/Assets/Editor/FeevaleLabReviewCapture.cs": "6b119276f93d79822d160abbf11b21dc8b38a12e5eacf830bf0446cf7c3c4af5",
+    "game/Assets/Tests/PlayMode/ClassroomEnvironmentTests.cs": "a2d6f5e47f2dcc82b7a1d53b9b316dbcb4ad0b16ec8917413ea2848dfb808d86"
+  },
+  "vr_evidence": "XRSimulatedHMD before Main startup; monoscopic Editor captures; not headset acceptance",
+  "headset_tested": false
+}

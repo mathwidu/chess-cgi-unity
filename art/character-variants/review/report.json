@@ -1,0 +1,54 @@
+{
+  "status": "Estudo visual, sem integração Unity",
+  "source_commit": "81bea194e6b4a24adfaf3c24b235709660829c8e",
+  "pieces": [
+    {
+      "kind": "Pawn",
+      "character": "Pawn_Mathwidu_Redhead_v2",
+      "clothing_faces": 1434,
+      "source_faces": 4865,
+      "study_faces": 4865,
+      "source_sha256": "be7d90fa5a0ef829f0b644914eb00daee0345350ede9000a85739058eee65717"
+    },
+    {
+      "kind": "Rook",
+      "character": "Rook_Alex",
+      "clothing_faces": 2236,
+      "source_faces": 4846,
+      "study_faces": 4846,
+      "source_sha256": "af1be1fde616e84b56fd754c7b9d7ea9876857787fc88cafe2d3fdca6dbdcfc7"
+    },
+    {
+      "kind": "Knight",
+      "character": "Knight_Gustavo",
+      "clothing_faces": 1667,
+      "source_faces": 4814,
+      "study_faces": 4814,
+      "source_sha256": "080fbb91520daf9d9446eae720c69ea8bf548890e470a5e253f497f124952bd1"
+    },
+    {
+      "kind": "Bishop",
+      "character": "Bishop_Rafael",
+      "clothing_faces": 2089,
+      "source_faces": 4870,
+      "study_faces": 4870,
+      "source_sha256": "ae3398139795265cccb546868625ba387f90b0baaf94e9d7479ddafb66d26700"
+    },
+    {
+      "kind": "Queen",
+      "character": "Queen_Marta",
+      "clothing_faces": 1763,
+      "source_faces": 4758,
+      "study_faces": 4607,
+      "source_sha256": "56455a9ce068d6f40aa1478b0309bc6a358b4f43424275c8c4c585e43e0a024b"
+    },
+    {
+      "kind": "King",
+      "character": "King_Ricardo_Carioca",
+      "clothing_faces": 1727,
+      "source_faces": 5004,
+      "study_faces": 4650,
+      "source_sha256": "ea52e01652a23b4cfabccdd36ac418810773ee2f9954a1f5b517e4021d81c8c1"
+    }
+  ]
+}

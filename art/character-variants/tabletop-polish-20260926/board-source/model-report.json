@@ -1,0 +1,11 @@
+{
+  "playing_width_units": 10,
+  "frame_width_units": 11.28,
+  "top_units": 0.04,
+  "bottom_units": -0.54,
+  "vr_thickness_m": 0.0261,
+  "coordinates": 32,
+  "interactive_squares_in_asset": 0,
+  "colliders_in_asset": 0,
+  "headset_tested": false
+}

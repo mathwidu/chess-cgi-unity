@@ -1,0 +1,29 @@
+{
+  "scene": "Assets/Scenes/Main.unity",
+  "unity": "6000.3.16f1",
+  "playmode_tests": {
+    "passed": "56",
+    "failed": "0",
+    "skipped": "0",
+    "start-time": "2026-09-25 19:07:54Z",
+    "end-time": "2026-09-25 19:08:10Z"
+  },
+  "protected_files": 185,
+  "changed_protected_files": [],
+  "captures": {
+    "pawn-rotated.png": "a900174ca3a89a13e5de46630fe3e701f18b17cbc280cd48870679ebd6224c21",
+    "knight-controls.png": "40c06494d5ed3f192cfec5e174eb16746404d03168dbbe33260fb230867c8ee9",
+    "pawn-controls.png": "285e74aebb781aaa5af3f40d58b822224afc57a6db02298caab51654f05030ff",
+    "king-controls.png": "f96301ec1c5cde2dd9f2cc569f3e18cb20f874f421adb764437b1cb3046f20d4"
+  },
+  "source_hashes": {
+    "game/Assets/Scripts/UI/GameHud.cs": "4315ca4358c9b1466cbec25c4756f24f67fd119821683f7e865b8da7f305404b",
+    "game/Assets/Scripts/UI/GameHud.Match.cs": "3e8dc2091d3821705522a3187747a259d8cdd7fac4a3b101640e50e47834f19e",
+    "game/Assets/Scripts/UI/SelectedPiecePreviewInput.cs": "c92efecbef70bde295b7ad6e8d38bb323b9f1485b2816b01c0cfa7c24078fa9d",
+    "game/Assets/Tests/PlayMode/SelectedPiecePreviewTests.cs": "ca4607e94389b3b324c0948965d8f81079d1f2739777c5757867d5b36c56558f",
+    "game/Assets/Editor/PiecePanelReviewCapture.cs": "a76f14930271a6c921f1b18cbff531c6602166419e2f2dd83643b5ce1d714df8"
+  },
+  "validation": "Mouse events through the Input System, UI buttons, both teams and world-space HUD with simulated XRHMD. Four Main renders inspected.",
+  "physical_headset_tested": false,
+  "interactive_editor": "Reopened Main in Play Mode at the menu. Manual pointer check was unavailable through desktop automation; no manual click pass claimed."
+}

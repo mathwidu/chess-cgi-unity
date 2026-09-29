@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -51,9 +52,9 @@ public class TableHeightTests
         float boardY = board.transform.position.y;
         Transform piece = board.Pieces[0].transform;
         float pieceY = piece.position.y;
-        Renderer leg = table.transform.Find("Leg").GetComponent<Renderer>();
-        float floorContact = leg.bounds.min.y;
-        float tabletopY = table.transform.Find("Top/Tabletop").GetComponent<Renderer>().bounds.max.y;
+        Transform room = GameObject.Find("FeevaleComputerLab").transform;
+        Vector2 deskBefore = ChessDeskHeightRange(room);
+        float roomY = room.position.y;
 
         Press("TableRaiseButton");
         yield return null;
@@ -63,9 +64,13 @@ public class TableHeightTests
         Assert.That(lift, Is.GreaterThan(0f));
         Assert.That(lift, Is.EqualTo(table.BoardOffset).Within(1e-4f));
         Assert.That(piece.position.y - pieceY, Is.EqualTo(lift).Within(1e-4f), "The pieces ride on the board.");
-        Assert.That(table.transform.Find("Top/Tabletop").GetComponent<Renderer>().bounds.max.y - tabletopY,
-            Is.EqualTo(lift).Within(1e-3f), "The tabletop stays right under the board.");
-        Assert.That(leg.bounds.min.y, Is.EqualTo(floorContact).Within(1e-3f), "The legs grow; the feet stay on the floor.");
+        Vector2 deskAfter = ChessDeskHeightRange(room);
+        Assert.That(deskAfter.y - deskBefore.y, Is.EqualTo(lift).Within(1e-3f), "The lab desk top stays right under the board.");
+        Assert.That(deskAfter.x, Is.EqualTo(deskBefore.x).Within(1e-3f), "The desk grows; its feet stay on the floor.");
+        Assert.That(room.position.y, Is.EqualTo(roomY).Within(1e-4f), "Only the desk moves, not the room.");
+        Renderer[] boardBase = board.BoardFrameRoot.Find("BoardBase").GetComponentsInChildren<Renderer>();
+        Assert.That(GameObject.Find("ChessTableSurface").transform.position.y,
+            Is.EqualTo(boardBase.Min(r => r.bounds.min.y)).Within(1e-3f), "The board still rests on the desk.");
         Assert.That(Vector3.Distance(Camera.main.transform.position, cameraPosition), Is.LessThan(1e-4f), "The camera never follows the table.");
         Assert.That(PlayerPrefs.GetInt(HeightStepKey), Is.EqualTo(1));
         Assert.That(GameObject.Find("HeightText").GetComponent<Text>().text, Does.EndWith(" cm"));
@@ -105,6 +110,22 @@ public class TableHeightTests
         Vector3 face = GameObject.Find("HeightPanelCanvas").transform.forward * -1f;
         Assert.That(face.y, Is.GreaterThan(0.5f), "The panel face looks up at the player.");
         Assert.That(face.z, Is.GreaterThan(0f), "The panel face turns toward the black player.");
+    }
+
+    private static Vector2 ChessDeskHeightRange(Transform room)
+    {
+        var range = new Vector2(float.MaxValue, float.MinValue);
+        foreach (MeshFilter filter in room.GetComponentsInChildren<MeshFilter>())
+        {
+            foreach (Vector3 vertex in filter.sharedMesh.vertices)
+            {
+                Vector3 roomPoint = room.InverseTransformPoint(filter.transform.TransformPoint(vertex));
+                if (Mathf.Abs(roomPoint.x) > 0.66f || Mathf.Abs(roomPoint.z) > 0.46f || roomPoint.y > 1f) continue;
+                float y = filter.transform.TransformPoint(vertex).y;
+                range = new Vector2(Mathf.Min(range.x, y), Mathf.Max(range.y, y));
+            }
+        }
+        return range;
     }
 
     private static Button Button(string name)

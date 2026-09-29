@@ -9,8 +9,8 @@ using UnityEngine.XR.Interaction.Toolkit.UI;
 // Its height panel moves only the table and the board on it; the camera never follows.
 public sealed class TableView : MonoBehaviour
 {
-    // Top surface just under the board frame; BoardView places the VR board at 0.78 m.
-    public const float DefaultHeight = 0.774f;
+    // Top surface under the board frame's base; BoardView places the VR board at 0.78 m.
+    public const float DefaultHeight = 0.7557f;
 
     private const string HeightStepKey = "ChessCgi.TableHeightStep";
     private const float TopSize = 0.9f;
@@ -21,6 +21,14 @@ public sealed class TableView : MonoBehaviour
     private const float LegInset = 0.375f;
     private const float LegSize = 0.045f;
     private const float FootHeight = 0.018f;
+
+    private const float LabDeskWidth = 1.3f;
+    private const float LabDeskDepth = 0.9f;
+    private const float LabDeskThickness = 0.028f;
+    private const float LabDeskMargin = 0.01f;
+    private const float LabDeskLegSplit = 0.2f;
+    private const float LabDeskReach = 1f;
+    private static readonly string[] LabDeskMarkers = { "ChessTableSurface", "BoardAnchor" };
 
     // A small lectern on the player's left, turned toward the seat and clear of the board.
     private static readonly Vector3 PanelPosition = new Vector3(-0.335f, 0f, 0.06f);
@@ -45,6 +53,9 @@ public sealed class TableView : MonoBehaviour
 
     private readonly List<Transform> legs = new List<Transform>();
     private readonly List<Image> levelTicks = new List<Image>();
+    private readonly List<LabDeskMesh> labDeskMeshes = new List<LabDeskMesh>();
+    private readonly List<LabDeskMarker> labDeskMarkers = new List<LabDeskMarker>();
+    private Transform labRoom;
     private Transform top;
     private Transform panel;
     private Canvas panelCanvas;
@@ -106,6 +117,66 @@ public sealed class TableView : MonoBehaviour
         ApplyHeight();
     }
 
+    public void BuildOnLabDesk(Transform room)
+    {
+        headset = XRRig.IsHeadsetPresent;
+        labRoom = room;
+        frameMaterial = ScenePolish.CreateMaterial("Runtime_Table_Frame", new Color(0.22f, 0.13f, 0.075f), 0f, 0.28f);
+
+        top = new GameObject("Top").transform;
+        top.SetParent(transform, false);
+        var tabletop = new GameObject("Tabletop");
+        tabletop.transform.SetParent(top, false);
+        tabletop.transform.localPosition = new Vector3(0f, -LabDeskThickness * 0.5f, 0f);
+        tabletop.AddComponent<BoxCollider>().size = new Vector3(LabDeskWidth, LabDeskThickness, LabDeskDepth);
+
+        labDeskMeshes.Clear();
+        MeshFilter[] roomMeshes = Application.isPlaying ? room.GetComponentsInChildren<MeshFilter>(true) : new MeshFilter[0];
+        foreach (MeshFilter filter in roomMeshes)
+        {
+            Mesh shared = filter.sharedMesh;
+            if (shared == null || !shared.isReadable)
+            {
+                continue;
+            }
+
+            Matrix4x4 meshToRoom = room.worldToLocalMatrix * filter.transform.localToWorldMatrix;
+            Vector3[] rest = shared.vertices;
+            var moving = new List<int>();
+            for (int i = 0; i < rest.Length; i++)
+            {
+                if (IsAboveLabDeskLegSplit(meshToRoom.MultiplyPoint3x4(rest[i])))
+                {
+                    moving.Add(i);
+                }
+            }
+
+            if (moving.Count > 0)
+            {
+                labDeskMeshes.Add(new LabDeskMesh(filter.mesh, rest, moving.ToArray(), meshToRoom.inverse.MultiplyVector(Vector3.up)));
+            }
+        }
+
+        labDeskMarkers.Clear();
+        foreach (Transform part in room.GetComponentsInChildren<Transform>(true))
+        {
+            if (System.Array.IndexOf(LabDeskMarkers, part.name) >= 0)
+            {
+                labDeskMarkers.Add(new LabDeskMarker(part, room.InverseTransformPoint(part.position)));
+            }
+        }
+
+        ApplyHeight();
+    }
+
+    private static bool IsAboveLabDeskLegSplit(Vector3 roomPoint)
+    {
+        return Mathf.Abs(roomPoint.x) <= LabDeskWidth * 0.5f + LabDeskMargin
+            && Mathf.Abs(roomPoint.z) <= LabDeskDepth * 0.5f + LabDeskMargin
+            && roomPoint.y > LabDeskLegSplit
+            && roomPoint.y < LabDeskReach;
+    }
+
     public void Raise()
     {
         SetHeightStep(HeightStep + 1);
@@ -165,6 +236,24 @@ public sealed class TableView : MonoBehaviour
         }
 
         top.localPosition = Vector3.up * Height;
+        float lift = Height - DefaultHeight;
+        foreach (LabDeskMesh desk in labDeskMeshes)
+        {
+            Vector3[] vertices = (Vector3[])desk.Rest.Clone();
+            foreach (int index in desk.Moving)
+            {
+                vertices[index] += desk.Up * lift;
+            }
+
+            desk.Mesh.vertices = vertices;
+            desk.Mesh.RecalculateBounds();
+        }
+
+        foreach (LabDeskMarker marker in labDeskMarkers)
+        {
+            marker.Transform.position = labRoom.TransformPoint(marker.Rest + Vector3.up * lift);
+        }
+
         // Adjustable legs: the feet stay on the floor and the legs reach the underside of the top.
         float legHeight = Height - TopThickness - FootHeight;
         foreach (Transform leg in legs)
@@ -179,6 +268,14 @@ public sealed class TableView : MonoBehaviour
         }
 
         RefreshPanel();
+    }
+
+    private void OnDestroy()
+    {
+        foreach (LabDeskMesh desk in labDeskMeshes)
+        {
+            Destroy(desk.Mesh);
+        }
     }
 
     private bool PlayerOnBlackSide()
@@ -331,5 +428,33 @@ public sealed class TableView : MonoBehaviour
         rect.anchoredPosition = new Vector2(x, -y);
         rect.sizeDelta = new Vector2(width, height);
         return rect;
+    }
+
+    private sealed class LabDeskMesh
+    {
+        public readonly Mesh Mesh;
+        public readonly Vector3[] Rest;
+        public readonly int[] Moving;
+        public readonly Vector3 Up;
+
+        public LabDeskMesh(Mesh mesh, Vector3[] rest, int[] moving, Vector3 up)
+        {
+            Mesh = mesh;
+            Rest = rest;
+            Moving = moving;
+            Up = up;
+        }
+    }
+
+    private sealed class LabDeskMarker
+    {
+        public readonly Transform Transform;
+        public readonly Vector3 Rest;
+
+        public LabDeskMarker(Transform transform, Vector3 rest)
+        {
+            Transform = transform;
+            Rest = rest;
+        }
     }
 }

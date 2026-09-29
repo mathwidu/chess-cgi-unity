@@ -22,7 +22,8 @@ A pasta correta para abrir como projeto Unity e `game`.
 - `N`: iniciar nova partida.
 - `Q` / `E`: girar a camera.
 - Scroll: aproximar ou afastar a camera principal.
-- Aba lateral: ao selecionar uma peca, mostra o modelo 3D, permite girar com drag, aproximar/afastar com scroll e usar os botoes `+` e `-`.
+- Olhar ao redor: botão da sala e arraste direito; `R`, `Esc` ou botão de retorno para voltar ao tabuleiro.
+- Aba lateral: ao selecionar uma peça, permite girar com arraste esquerdo, ampliar com scroll ou `+`/`-`, reposicionar com arraste direito/do meio ou Mover ↑/↓ e restaurar o enquadramento.
 
 O jogo alterna automaticamente entre brancas e pretas. No modo local a camera acompanha o turno; contra a IA ela permanece no lado humano.
 
@@ -71,6 +72,8 @@ As fotos usadas como referencia ficam apenas localmente e nao entram no Git. Os 
 
 ## Código e documentação
 
+- [Entrega visual Feevale: escopo, controles, testes e integração com a equipe](docs/visual-feevale.md).
+- [Fontes 3D, texturas, referências e histórico visual](art/README.md).
 - [IA, organização dos fontes, testes e integração com VR](docs/ai-desktop.md).
 - [Regras e contratos do jogo](domainbook/domains/gameplay/index.md).
 - [Sistema visual aprovado](DESIGN.md) e [índice de referências da interface](.impeccable/README.md).

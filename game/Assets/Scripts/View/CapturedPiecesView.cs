@@ -18,8 +18,8 @@ public sealed class CapturedPiecesView : MonoBehaviour
     private const float SlotSpacing = 0.95f;
     // 3 × 5 slots: a side can take at most 15 pieces (never the king).
     private const int Columns = 3;
-    // The table top sits just under the board base: 0.774 m against the board's 0.78 m, in board units.
-    private const float TableTop = -0.133f;
+    // The table top sits at the board frame's base: 0.7557 m against the board's 0.78 m, in board units.
+    private const float TableTop = -0.54f;
     private const float MatHeight = 0.03f;
     private const float FlySeconds = 0.45f;
     private const float FlyArc = 1.2f;

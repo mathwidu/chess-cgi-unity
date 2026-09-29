@@ -30,6 +30,26 @@ Example: Descer a mesa
   Then a mesa e o tabuleiro descem um passo
 ```
 
+## Rule: No laboratório Feevale, a mesa regulável é a mesa do laboratório
+
+```gherkin
+Example: Subir a mesa do laboratório
+  Given o laboratório Feevale carregado ao redor do tabuleiro
+  When o jogador aciona Subir na placa da mesa
+  Then o tampo da mesa de xadrez do laboratório sobe um passo com o tabuleiro
+  And os pés em T continuam no chão, e as colunas crescem
+  And o resto da sala, o piso e as cadeiras não se movem
+```
+
+A mesa de xadrez vem fundida às outras mesas nas malhas do laboratório. O
+`TableView` não monta mesa própria: ele desloca, só em Play, os vértices da
+malha dentro da área de 1,30 × 0,90 m da mesa de xadrez e acima de 20 cm,
+e move os marcadores `ChessTableSurface` e `BoardAnchor` junto. A sala
+acompanha a pose do tabuleiro descontando esse deslocamento, então fica
+parada no chão. Um collider invisível do tamanho do tampo mantém o bloqueio
+do raio do VR. A mesa própria do `TableView` só aparece se o prefab do
+laboratório faltar.
+
 ## Rule: A altura tem limites e é lembrada
 
 ```gherkin
@@ -61,8 +81,8 @@ Example: A placa responde ao mouse e ao raio do controle
   Then os botões respondem ao raio do controle com o gatilho
 ```
 
-No VR, o passo é de 3 cm, entre 65 e 95 cm de altura do tampo, e a altura
-padrão é 77 cm. No desktop, a mesma sala aparece escalada
+No VR, o passo é de 3 cm, entre 64 e 94 cm de altura do tampo, e a altura
+padrão é 75,57 cm, a base da moldura do tabuleiro. No desktop, a mesma sala aparece escalada
 ([ADR-0002](../decisions/0002-modelar-a-sala-em-metros-do-vr-e-escalar-para-o-desktop.md))
 e o passo é de 0,25 unidade do tabuleiro, para o tabuleiro não sair do
 enquadramento. A escolha fica em `PlayerPrefs` (`ChessCgi.TableHeightStep`).

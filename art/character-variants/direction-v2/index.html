@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personagens da turma · Direção 02</title>
+<style>
+:root{color-scheme:dark;--bg:#18191a;--panel:#222425;--line:#3a3d3f;--text:#f0eee8;--muted:#bbbcb9;--accent:#e6ce8a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,sans-serif}main{max-width:1220px;margin:auto;padding:42px 28px 60px}a{color:var(--accent);text-underline-offset:4px}a:hover{color:#fff}header{display:flex;gap:28px;align-items:flex-start;justify-content:space-between;margin-bottom:28px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}h1{font-size:clamp(26px,4vw,42px);line-height:1.15;letter-spacing:-.035em;margin:0 0 15px}h2{font-size:25px;letter-spacing:-.025em;margin:40px 0 16px}h3{font-size:18px;line-height:1.35;margin:0 0 10px}p{margin:0 0 12px}.lede{color:var(--muted);max-width:800px;margin:0}.status{white-space:nowrap;border:1px solid var(--line);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--muted)}.viewer{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}.tabs{display:flex;gap:8px;padding:12px;flex-wrap:wrap}button{font:inherit;font-size:14px;border:1px solid transparent;border-radius:7px;padding:9px 16px;background:transparent;color:var(--muted);cursor:pointer}button[aria-selected=true]{background:#383b3d;color:white;border-color:#5a5d60}button:hover{background:#303335;color:white}button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.art{background:#979a9c;aspect-ratio:3/2;display:flex;align-items:center;justify-content:center}.art img{display:block;width:100%;height:100%;object-fit:contain}.caption{font-size:14px;color:var(--muted);padding:16px 20px;margin:0}.caption strong{color:var(--text)}.note{border-left:3px solid var(--accent);padding:0 0 0 16px;color:var(--muted);margin:22px 0 0;max-width:950px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}.card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}.copy{padding:20px}.copy p{font-size:15px;color:var(--muted)}.copy .tag{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:.1em}.copy p:last-child{margin:0}.pill{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:4px 4px 0 0}.cast{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.cast article{border:1px solid var(--line);border-radius:9px;padding:18px;background:var(--panel)}.cast h3 span{display:block;font-weight:400;font-size:13px;color:var(--accent);margin-top:3px}.cast p{font-size:14px;color:var(--muted)}.cast p:last-child{margin:0}.brands{display:grid;grid-template-columns:1fr 1fr;gap:18px}.swatch{padding:26px;border-radius:9px;text-align:center;border:1px solid var(--line)}.swatch img{display:block;width:min(100%,330px);margin:auto}.swatch p{font-size:13px;margin:12px 0 0}.light{background:#e8e5dd;color:#333}.dark{background:#303235;color:#ddd}.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}.steps p{font-size:15px;color:var(--muted)}.number{color:var(--accent);font-size:12px;letter-spacing:.1em;display:block;margin-bottom:7px}footer{border-top:1px solid var(--line);padding-top:22px;margin-top:32px;color:var(--muted);font-size:13px}footer p{margin:0 0 8px}
+@media(max-width:760px){main{padding:26px 16px 40px}header{display:block}.status{display:inline-block;margin-top:18px}.grid,.brands,.steps{grid-template-columns:1fr}.cast{grid-template-columns:repeat(2,minmax(0,1fr))}.tabs{gap:3px}button{padding:8px 10px}.caption{padding:14px}.art{aspect-ratio:3/2}}
+@media(max-width:470px){.cast{grid-template-columns:1fr}h1{font-size:30px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><p class="eyebrow">Chess CGI · Revisão dos personagens · 25.09.2026</p><h1>Personagens da turma · Direção 02</h1><p class="lede">Roupas revisadas, Feevale apenas nas costas e acessórios proporcionais. O mesmo personagem nas brancas e nas pretas, com leitura também pela parte superior.</p></div>
+  <span class="status">Revisão local · base main 81bea19</span>
+</header>
+<p class="note"><a href="../visual-review-20260925/index.html">Revisão visual do Gustavo, do elenco e do jogo</a> · comparação e prioridades de acabamento.</p>
+<div class="viewer">
+  <div class="tabs" role="tablist" aria-label="Comparar direções dos personagens">
+    <button role="tab" id="tab-before" aria-controls="art-panel" aria-selected="false" tabindex="-1" data-view="before">Antes da correção</button>
+    <button role="tab" id="tab-original" aria-controls="art-panel" aria-selected="false" tabindex="-1" data-view="original">Elenco original</button>
+    <button role="tab" id="tab-first" aria-controls="art-panel" aria-selected="false" tabindex="-1" data-view="first">Estudo 01 · descartado</button>
+    <button role="tab" id="tab-current" aria-controls="art-panel" aria-selected="false" tabindex="-1" data-view="current">Conceito aprovado</button>
+    <button role="tab" id="tab-production" aria-controls="art-panel" aria-selected="true" data-view="production">Modelos no Unity</button>
+    <button role="tab" id="tab-top" aria-controls="art-panel" aria-selected="false" tabindex="-1" data-view="top">Vista superior</button>
+    <button role="tab" id="tab-back" aria-controls="art-panel" aria-selected="false" tabindex="-1" data-view="back">Elenco de costas</button>
+    <button role="tab" id="tab-board" aria-controls="art-panel" aria-selected="false" tabindex="-1" data-view="board">Tabuleiro</button>
+  </div>
+  <div id="art-panel" role="tabpanel" aria-labelledby="tab-production" tabindex="0">
+    <div class="art"><img id="art-image" src="../production/unity/cast-front.png" alt="Os seis modelos reais no Unity, nas versões branca e preta."></div>
+    <p class="caption" id="art-caption" aria-live="polite"><strong>Modelos reais no Unity.</strong> Seis personagens, duas cores de roupa, Feevale nas costas, acessórios proporcionais e símbolos nas bases. <a href="../production/README.md">Arquivos e verificação</a>.</p>
+  </div>
+</div>
+<p class="note">A espadinha e o cetro ajudam na vista inclinada. Perto de 90°, os símbolos clássicos nas bases permanecem livres dos pés e da montaria. A captura do tabuleiro mostra as 32 peças; o reconhecimento por jogadores e a leitura em headset ainda precisam de avaliação.</p>
+
+<h2>Inspecionar cada personagem</h2>
+<p class="lede">Capturas dos prefabs no Unity, de perto. Escolha o personagem e o lado para conferir o tecido, a marca nas costas e o contato com os acessórios.</p>
+<label for="detail-person">Personagem</label>
+<select id="detail-person" style="font:inherit;background:var(--panel);color:var(--text);padding:10px;margin:16px;border:1px solid var(--line);border-radius:7px">
+<option value="king">Ricardo · rei</option><option value="pawn">Matheus · peão</option><option value="rook">Alex · torre</option><option value="knight">Gustavo · cavalo</option><option value="bishop">Rafael · bispo</option><option value="queen">Marta · rainha</option>
+</select>
+<label for="detail-side">Lado</label>
+<select id="detail-side" style="font:inherit;background:var(--panel);color:var(--text);padding:10px;margin:16px;border:1px solid var(--line);border-radius:7px"><option value="white">Brancas</option><option value="black">Pretas</option></select>
+<div class="grid">
+<figure class="card" style="margin:0"><a id="detail-front-link" href="../production/unity/detail-king.png" target="_blank"><img id="detail-front" src="../production/unity/detail-king.png" alt="Ricardo de frente no Unity" style="aspect-ratio:11/14;object-fit:contain"></a><figcaption class="caption">Frente · abrir para ampliar</figcaption></figure>
+<figure class="card" style="margin:0"><a id="detail-back-link" href="../production/unity/back-king.png" target="_blank"><img id="detail-back" src="../production/unity/back-king.png" alt="Ricardo de costas no Unity" style="aspect-ratio:11/14;object-fit:contain"></a><figcaption class="caption">Costas · abrir para ampliar</figcaption></figure>
+</div>
+<p class="note">Ricardo mantém a cabeça e a pequena coroa originais. A Feevale aparece apenas nas costas, em uma textura própria. A revisão corrige vazamentos de cor e áreas da roupa confundidas com pele ou acessórios. Os símbolos foram afastados dos pés e da montaria.</p>
+
+<h2>O que observar nas referências</h2>
+<div class="grid">
+  <article class="card"><a href="https://store.steampowered.com/app/200150/Battle_Chess_Game_of_Kings/" target="_blank" rel="noreferrer"><img loading="lazy" src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/200150/ss_f99666f6ea4c1c88b3b721ab04cb77397da234bb.1920x1080.jpg?t=1667153031" alt="Captura oficial de Battle Chess: personagens vermelhos e azuis em um tabuleiro, com diferentes volumes e equipamentos."></a><div class="copy"><p class="tag">Roupa + porte + equipamento</p><h3>Battle Chess: Game of Kings</h3><p>A cor do time convive com detalhes das roupas. Os tipos combinam várias pistas, incluindo porte e acessórios. Para nós: preservar o vestuário ao trocar a cor.</p><a href="https://store.steampowered.com/app/200150/Battle_Chess_Game_of_Kings/" target="_blank" rel="noreferrer">Ver referência oficial ↗</a></div></article>
+  <article class="card"><a href="https://store.steampowered.com/app/518060/Chess_Ultra/" target="_blank" rel="noreferrer"><img loading="lazy" src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/518060/ss_7ac7c3f80e0a8055f61ef64362223f51085d8cb6.1920x1080.jpg?t=1764082204" alt="Captura oficial de Chess Ultra: peças clássicas claras e vermelhas, com formas diferenciadas e acabamento consistente."></a><div class="copy"><p class="tag">Formas clássicas + materiais + VR</p><h3>Chess Ultra</h3><p>Referência de acabamento e continuidade das formas entre lados. A linguagem clássica pode apoiar nossos personagens com símbolos discretos nas bases.</p><a href="https://store.steampowered.com/app/518060/Chess_Ultra/" target="_blank" rel="noreferrer">Ver referência oficial ↗</a></div></article>
+  <article class="card"><div class="copy"><p class="tag">Referência documental · unidades e funções</p><h3>Warhammer 40,000: Regicide</h3><p>O Librarium associa o Terminator à torre e o Librarian à rainha, cada um com equipamento próprio. Sugere pensar a peça como um conjunto coerente de pessoa, postura e objeto.</p><a href="https://www.warhammer40kregicide.com/about-the-game/the-units" target="_blank" rel="noreferrer">Ver unidades na fonte oficial ↗</a></div></article>
+  <article class="card"><div class="copy"><p class="tag">Referência documental · limite para o nosso projeto</p><h3>Battle vs Chess</h3><p>A descrição troca torre por golem e cavalo por quimera. O contraste de corpos é forte, mas essa transformação entraria em conflito com o reconhecimento da turma.</p><a href="https://store.steampowered.com/app/211050/Battle_vs_Chess/" target="_blank" rel="noreferrer">Ver referência oficial ↗</a></div></article>
+</div>
+<p class="caption">Fontes oficiais consultadas em 24/09/2026. As imagens são dos respectivos jogos; as aplicações ao Chess CGI são propostas nossas, ainda sem teste de reconhecimento. <a href="references.md">Notas da pesquisa</a>.</p>
+
+<h2>Preservar cada pessoa</h2>
+<div class="cast">
+  <article><h3>Peão <span>Matheus</span></h3><p>Ruivo, camiseta, cargo e tênis. Espadinha curta, com a mão realmente segurando o cabo; cabeça livre.</p><p>Feevale apenas nas costas da camiseta.</p></article>
+  <article><h3>Torre <span>Alex</span></h3><p>Camisa xadrez e postura sentada. Valorizar o parapeito da torre existente, visível ao redor do corpo.</p><p>Marca nas costas, preservando o xadrez na frente.</p></article>
+  <article><h3>Cavalo <span>Gustavo</span></h3><p>Óculos, moletom e montaria. Melhorar o cavalo que já existe, mantendo sua forma reconhecível.</p><p>Feevale nas costas do moletom, abaixo do capuz.</p></article>
+  <article><h3>Bispo <span>Rafael</span></h3><p>Fones, moletom e alça transversal. Báculo inclinado com espaço livre em relação ao antebraço; cabeça livre.</p><p>Marca nas costas; frente livre para alça e fones.</p></article>
+  <article><h3>Rainha <span>Marta</span></h3><p>Cardigan, lenço azul, saia estampada e óculos. Tiara pequena e silhueta da saia, preservando o penteado.</p><p>Marca nas costas do cardigan; lenço preservado na frente.</p></article>
+  <article><h3>Rei <span>Ricardo</span></h3><p>Moletom branco ou preto, óculos e dobra do capuz. Cetro com cruz e cabeça original restaurada, incluindo a pequena coroa.</p><p>Feevale apenas nas costas, abaixo do capuz.</p></article>
+</div>
+
+<h2>Marca oficial, independente da cor do tecido</h2>
+<div class="brands">
+  <div class="swatch light"><img src="brand/feevale-color-dark-type.png" alt="Assinatura oficial da Universidade Feevale com símbolo colorido e letras cinzas."><p>Arquivo oficial para fundo claro</p></div>
+  <div class="swatch dark"><img src="brand/feevale-color-white-type.png" alt="Assinatura oficial da Universidade Feevale com símbolo colorido e letras brancas."><p>Arquivo oficial para fundo escuro</p></div>
+</div>
+<p class="caption">PNGs extraídos sem alteração do <a href="https://www.feevale.br/institucional/bem-vindo/marketing/manual-da-marca" target="_blank" rel="noreferrer">pacote oficial da Feevale</a>. A aplicação sobre as roupas usa os arquivos oficiais.</p>
+
+<h2>O que mudou nesta revisão</h2>
+<div class="steps">
+  <div><span class="number">01 · TECIDOS</span><h3>Cor contínua na roupa</h3><p>Barra, mangas e contornos revisados. Regiões de textura separadas para que camisa, pele, fones e lenço mantenham seu acabamento.</p></div>
+  <div><span class="number">02 · FEEVALE</span><h3>Somente nas costas</h3><p>Assinatura com contraste próprio para cada lado. As aplicações frontais e as letras antigas gravadas nos moletoms foram retiradas.</p></div>
+  <div><span class="number">03 · JOGO</span><h3>Conferência dos seis personagens</h3><p>Closes de frente e costas dos seis personagens nos dois lados, mais vista superior, tabuleiro e preview. Escala desktop e VR verificadas por testes; desempenho e leitura no headset pendentes.</p></div>
+</div>
+<footer>
+  <p><strong>Entrega aplicada:</strong> seis personagens e 12 variantes integradas ao Unity, com fonte Blender e GLBs originais preservados. Menu, tabuleiro e preview conferidos; testes de escala e apresentação aprovados. A avaliação em headset continua pendente. <a href="../production/README.md">Registro da implementação</a>.</p>
+  <p><a href="README.md">Direção completa e critérios</a> · <a href="concepts/pawn-king.prompt.txt">Prompt inicial</a> · <a href="concepts/pawn-king-refine.prompt.txt">Refinamento</a> · <a href="brand/provenance.json">Origem da marca</a></p>
+</footer>
+</main>
+<script>
+const views={
+  before:{src:"../production/before-fabric-cast-front.png",alt:"Versão anterior, com os defeitos relatados.",caption:"<strong>Antes da correção.</strong> Captura preservada antes da revisão dos tecidos e da retirada das marcas frontais."},
+  back:{src:"../production/unity/cast-back.png",alt:"Elenco branco e preto visto de costas no Unity.",caption:"<strong>Costas no Unity.</strong> Aplicações Feevale com contraste adequado a cada cor de roupa."},
+  production:{src:"../production/unity/cast-front.png",alt:"Doze variantes reais renderizadas no Unity.",caption:'<strong>Modelos reais no Unity.</strong> Branco e preto compartilham a geometria de cada personagem. <a href="../production/README.md">Arquivos e verificação</a>.'},
+  top:{src:"../production/unity/cast-top.png",alt:"Vista superior das doze variantes no Unity, com os símbolos das peças nas bases.",caption:"<strong>Vista superior no Unity.</strong> Símbolos clássicos na superfície horizontal das bases, repetidos na frente e atrás. A leitura em headset ainda precisa de avaliação."},
+  board:{src:"../production/unity/board.png",alt:"Tabuleiro completo da Main no Unity, com as novas peças brancas e pretas.",caption:"<strong>Partida real na Main.</strong> Modo desempenho desmarcado, com 32 personagens. A preferência existente foi preservada."},
+  original:{src:'original-cast.png',alt:'Elenco original de seis personagens: Matheus, Alex, Gustavo, Rafael, Marta e Ricardo.',caption:'<strong>Modelos originais.</strong> Render feito a partir dos seis GLBs do projeto. Estampas, montaria, torre, fones e roupas fazem parte da identidade que deve ser preservada.'},
+  first:{src:'../review/angle-45.png',alt:'Estudo 01 com 12 variações e grandes adereços na cabeça.',caption:'<strong>Estudo 01 · direção descartada.</strong> Renders de cópias no Blender. Os grandes chapéus e a recoloração lisa descaracterizaram o elenco. Preservado apenas para comparação.'},
+  current:{src:'concepts/pawn-king.png',alt:'Conceito de Matheus e Ricardo, em roupas brancas e pretas, com logo Feevale, espadinha e cetro; símbolos clássicos na parte superior das bases.',caption:'<strong>Conceito aprovado.</strong> Referência ilustrada gerada com imagegen. Os modelos reais e suas capturas no Unity estão nas próximas abas.'}
+};
+const tabs=Array.from(document.querySelectorAll('[data-view]'));
+function activate(tab){const view=views[tab.dataset.view];document.getElementById('art-image').src=view.src;document.getElementById('art-image').alt=view.alt;document.getElementById('art-caption').innerHTML=view.caption;document.getElementById('art-panel').setAttribute('aria-labelledby',tab.id);tabs.forEach(button=>{const selected=button===tab;button.setAttribute('aria-selected',String(selected));button.tabIndex=selected?0:-1;});}
+tabs.forEach((tab,index)=>{tab.addEventListener('click',()=>activate(tab));tab.addEventListener('keydown',event=>{let next;if(event.key==='ArrowRight')next=(index+1)%tabs.length;if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;if(event.key==='Home')next=0;if(event.key==='End')next=tabs.length-1;if(next!==undefined){event.preventDefault();activate(tabs[next]);tabs[next].focus();}});});
+function updateDetail(){const person=document.getElementById('detail-person');const kind=person.value;const name=person.selectedOptions[0].textContent;const black=document.getElementById('detail-side').value==='black';for(const [view,prefix] of [['front','detail'],['back','back']]){const src='../production/unity/'+prefix+'-'+(black?'black-':'')+kind+'.png';document.getElementById('detail-'+view).src=src;document.getElementById('detail-'+view).alt=name+(view==='front'?' de frente':' de costas')+(black?' · pretas':' · brancas')+' no Unity';document.getElementById('detail-'+view+'-link').href=src;}}
+for(const id of ['detail-person','detail-side'])document.getElementById(id).addEventListener('change',updateDetail);
+</script>
+</body>
+</html>
