@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -19,6 +20,7 @@ public static class XRGrabVerification
     private const string MainScenePath = "Assets/Scenes/Main.unity";
     private const int FramesBeforeStart = 30;
     private const float MoveWait = 0.8f;
+    private const float HeldTiltDegrees = 40f;
 
     private static readonly XRVerificationResult result = new XRVerificationResult();
     private static readonly Queue<(float delay, Action run)> steps = new Queue<(float, Action)>();
@@ -139,11 +141,22 @@ public static class XRGrabVerification
             result.Check(game.SelectedPiece == whitePawn, "grabbing a piece should select it");
             result.Check(board.HighlightCount == 2, "grabbing e2 should highlight its 2 legal destinations");
             result.Check(leftInteractor.GetComponentInChildren<ControllerHandPose>().Pinch > 0f, "the grabbing hand should close into the pinch pose");
+            leftInteractor.GetComponent<TrackedPoseDriver>().enabled = false;
+            Transform controller = leftInteractor.transform;
+            controller.rotation = Quaternion.AngleAxis(HeldTiltDegrees, controller.right) * controller.rotation;
+        }));
+        steps.Enqueue((0.4f, () =>
+        {
+            float tilt = Vector3.Angle(whitePawn.transform.up, board.transform.up);
+            result.Check(Mathf.Abs(tilt - HeldTiltDegrees) < 2f, $"a held piece should tilt with the controller, tilted {tilt:F1} degrees");
             XRGrabInteractable white = whitePawn.GetComponent<XRGrabInteractable>();
             white.interactionManager.SelectExit((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)white);
+            leftInteractor.GetComponent<TrackedPoseDriver>().enabled = true;
         }));
         steps.Enqueue((0.3f, () =>
         {
+            float tilt = Vector3.Angle(whitePawn.transform.up, board.transform.up);
+            result.Check(tilt < 0.5f, $"a released piece should stand upright on its square again, tilted {tilt:F1} degrees");
             result.Check(game.SelectedPiece == null, "releasing on the origin square should deselect the piece");
             result.Check(leftInteractor.GetComponentInChildren<ControllerHandPose>().Pinch == 0f, "releasing the piece should open the hand again");
             result.Check(game.CurrentTurn == ChessSide.White, "releasing on the origin square should not move");

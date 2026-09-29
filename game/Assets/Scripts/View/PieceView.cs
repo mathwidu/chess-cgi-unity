@@ -9,6 +9,7 @@ public sealed class PieceView : MonoBehaviour
     private const float MoveArcHeight = 0.18f;
 
     private Vector3 baseScale;
+    private Quaternion restRotation;
 
     public BoardSquare Square { get; private set; }
     public ChessSide Side { get; private set; }
@@ -20,6 +21,7 @@ public sealed class PieceView : MonoBehaviour
         Side = state.Side;
         Kind = state.Kind;
         baseScale = transform.localScale;
+        restRotation = transform.localRotation;
         gameObject.name = $"{Side} {Kind} {Square.ToAlgebraic()}";
     }
 
@@ -37,6 +39,7 @@ public sealed class PieceView : MonoBehaviour
     public IEnumerator MoveTo(Vector3 target, float duration)
     {
         Vector3 start = transform.position;
+        Quaternion startRotation = transform.localRotation;
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -46,9 +49,11 @@ public sealed class PieceView : MonoBehaviour
             float eased = Mathf.SmoothStep(0f, 1f, t);
             Vector3 arc = Vector3.up * (Mathf.Sin(t * Mathf.PI) * MoveArcHeight);
             transform.position = Vector3.Lerp(start, target, eased) + arc;
+            transform.localRotation = Quaternion.Slerp(startRotation, restRotation, eased);
             yield return null;
         }
 
         transform.position = target;
+        transform.localRotation = restRotation;
     }
 }

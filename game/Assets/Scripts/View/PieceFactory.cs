@@ -109,7 +109,7 @@ public sealed class PieceFactory : MonoBehaviour
 
         XRGrabInteractable grab = root.AddComponent<XRGrabInteractable>();
         grab.movementType = XRBaseInteractable.MovementType.Instantaneous;
-        grab.trackRotation = false;
+        grab.trackRotation = true;
         grab.throwOnDetach = false;
         grab.useDynamicAttach = true;
     }

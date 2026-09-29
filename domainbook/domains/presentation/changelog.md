@@ -144,6 +144,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- No VR, a peça agarrada inclina junto com o controle: o `XRGrabInteractable`
+  das peças passa a seguir a rotação (`trackRotation`), mantendo a pose do
+  momento em que foi pega. Ao soltar, `PieceView.MoveTo` endireita a peça
+  enquanto ela desliza para a casa, no lance aceito, na jogada recusada e na
+  promoção. O `XRGrabVerification` inclina o controle 40° com a peça na mão e
+  confere que ela volta de pé.
+
 - Junção do laboratório Feevale com a [mesa](glossary.md) regulável
   ([feature](features/regular-a-altura-da-mesa.md)): no laboratório, a placa
   de altura sobe e desce a mesa de xadrez do próprio laboratório (tampo sobe,
