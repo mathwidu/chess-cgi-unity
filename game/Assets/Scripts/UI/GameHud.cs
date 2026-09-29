@@ -89,6 +89,11 @@ public sealed partial class GameHud : MonoBehaviour
             hudCanvas.worldCamera = XRRig.EyeCamera;
         }
 
+        if (EventSystem.current != null && EventSystem.current.currentInputModule is XRUIInputModule xrInput && xrInput.uiCamera == null)
+        {
+            xrInput.uiCamera = XRRig.EyeCamera;
+        }
+
         if (hudCanvas != null && hudCanvas.renderMode == RenderMode.WorldSpace && panelSeatedAsBlack != XRRig.SeatedAsBlack)
         {
             PlaceWorldPanel((RectTransform)transform);

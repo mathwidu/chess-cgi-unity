@@ -231,6 +231,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- No VR, o raio do controle não gruda mais nos botões (como Descer): o
+  `XRUIInputModule` não tinha câmera (`uiCamera`), e no VR não há
+  `Camera.main`. Sem câmera, o módulo descartava o resultado "nenhum acerto" e
+  mantinha o último botão acertado, então a linha continuava presa nele depois
+  que o controle saía. O `GameHud` passa a câmera do headset ao módulo, e o
+  `XRHudVerification` aponta para um botão, aponta para fora e confere que o
+  raio o solta.
+
 - Raio do VR grudando no HUD do fundo:
   - O `TrackedDeviceGraphicRaycaster` do HUD passa a checar oclusão 3D em
     todas as camadas.

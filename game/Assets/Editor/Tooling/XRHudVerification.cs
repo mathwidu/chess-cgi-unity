@@ -27,6 +27,8 @@ public static class XRHudVerification
         VerifyClick,
         CheckUnblockedRay,
         CheckBlockedRay,
+        CheckHoverTakesButton,
+        CheckHoverLetsGo,
     }
 
     private static Stage stage;
@@ -167,6 +169,36 @@ public static class XRHudVerification
 
                 CheckRayHitsNewGame(false);
                 Object.Destroy(rayBlocker);
+                AimControllerAt(GetRectWorldCenter((RectTransform)newGameButton.transform), HighAimOrigin);
+                stageStartFrame = Time.frameCount;
+                stage = Stage.CheckHoverTakesButton;
+                return;
+
+            case Stage.CheckHoverTakesButton:
+                if (Time.frameCount - stageStartFrame < HoldSimFrames)
+                {
+                    return;
+                }
+
+                bool hovers = interactor.TryGetCurrentUIRaycastResult(out RaycastResult hover) && hover.gameObject == newGameButton;
+                result.Check(hovers, "pointing the controller at a HUD button should hover it");
+                AimControllerAt(HighAimOrigin + Vector3.up, HighAimOrigin);
+                stageStartFrame = Time.frameCount;
+                stage = Stage.CheckHoverLetsGo;
+                return;
+
+            case Stage.CheckHoverLetsGo:
+                if (Time.frameCount - stageStartFrame < HoldSimFrames)
+                {
+                    return;
+                }
+
+                bool stillHovering = interactor.TryGetCurrentUIRaycastResult(out RaycastResult stale);
+                XRUIInputModule module = EventSystem.current.GetComponent<XRUIInputModule>();
+                Debug.Log($"CHESS_CGI_XR_HUD_CHECK hoverLetsGo stillHovering={stillHovering} " +
+                    $"stale={(stillHovering ? stale.gameObject.name : "none")} uiCamera={(module.uiCamera != null ? module.uiCamera.name : "none")}");
+                result.Check(!stillHovering, "pointing away from the HUD should let go of the button, not keep a stale hit");
+                result.Check(module.uiCamera == XRRig.EyeCamera, "the XR UI module should use the headset camera");
                 ReportAndStop();
                 return;
         }
