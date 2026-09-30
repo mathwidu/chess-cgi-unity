@@ -26,6 +26,8 @@ public sealed class ChessGameController : MonoBehaviour
     private bool matchStarted;
     private bool suspended;
     private MoveResult? animatingMove;
+    private MoveResult? interruptedMove;
+    private bool restoreBoardOnEnable;
     private ComputerTurnCoordinator computerTurn;
     private System.Func<IMoveChooser> moveChooserFactory = ComputerOpponentFactory.Create;
 
@@ -168,6 +170,8 @@ public sealed class ChessGameController : MonoBehaviour
         StopComputerTurn();
         rules.Reset();
         animatingMove = null;
+        interruptedMove = null;
+        restoreBoardOnEnable = false;
         matchStarted = true;
         Outcome = MatchOutcome.InProgress;
         Winner = null;
@@ -209,6 +213,8 @@ public sealed class ChessGameController : MonoBehaviour
         StopAllCoroutines();
         StopComputerTurn();
         animatingMove = null;
+        interruptedMove = null;
+        restoreBoardOnEnable = false;
         matchStarted = false;
         inputBlocked = false;
         awaitingPromotion = false;
@@ -267,17 +273,27 @@ public sealed class ChessGameController : MonoBehaviour
         {
             ClearSelection();
             awaitingPromotion = false;
-            boardView.SyncPieces(rules.GetPieces(), pieceFactory);
-            if (animatingMove.HasValue)
-            {
-                ApplyMoveResult(animatingMove.Value);
-            }
+            // Disabling also runs during scene destruction. Creating pieces here
+            // can resurrect XRI's already destroyed interaction manager.
+            restoreBoardOnEnable = true;
+            if (animatingMove.HasValue) interruptedMove = animatingMove;
             animatingMove = null;
         }
     }
 
     private void OnEnable()
     {
+        if (restoreBoardOnEnable && matchStarted && boardView != null && pieceFactory != null)
+        {
+            restoreBoardOnEnable = false;
+            boardView.SyncPieces(rules.GetPieces(), pieceFactory);
+            if (interruptedMove.HasValue)
+            {
+                MoveResult result = interruptedMove.Value;
+                interruptedMove = null;
+                ApplyMoveResult(result);
+            }
+        }
         if (matchStarted && !IsGameOver)
         {
             SetStatusForTurn();

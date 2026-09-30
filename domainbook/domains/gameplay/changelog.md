@@ -70,4 +70,5 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- Desativar o controlador cancela tarefas e adia a reconstrução das peças e a conclusão de uma animação interrompida para a reativação. Fechar a cena VR deixa de recriar o gerenciador de interação XR durante a destruição; retomar preserva a posição das regras e uma notificação por jogada.
 - Reinício durante a animação não aplica o resultado da partida anterior.

@@ -10,6 +10,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Ajustar o tabuleiro com duas mãos](features/ajustar-o-tabuleiro-com-duas-maos.md):
+  duas hastes metálicas de proximidade controlam o tamanho continuamente;
+  uma mão sozinha, entrada do mesmo lado e o raio do HUD não iniciam o gesto.
+  Rastreamento inválido, pausa, recentralização e estados ocupados da partida
+  interrompem o ajuste e exigem novas agarradas.
+
 - [Pressionar os botões da mesa no VR](features/pressionar-os-botoes-da-mesa-no-vr.md):
   contatos cinemáticos no controle e no indicador empurram as capas dinâmicas,
   sem gatilho. Perda de rastreamento e reposicionamentos desarmam o contato
@@ -94,6 +100,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   só acerta o que está exatamente na mira e a linha fica reta. O
   `XRGrabVerification` confere isso nos dois controles e nas duas mãos.
 
+- Os [botões da mesa](features/pressionar-os-botoes-da-mesa-no-vr.md) recebem
+  contatos da palma e dos cinco dedos. A mão desenhada apoia na face interpolada
+  da capa sem deslocar a mira ou o ponto de pega. Perda de rastreamento e
+  mudanças de altura desarmam a mão inteira até sua retirada.
+
 - O assento de VR foi reposicionado para uma vista de mesa: `XRRig` senta o
   jogador logo à frente e acima de um tabuleiro em escala de mesa, em vez de
   colocá-lo dentro de um tabuleiro em escala de sala. O modo desktop permanece
@@ -121,6 +132,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- O alcance próximo das mãos rastreadas inclui a camada das peças do jogo.
+  Os prefabs só consultavam a camada padrão, deixando as peças fora da detecção;
+  o rig agora consulta só peças e hastes nos dois lados, com raio de 6 cm,
+  evitando que casas e cenário ocupem o buffer antes dos alvos agarráveis.
+
 - O [raio de seleção](glossary.md) não gruda mais no HUD do fundo em VR.
   Antes, o raio atravessava o tabuleiro e a mesa e pegava os painéis do HUD
   a 4 m; às vezes acionava Nova partida ou Menu ao mirar numa peça. Agora só
@@ -143,3 +159,5 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   marca o rig como construído antes de montá-lo, para que uma falha não o
   reconstrua a cada frame.
 - Cliques sobre a interface não selecionam peças por trás do HUD; o atalho N fica inativo no menu.
+
+- O contato da ponta do indicador foi calibrado no modelo importado para reduzir o afastamento visual durante a pressão, mantendo a proteção contra atravessar a capa.

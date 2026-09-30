@@ -41,6 +41,7 @@ public sealed class XRRig : MonoBehaviour
     private Camera eyeCamera;
     private bool rigBuilt;
     private readonly List<XRPhysicsPusher> physicsPushers = new List<XRPhysicsPusher>();
+    private readonly List<XRPhysicalHand> physicalHands = new List<XRPhysicalHand>();
     private readonly List<XRInputSubsystem> trackingSubsystems = new List<XRInputSubsystem>();
 
     public static bool IsHeadsetPresent =>
@@ -239,9 +240,14 @@ public sealed class XRRig : MonoBehaviour
     {
         // Contact proxies must never become near-grab targets or block UI rays.
         foreach (SphereInteractionCaster caster in interactorObject.GetComponentsInChildren<SphereInteractionCaster>(true))
-            caster.physicsLayerMask &= ~(1 << XRPhysicsPusher.PhysicsLayer);
+        {
+            // The caster has a small fixed hit buffer. Board tiles and scenery
+            // must not fill it before actual grab targets can be considered.
+            caster.physicsLayerMask = (1 << PieceView.PhysicsLayer) | (1 << BoardScaleHandles.PhysicsLayer);
+            caster.castRadius = GrabRadius;
+        }
         foreach (CurveInteractionCaster caster in interactorObject.GetComponentsInChildren<CurveInteractionCaster>(true))
-            caster.raycastMask &= ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer));
+            caster.raycastMask &= ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer) | (1 << BoardScaleHandles.PhysicsLayer));
 
         NearFarInteractor interactor = interactorObject.GetComponentInChildren<NearFarInteractor>(true);
         if (interactor == null)
@@ -290,10 +296,14 @@ public sealed class XRRig : MonoBehaviour
         controllerObject.transform.SetParent(parent, false);
 
         TrackedPoseDriver poseDriver = controllerObject.AddComponent<TrackedPoseDriver>();
-        poseDriver.positionInput = new InputActionProperty(new InputAction(
-            $"XR {hand} Position", InputActionType.Value, $"<XRController>{{{hand}}}/pointerPosition", expectedControlType: "Vector3"));
-        poseDriver.rotationInput = new InputActionProperty(new InputAction(
-            $"XR {hand} Rotation", InputActionType.Value, $"<XRController>{{{hand}}}/pointerRotation", expectedControlType: "Quaternion"));
+        var positionAction = new InputAction(
+            $"XR {hand} Position", InputActionType.Value, $"<XRController>{{{hand}}}/pointerPosition", expectedControlType: "Vector3");
+        positionAction.AddBinding($"<XRSimulatedController>{{{hand}}}/devicePosition");
+        poseDriver.positionInput = new InputActionProperty(positionAction);
+        var rotationAction = new InputAction(
+            $"XR {hand} Rotation", InputActionType.Value, $"<XRController>{{{hand}}}/pointerRotation", expectedControlType: "Quaternion");
+        rotationAction.AddBinding($"<XRSimulatedController>{{{hand}}}/deviceRotation");
+        poseDriver.rotationInput = new InputActionProperty(rotationAction);
         poseDriver.trackingStateInput = new InputActionProperty(new InputAction(
             $"XR {hand} Tracking State", InputActionType.Value, $"<XRController>{{{hand}}}/trackingState", expectedControlType: "Integer"));
 
@@ -304,9 +314,9 @@ public sealed class XRRig : MonoBehaviour
         SphereInteractionCaster nearCaster = controllerObject.AddComponent<SphereInteractionCaster>();
         nearCaster.castOrigin = grabPoint.transform;
         nearCaster.castRadius = GrabRadius;
-        nearCaster.physicsLayerMask = ~(1 << XRPhysicsPusher.PhysicsLayer);
+        nearCaster.physicsLayerMask = (1 << PieceView.PhysicsLayer) | (1 << BoardScaleHandles.PhysicsLayer);
         CurveInteractionCaster farCaster = controllerObject.AddComponent<CurveInteractionCaster>();
-        farCaster.raycastMask = ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer));
+        farCaster.raycastMask = ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer) | (1 << BoardScaleHandles.PhysicsLayer));
         farCaster.hitDetectionType = CurveInteractionCaster.HitDetectionType.Raycast;
         InteractionAttachController attachController = controllerObject.AddComponent<InteractionAttachController>();
 
@@ -353,17 +363,14 @@ public sealed class XRRig : MonoBehaviour
         if (handModel != null)
         {
             handModel.AddComponent<ControllerHandPose>().Configure(interactor, hand == "LeftHand");
-            string indexTipName = hand == "LeftHand" ? "L_IndexTip" : "R_IndexTip";
-            foreach (Transform bone in handModel.GetComponentsInChildren<Transform>(true))
-            {
-                if (bone.name != indexTipName) continue;
-                BuildPhysicsPusher(name + " Index Contact", bone, () => ControllerIsTracked(controllerObject, poseDriver), .012f);
-                break;
-            }
+            XRPhysicalHand physicalHand = handModel.AddComponent<XRPhysicalHand>();
+            physicalHand.ConfigureController(handModel.transform, transform, Origin,
+                () => ControllerIsTracked(controllerObject, poseDriver), hand == "LeftHand");
+            RegisterPhysicalHand(physicalHand);
         }
-
-        BuildPhysicsPusher(name + " Contact", grabPoint.transform,
-            () => ControllerIsTracked(controllerObject, poseDriver), .022f);
+        else
+            BuildPhysicsPusher(name + " Contact", grabPoint.transform,
+                () => ControllerIsTracked(controllerObject, poseDriver), .022f);
 
         controllerObject.SetActive(true);
         return controllerObject;
@@ -381,25 +388,16 @@ public sealed class XRRig : MonoBehaviour
     {
         if (visual == null || handInteractor == null) return;
         XRHandSkeletonDriver skeleton = visual.GetComponentInChildren<XRHandSkeletonDriver>(true);
-        if (skeleton == null || skeleton.handTrackingEvents == null || skeleton.jointTransformReferences == null) return;
-
-        foreach (JointToTransformReference joint in skeleton.jointTransformReferences)
-        {
-            if (joint.xrHandJointID != XRHandJointID.IndexTip || joint.jointTransform == null) continue;
-            BuildPhysicsPusher(visual.name + " Index Contact", joint.jointTransform,
-                () => HandIndexIsTracked(skeleton, handInteractor), .012f);
-            return;
-        }
+        if (skeleton == null || skeleton.handTrackingEvents == null || skeleton.rootTransform == null) return;
+        XRPhysicalHand physicalHand = visual.AddComponent<XRPhysicalHand>();
+        physicalHand.ConfigureTrackedHand(skeleton, handInteractor, visual.transform.parent, transform, Origin);
+        RegisterPhysicalHand(physicalHand);
     }
 
-    private static bool HandIndexIsTracked(XRHandSkeletonDriver skeleton, GameObject handInteractor)
+    private void RegisterPhysicalHand(XRPhysicalHand hand)
     {
-        if (skeleton == null || !skeleton.isActiveAndEnabled || handInteractor == null || !handInteractor.activeInHierarchy)
-            return false;
-        XRHandTrackingEvents events = skeleton.handTrackingEvents;
-        if (events == null || !events.isActiveAndEnabled || !events.handIsTracked) return false;
-        XRHand hand = events.handedness == Handedness.Left ? events.subsystem.leftHand : events.subsystem.rightHand;
-        return hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out _);
+        physicalHands.Add(hand);
+        for (int i = 0; i < hand.Contacts.Count; i++) physicsPushers.Add(hand.Contacts[i]);
     }
 
     private void BuildPhysicsPusher(string name, Transform source, System.Func<bool> tracked, float radius)
@@ -415,6 +413,8 @@ public sealed class XRRig : MonoBehaviour
 
     private void RearmPhysicalContacts()
     {
+        foreach (XRPhysicalHand hand in physicalHands)
+            if (hand != null) hand.RequireRearm();
         foreach (XRPhysicsPusher pusher in physicsPushers)
             if (pusher != null) pusher.RequireRearm();
     }

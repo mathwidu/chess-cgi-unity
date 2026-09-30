@@ -29,11 +29,15 @@ public sealed class PhysicalTableButton : MonoBehaviour
     private Vector3 savedPosition;
     private Quaternion savedRotation;
 
+    public float Diameter { get; private set; }
+
     public Rigidbody Body => capBody;
     public TableHeightButtonGraphic FaceGraphic => face;
     public Vector3 PressDirection => transform.forward;
     public Vector3 RestFaceCenter => transform.TransformPoint(Vector3.back * (CapDepth * 0.5f));
-    public Vector3 FaceCenter => capBody.position - PressDirection * (CapDepth * 0.5f * transform.lossyScale.z);
+    // Rendered contact follows the interpolated cap and its face decal. The
+    // solver still uses RestFaceCenter and Body.position for physical travel.
+    public Vector3 FaceCenter => face.transform.position;
     public float PressDepth => transform.InverseTransformPoint(capBody.position).z;
     public float PressFraction => Mathf.Clamp01(PressDepth / Stroke);
     public bool IsPressed => PressFraction >= ActivationFraction;
@@ -41,6 +45,7 @@ public sealed class PhysicalTableButton : MonoBehaviour
 
     public void Configure(float diameter, Color color, bool pointsUp, bool pointerInput, UnityAction pressed)
     {
+        Diameter = diameter;
         allowPointer = pointerInput;
         onPressed = pressed;
         availableColor = color;
@@ -95,6 +100,9 @@ public sealed class PhysicalTableButton : MonoBehaviour
         joint.linearLimit = new SoftJointLimit { limit = Stroke * .5f * transform.lossyScale.z, contactDistance = .0001f };
         joint.enableCollision = false;
         joint.enablePreprocessing = false;
+        joint.projectionMode = JointProjectionMode.PositionAndRotation;
+        joint.projectionDistance = .0005f * transform.lossyScale.z;
+        joint.projectionAngle = .5f;
 
         var canvasObject = new GameObject("CapFace", typeof(RectTransform), typeof(Canvas));
         var rect = (RectTransform)canvasObject.transform;
@@ -143,11 +151,13 @@ public sealed class PhysicalTableButton : MonoBehaviour
         capBody.rotation = transform.rotation * savedRotation;
         capBody.linearVelocity = Vector3.zero;
         capBody.angularVelocity = Vector3.zero;
+        ConstrainToGuide();
     }
 
     private void FixedUpdate()
     {
         if (capBody == null) return;
+        ConstrainToGuide();
         contacts.RemoveWhere(c => c == null || !c.enabled || !c.gameObject.activeInHierarchy);
         float fraction = PressFraction;
         if (!armed && fraction <= ReleaseFraction && contacts.Count == 0 && Time.fixedTime >= pointerPressUntil)
@@ -165,6 +175,28 @@ public sealed class PhysicalTableButton : MonoBehaviour
         if (Time.fixedTime < pointerPressUntil)
             acceleration += 1200f * Stroke * transform.lossyScale.z;
         capBody.AddForce(PressDirection * acceleration, ForceMode.Acceleration);
+    }
+
+    private void LateUpdate()
+    {
+        if (capBody != null) ConstrainToGuide();
+    }
+
+    // A tracked kinematic hand can apply effectively unlimited force. The physical
+    // spring still drives the cap, but its machined guide is an absolute boundary.
+    private void ConstrainToGuide()
+    {
+        Vector3 local = transform.InverseTransformPoint(capBody.position);
+        float depth = Mathf.Clamp(local.z, 0f, Stroke);
+        Vector3 constrained = transform.TransformPoint(Vector3.forward * depth);
+        if ((capBody.position - constrained).sqrMagnitude > 1e-12f)
+            capBody.position = constrained;
+        if (Quaternion.Angle(capBody.rotation, transform.rotation) > .01f)
+            capBody.rotation = transform.rotation;
+        float speed = Vector3.Dot(capBody.linearVelocity, PressDirection);
+        if ((depth <= 0f && speed < 0f) || (depth >= Stroke && speed > 0f)) speed = 0f;
+        capBody.linearVelocity = PressDirection * speed;
+        capBody.angularVelocity = Vector3.zero;
     }
 
     internal void Contact(Collider other, bool touching)

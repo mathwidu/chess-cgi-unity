@@ -10,6 +10,7 @@ public sealed class XRPhysicsPusherTests
     private Transform source;
     private XRPhysicsPusher pusher;
     private bool tracked;
+    private int presses;
 
     [SetUp]
     public void SetUp()
@@ -124,6 +125,124 @@ public sealed class XRPhysicsPusherTests
         Assert.That(Vector3.Distance(cap.position, initialPosition), Is.LessThan(.0001f),
             "The disabled body relocates directly without a swept press.");
         Assert.That(pusher.IsContactEnabled, Is.True);
+    }
+
+    [UnityTest]
+    public IEnumerator FullOverpressStaysWithinCapTravelAndCanEscapeSideways()
+    {
+        PhysicalTableButton button = CreatePhysicalButton();
+        source.position = SourceAtDepth(button, -.03f);
+        yield return FixedSteps(4);
+        for (int i = 1; i <= 35; i++)
+        {
+            source.position = SourceAtDepth(button, Mathf.Lerp(-.03f, .075f, i / 35f));
+            yield return new WaitForFixedUpdate();
+        }
+        yield return FixedSteps(8);
+
+        Assert.That(pusher.IsArmed, Is.True);
+        Assert.That(pusher.ContactButton, Is.SameAs(button));
+        float targetDepth = Vector3.Dot(pusher.TargetPose.position - button.RestFaceCenter, button.PressDirection);
+        Assert.That(targetDepth + pusher.TouchCollider.radius, Is.LessThanOrEqualTo(PhysicalTableButton.Stroke + .0001f),
+            "The target cannot drive the cap past its machined stop, even when raw tracking passes through it.");
+        Assert.That(button.PressFraction, Is.GreaterThan(.7f));
+        Assert.That(button.PressDepth, Is.InRange(0f, PhysicalTableButton.Stroke + .0001f));
+        Assert.That(presses, Is.EqualTo(1), "Holding a deep raw pose must not repeatedly actuate.");
+        Assert.That(pusher.TryGetVisualOffset(out Vector3 offset), Is.True);
+        Assert.That(Vector3.Dot(source.position + offset - button.FaceGraphic.transform.position, button.PressDirection) + pusher.TouchCollider.radius,
+            Is.EqualTo(0f).Within(.0001f), "Visual contact uses the actual moving face, with no visible gap or penetration.");
+        Assert.That(Vector3.Distance(source.position, pusher.RawPose.position), Is.LessThan(.0001f));
+
+        source.position += button.transform.right * .09f;
+        yield return FixedSteps(3);
+        Assert.That(pusher.ContactButton, Is.Null);
+        Assert.That(pusher.TryGetVisualOffset(out _), Is.False);
+        Assert.That(Vector3.Distance(pusher.Body.position, source.position), Is.LessThan(.0001f),
+            "The hand can leave laterally instead of sticking to an infinite plane.");
+    }
+
+    [UnityTest]
+    public IEnumerator TrackingFocusPauseAndMountMovementRequireWithdrawalAfterOverpress()
+    {
+        PhysicalTableButton button = CreatePhysicalButton();
+        source.position = SourceAtDepth(button, -.03f);
+        yield return FixedSteps(4);
+        for (int i = 1; i <= 25; i++)
+        {
+            source.position = SourceAtDepth(button, Mathf.Lerp(-.03f, .065f, i / 25f));
+            yield return new WaitForFixedUpdate();
+        }
+        Assert.That(pusher.IsArmed, Is.True);
+        tracked = false;
+        yield return new WaitForFixedUpdate();
+        tracked = true;
+        yield return FixedSteps(5);
+        Assert.That(pusher.IsArmed, Is.False, "Loss of tracking retains a quarantine beyond the collider's back face.");
+        source.position = SourceAtDepth(button, -.03f);
+        yield return FixedSteps(5);
+        Assert.That(pusher.IsArmed, Is.True);
+
+        foreach (string interruption in new[] { "OnApplicationFocus", "OnApplicationPause" })
+        {
+            for (int i = 1; i <= 25; i++)
+            {
+                source.position = SourceAtDepth(button, Mathf.Lerp(-.03f, .035f, i / 25f));
+                yield return new WaitForFixedUpdate();
+            }
+            pusher.SendMessage(interruption, interruption == "OnApplicationPause");
+            yield return null;
+            Assert.That(pusher.IsArmed, Is.False);
+            pusher.SendMessage(interruption, interruption == "OnApplicationFocus");
+            yield return FixedSteps(5);
+            Assert.That(pusher.IsArmed, Is.False, "Recovery while held still requires leaving the cap.");
+            source.position = SourceAtDepth(button, -.03f);
+            yield return FixedSteps(5);
+            Assert.That(pusher.IsArmed, Is.True);
+        }
+
+        for (int i = 1; i <= 20; i++)
+        {
+            source.position = SourceAtDepth(button, Mathf.Lerp(-.03f, .025f, i / 20f));
+            yield return new WaitForFixedUpdate();
+        }
+        button.PrepareMountMove();
+        button.transform.position += button.transform.up * .01f;
+        button.FinishMountMove();
+        yield return FixedSteps(5);
+        Assert.That(pusher.IsArmed, Is.False, "A relocated table panel cannot sweep into an armed hand.");
+        Assert.That(pusher.TryGetVisualOffset(out _), Is.True, "The quarantined hand remains visually outside the relocated cap.");
+    }
+
+    [UnityTest]
+    public IEnumerator ApproachingFromBehindCannotActuateTheButton()
+    {
+        PhysicalTableButton button = CreatePhysicalButton();
+        source.position = SourceAtDepth(button, .07f);
+        yield return FixedSteps(4);
+        for (int i = 1; i <= 30; i++)
+        {
+            source.position = SourceAtDepth(button, Mathf.Lerp(.07f, -.03f, i / 30f));
+            yield return new WaitForFixedUpdate();
+        }
+        yield return FixedSteps(5);
+        Assert.That(presses, Is.Zero, "Contacts are quarantined at the back instead of pulling the cap toward the hand.");
+        Assert.That(button.PressDepth, Is.LessThan(.001f));
+    }
+
+    private PhysicalTableButton CreatePhysicalButton()
+    {
+        var mount = new GameObject("Guided physical cap");
+        mount.transform.SetParent(root.transform, false);
+        PhysicalTableButton button = mount.AddComponent<PhysicalTableButton>();
+        presses = 0;
+        button.Configure(.07f, Color.blue, false, false, () => presses++);
+        Physics.SyncTransforms();
+        return button;
+    }
+
+    private Vector3 SourceAtDepth(PhysicalTableButton button, float depth)
+    {
+        return button.RestFaceCenter + button.PressDirection * (depth - pusher.TouchCollider.radius);
     }
 
     private void CreateStaticCap()

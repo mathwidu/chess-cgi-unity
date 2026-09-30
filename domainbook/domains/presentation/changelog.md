@@ -37,6 +37,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   No desktop e no prefab a sala continua sem colliders, para o mobiliário não
   interceptar o toque no tabuleiro.
 
+- [Redimensionar o tabuleiro no VR](features/redimensionar-o-tabuleiro-no-vr.md):
+  tamanho pessoal de 75% a 150%, incluindo peças e colliders, com contato
+  preservado entre moldura e tampo. A sala usa uma referência independente
+  desse tamanho. Retornos de peças a suas casas acompanham a transformação
+  do tabuleiro durante a animação.
+
 - [Marca do último lance](glossary.md) e [rei em xeque](glossary.md)
   ([feature](features/sentir-cada-lance.md)): `BoardView.MarkLastMove` tinge
   de amarelo suave as casas de origem e destino do último lance, e
@@ -270,6 +276,10 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `XRHudVerification` aponta para um botão, aponta para fora e confere que o
   raio o solta.
 
+- Os botões da mesa conservam seu eixo, orientação e curso mesmo sob pressão
+  profunda ou lateral de uma mão rastreada. A guia mecânica corrige o excesso
+  que o solver de física permite em contatos cinemáticos.
+
 - Raio do VR grudando no HUD do fundo:
   - O `TrackedDeviceGraphicRaycaster` do HUD passa a checar oclusão 3D em
     todas as camadas.
@@ -361,3 +371,7 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   Luzes do estúdio dos professores isoladas no tempo de render, para não
   iluminar a sala. Bias da luz principal ajustado somente na escala VR após
   comparação visual identificar faixas de auto-sombra no tampo.
+
+- As mãos dos controles e do rastreamento usam material opaco, preservando a cor e as referências dos prefabs, para ocultar corretamente a capa durante a pressão física.
+
+- Limpar os destinos destacados não cria raízes do tabuleiro durante o descarregamento da cena.

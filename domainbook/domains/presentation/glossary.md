@@ -3,6 +3,16 @@
 As palavras que o contexto de apresentação usa para o que o jogador vê. Um
 termo é um heading H2 com sua definição logo abaixo.
 
+## Tamanho do tabuleiro no VR
+
+Multiplicador pessoal entre 75% e 150% que aumenta ou diminui tabuleiro,
+peças, colliders e destaques juntos. Mantém a base apoiada na mesa e preserva
+as dimensões da sala e a câmera. Vale durante a sessão e sobrevive a novas
+partidas, sem alterar a escala do desktop.
+
+- **Aliases:** VrSize, Escala do tabuleiro
+- **Status:** draft
+
 ## Peça personalizada
 
 O modelo de personagem mostrado para um tipo de peça, um por tipo, inspirado

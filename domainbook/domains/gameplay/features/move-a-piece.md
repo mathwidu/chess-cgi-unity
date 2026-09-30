@@ -88,6 +88,23 @@ Example: Uma jogada de xeque nomeia o xeque e continua
   And é a vez do adversário
 ```
 
+## Rule: Desativar e retomar preserva a jogada sem reconstruir a cena ao fechar
+
+```gherkin
+Example: Retomar durante uma animação interrompida
+  Given uma jogada legal está em animação
+  When o controlador da partida é desativado
+  Then as tarefas e a animação param e a entrada fica bloqueada
+  When o controlador é reativado
+  Then as peças são sincronizadas com a posição das regras
+  And a conclusão da jogada é notificada uma única vez
+
+Example: Destruir a partida libera a cena VR
+  Given uma partida ativa no modo VR
+  When a cena ou o controlador da partida é destruído
+  Then a desativação não recria peças nem um gerenciador de interação XR
+```
+
 ## Open Questions
 
 Nenhuma.

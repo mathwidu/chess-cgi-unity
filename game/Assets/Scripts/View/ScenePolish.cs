@@ -73,15 +73,16 @@ public sealed class ScenePolish : MonoBehaviour
         if (board == null) board = Object.FindFirstObjectByType<BoardView>();
         if (board == null) return;
         Transform boardTransform = board.transform;
+        Vector3 referenceScale = board.RoomReferenceScale;
         classroom.SetPositionAndRotation(
-            boardTransform.TransformPoint(Vector3.down * (AuthoredBoardHeight / BoardMetresPerUnit))
-                - Vector3.up * board.SurfaceOffset,
+            board.RoomReferencePosition + boardTransform.rotation *
+                Vector3.Scale(Vector3.down * (AuthoredBoardHeight / BoardMetresPerUnit), referenceScale),
             boardTransform.rotation);
-        Vector3 scale = boardTransform.lossyScale / BoardMetresPerUnit;
+        Vector3 scale = referenceScale / BoardMetresPerUnit;
         Vector3 parentScale = classroom.parent.lossyScale;
         classroom.localScale = new Vector3(scale.x / parentScale.x, scale.y / parentScale.y, scale.z / parentScale.z);
         if (keyLightData != null)
-            keyLightData.usePipelineSettings = boardTransform.lossyScale.x > .1f;
+            keyLightData.usePipelineSettings = referenceScale.x > .1f;
         float roomScale = Mathf.Abs(classroom.lossyScale.x);
         for (int i = 0; i < indoorFill.Length; i++)
         {

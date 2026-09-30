@@ -2,7 +2,11 @@
   "name": "ChessCgi.PlayModeTests",
   "references": [
     "ChessCgi.Runtime",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.XR.Interaction.Toolkit",
+    "Unity.XR.Hands",
+    "Unity.Collections",
+    "Unity.XR.CoreUtils"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"

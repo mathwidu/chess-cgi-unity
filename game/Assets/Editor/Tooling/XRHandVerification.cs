@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.Interaction.Toolkit.Interactors.Casters;
 
 [InitializeOnLoad]
 public static class XRHandVerification
@@ -113,6 +114,16 @@ public static class XRHandVerification
         result.Check(leftHand != null, "LeftHandInteractor should be built under Camera Offset");
         result.Check(rightHand != null, "RightHandInteractor should be built under Camera Offset");
         result.Check(leftHandNearFar != null, "the left hand interactor should include a NearFarInteractor");
+        foreach (GameObject handRoot in new[] { leftHand, rightHand })
+        {
+            SphereInteractionCaster near = handRoot != null ? handRoot.GetComponentInChildren<SphereInteractionCaster>(true) : null;
+            int mask = near != null ? near.physicsLayerMask.value : 0;
+            result.Check(near != null && (mask & (1 << PieceView.PhysicsLayer)) != 0,
+                "each actual tracked hand's near caster should detect the game's piece layer");
+            result.Check(near != null && (mask & (1 << BoardScaleHandles.PhysicsLayer)) != 0 &&
+                (mask & (1 << XRPhysicsPusher.PhysicsLayer)) == 0,
+                "each tracked hand should detect scale grips while excluding physical contact proxies");
+        }
         result.Check(leftHandPoke != null, "the left hand interactor should include an XRPokeInteractor");
         result.Check(modalityManager != null, "an XRInputModalityManager should be present on Camera Offset");
         result.Check(leftHandVisual != null, "a LeftHandVisual should be built so the left hand is visible");

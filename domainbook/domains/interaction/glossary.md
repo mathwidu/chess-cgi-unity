@@ -3,6 +3,16 @@
 As palavras que o contexto de interação usa para a entrada e a câmera. Um
 termo é um heading H2 com sua definição logo abaixo.
 
+## Hastes de ajuste
+
+Duas hastes metálicas presas aos lados do tabuleiro no modo VR. Segurar uma
+com cada mão e afastar ou aproximar as mãos ajusta o tamanho em tempo real.
+Uma haste sozinha e o raio do HUD não redimensionam o jogo; soltar uma mão
+mantém o tamanho escolhido.
+
+- **Aliases:** BoardScaleHandles, Hastes laterais, Ajuste com duas mãos
+- **Status:** draft
+
 ## Seleção
 
 A peça que um jogador escolheu para jogar. Escolher uma peça mostra seus

@@ -84,13 +84,19 @@ Example: Os controles são maiores e distinguem as duas direções
 
 Example: Os botões são apertados com física
   Given a placa de controle no VR
-  When o jogador encosta a ponta do indicador ou o controle num botão e empurra
+  When o jogador encosta a palma, um dedo ou o controle num botão e empurra
   Then a capa circular afunda ao longo de um curso de 12 mm
   And a mesa muda um passo quando o botão atinge 70% desse curso
   And segurar o botão apertado não repete o comando
   When o jogador afasta a mão ou o controle
   Then a mola traz a capa de volta
   And outro comando exige soltar e apertar novamente
+
+Example: Pressão profunda ou lateral conserva o mecanismo
+  Given uma mão empurrando a capa além do fim do curso ou para o lado
+  Then a capa conserva seu eixo e sua orientação na placa
+  And seu deslocamento fica entre o repouso e os 12 mm de curso
+  And a mão visível fica apoiada na face física até ser retirada
 
 Example: O clique desktop pressiona o mesmo mecanismo
   Given o modo desktop
@@ -123,8 +129,10 @@ enquadramento. A escolha fica em `PlayerPrefs` (`ChessCgi.TableHeightStep`).
 
 Cada `PhysicalTableButton` tem uma capa cilíndrica com `MeshCollider` convexo e
 `Rigidbody` dinâmico. Um `ConfigurableJoint` limita o deslocamento ao eixo de
-pressão; a mola e o amortecimento aplicam força em `FixedUpdate`. A seta acompanha
-a capa. Ao mover a mesa ou trocar o lado, capa e âncora são reposicionadas juntas,
+pressão; a mola e o amortecimento aplicam força em `FixedUpdate`. A guia também
+corrige deslocamentos laterais, rotação e excesso de curso, pois um contato
+cinemático rastreado pode superar os limites do solver. A seta acompanha a
+capa. Ao mover a mesa ou trocar o lado, capa e âncora são reposicionadas juntas,
 preservando o curso e evitando um impulso do solver. Os contatos do VR vêm de
 [`XRPhysicsPusher`](../../interaction/features/pressionar-os-botoes-da-mesa-no-vr.md).
 

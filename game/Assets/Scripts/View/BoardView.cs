@@ -3,6 +3,9 @@ using UnityEngine;
 
 public sealed class BoardView : MonoBehaviour
 {
+    public const float MinimumVrSize = 0.75f;
+    public const float MaximumVrSize = 1.5f;
+
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
     // Tints blended into the square's own color, so light and dark squares stay readable.
     private static readonly Color LastMoveTint = new Color32(255, 221, 0, 255);
@@ -32,6 +35,12 @@ public sealed class BoardView : MonoBehaviour
     private readonly List<SquareView> squares = new List<SquareView>();
     private readonly List<PieceView> pieces = new List<PieceView>();
     private float surfaceOffset;
+    private float vrSize = 1f;
+    private float appliedVrSize = 1f;
+    private Vector3 sizeLift;
+    private bool configuredForHeadset;
+    private bool boardBuilt;
+    private Bounds frameLocalBounds = new Bounds(new Vector3(0f, -0.265f, 0f), new Vector3(11.28f, 0.55f, 11.28f));
     private TurnIndicatorView turnIndicator;
     private CapturedPiecesView capturedPieces;
     private BoardSounds sounds;
@@ -48,6 +57,16 @@ public sealed class BoardView : MonoBehaviour
     public int HighlightCount => highlightsRoot == null ? 0 : highlightsRoot.childCount;
     public Transform BoardFrameRoot => boardFrameRoot;
     public float SurfaceOffset => surfaceOffset;
+    public float VrSize => vrSize;
+    public float AppliedVrSize => appliedVrSize;
+    public Vector3 VrBaseScale => vrBoardScale;
+    public Bounds FrameLocalBounds => frameLocalBounds;
+    // A personal board size must never change the room's metre scale or floor position.
+    public Vector3 RoomReferenceScale => transform.lossyScale / appliedVrSize;
+    public Vector3 RoomReferencePosition => transform.position -
+        (transform.parent != null
+            ? transform.parent.TransformVector(Vector3.up * surfaceOffset + sizeLift)
+            : Vector3.up * surfaceOffset + sizeLift);
     public TurnIndicatorView TurnIndicator => turnIndicator;
     public CapturedPiecesView CapturedPieces => capturedPieces;
     public BoardSounds Sounds => sounds;
@@ -76,6 +95,25 @@ public sealed class BoardView : MonoBehaviour
     {
         surfaceOffset = worldOffset;
         ConfigureBoardTransformForMode();
+    }
+
+    public bool SetVrSize(float factor)
+    {
+        if (!XRRig.IsHeadsetPresent || float.IsNaN(factor) || float.IsInfinity(factor)) return false;
+        float next = Mathf.Clamp(factor, MinimumVrSize, MaximumVrSize);
+        if (Mathf.Approximately(next, vrSize)) return false;
+        vrSize = next;
+        ConfigureBoardTransformForMode();
+        // Near selection and drops must see the new square and piece colliders immediately.
+        Physics.SyncTransforms();
+        return true;
+    }
+
+    private void Update()
+    {
+        // A simulator or runtime can become available after the scene has already built.
+        if (boardBuilt && configuredForHeadset != XRRig.IsHeadsetPresent)
+            ConfigureBoardTransformForMode();
     }
 
     // The room is modelled in VR meters around the VR board. On the desktop the same room is
@@ -141,6 +179,8 @@ public sealed class BoardView : MonoBehaviour
         RefreshCheckAura();
 
         BuildBoardFrame();
+        MeasureFrameBounds();
+        ConfigureBoardTransformForMode();
         EnsureTurnIndicator();
         EnsureCapturedPieces();
         EnsureSounds();
@@ -168,6 +208,8 @@ public sealed class BoardView : MonoBehaviour
                 squares.Add(squareView);
             }
         }
+        boardBuilt = true;
+        BoardScaleHandles.Build(this);
     }
 
     public void SyncPieces(IEnumerable<VisualPieceState> states, PieceFactory factory)
@@ -362,21 +404,46 @@ public sealed class BoardView : MonoBehaviour
 
     public void ClearHighlights()
     {
-        EnsureRoots();
-        ClearChildren(highlightsRoot);
+        // Clearing may be called during teardown; it must never create roots.
+        if (highlightsRoot != null) ClearChildren(highlightsRoot);
     }
 
     private void ConfigureBoardTransformForMode()
     {
-        if (XRRig.IsHeadsetPresent)
+        configuredForHeadset = XRRig.IsHeadsetPresent;
+        if (configuredForHeadset)
         {
-            transform.localPosition = vrBoardPosition + Vector3.up * surfaceOffset;
-            transform.localScale = vrBoardScale;
+            appliedVrSize = vrSize;
+            // Grow around the bottom of the frame, which remains in contact with the tabletop.
+            sizeLift = Vector3.up * (-frameLocalBounds.min.y * vrBoardScale.y * (vrSize - 1f));
+            transform.localPosition = vrBoardPosition + Vector3.up * surfaceOffset + sizeLift;
+            transform.localScale = vrBoardScale * vrSize;
         }
         else
         {
+            appliedVrSize = 1f;
+            sizeLift = Vector3.zero;
             transform.localPosition = desktopBoardPosition + Vector3.up * surfaceOffset;
             transform.localScale = desktopBoardScale;
+        }
+    }
+
+    private void MeasureFrameBounds()
+    {
+        bool hasPoint = false;
+        foreach (MeshFilter filter in boardFrameRoot.GetComponentsInChildren<MeshFilter>())
+        {
+            if (filter.sharedMesh == null) continue;
+            Bounds mesh = filter.sharedMesh.bounds;
+            Matrix4x4 toBoard = transform.worldToLocalMatrix * filter.transform.localToWorldMatrix;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = mesh.center + Vector3.Scale(mesh.extents,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                Vector3 point = toBoard.MultiplyPoint3x4(corner);
+                if (!hasPoint) { frameLocalBounds = new Bounds(point, Vector3.zero); hasPoint = true; }
+                else frameLocalBounds.Encapsulate(point);
+            }
         }
     }
 
