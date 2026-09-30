@@ -100,7 +100,11 @@ inicial e o painel da peça selecionada.
 
 A mesa de madeira sobre a qual o tabuleiro fica: tampo, friso, saia, quatro
 pés e ponteiras metálicas, modelada em metros do VR e escalada para o desktop.
-Uma placa de controle no tampo, à esquerda do jogador, regula a altura: a
+Uma placa de controle presa à borda frontal, abaixo do tampo e à esquerda do
+jogador, regula a altura com dois botões circulares: vermelho com seta para
+cima para Subir, azul com seta para baixo para Descer. As capas são peças físicas
+com curso de pressão e retorno por mola: empurrar com a mão ou o controle no VR
+aciona um passo, e é preciso soltar antes de apertar novamente. A
 mesa sobe ou desce com o tabuleiro em cima, entre um limite mínimo e um
 máximo, e a escolha é persistida. A câmera nunca acompanha a mesa. No
 laboratório Feevale, a mesa regulada é a mesa de xadrez do próprio

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
+using UnityEngine.XR.Hands;
 using UnityEngine.XR.Interaction.Toolkit.Attachment;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
@@ -39,6 +40,8 @@ public sealed class XRRig : MonoBehaviour
     private Camera desktopCamera;
     private Camera eyeCamera;
     private bool rigBuilt;
+    private readonly List<XRPhysicsPusher> physicsPushers = new List<XRPhysicsPusher>();
+    private readonly List<XRInputSubsystem> trackingSubsystems = new List<XRInputSubsystem>();
 
     public static bool IsHeadsetPresent =>
         XRSettings.isDeviceActive || InputSystem.GetDevice<XRHMD>() != null;
@@ -115,6 +118,7 @@ public sealed class XRRig : MonoBehaviour
         }
 
         SeatedAsBlack = asBlack;
+        RearmPhysicalContacts();
         Origin.RotateAround(BoardTarget, Vector3.up, 180f);
     }
 
@@ -122,12 +126,14 @@ public sealed class XRRig : MonoBehaviour
     {
         if (Mathf.Abs(orbitDirection) > 0f)
         {
+            RearmPhysicalContacts();
             subject.RotateAround(BoardTarget, Vector3.up, orbitDirection * OrbitSpeed * Time.deltaTime);
             subject.rotation = Quaternion.LookRotation(BoardTarget - subject.position, Vector3.up);
         }
 
         if (Mathf.Abs(scrollDelta) > 0.01f)
         {
+            RearmPhysicalContacts();
             Vector3 direction = (subject.position - BoardTarget).normalized;
             float distance = Vector3.Distance(subject.position, BoardTarget);
             distance = Mathf.Clamp(distance - scrollDelta * ZoomSpeed, MinBoardDistance, MaxBoardDistance);
@@ -194,14 +200,20 @@ public sealed class XRRig : MonoBehaviour
         GameObject rightController = BuildController(offsetObject.transform, "Right Controller", "RightHand", "RightControllerHand");
         GameObject leftHand = BuildHandInteractor(offsetObject.transform, "LeftHandInteractor");
         GameObject rightHand = BuildHandInteractor(offsetObject.transform, "RightHandInteractor");
-        BuildHandVisual(offsetObject.transform, "LeftHandVisual");
-        BuildHandVisual(offsetObject.transform, "RightHandVisual");
+        GameObject leftHandVisual = BuildHandVisual(offsetObject.transform, "LeftHandVisual");
+        GameObject rightHandVisual = BuildHandVisual(offsetObject.transform, "RightHandVisual");
+        BuildTrackedHandPusher(leftHandVisual, leftHand);
+        BuildTrackedHandPusher(rightHandVisual, rightHand);
 
         XRInputModalityManager modalityManager = offsetObject.AddComponent<XRInputModalityManager>();
         modalityManager.leftController = leftController;
         modalityManager.rightController = rightController;
         modalityManager.leftHand = leftHand;
         modalityManager.rightHand = rightHand;
+
+        SubsystemManager.GetSubsystems(trackingSubsystems);
+        foreach (XRInputSubsystem subsystem in trackingSubsystems)
+            subsystem.trackingOriginUpdated += TrackingOriginUpdated;
     }
 
     private static GameObject BuildHandInteractor(Transform parent, string resourceName)
@@ -225,6 +237,12 @@ public sealed class XRRig : MonoBehaviour
 
     private static void RestrictRayToUi(GameObject interactorObject)
     {
+        // Contact proxies must never become near-grab targets or block UI rays.
+        foreach (SphereInteractionCaster caster in interactorObject.GetComponentsInChildren<SphereInteractionCaster>(true))
+            caster.physicsLayerMask &= ~(1 << XRPhysicsPusher.PhysicsLayer);
+        foreach (CurveInteractionCaster caster in interactorObject.GetComponentsInChildren<CurveInteractionCaster>(true))
+            caster.raycastMask &= ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer));
+
         NearFarInteractor interactor = interactorObject.GetComponentInChildren<NearFarInteractor>(true);
         if (interactor == null)
         {
@@ -234,7 +252,6 @@ public sealed class XRRig : MonoBehaviour
         CurveInteractionCaster farCaster = interactor.farInteractionCaster as CurveInteractionCaster;
         if (farCaster != null)
         {
-            farCaster.raycastMask = ~(1 << PieceView.PhysicsLayer);
             farCaster.hitDetectionType = CurveInteractionCaster.HitDetectionType.Raycast;
         }
 
@@ -266,7 +283,7 @@ public sealed class XRRig : MonoBehaviour
         return instance;
     }
 
-    private static GameObject BuildController(Transform parent, string name, string hand, string handModelName)
+    private GameObject BuildController(Transform parent, string name, string hand, string handModelName)
     {
         GameObject controllerObject = new GameObject(name);
         controllerObject.SetActive(false);
@@ -277,6 +294,8 @@ public sealed class XRRig : MonoBehaviour
             $"XR {hand} Position", InputActionType.Value, $"<XRController>{{{hand}}}/pointerPosition", expectedControlType: "Vector3"));
         poseDriver.rotationInput = new InputActionProperty(new InputAction(
             $"XR {hand} Rotation", InputActionType.Value, $"<XRController>{{{hand}}}/pointerRotation", expectedControlType: "Quaternion"));
+        poseDriver.trackingStateInput = new InputActionProperty(new InputAction(
+            $"XR {hand} Tracking State", InputActionType.Value, $"<XRController>{{{hand}}}/trackingState", expectedControlType: "Integer"));
 
         GameObject grabPoint = new GameObject("Grab Point");
         grabPoint.transform.SetParent(controllerObject.transform, false);
@@ -285,8 +304,9 @@ public sealed class XRRig : MonoBehaviour
         SphereInteractionCaster nearCaster = controllerObject.AddComponent<SphereInteractionCaster>();
         nearCaster.castOrigin = grabPoint.transform;
         nearCaster.castRadius = GrabRadius;
+        nearCaster.physicsLayerMask = ~(1 << XRPhysicsPusher.PhysicsLayer);
         CurveInteractionCaster farCaster = controllerObject.AddComponent<CurveInteractionCaster>();
-        farCaster.raycastMask = ~(1 << PieceView.PhysicsLayer);
+        farCaster.raycastMask = ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer));
         farCaster.hitDetectionType = CurveInteractionCaster.HitDetectionType.Raycast;
         InteractionAttachController attachController = controllerObject.AddComponent<InteractionAttachController>();
 
@@ -333,14 +353,83 @@ public sealed class XRRig : MonoBehaviour
         if (handModel != null)
         {
             handModel.AddComponent<ControllerHandPose>().Configure(interactor, hand == "LeftHand");
+            string indexTipName = hand == "LeftHand" ? "L_IndexTip" : "R_IndexTip";
+            foreach (Transform bone in handModel.GetComponentsInChildren<Transform>(true))
+            {
+                if (bone.name != indexTipName) continue;
+                BuildPhysicsPusher(name + " Index Contact", bone, () => ControllerIsTracked(controllerObject, poseDriver), .012f);
+                break;
+            }
         }
+
+        BuildPhysicsPusher(name + " Contact", grabPoint.transform,
+            () => ControllerIsTracked(controllerObject, poseDriver), .022f);
 
         controllerObject.SetActive(true);
         return controllerObject;
     }
 
-    private static void Recenter()
+    private static bool ControllerIsTracked(GameObject controller, TrackedPoseDriver driver)
     {
+        var device = driver.positionInput.action?.activeControl?.device as UnityEngine.InputSystem.TrackedDevice;
+        const int poseTracked = (int)(InputTrackingState.Position | InputTrackingState.Rotation);
+        return controller.activeInHierarchy && driver.isActiveAndEnabled && device != null && device.added &&
+            device.isTracked.isPressed && (device.trackingState.ReadValue() & poseTracked) == poseTracked;
+    }
+
+    private void BuildTrackedHandPusher(GameObject visual, GameObject handInteractor)
+    {
+        if (visual == null || handInteractor == null) return;
+        XRHandSkeletonDriver skeleton = visual.GetComponentInChildren<XRHandSkeletonDriver>(true);
+        if (skeleton == null || skeleton.handTrackingEvents == null || skeleton.jointTransformReferences == null) return;
+
+        foreach (JointToTransformReference joint in skeleton.jointTransformReferences)
+        {
+            if (joint.xrHandJointID != XRHandJointID.IndexTip || joint.jointTransform == null) continue;
+            BuildPhysicsPusher(visual.name + " Index Contact", joint.jointTransform,
+                () => HandIndexIsTracked(skeleton, handInteractor), .012f);
+            return;
+        }
+    }
+
+    private static bool HandIndexIsTracked(XRHandSkeletonDriver skeleton, GameObject handInteractor)
+    {
+        if (skeleton == null || !skeleton.isActiveAndEnabled || handInteractor == null || !handInteractor.activeInHierarchy)
+            return false;
+        XRHandTrackingEvents events = skeleton.handTrackingEvents;
+        if (events == null || !events.isActiveAndEnabled || !events.handIsTracked) return false;
+        XRHand hand = events.handedness == Handedness.Left ? events.subsystem.leftHand : events.subsystem.rightHand;
+        return hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out _);
+    }
+
+    private void BuildPhysicsPusher(string name, Transform source, System.Func<bool> tracked, float radius)
+    {
+        // Keep rigidbodies outside the tracked hierarchy. Origin/bone transforms
+        // can jump at recentering; only FixedUpdate moves an armed contact proxy.
+        var contact = new GameObject(name);
+        contact.transform.SetParent(transform, false);
+        XRPhysicsPusher pusher = contact.AddComponent<XRPhysicsPusher>();
+        pusher.Configure(source, tracked, Origin, radius);
+        physicsPushers.Add(pusher);
+    }
+
+    private void RearmPhysicalContacts()
+    {
+        foreach (XRPhysicsPusher pusher in physicsPushers)
+            if (pusher != null) pusher.RequireRearm();
+    }
+
+    private void TrackingOriginUpdated(XRInputSubsystem subsystem) => RearmPhysicalContacts();
+
+    private void OnDestroy()
+    {
+        foreach (XRInputSubsystem subsystem in trackingSubsystems)
+            subsystem.trackingOriginUpdated -= TrackingOriginUpdated;
+    }
+
+    private void Recenter()
+    {
+        RearmPhysicalContacts();
         var inputSubsystems = new List<XRInputSubsystem>();
         SubsystemManager.GetSubsystems(inputSubsystems);
         for (int i = 0; i < inputSubsystems.Count; i++)

@@ -5,6 +5,7 @@
     "Unity.InputSystem",
     "Unity.RenderPipelines.Universal.Runtime",
         "Unity.XR.CoreUtils",
+        "Unity.XR.Hands",
         "Unity.XR.Interaction.Toolkit"
     ],
     "includePlatforms": [],

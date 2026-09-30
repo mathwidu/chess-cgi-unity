@@ -110,6 +110,15 @@ public sealed class CameraController : MonoBehaviour
         EnterRoomView(true);
     }
 
+    public void LookAt(Vector3 position, Vector3 focus)
+    {
+        if (XRRig.IsHeadsetPresent || !isActiveAndEnabled) return;
+        EnterRoomView(false);
+        transform.SetPositionAndRotation(position, Quaternion.LookRotation(focus - position, Vector3.up));
+        lookYaw = transform.eulerAngles.y;
+        lookPitch = Mathf.DeltaAngle(0, transform.eulerAngles.x);
+    }
+
     private void EnterRoomView(bool levelView)
     {
         StopPerspectiveTransition();

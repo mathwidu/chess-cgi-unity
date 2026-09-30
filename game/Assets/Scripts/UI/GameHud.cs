@@ -638,7 +638,7 @@ public sealed partial class GameHud : MonoBehaviour
         // Board, pieces and table stand between the player and the HUD: a ray aimed at them
         // must stop there instead of pressing a HUD button behind the board.
         xrRaycaster.checkFor3DOcclusion = true;
-        xrRaycaster.blockingMask = ~0;
+        xrRaycaster.blockingMask = ~(1 << XRPhysicsPusher.PhysicsLayer);
     }
 
     private void PlaceWorldPanel(RectTransform canvasRect)
