@@ -30,19 +30,20 @@ public sealed class TableView : MonoBehaviour
     private const float LabDeskReach = 1f;
     private static readonly string[] LabDeskMarkers = { "ChessTableSurface", "BoardAnchor" };
 
-    // A small lectern on the player's left, turned toward the seat and clear of the board.
-    private static readonly Vector3 PanelPosition = new Vector3(-0.335f, 0f, 0.06f);
-    private const float PanelYaw = -12f;
-    private const float PanelTilt = 28f;
-    private const float PanelWidth = 0.12f;
-    private const float PanelDepth = 0.14f;
+    // An edge-mounted control on the player's left, entirely below the tabletop.
+    private static readonly Vector3 PanelPosition = new Vector3(-0.30f, -0.018f, -TopSize * 0.5f - 0.008f);
+    private const float PanelTilt = 25f;
+    private const float PanelWidth = 0.27f;
+    private const float PanelHeight = 0.185f;
     private const float PanelPixelsPerMeter = 2000f;
+    private const float ButtonDiameter = 180f; // 9 cm in the metre-scale VR room.
 
-    private static readonly Color PanelColor = new Color32(4, 43, 27, 255);
-    private static readonly Color PanelBorderColor = new Color32(43, 86, 66, 255);
-    private static readonly Color ChoiceColor = new Color32(19, 57, 43, 255);
-    private static readonly Color ChoiceBorderColor = new Color32(49, 86, 69, 255);
-    private static readonly Color MutedTextColor = new Color32(202, 228, 211, 255);
+    private static readonly Color PanelColor = new Color32(21, 27, 34, 255);
+    private static readonly Color PanelBorderColor = new Color32(70, 79, 92, 255);
+    private static readonly Color RaiseColor = new Color32(232, 49, 58, 255);
+    private static readonly Color LowerColor = new Color32(36, 118, 229, 255);
+    private static readonly Color ChoiceBorderColor = new Color32(62, 72, 84, 255);
+    private static readonly Color MutedTextColor = new Color32(213, 221, 231, 255);
     private static readonly Color AccentColor = new Color32(255, 221, 0, 255);
 
     [SerializeField] private int minStep = -4;
@@ -61,6 +62,7 @@ public sealed class TableView : MonoBehaviour
     private Canvas panelCanvas;
     private Button raiseButton;
     private Button lowerButton;
+    private readonly List<PhysicalTableButton> physicalButtons = new List<PhysicalTableButton>();
     private Text heightText;
     private Material frameMaterial;
     private BoardView board;
@@ -187,6 +189,15 @@ public sealed class TableView : MonoBehaviour
         SetHeightStep(HeightStep - 1);
     }
 
+    public void FocusControls()
+    {
+        if (headset || panelCanvas == null || cameraController == null) return;
+        var rect = (RectTransform)panelCanvas.transform;
+        Vector3 center = rect.TransformPoint(rect.rect.center);
+        Vector3 position = center - rect.forward * (0.48f * transform.lossyScale.x);
+        cameraController.LookAt(position, center);
+    }
+
     public void SetHeightStep(int step)
     {
         HeightStep = Mathf.Clamp(step, minStep, maxStep);
@@ -235,6 +246,7 @@ public sealed class TableView : MonoBehaviour
             return;
         }
 
+        foreach (PhysicalTableButton button in physicalButtons) button.PrepareMountMove();
         top.localPosition = Vector3.up * Height;
         float lift = Height - DefaultHeight;
         foreach (LabDeskMesh desk in labDeskMeshes)
@@ -267,6 +279,7 @@ public sealed class TableView : MonoBehaviour
             board.SetSurfaceOffset(BoardOffset);
         }
 
+        foreach (PhysicalTableButton button in physicalButtons) button.FinishMountMove();
         RefreshPanel();
     }
 
@@ -290,9 +303,11 @@ public sealed class TableView : MonoBehaviour
 
     private void PlacePanel(bool onBlackSide)
     {
+        foreach (PhysicalTableButton button in physicalButtons) button.PrepareMountMove();
         panelOnBlackSide = onBlackSide;
         panel.localPosition = onBlackSide ? new Vector3(-PanelPosition.x, PanelPosition.y, -PanelPosition.z) : PanelPosition;
-        panel.localRotation = Quaternion.Euler(0f, onBlackSide ? 180f + PanelYaw : PanelYaw, 0f);
+        panel.localRotation = Quaternion.Euler(0f, onBlackSide ? 180f : 0f, 0f);
+        foreach (PhysicalTableButton button in physicalButtons) button.FinishMountMove();
     }
 
     private void BuildPanel()
@@ -301,27 +316,32 @@ public sealed class TableView : MonoBehaviour
         panel.SetParent(top, false);
         Transform tilt = new GameObject("Tilt").transform;
         tilt.SetParent(panel, false);
-        // Hinged at the front edge: the far edge rises so the face looks up at the player.
-        tilt.localRotation = Quaternion.Euler(-PanelTilt, 0f, 0f);
-        ScenePolish.CreateCube(tilt, "PanelBase", new Vector3(0f, 0.006f, PanelDepth * 0.5f),
-            new Vector3(PanelWidth + 0.01f, 0.012f, PanelDepth + 0.01f), frameMaterial, false);
-        float rise = PanelDepth * Mathf.Sin(PanelTilt * Mathf.Deg2Rad);
-        ScenePolish.CreateCube(panel, "PanelStand", new Vector3(0f, rise * 0.5f, PanelDepth * Mathf.Cos(PanelTilt * Mathf.Deg2Rad) - 0.008f),
-            new Vector3(PanelWidth, rise, 0.014f), frameMaterial, false);
+        // The upper edge is fixed to the fascia; the lower edge angles out toward the seat.
+        tilt.localRotation = Quaternion.Euler(PanelTilt, 0f, 0f);
+        Material mountMaterial = ScenePolish.CreateMaterial("Runtime_Table_ControlMount", PanelBorderColor, 0.6f, 0.35f);
+        ScenePolish.CreateCube(tilt, "PanelBase", new Vector3(0f, -PanelHeight * 0.5f, 0f),
+            new Vector3(PanelWidth + 0.008f, PanelHeight + 0.008f, 0.012f), mountMaterial, false);
+        foreach (float x in new[] { -PanelWidth * 0.35f, PanelWidth * 0.35f })
+        {
+            ScenePolish.CreateCube(panel, "EdgeMount", new Vector3(x, 0f, 0.008f),
+                new Vector3(0.018f, 0.026f, 0.026f), mountMaterial, false);
+        }
 
         var canvasObject = new GameObject("HeightPanelCanvas", typeof(RectTransform));
         var canvasRect = (RectTransform)canvasObject.transform;
         canvasRect.SetParent(tilt, false);
-        canvasRect.localPosition = new Vector3(0f, 0.0125f, PanelDepth * 0.5f);
-        canvasRect.localRotation = Quaternion.Euler(90f, 0f, 0f);
-        canvasRect.sizeDelta = new Vector2(PanelWidth, PanelDepth) * PanelPixelsPerMeter;
+        canvasRect.localPosition = new Vector3(0f, 0f, -0.0065f);
+        canvasRect.pivot = new Vector2(0.5f, 1f);
+        canvasRect.sizeDelta = new Vector2(PanelWidth, PanelHeight) * PanelPixelsPerMeter;
         canvasRect.localScale = Vector3.one / PanelPixelsPerMeter;
         panelCanvas = canvasObject.AddComponent<Canvas>();
         panelCanvas.renderMode = RenderMode.WorldSpace;
         panelCanvas.worldCamera = headset ? XRRig.EyeCamera : Camera.main;
         if (headset)
         {
-            canvasObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+            var raycaster = canvasObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+            raycaster.checkFor3DOcclusion = true;
+            raycaster.blockingMask = ~(1 << XRPhysicsPusher.PhysicsLayer);
         }
         else
         {
@@ -329,12 +349,14 @@ public sealed class TableView : MonoBehaviour
         }
 
         Font bold = Resources.Load<Font>("UI/Lato-Bold");
-        Surface(Rect("Background", canvasRect, 0f, 0f, 240f, 280f), PanelColor, PanelBorderColor, 16f, 2f);
-        Label("Title", canvasRect, "ALTURA DA MESA", 17, MutedTextColor, bold, 0f, 16f, 240f, 26f);
-        raiseButton = PanelButton("TableRaiseButton", canvasRect, "↑  Subir", 52f, bold, Raise);
+        float width = canvasRect.sizeDelta.x;
+        float height = canvasRect.sizeDelta.y;
+        Surface(Rect("Background", canvasRect, 0f, 0f, width, height), PanelColor, PanelBorderColor, 18f, 2f);
+        Label("Title", canvasRect, "ALTURA DA MESA", 20, MutedTextColor, bold, 0f, 14f, width, 28f);
+        raiseButton = PanelButton("TableRaiseButton", canvasRect, "Subir", true, RaiseColor, 54f, bold, Raise);
+        lowerButton = PanelButton("TableLowerButton", canvasRect, "Descer", false, LowerColor, 306f, bold, Lower);
         BuildLevelTicks(canvasRect);
-        heightText = Label("HeightText", canvasRect, "", 22, Color.white, bold, 0f, 148f, 240f, 32f);
-        lowerButton = PanelButton("TableLowerButton", canvasRect, "↓  Descer", 196f, bold, Lower);
+        heightText = Label("HeightText", canvasRect, "", 24, Color.white, bold, 392f, 312f, 116f, 36f);
         PlacePanel(PlayerOnBlackSide());
     }
 
@@ -343,10 +365,10 @@ public sealed class TableView : MonoBehaviour
         levelTicks.Clear();
         int count = maxStep - minStep + 1;
         const float gap = 4f;
-        float width = (200f - gap * (count - 1)) / count;
+        float width = (328f - gap * (count - 1)) / count;
         for (int i = 0; i < count; i++)
         {
-            Image tick = Rect("LevelTick", parent, 20f + i * (width + gap), 130f, width, 10f).gameObject.AddComponent<Image>();
+            Image tick = Rect("LevelTick", parent, 32f + i * (width + gap), 324f, width, 12f).gameObject.AddComponent<Image>();
             tick.raycastTarget = false;
             levelTicks.Add(tick);
         }
@@ -361,6 +383,8 @@ public sealed class TableView : MonoBehaviour
 
         raiseButton.interactable = CanRaise;
         lowerButton.interactable = CanLower;
+        physicalButtons[0].SetAvailable(CanRaise);
+        physicalButtons[1].SetAvailable(CanLower);
         for (int i = 0; i < levelTicks.Count; i++)
         {
             levelTicks[i].color = minStep + i <= HeightStep ? AccentColor : ChoiceBorderColor;
@@ -370,28 +394,29 @@ public sealed class TableView : MonoBehaviour
         heightText.text = Mathf.RoundToInt(Height * 100f) + " cm";
     }
 
-    private static Button PanelButton(string name, Transform parent, string label, float y, Font font, UnityAction action)
+    private Button PanelButton(string name, Transform parent, string label, bool pointsUp, Color fill,
+        float x, Font font, UnityAction action)
     {
-        RectTransform rect = Rect(name, parent, 20f, y, 200f, 64f);
-        // The clear root Image is the hit target for the mouse and the XR ray.
-        rect.gameObject.AddComponent<Image>().color = Color.clear;
-        MenuSurface surface = Surface(Rect("ButtonSurface", rect, 0f, 0f, 200f, 64f), ChoiceColor, ChoiceBorderColor, 10f, 1.5f);
-        Button button = rect.gameObject.AddComponent<Button>();
+        var mount = new GameObject(name + "Mechanism");
+        mount.transform.SetParent(parent.parent, false);
+        mount.transform.localPosition = new Vector3(
+            (x + ButtonDiameter * .5f - PanelWidth * PanelPixelsPerMeter * .5f) / PanelPixelsPerMeter,
+            -(58f + ButtonDiameter * .5f) / PanelPixelsPerMeter, -.025f);
+        PhysicalTableButton physical = mount.AddComponent<PhysicalTableButton>();
+        physical.Configure(ButtonDiameter / PanelPixelsPerMeter, fill, pointsUp, !headset, action);
+        physicalButtons.Add(physical);
+        // Desktop hits use the visible cap's own moving canvas, so the circular
+        // hit area matches the face even when it is depressed or seen at an angle.
+        TableHeightButtonGraphic surface = physical.FaceGraphic;
+        surface.gameObject.name = name;
+        Button button = surface.gameObject.AddComponent<Button>();
         button.targetGraphic = surface;
-        button.colors = new ColorBlock
-        {
-            normalColor = Color.white,
-            selectedColor = Color.white,
-            highlightedColor = new Color(0.91f, 1f, 0.94f),
-            pressedColor = new Color(0.72f, 0.82f, 0.75f),
-            disabledColor = new Color(0.45f, 0.5f, 0.45f),
-            colorMultiplier = 1f,
-            fadeDuration = 0.12f
-        };
+        button.transition = Selectable.Transition.None;
+        button.enabled = !headset;
         // Keep keyboard navigation inside the HUD; this panel is pointed at, not tabbed to.
         button.navigation = new Navigation { mode = Navigation.Mode.None };
-        button.onClick.AddListener(action);
-        Label("Label", rect, label, 24, Color.white, font, 0f, 0f, 200f, 64f);
+        button.onClick.AddListener(physical.PressFromPointer);
+        Label("Label", parent, label, 24, Color.white, font, x, 264f, ButtonDiameter, 36f);
         return button;
     }
 

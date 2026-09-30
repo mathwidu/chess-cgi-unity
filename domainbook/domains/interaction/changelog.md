@@ -10,6 +10,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Pressionar os botões da mesa no VR](features/pressionar-os-botoes-da-mesa-no-vr.md):
+  contatos cinemáticos no controle e no indicador empurram as capas dinâmicas,
+  sem gatilho. Perda de rastreamento e reposicionamentos desarmam o contato
+  até que ele esteja estável fora do botão. Os proxies não empurram peças nem
+  bloqueiam os raios de interação do HUD.
+
 - Vibração no [agarrar e soltar](glossary.md): o `XRRig` põe um
   `HapticImpulsePlayer` em cada controle, ligado direto à saída de vibração
   do OpenXR (`<XRController>{mão}/{Haptic}`), porque o rig é montado em

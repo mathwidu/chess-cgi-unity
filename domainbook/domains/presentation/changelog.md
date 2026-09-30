@@ -57,13 +57,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   [ADR-0002](decisions/0002-modelar-a-sala-em-metros-do-vr-e-escalar-para-o-desktop.md)).
   - `TableView` monta um tampo de nogueira com friso, a saia, quatro pés e
     ponteiras metálicas.
-  - Uma placa inclinada no tampo, à esquerda do jogador, tem Subir e Descer,
+  - Uma placa inclinada presa à borda, à esquerda do jogador, tem Subir e Descer,
     um indicador de nível e a altura em centímetros.
   - A mesa sobe ou desce um passo com o tabuleiro em cima: os pés ficam no
     chão, as pernas crescem e a câmera não se move. Há limite mínimo e
     máximo, e a escolha fica em `PlayerPrefs`.
-  - A placa acompanha o lado de quem joga e responde ao mouse e ao raio do
-    controle.
+  - A placa acompanha o lado de quem joga. Os botões respondem ao mouse no
+    desktop e à pressão física da mão ou do controle no VR.
   - `BoardView.SetSurfaceOffset` move o tabuleiro com a mesa, e
     `BoardView.FitVrRoomToMode` escala a sala, modelada em metros do VR, para
     o desktop.
@@ -143,6 +143,16 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - Nova partida mantém as opções escolhidas.
 
 ### Changed
+
+- [Mesa](glossary.md) ([feature](features/regular-a-altura-da-mesa.md)): a placa
+  de altura agora fica presa à borda frontal, abaixo do tampo, com suporte
+  metálico. Subir e Descer usam botões circulares de 9 cm, vermelho com seta
+  branca para cima e azul com seta branca para baixo. A área de clique segue
+  o disco; a placa continua acompanhando a altura da mesa e o lado do jogador.
+  Cada capa tem corpo dinâmico, colisão convexa, curso de 12 mm e retorno por
+  mola. No VR, empurrar fisicamente aciona um passo, sem repetição enquanto
+  segurado. No desktop, o clique aplica força ao mesmo mecanismo.
+  No desktop, Altura da mesa enquadra a placa, e Voltar ao tabuleiro restaura a partida.
 
 - Junção do laboratório Feevale com a [mesa](glossary.md) regulável
   ([feature](features/regular-a-altura-da-mesa.md)): no laboratório, a placa

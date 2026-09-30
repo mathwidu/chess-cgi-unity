@@ -296,13 +296,14 @@ public static class XRHudVerification
         Transform turnPanel = hud.transform.Find("HudRoot/MatchInterface/TurnPanel");
         Transform tabletop = Object.FindFirstObjectByType<TableView>()?.transform.Find("Top/Tabletop");
         newGameButton = GameObject.Find("NewGameButton");
-        bool occludes = raycaster != null && raycaster.checkFor3DOcclusion && raycaster.blockingMask.value == ~0;
+        bool occludes = raycaster != null && raycaster.checkFor3DOcclusion &&
+            raycaster.blockingMask.value == ~(1 << XRPhysicsPusher.PhysicsLayer);
         bool panelIgnoresRay = turnPanel != null && !turnPanel.GetComponent<Image>().raycastTarget;
         bool buttonTakesRay = newGameButton != null && newGameButton.GetComponent<Image>().raycastTarget;
         bool tableBlocks = tabletop != null && tabletop.GetComponent<Collider>() != null;
         Debug.Log("CHESS_CGI_XR_HUD_CHECK rayGuard " +
             $"occlusion={occludes} panelIgnoresRay={panelIgnoresRay} buttonTakesRay={buttonTakesRay} tableBlocks={tableBlocks}");
-        result.Check(occludes, "the HUD raycaster should check 3D occlusion against every layer");
+        result.Check(occludes, "the HUD raycaster should check 3D occlusion, excluding only the hand contact proxies");
         result.Check(panelIgnoresRay, "decorative HUD panels should not catch the VR ray");
         result.Check(buttonTakesRay, "HUD buttons should still take the VR ray");
         result.Check(tableBlocks, "the tabletop should have a collider that blocks the ray");

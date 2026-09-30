@@ -26,6 +26,12 @@ visão anterior. Uma troca de turno atualiza esse lado, mas não interrompe a
 observação. Iniciar outra partida ou abrir o menu restaura a vista do jogo.
 Q/E e scroll continuam como órbita e zoom na vista do tabuleiro.
 
+O botão **Altura da mesa** entra na observação e aproxima a câmera da placa
+fixada abaixo da borda frontal. Os botões circulares ficam visíveis e clicáveis
+com o HUD presente. **Voltar ao tabuleiro**, **R** ou **Esc** restaura a
+perspectiva do lado atual. Regular a altura não faz a câmera seguir a mesa;
+o acesso existe apenas no desktop, e o headset mantém seu rastreamento.
+
 ## Rule: Olhar ao redor preserva a seleção e libera o cursor
 
 `CameraController` cuida da pose e libera o cursor ao perder foco, ser

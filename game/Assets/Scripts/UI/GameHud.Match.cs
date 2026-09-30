@@ -110,13 +110,17 @@ public sealed partial class GameHud
         desktopView = Object.FindFirstObjectByType<CameraController>();
         roomViewPanel = CreatePanel("RoomViewPanel", matchInterface, new Vector2(1, 0), new Vector2(1, 0),
             new Vector2(1, 0), new Vector2(-24, 24), new Vector2(408, 100), panelColor);
-        roomViewButtonText = MenuButton("RoomViewButton", roomViewPanel, "Olhar ao redor", 16, 12, 376, 42,
+        roomViewButtonText = MenuButton("RoomViewButton", roomViewPanel, "Olhar ao redor", 16, 12, 184, 42,
             neutralButtonColor, () =>
             {
                 if (desktopView == null) return;
                 if (desktopView.IsLookingAround) desktopView.ReturnToBoard();
                 else desktopView.LookAround();
             }).GetComponentInChildren<UnityEngine.UI.Text>();
+        roomViewButtonText.fontSize = 17;
+        MenuButton("TableControlsButton", roomViewPanel, "Altura da mesa", 208, 12, 184, 42,
+            neutralButtonColor, () => Object.FindFirstObjectByType<TableView>()?.FocusControls())
+            .GetComponentInChildren<UnityEngine.UI.Text>().fontSize = 17;
         roomViewHint = MenuLabel("RoomViewHint", roomViewPanel, "", 15, mutedTextColor, 16, 64, 376, 22);
     }
 
@@ -125,8 +129,8 @@ public sealed partial class GameHud
         if (roomViewPanel == null) return;
         SetActive(roomViewPanel, !XRRig.IsHeadsetPresent);
         bool looking = desktopView != null && desktopView.IsLookingAround;
-        roomViewButtonText.text = looking ? "Voltar ao tabuleiro  ·  R" : "Olhar ao redor";
-        roomViewHint.text = looking ? "Arraste com o botão direito para olhar" : "Q/E: girar  ·  Scroll: zoom  ·  R: voltar";
+        roomViewButtonText.text = looking ? "Voltar ao tabuleiro" : "Olhar ao redor";
+        roomViewHint.text = looking ? "Botão direito: olhar  ·  R: voltar ao tabuleiro" : "Q/E: girar  ·  Scroll: zoom  ·  R: voltar";
     }
 
     private void BuildPromotionDialog()
