@@ -124,9 +124,8 @@ public sealed class PieceFactory : MonoBehaviour
 
     private static void AddCollider(GameObject root)
     {
-        CapsuleCollider collider = root.AddComponent<CapsuleCollider>();
-        collider.height = 1.4f;
-        collider.radius = 0.35f;
+        BoxCollider collider = root.AddComponent<BoxCollider>();
+        collider.size = new Vector3(0.7f, 1.4f, 0.7f);
         collider.center = new Vector3(0f, 0.7f, 0f);
     }
 

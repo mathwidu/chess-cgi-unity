@@ -29,6 +29,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   `ThrowablePiece` quando há headset. A partida não é afetada, e a miniatura
   não pode ser agarrada durante o voo da captura.
 
+- No VR, a sala do laboratório ganha colliders (`MeshCollider` em cada malha
+  legível, adicionados pelo `TableView`), e uma [peça solta](glossary.md)
+  passa a bater no chão, nas paredes e nos móveis, não só no tampo da mesa. A
+  malha da mesa que sobe e desce com a altura refaz o collider a cada ajuste.
+  No desktop e no prefab a sala continua sem colliders, para o mobiliário não
+  interceptar o toque no tabuleiro.
+
 - [Marca do último lance](glossary.md) e [rei em xeque](glossary.md)
   ([feature](features/sentir-cada-lance.md)): `BoardView.MarkLastMove` tinge
   de amarelo suave as casas de origem e destino do último lance, e
@@ -162,6 +169,10 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - Nova partida mantém as opções escolhidas.
 
 ### Changed
+
+- O collider das peças passa de cápsula para caixa (0,7 × 1,4 × 0,7): uma
+  cápsula se apoia numa ponta arredondada e tombava a qualquer inclinação,
+  então toda [peça solta](glossary.md) caía deitada. A base plana pode parar em pé.
 
 - No VR, a peça agarrada inclina junto com o controle: o `XRGrabInteractable`
   das peças passa a seguir a rotação (`trackRotation`), mantendo a pose do

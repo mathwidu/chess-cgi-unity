@@ -167,6 +167,32 @@ public sealed class TableView : MonoBehaviour
         }
 
         ApplyHeight();
+        if (headset)
+        {
+            AddRoomColliders(room);
+        }
+    }
+
+    private void AddRoomColliders(Transform room)
+    {
+        foreach (MeshFilter filter in room.GetComponentsInChildren<MeshFilter>(true))
+        {
+            Mesh mesh = filter.sharedMesh;
+            if (mesh == null || !mesh.isReadable)
+            {
+                continue;
+            }
+
+            MeshCollider collider = filter.gameObject.AddComponent<MeshCollider>();
+            collider.sharedMesh = mesh;
+            foreach (LabDeskMesh desk in labDeskMeshes)
+            {
+                if (desk.Mesh == mesh)
+                {
+                    desk.Collider = collider;
+                }
+            }
+        }
     }
 
     private static bool IsAboveLabDeskLegSplit(Vector3 roomPoint)
@@ -247,6 +273,11 @@ public sealed class TableView : MonoBehaviour
 
             desk.Mesh.vertices = vertices;
             desk.Mesh.RecalculateBounds();
+            if (desk.Collider != null)
+            {
+                desk.Collider.sharedMesh = null;
+                desk.Collider.sharedMesh = desk.Mesh;
+            }
         }
 
         foreach (LabDeskMarker marker in labDeskMarkers)
@@ -436,6 +467,7 @@ public sealed class TableView : MonoBehaviour
         public readonly Vector3[] Rest;
         public readonly int[] Moving;
         public readonly Vector3 Up;
+        public MeshCollider Collider;
 
         public LabDeskMesh(Mesh mesh, Vector3[] rest, int[] moving, Vector3 up)
         {

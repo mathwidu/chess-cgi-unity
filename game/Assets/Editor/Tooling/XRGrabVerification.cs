@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -23,6 +24,7 @@ public static class XRGrabVerification
     private const float HeldTiltDegrees = 40f;
     private const float ReturnWait = 3.6f;
     private const float DropLift = 0.25f;
+    private const float ThrowDistance = 1.5f;
 
     private static readonly XRVerificationResult result = new XRVerificationResult();
     private static readonly Queue<(float delay, Action run)> steps = new Queue<(float, Action)>();
@@ -216,6 +218,39 @@ public static class XRGrabVerification
             PieceView returned = FindPiece(4, 7);
             Vector3 expected = board.GetPieceWorldPosition(new BoardSquare(4, 7));
             result.Check(Vector3.Distance(returned.transform.position, expected) < 0.001f, "a refused drop should return the piece to its square after 3 seconds");
+        }));
+
+        steps.Enqueue((0.1f, () =>
+        {
+            PieceView piece = FindPiece(3, 7);
+            result.Check(piece.GetComponent<BoxCollider>() != null, "a piece should have a box collider, so it can stand upright");
+            Transform room = GameObject.Find("FeevaleComputerLab")?.transform;
+            result.Check(room != null && room.GetComponentsInChildren<MeshCollider>().Length > 0, "the VR room should have colliders, not only the table top");
+            XRGrabInteractable grab = piece.GetComponent<XRGrabInteractable>();
+            grab.interactionManager.SelectEnter((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)grab);
+        }));
+        steps.Enqueue((0.2f, () =>
+        {
+            leftInteractor.GetComponent<TrackedPoseDriver>().enabled = false;
+            leftInteractor.transform.position += Vector3.right * ThrowDistance + Vector3.up * DropLift;
+        }));
+        steps.Enqueue((1.2f, () =>
+        {
+            XRGrabInteractable grab = FindPiece(3, 7).GetComponent<XRGrabInteractable>();
+            grab.interactionManager.SelectExit((IXRSelectInteractor)leftInteractor, (IXRSelectInteractable)grab);
+            leftInteractor.GetComponent<TrackedPoseDriver>().enabled = true;
+        }));
+        steps.Enqueue((ReturnWait, () =>
+        {
+            Renderer floor = GameObject.Find("FeevaleComputerLab").GetComponentsInChildren<Renderer>().Single(r => r.name == "Floor_OakLaminate");
+            float height = FindPiece(3, 7).transform.position.y;
+            result.Check(height > floor.bounds.max.y - 0.05f, $"a piece thrown off the table should land in the room, not fall through it, height {height:F2}");
+        }));
+        steps.Enqueue((0.1f, () =>
+        {
+            PieceView piece = FindPiece(3, 7);
+            Vector3 expected = board.GetPieceWorldPosition(new BoardSquare(3, 7));
+            result.Check(Vector3.Distance(piece.transform.position, expected) < 0.001f, "a thrown piece should return to its square after 3 seconds");
         }));
 
         steps.Enqueue((0.1f, () =>
