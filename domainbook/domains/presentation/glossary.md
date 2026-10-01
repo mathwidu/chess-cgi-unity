@@ -52,7 +52,7 @@ selecionada.
 
 ## Aura de captura
 
-Um brilho verde translúcido ao redor de cada peça adversária que a peça
+Um cilindro verde translúcido, como o marcador do GTA San Andreas, ao redor de cada peça adversária que a peça
 selecionada pode capturar, inclusive o peão tomado en passant. Aparece junto
 com os [destaques](glossary.md) e some com eles.
 
@@ -71,7 +71,7 @@ marcado; uma nova partida limpa as marcas.
 ## Rei em xeque
 
 A casa do rei do lado a jogar tinge de vermelho enquanto ele está em xeque,
-inclusive no xeque-mate, e um brilho vermelho translúcido envolve o próprio
+inclusive no xeque-mate, e um cilindro vermelho translúcido envolve o próprio
 rei, seguindo-o se for agarrado. O vermelho prevalece sobre a marca do último
 lance e tudo some quando o xeque é respondido.
 

@@ -122,6 +122,10 @@ public class BoardFeedbackTests
         Assert.That(auras.Select(a => a.name), Is.EqualTo(new[] { "CaptureAura d5" }));
         Bounds target = board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("d5"))).GetComponentInChildren<Renderer>().bounds;
         Assert.That(auras[0].GetComponent<Renderer>().bounds.Contains(target.center), Is.True);
+        Assert.That(auras[0].GetComponent<MeshFilter>().sharedMesh.name, Is.EqualTo("Cylinder"));
+        Bounds auraBounds = auras[0].GetComponent<Renderer>().bounds;
+        Assert.That(auraBounds.min.y, Is.LessThanOrEqualTo(target.min.y));
+        Assert.That(auraBounds.max.y, Is.GreaterThanOrEqualTo(target.max.y));
 
         controller.CancelSelection();
         yield return null;

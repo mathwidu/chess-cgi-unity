@@ -299,12 +299,14 @@ public sealed class BoardView : MonoBehaviour
             bounds.Encapsulate(renderers[i].bounds);
         }
 
-        GameObject auraObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        GameObject auraObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         auraObject.name = auraName;
         auraObject.transform.SetParent(parent);
         auraObject.transform.position = bounds.center;
         auraObject.transform.localRotation = Quaternion.identity;
-        auraObject.transform.localScale = bounds.size * AuraSizeMultiplier / transform.lossyScale.x;
+        float diameter = Mathf.Max(bounds.size.x, bounds.size.z) * AuraSizeMultiplier;
+        float halfHeight = bounds.size.y * AuraSizeMultiplier * 0.5f;
+        auraObject.transform.localScale = new Vector3(diameter, halfHeight, diameter) / transform.lossyScale.x;
 
         Collider collider = auraObject.GetComponent<Collider>();
         if (Application.isPlaying)
