@@ -178,8 +178,9 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 ### Changed
 
 - A [aura de captura](glossary.md) e o brilho do rei em xeque deixam de ser
-  esferas e passam a ser cilindros translúcidos, mais altos que a peça, com o
-  mesmo shader `ChessCgi/CaptureAura`.
+  esferas e passam a ser cilindros translúcidos, mais altos que a peça e com
+  a largura limitada à casa que ela ocupa, com o mesmo shader
+  `ChessCgi/CaptureAura`.
 
 - O collider das peças passa de cápsula para caixa (0,7 × 1,4 × 0,7): uma
   cápsula se apoia numa ponta arredondada e tombava a qualquer inclinação,

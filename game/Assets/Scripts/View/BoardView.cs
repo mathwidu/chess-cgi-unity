@@ -15,6 +15,7 @@ public sealed class BoardView : MonoBehaviour
     private const string CaptureAuraMaterialPath = "Materials/CaptureAuraMaterial";
     private const string CheckAuraMaterialPath = "Materials/CheckAuraMaterial";
     private const float AuraSizeMultiplier = 1.5f;
+    private const float AuraSquareFill = 0.95f;
 
     [SerializeField] private float squareSize = 1.25f;
     [SerializeField] private float pieceBaseHeight = 0.08f;
@@ -304,9 +305,10 @@ public sealed class BoardView : MonoBehaviour
         auraObject.transform.SetParent(parent);
         auraObject.transform.position = bounds.center;
         auraObject.transform.localRotation = Quaternion.identity;
-        float diameter = Mathf.Max(bounds.size.x, bounds.size.z) * AuraSizeMultiplier;
-        float halfHeight = bounds.size.y * AuraSizeMultiplier * 0.5f;
-        auraObject.transform.localScale = new Vector3(diameter, halfHeight, diameter) / transform.lossyScale.x;
+        float scale = transform.lossyScale.x;
+        float diameter = Mathf.Min(Mathf.Max(bounds.size.x, bounds.size.z) * AuraSizeMultiplier / scale, squareSize * AuraSquareFill);
+        float halfHeight = bounds.size.y * AuraSizeMultiplier * 0.5f / scale;
+        auraObject.transform.localScale = new Vector3(diameter, halfHeight, diameter);
 
         Collider collider = auraObject.GetComponent<Collider>();
         if (Application.isPlaying)

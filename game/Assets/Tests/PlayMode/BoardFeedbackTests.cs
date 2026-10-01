@@ -126,6 +126,10 @@ public class BoardFeedbackTests
         Bounds auraBounds = auras[0].GetComponent<Renderer>().bounds;
         Assert.That(auraBounds.min.y, Is.LessThanOrEqualTo(target.min.y));
         Assert.That(auraBounds.max.y, Is.GreaterThanOrEqualTo(target.max.y));
+        Vector3 squareCentre = board.GetPieceWorldPosition(BoardSquare.FromAlgebraic("d5"));
+        float squareWorld = board.SquareSize * board.transform.lossyScale.x;
+        Assert.That(Mathf.Abs(auraBounds.center.x - squareCentre.x) + auraBounds.extents.x, Is.LessThanOrEqualTo(squareWorld * .5f + .001f));
+        Assert.That(Mathf.Abs(auraBounds.center.z - squareCentre.z) + auraBounds.extents.z, Is.LessThanOrEqualTo(squareWorld * .5f + .001f));
 
         controller.CancelSelection();
         yield return null;
