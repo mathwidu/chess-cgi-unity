@@ -76,6 +76,30 @@ public class CapturedPiecesTests
     }
 
     [UnityTest]
+    public IEnumerator DroppingTheKingOnItsOwnRookCastlesWithoutCapturingIt()
+    {
+        yield return Play("e2e4", "e7e5", "g1f3", "g8f6", "f1c4", "f8c5");
+        PieceView king = board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("e1")));
+        BoardSquare rookSquare = BoardSquare.FromAlgebraic("h1");
+
+        controller.GrabPiece(king);
+        bool aura = board.transform.GetComponentsInChildren<Transform>().Any(t => t.name == "CaptureAura h1");
+        Assert.That(aura, Is.False, "Your own rook is not something the king can take.");
+
+        Assert.That(controller.ReleasePiece(king, board.GetPieceWorldPosition(rookSquare), out bool moveStarted), Is.True);
+        Assert.That(moveStarted, Is.True);
+        yield return WaitFor(() => !controller.IsInputBlocked);
+        yield return new WaitForSecondsRealtime(0.6f);
+
+        Assert.That(board.Pieces.First(p => p.Kind == ChessPieceKind.King && p.Side == ChessSide.White).Square.ToAlgebraic(), Is.EqualTo("g1"));
+        Assert.That(board.Pieces.First(p => p.Kind == ChessPieceKind.Rook && p.Square.ToAlgebraic() == "f1").Side, Is.EqualTo(ChessSide.White));
+        Assert.That(controller.CapturedPieces, Is.Empty);
+        Assert.That(controller.MaterialBalance, Is.Zero);
+        Assert.That(View.DisplayedCount, Is.Zero, "Nothing flies to the tray.");
+        Assert.That(board.Pieces.Count, Is.EqualTo(32));
+    }
+
+    [UnityTest]
     public IEnumerator EachSideKeepsItsOwnCapturesAndEvenMaterialHidesTheScore()
     {
         yield return Play("e2e4", "d7d5", "e4d5", "d8d5");

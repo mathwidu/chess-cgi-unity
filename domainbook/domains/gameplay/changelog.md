@@ -70,5 +70,6 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- Soltar o rei sobre a própria torre faz o roque sem capturar a torre: `ChessRulesAdapter.TryMove` não informa mais captura quando a peça tomada é do mesmo lado de quem joga, e `GetCapturableSquares` só lista peças adversárias. A torre deixa de ir para a bandeja de capturadas, de contar no saldo de material e de tocar o som de captura.
 - Desativar o controlador cancela tarefas e adia a reconstrução das peças e a conclusão de uma animação interrompida para a reativação. Fechar a cena VR deixa de recriar o gerenciador de interação XR durante a destruição; retomar preserva a posição das regras e uma notificação por jogada.
 - Reinício durante a animação não aplica o resultado da partida anterior.

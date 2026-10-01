@@ -54,6 +54,27 @@ public class ChessRulesTests
         Assert.That(rules.GetPieceAt(BoardSquare.FromAlgebraic("g1")).Value.Kind, Is.EqualTo(ChessPieceKind.King));
     }
 
+    [TestCase("e1h1", "g1", "f1")]
+    [TestCase("e1a1", "c1", "d1")]
+    public void CastlingOntoTheRookSquareIsNotACapture(string uci, string kingSquare, string rookSquare)
+    {
+        var rules = new ChessRulesAdapter("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+        MoveResult result = rules.TryMove(Move(uci));
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.IsCapture, Is.False);
+        Assert.That(result.Captured, Is.Null);
+        Assert.That(rules.GetPieceAt(BoardSquare.FromAlgebraic(kingSquare)).Value.Kind, Is.EqualTo(ChessPieceKind.King));
+        Assert.That(rules.GetPieceAt(BoardSquare.FromAlgebraic(rookSquare)).Value.Kind, Is.EqualTo(ChessPieceKind.Rook));
+        Assert.That(rules.GetMaterialBalance(), Is.Zero);
+    }
+
+    [Test]
+    public void CapturableSquaresSkipTheRooksTheKingCanCastleWith()
+    {
+        var rules = new ChessRulesAdapter("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+        Assert.That(rules.GetCapturableSquares(BoardSquare.FromAlgebraic("e1")), Is.Empty);
+    }
+
     [Test]
     public void EnPassantRemovesTheCapturedPawn()
     {

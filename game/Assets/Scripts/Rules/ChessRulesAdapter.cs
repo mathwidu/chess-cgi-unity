@@ -73,7 +73,8 @@ public sealed class ChessRulesAdapter
         foreach (Move move in game.GetValidMoves(ToPosition(from)))
         {
             BoardSquare destination = FromPosition(move.NewPosition);
-            if (game.GetPieceAt(move.NewPosition) != null)
+            Piece target = game.GetPieceAt(move.NewPosition);
+            if (target != null && target.Owner != mover.Owner)
             {
                 capturable.Add(destination);
             }
@@ -102,6 +103,11 @@ public sealed class ChessRulesAdapter
         bool destinationWasEmpty = game.GetPieceAt(ToPosition(to)) == null;
         Piece capturedPiece;
         MoveType moveType = game.MakeMove(move, true, out capturedPiece);
+        if (capturedPiece != null && capturedPiece.Owner == move.Player)
+        {
+            capturedPiece = null;
+        }
+
         VisualPieceState? captured = null;
         if (capturedPiece != null)
         {
