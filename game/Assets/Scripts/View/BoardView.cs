@@ -16,6 +16,7 @@ public sealed class BoardView : MonoBehaviour
     private const string CheckAuraMaterialPath = "Materials/CheckAuraMaterial";
     private const float AuraSizeMultiplier = 1.5f;
     private const float AuraSquareFill = 0.95f;
+    private const float AuraHeightMultiplier = 1.1f;
 
     [SerializeField] private float squareSize = 1.25f;
     [SerializeField] private float pieceBaseHeight = 0.08f;
@@ -288,27 +289,20 @@ public sealed class BoardView : MonoBehaviour
     private GameObject CreateAura(PieceView target, string materialPath, string auraName, Transform parent)
     {
         Material aura = Resources.Load<Material>(materialPath);
-        Renderer[] renderers = target.GetComponentsInChildren<Renderer>();
-        if (aura == null || renderers.Length == 0)
+        if (aura == null || !TryGetPieceBounds(target, out Bounds bounds))
         {
             return null;
-        }
-
-        Bounds bounds = renderers[0].bounds;
-        for (int i = 1; i < renderers.Length; i++)
-        {
-            bounds.Encapsulate(renderers[i].bounds);
         }
 
         GameObject auraObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         auraObject.name = auraName;
         auraObject.transform.SetParent(parent);
-        auraObject.transform.position = bounds.center;
         auraObject.transform.localRotation = Quaternion.identity;
         float scale = transform.lossyScale.x;
         float diameter = Mathf.Min(Mathf.Max(bounds.size.x, bounds.size.z) * AuraSizeMultiplier / scale, squareSize * AuraSquareFill);
-        float halfHeight = bounds.size.y * AuraSizeMultiplier * 0.5f / scale;
+        float halfHeight = TallestPieceHeight() * AuraHeightMultiplier * 0.5f / scale;
         auraObject.transform.localScale = new Vector3(diameter, halfHeight, diameter);
+        auraObject.transform.position = AuraCenter(bounds, auraObject.transform.lossyScale.y);
 
         Collider collider = auraObject.GetComponent<Collider>();
         if (Application.isPlaying)
@@ -352,20 +346,47 @@ public sealed class BoardView : MonoBehaviour
             return;
         }
 
-        Renderer[] renderers = checkAuraTarget.GetComponentsInChildren<Renderer>();
+        if (TryGetPieceBounds(checkAuraTarget, out Bounds bounds))
+        {
+            Transform aura = checkAuraRoot.GetChild(0);
+            aura.position = AuraCenter(bounds, aura.lossyScale.y);
+        }
+    }
+
+    private static bool TryGetPieceBounds(PieceView piece, out Bounds bounds)
+    {
+        Renderer[] renderers = piece.GetComponentsInChildren<Renderer>();
+        bounds = default;
         if (renderers.Length == 0)
         {
-            return;
+            return false;
         }
 
-        Bounds bounds = renderers[0].bounds;
+        bounds = renderers[0].bounds;
         for (int i = 1; i < renderers.Length; i++)
         {
             bounds.Encapsulate(renderers[i].bounds);
         }
 
-        checkAuraRoot.GetChild(0).position = bounds.center;
+        return true;
     }
+
+    private float TallestPieceHeight()
+    {
+        float tallest = 0f;
+        foreach (PieceView piece in pieces)
+        {
+            if (TryGetPieceBounds(piece, out Bounds bounds))
+            {
+                tallest = Mathf.Max(tallest, bounds.size.y);
+            }
+        }
+
+        return tallest;
+    }
+
+    private static Vector3 AuraCenter(Bounds pieceBounds, float halfHeight) =>
+        new Vector3(pieceBounds.center.x, pieceBounds.min.y + halfHeight, pieceBounds.center.z);
 
     public void MarkLastMove(BoardSquare from, BoardSquare to)
     {

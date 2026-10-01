@@ -112,6 +112,9 @@ public class BoardFeedbackTests
         Assert.That(CheckAuras(), Is.Empty);
     }
 
+    private static Bounds PieceBounds(PieceView piece) =>
+        piece.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; });
+
     [UnityTest]
     public IEnumerator SelectingAPieceWrapsTheEnemiesItCanTakeInAnAura()
     {
@@ -124,8 +127,9 @@ public class BoardFeedbackTests
         Assert.That(auras[0].GetComponent<Renderer>().bounds.Contains(target.center), Is.True);
         Assert.That(auras[0].GetComponent<MeshFilter>().sharedMesh.name, Is.EqualTo("Cylinder"));
         Bounds auraBounds = auras[0].GetComponent<Renderer>().bounds;
-        Assert.That(auraBounds.min.y, Is.LessThanOrEqualTo(target.min.y));
-        Assert.That(auraBounds.max.y, Is.GreaterThanOrEqualTo(target.max.y));
+        Assert.That(auraBounds.min.y, Is.EqualTo(PieceBounds(board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("d5")))).min.y).Within(.001f), "The cylinder stands on the square.");
+        float tallest = board.Pieces.Max(p => PieceBounds(p).size.y);
+        Assert.That(auraBounds.size.y, Is.InRange(tallest, tallest * 1.25f), "Every aura is about as tall as the tallest piece.");
         Vector3 squareCentre = board.GetPieceWorldPosition(BoardSquare.FromAlgebraic("d5"));
         float squareWorld = board.SquareSize * board.transform.lossyScale.x;
         Assert.That(Mathf.Abs(auraBounds.center.x - squareCentre.x) + auraBounds.extents.x, Is.LessThanOrEqualTo(squareWorld * .5f + .001f));
