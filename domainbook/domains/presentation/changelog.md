@@ -10,6 +10,10 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Botões do HUD no VR ganham área de clique maior: até 16 unidades a mais em
+  cada lado, limitadas à metade da folga até o vizinho da mesma linha ou
+  coluna, para que áreas de botões vizinhos nunca se toquem.
+
 - [Rei em xeque](glossary.md) ganha um brilho vermelho translúcido ao redor da
   peça, além da casa vermelha. O brilho usa o mesmo shader da
   [aura de captura](glossary.md), acompanha o rei e é refeito quando as peças

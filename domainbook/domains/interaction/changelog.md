@@ -10,6 +10,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Raio de seleção](glossary.md) ocioso: com a mão vazia e apontando para o
+  painel do HUD, o raio aparece mais escuro até tocar um botão, quando volta
+  ao brilho normal. Tabuleiro, peças e mesa barram a mira, e segurar ou
+  tocar uma peça esconde o raio ocioso.
+
 - [Ajustar o tabuleiro com duas mãos](features/ajustar-o-tabuleiro-com-duas-maos.md):
   duas hastes metálicas de proximidade controlam o tamanho continuamente;
   uma mão sozinha, entrada do mesmo lado e o raio do HUD não iniciam o gesto.

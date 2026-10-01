@@ -76,9 +76,12 @@ agarrar peças e apontar para o HUD no lugar do mouse.
 ## Raio de seleção
 
 Um raio que um controle de movimento projeta e que só aparece ao apontar
-para os botões do HUD, para clicá-los com o gatilho. Não escolhe peças: elas
-são [agarradas e soltas](#agarrar-e-soltar) com a mão. Tabuleiro, peças e mesa
-barram o raio, então apontar para eles nunca aciona o HUD que fica atrás.
+para o painel do HUD, para clicar seus botões com o gatilho. Sobre um botão
+ele aparece com brilho normal; com a mão vazia e apontando para o painel (com
+uma folga de 150 unidades em volta), aparece mais escuro, para orientar a
+mira. Não escolhe peças: elas são [agarradas e soltas](#agarrar-e-soltar) com
+a mão. Tabuleiro, peças e mesa barram o raio, então apontar para eles nunca
+aciona o HUD que fica atrás nem mostra o raio ocioso.
 
 - **Aliases:** Ray interactor, Pointer ray
 - **Status:** draft

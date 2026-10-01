@@ -22,6 +22,7 @@ public sealed class XRRig : MonoBehaviour
     private const float MinBoardDistance = 0.35f;
     private const float MaxBoardDistance = 1.2f;
     private const float GrabRadius = 0.06f;
+    private const float IdleRayShade = 0.35f;
     private static readonly Vector3 GrabPointOffset = new Vector3(0f, -0.02f, 0f);
     private static readonly Vector3 SeatPosition = new Vector3(0f, 0f, -0.6f);
     private static readonly Vector3 BoardTarget = new Vector3(0f, 0.78f, 0f);
@@ -273,6 +274,22 @@ public sealed class XRRig : MonoBehaviour
     {
         curveVisual.snapToSelectedAttachIfAvailable = false;
         curveVisual.snapToSnapVolumeIfAvailable = false;
+        curveVisual.extendLineToEmptyHit = true;
+        curveVisual.customizeLinePropertiesForState = true;
+        curveVisual.noValidHitProperties = RayState(IdleRayShade);
+        curveVisual.uiHitProperties = RayState(1f);
+        curveVisual.uiPressHitProperties = RayState(1f);
+        curveVisual.hoverHitProperties = RayState(1f);
+        curveVisual.selectHitProperties = RayState(1f);
+    }
+
+    private static LineProperties RayState(float shade)
+    {
+        var gradient = new Gradient();
+        gradient.SetKeys(
+            new[] { new GradientColorKey(new Color(shade, shade, shade), 0f), new GradientColorKey(new Color(shade, shade, shade), 1f) },
+            new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 1f) });
+        return new LineProperties { adjustWidth = false, gradient = gradient };
     }
 
     private static GameObject BuildHandVisual(Transform parent, string resourceName)

@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.Interaction.Toolkit.Interactors.Visuals;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
 [InitializeOnLoad]
@@ -29,6 +30,9 @@ public static class XRHudVerification
         CheckBlockedRay,
         CheckHoverTakesButton,
         CheckHoverLetsGo,
+        CheckIdleRay,
+        CheckIdleRayOnButton,
+        CheckIdleRayBlocked,
     }
 
     private static Stage stage;
@@ -39,6 +43,12 @@ public static class XRHudVerification
     private static GameObject startOverlay;
     private static GameObject newGameButton;
     private static GameObject rayBlocker;
+    private static RectTransform panelRect;
+    private static CurveVisualController rayVisual;
+    private const float IdleSpotX = -800f;
+    private const float IdleSpotY = 450f;
+    private const float PaddedMissUnits = 8f;
+    private const float OutsidePaddingUnits = 40f;
     private static int stageStartFrame;
     // Above the board, so only the test blocker can stand between the hand and the HUD.
     private static readonly Vector3 HighAimOrigin = new Vector3(0.25f, 1.3f, -0.5f);
@@ -199,9 +209,76 @@ public static class XRHudVerification
                     $"stale={(stillHovering ? stale.gameObject.name : "none")} uiCamera={(module.uiCamera != null ? module.uiCamera.name : "none")}");
                 result.Check(!stillHovering, "pointing away from the HUD should let go of the button, not keep a stale hit");
                 result.Check(module.uiCamera == XRRig.EyeCamera, "the XR UI module should use the headset camera");
+                BeginIdleRayCheck();
+                return;
+
+            case Stage.CheckIdleRay:
+                if (Time.frameCount - stageStartFrame < HoldSimFrames)
+                {
+                    return;
+                }
+
+                ICurveInteractionDataProvider idle = rayVisual.curveInteractionDataProvider;
+                EndPointType idleType = idle.TryGetCurveEndPoint(out Vector3 idleEnd);
+                Transform curveOrigin = idle.curveOrigin;
+                result.Check(!interactor.TryGetCurrentUIRaycastResult(out _), "the empty panel spot should hold no control");
+                result.Check(idle.isActive, "aiming at the empty panel should still draw the ray");
+                result.Check(idleType == EndPointType.EmptyCastHit, $"the idle ray should end as an empty hit, ended as {idleType}");
+                result.Check(Mathf.Abs(panelRect.InverseTransformPoint(idleEnd).z) < 0.01f, "the idle ray should end on the panel");
+                AimControllerAt(GetRectWorldCenter((RectTransform)newGameButton.transform), HighAimOrigin);
+                stageStartFrame = Time.frameCount;
+                stage = Stage.CheckIdleRayOnButton;
+                return;
+
+            case Stage.CheckIdleRayOnButton:
+                if (Time.frameCount - stageStartFrame < HoldSimFrames)
+                {
+                    return;
+                }
+
+                EndPointType onButtonType = rayVisual.curveInteractionDataProvider.TryGetCurveEndPoint(out _);
+                result.Check(rayVisual.curveInteractionDataProvider.isActive && onButtonType == EndPointType.UI,
+                    $"aiming at a control should end the ray as a UI hit, ended as {onButtonType}");
+                rayBlocker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                rayBlocker.name = "HudRayBlocker";
+                rayBlocker.transform.position = Vector3.Lerp(HighAimOrigin, PanelPoint(IdleSpotX, IdleSpotY), 0.3f);
+                rayBlocker.transform.localScale = Vector3.one * 0.3f;
+                Physics.SyncTransforms();
+                AimControllerAt(PanelPoint(IdleSpotX, IdleSpotY), HighAimOrigin);
+                stageStartFrame = Time.frameCount;
+                stage = Stage.CheckIdleRayBlocked;
+                return;
+
+            case Stage.CheckIdleRayBlocked:
+                if (Time.frameCount - stageStartFrame < HoldSimFrames)
+                {
+                    return;
+                }
+
+                result.Check(!rayVisual.curveInteractionDataProvider.isActive, "a collider in front of the empty panel should hide the idle ray");
+                Object.Destroy(rayBlocker);
+                AimControllerAt(HighAimOrigin + Vector3.up, HighAimOrigin);
+                Physics.SyncTransforms();
+                result.Check(!rayVisual.curveInteractionDataProvider.isActive, "pointing away from the panel should draw no ray");
                 ReportAndStop();
                 return;
         }
+    }
+
+    private static Vector3 PanelPoint(float x, float y) => panelRect.TransformPoint(new Vector3(x, y, 0f));
+
+    private static void BeginIdleRayCheck()
+    {
+        panelRect = Object.FindFirstObjectByType<GameHud>().GetComponent<RectTransform>();
+        rayVisual = GameObject.Find("Right Controller").GetComponent<CurveVisualController>();
+        RectTransform button = (RectTransform)newGameButton.transform;
+        Vector3 left = GetRectWorldCenter(button) - panelRect.right * (button.rect.width * 0.5f * panelRect.lossyScale.x);
+        float unit = panelRect.lossyScale.x;
+        result.Check(RayHitsNewGame(left - panelRect.right * PaddedMissUnits * unit), "a ray just outside the Nova partida button should still press it through the hit padding");
+        result.Check(!RayHitsNewGame(left - panelRect.right * OutsidePaddingUnits * unit), "a ray well outside the Nova partida button should miss it");
+        AimControllerAt(PanelPoint(IdleSpotX, IdleSpotY), HighAimOrigin);
+        stageStartFrame = Time.frameCount;
+        stage = Stage.CheckIdleRay;
     }
 
     private static bool TryBeginPressStartButton()
@@ -351,12 +428,9 @@ public static class XRHudVerification
         stage = Stage.CheckUnblockedRay;
     }
 
-    private static void CheckRayHitsNewGame(bool expectHit)
+    private static bool RayHitsNewGame(Vector3 target)
     {
-        // Cast straight through the HUD raycaster: the UI module only recasts a device that moved,
-        // so a still, scripted controller would report a stale result.
         TrackedDeviceGraphicRaycaster raycaster = Object.FindFirstObjectByType<GameHud>().GetComponent<TrackedDeviceGraphicRaycaster>();
-        Vector3 target = GetRectWorldCenter((RectTransform)newGameButton.transform);
         var eventData = new TrackedDeviceEventData(EventSystem.current)
         {
             rayPoints = new List<Vector3> { HighAimOrigin, HighAimOrigin + (target - HighAimOrigin) * 1.5f },
@@ -364,9 +438,15 @@ public static class XRHudVerification
         };
         var hits = new List<RaycastResult>();
         raycaster.Raycast(eventData, hits);
-        GameObject hit = hits.Count > 0 ? hits[0].gameObject : null;
-        bool hitsButton = hits.Exists(result => result.gameObject == newGameButton);
-        Debug.Log($"CHESS_CGI_XR_HUD_CHECK rayToNewGame blocker={!expectHit} hit={(hit != null ? hit.name : "none")}");
+        return hits.Exists(result => result.gameObject == newGameButton);
+    }
+
+    private static void CheckRayHitsNewGame(bool expectHit)
+    {
+        // Cast straight through the HUD raycaster: the UI module only recasts a device that moved,
+        // so a still, scripted controller would report a stale result.
+        bool hitsButton = RayHitsNewGame(GetRectWorldCenter((RectTransform)newGameButton.transform));
+        Debug.Log($"CHESS_CGI_XR_HUD_CHECK rayToNewGame blocker={!expectHit} hit={hitsButton}");
         result.Check(hitsButton == expectHit, expectHit
             ? "an unobstructed ray should reach the Nova partida button"
             : "a collider in front of the HUD should stop the ray before the Nova partida button");

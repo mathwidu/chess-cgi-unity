@@ -13,6 +13,7 @@ public sealed partial class GameHud : MonoBehaviour
     // before the computer benches, so furniture cannot cover its controls.
     private static readonly Vector3 VrPanelPosition = new Vector3(0f, 1.6f, 1.35f);
     private const float VrPanelScale = 0.0012f;
+    private const float MaxHitPadding = 16f;
 
     [SerializeField] private ChessGameController gameController;
     [SerializeField] private int visibleMoveCount = 6;
@@ -116,6 +117,7 @@ public sealed partial class GameHud : MonoBehaviour
         if (hudCanvas.renderMode == RenderMode.WorldSpace)
         {
             LimitRayTargetsToControls(matchInterface);
+            WidenButtonHitAreas(hudRoot);
         }
 
         RefreshInterface();
@@ -132,6 +134,59 @@ public sealed partial class GameHud : MonoBehaviour
                 graphic.raycastTarget = false;
             }
         }
+    }
+
+    private static void WidenButtonHitAreas(RectTransform root)
+    {
+        foreach (Transform panel in root)
+        {
+            var controls = new List<KeyValuePair<Graphic, Rect>>();
+            foreach (Selectable selectable in panel.GetComponentsInChildren<Selectable>(true))
+            {
+                Graphic graphic = selectable.targetGraphic;
+                if (graphic != null && graphic.raycastTarget)
+                {
+                    controls.Add(new KeyValuePair<Graphic, Rect>(graphic, RectIn(root, graphic.rectTransform)));
+                }
+            }
+
+            foreach (KeyValuePair<Graphic, Rect> control in controls)
+            {
+                control.Key.raycastPadding = -FreeSpace(control, controls);
+            }
+        }
+    }
+
+    private static Vector4 FreeSpace(KeyValuePair<Graphic, Rect> control, List<KeyValuePair<Graphic, Rect>> controls)
+    {
+        Rect rect = control.Value;
+        float left = MaxHitPadding, bottom = MaxHitPadding, right = MaxHitPadding, top = MaxHitPadding;
+        foreach (KeyValuePair<Graphic, Rect> other in controls)
+        {
+            Rect neighbour = other.Value;
+            bool sharesRow = neighbour.yMin < rect.yMax && neighbour.yMax > rect.yMin;
+            bool sharesColumn = neighbour.xMin < rect.xMax && neighbour.xMax > rect.xMin;
+            if (other.Key == control.Key)
+            {
+                continue;
+            }
+
+            if (sharesRow && neighbour.xMax <= rect.xMin) left = Mathf.Min(left, (rect.xMin - neighbour.xMax) / 2f);
+            if (sharesRow && neighbour.xMin >= rect.xMax) right = Mathf.Min(right, (neighbour.xMin - rect.xMax) / 2f);
+            if (sharesColumn && neighbour.yMax <= rect.yMin) bottom = Mathf.Min(bottom, (rect.yMin - neighbour.yMax) / 2f);
+            if (sharesColumn && neighbour.yMin >= rect.yMax) top = Mathf.Min(top, (neighbour.yMin - rect.yMax) / 2f);
+        }
+
+        return new Vector4(left, bottom, right, top);
+    }
+
+    private static Rect RectIn(RectTransform root, RectTransform target)
+    {
+        var corners = new Vector3[4];
+        target.GetWorldCorners(corners);
+        Vector3 min = root.InverseTransformPoint(corners[0]);
+        Vector3 max = root.InverseTransformPoint(corners[2]);
+        return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
     }
 
     public void RefreshInterface()
