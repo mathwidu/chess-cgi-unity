@@ -1,8 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public sealed class PieceFactory : MonoBehaviour
 {
+    private const int RollingSides = 16;
+    private const float BaseRadius = 0.35f;
+    private const float TopRadius = 0.2f;
+    private const float Bounciness = 0.35f;
+    private const float DynamicFriction = 0.35f;
+    private const float StaticFriction = 0.5f;
+    private const float AngularDamping = 0.5f;
+
+    private static readonly Dictionary<int, Mesh> rollingShapes = new Dictionary<int, Mesh>();
+    private static PhysicsMaterial pieceSurface;
+
     [SerializeField] private Material whiteMaterial;
     [SerializeField] private Material blackMaterial;
     [SerializeField] private GameObject pawnPrefab;
@@ -63,15 +75,19 @@ public sealed class PieceFactory : MonoBehaviour
         root.layer = PieceView.PhysicsLayer;
 
         PieceView pieceView = root.AddComponent<PieceView>();
-        AddCollider(root);
         BuildShape(root.transform, state.Kind, state.Side);
         pieceView.Initialize(state);
 
         if (XRRig.IsHeadsetPresent)
         {
+            AddRollingCollider(root);
             AddGrabInteractable(root).SetRest(root.transform.localPosition);
             root.AddComponent<VrSelectionBridge>();
             root.AddComponent<PieceGrabHighlight>();
+        }
+        else
+        {
+            AddCollider(root);
         }
 
         return pieceView;
@@ -92,7 +108,7 @@ public sealed class PieceFactory : MonoBehaviour
         if (XRRig.IsHeadsetPresent)
         {
             root.layer = PieceView.PhysicsLayer;
-            AddCollider(root);
+            AddRollingCollider(root);
             AddGrabInteractable(root);
         }
 
@@ -113,6 +129,11 @@ public sealed class PieceFactory : MonoBehaviour
         Rigidbody body = root.AddComponent<Rigidbody>();
         body.isKinematic = true;
         body.useGravity = false;
+        body.angularDamping = AngularDamping;
+        body.interpolation = RigidbodyInterpolation.Interpolate;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+        Physics.IgnoreLayerCollision(PieceView.PhysicsLayer, PhysicalTableButton.PhysicsLayer);
+        Physics.IgnoreLayerCollision(PieceView.PhysicsLayer, BoardScaleHandles.PhysicsLayer);
 
         ThrowablePiece grab = root.AddComponent<ThrowablePiece>();
         grab.movementType = XRBaseInteractable.MovementType.Instantaneous;
@@ -127,6 +148,69 @@ public sealed class PieceFactory : MonoBehaviour
         BoxCollider collider = root.AddComponent<BoxCollider>();
         collider.size = new Vector3(0.7f, 1.4f, 0.7f);
         collider.center = new Vector3(0f, 0.7f, 0f);
+    }
+
+    private static void AddRollingCollider(GameObject root)
+    {
+        Bounds bounds = CalculateBounds(root.GetComponentsInChildren<Renderer>());
+        float height = bounds.size.y / root.transform.lossyScale.y;
+        MeshCollider collider = root.AddComponent<MeshCollider>();
+        collider.sharedMesh = RollingShape(height);
+        collider.convex = true;
+        collider.sharedMaterial = PieceSurface;
+    }
+
+    private static Mesh RollingShape(float height)
+    {
+        int key = Mathf.RoundToInt(height * 100f);
+        if (!rollingShapes.TryGetValue(key, out Mesh shape) || shape == null)
+        {
+            shape = BuildRollingShape(key / 100f);
+            rollingShapes[key] = shape;
+        }
+
+        return shape;
+    }
+
+    private static Mesh BuildRollingShape(float height)
+    {
+        var vertices = new Vector3[RollingSides * 2];
+        var triangles = new int[RollingSides * 6];
+        for (int side = 0; side < RollingSides; side++)
+        {
+            float angle = side * Mathf.PI * 2f / RollingSides;
+            var direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+            int next = (side + 1) % RollingSides;
+            vertices[side] = direction * BaseRadius;
+            vertices[RollingSides + side] = direction * TopRadius + Vector3.up * height;
+            triangles[side * 6] = side;
+            triangles[side * 6 + 1] = RollingSides + side;
+            triangles[side * 6 + 2] = next;
+            triangles[side * 6 + 3] = next;
+            triangles[side * 6 + 4] = RollingSides + side;
+            triangles[side * 6 + 5] = RollingSides + next;
+        }
+
+        return new Mesh { name = "Rolling piece", vertices = vertices, triangles = triangles };
+    }
+
+    private static PhysicsMaterial PieceSurface
+    {
+        get
+        {
+            if (pieceSurface == null)
+            {
+                pieceSurface = new PhysicsMaterial("Chess piece")
+                {
+                    bounciness = Bounciness,
+                    dynamicFriction = DynamicFriction,
+                    staticFriction = StaticFriction,
+                    bounceCombine = PhysicsMaterialCombine.Maximum,
+                };
+            }
+
+            return pieceSurface;
+        }
     }
 
     private bool BuildCustomShape(Transform parent, ChessPieceKind kind, ChessSide side, Material sideMaterial)

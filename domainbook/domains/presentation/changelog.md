@@ -181,6 +181,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- [Peça solta](glossary.md) rola e quica: no VR o corpo físico virou um tronco
+  de cone com o peso perto da base, com material de quique leve e detecção de
+  colisão contínua. Antes, uma caixa fazia a peça parar onde caía. Ela não
+  aciona os botões da mesa nem as hastes de tamanho, e continua voltando 3
+  segundos depois de solta.
+
 - A [aura de captura](glossary.md) e o brilho do rei em xeque deixam de ser
   esferas e passam a ser cilindros translúcidos, apoiados na casa da peça, com
   a largura limitada a essa casa e a altura de 1,1 vez a da maior peça do

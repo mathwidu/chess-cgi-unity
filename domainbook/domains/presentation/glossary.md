@@ -149,7 +149,12 @@ peças mais valiosas vêm primeiro. Um "+N" marca o lado à frente na
 
 Peça que o jogador largou no VR sem fazer um lance: cai, quica e pode ser
 arremessada pela física da cena, batendo na mesa, no chão, nas paredes e nos
-móveis da sala. Depois de 3 segundos solta, ela desliza de
+móveis da sala. Seu corpo físico é um tronco de cone (base larga, topo
+estreito) com o peso perto da base: em pé ela se apoia na base, deitada rola
+em arco como uma peça de verdade, e quica de leve ao cair. Ela passa pelos
+botões da mesa e pelas hastes de tamanho sem acioná-los. Só existe no VR; no
+desktop a peça mantém a caixa usada pelo clique. Depois de 3 segundos solta,
+mesmo que ainda esteja rolando, ela desliza de
 volta ao lugar de origem (a casa, ou o lugar na faixa das
 [peças capturadas](#peças-capturadas)). Agarrá-la de novo cancela a volta.
 

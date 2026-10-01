@@ -7,6 +7,7 @@ public sealed class ThrowablePiece : XRGrabInteractable
 {
     private const float ReturnDelaySeconds = 3f;
     private const float ReturnSeconds = 0.25f;
+    private const float CenterOfMassScale = 0.6f;
 
     private Rigidbody body;
     private Vector3 restPosition;
@@ -40,6 +41,8 @@ public sealed class ThrowablePiece : XRGrabInteractable
             CancelRecovery();
             rigidbody.isKinematic = false;
             rigidbody.useGravity = true;
+            rigidbody.ResetCenterOfMass();
+            rigidbody.centerOfMass *= CenterOfMassScale;
         }
 
         base.SetupRigidbodyGrab(rigidbody);
