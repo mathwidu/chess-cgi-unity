@@ -93,4 +93,34 @@ Para gerar uma versao jogavel fora do Editor:
 
 Tambem e possivel usar `File > Build Profiles`, desde que `Assets/Scenes/Main.unity` esteja na lista de cenas.
 
+### Build completa para Windows (pasta para pendrive)
+
+A pasta final fica em `Builds/XadrezCGI-Windows/`, pronta para copiar inteira
+para um pendrive e abrir `XadrezCGI.exe` num Windows 64 bits. Pode ser gerada
+de um Mac, com o módulo Windows Build Support do Unity `6000.3.16f1` instalado
+e o projeto fechado no Editor. Na raiz do repositório:
+
+```sh
+/Applications/Unity/Hub/Editor/6000.3.16f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -projectPath "$PWD/game" -buildTarget StandaloneWindows64 -executeMethod ChessCgiBuild.BuildWindows -logFile "$PWD/.local/build-windows.log"
+rm -rf Builds/XadrezCGI-Windows
+rsync -a --exclude '*_BurstDebugInformation_DoNotShip' Builds/Windows/ Builds/XadrezCGI-Windows/
+python3 tools/setup_stockfish.py --target windows --game-directory Builds/XadrezCGI-Windows
+```
+
+1. O primeiro comando gera `Builds/Windows/` (apagada a cada build) e termina
+   com `CHESS_CGI_BUILD_RESULT result=Succeeded` no log. Pelo Editor, o
+   equivalente é `Chess CGI > Build > Windows`.
+2. O `rsync` copia o jogo sem a pasta `*_BurstDebugInformation_DoNotShip`, que
+   o Unity marca como "não distribuir".
+3. O `setup_stockfish.py` baixa o Stockfish 18 oficial para Windows, confere o
+   SHA-256 fixado no script e coloca `stockfish.exe`, `Copying.txt` (GPL-3.0) e
+   `manifest.json` (origem e hashes) ao lado do `XadrezCGI.exe`. O jogo procura
+   o motor primeiro nessa pasta; sem ele, só o modo de dois jogadores funciona.
+   O download fica em cache em `.local/stockfish/windows/`.
+
+Refaça o `rm -rf` e o `rsync` a cada nova build, para não levar arquivos de
+uma versão antiga. Não há execução do `.exe` no Mac: valide a pasta num
+Windows. Quem distribuir a pasta a terceiros precisa manter `Copying.txt` e
+oferecer o código-fonte do Stockfish (link em `manifest.json`).
+
 As pastas `Build/` e `Builds/` sao ignoradas no Git para manter o repositorio leve. Para entrega por Git, o codigo-fonte e os assets em `game/` sao suficientes para abrir e rodar no Editor.

@@ -18,6 +18,8 @@ ARTIFACTS = {
     ('Linux', 'x86_64'): ('stockfish-ubuntu-x86-64.tar', '5c6f38b02a4da5f3ffe763f27da6c3e743eebefd92b50cb3661623b96696adff'),
 }
 
+TARGETS = {'windows': ('Windows', 'AMD64')}
+
 
 def digest(path):
     with path.open('rb') as stream:
@@ -27,12 +29,24 @@ def digest(path):
         return checksum.hexdigest()
 
 
-def prepare(player_directory=None):
-    key = (platform.system(), platform.machine())
+def install(destination, executable, expected_digest, files):
+    destination.mkdir(parents=True, exist_ok=True)
+    target = destination / executable.name
+    if target.exists() and digest(target) != expected_digest:
+        raise SystemExit(f'Another engine exists at {target}; preserve it before replacing.')
+    for source in files:
+        shutil.copy2(source, destination / source.name)
+    return target
+
+
+def prepare(player_directory=None, game_directory=None, target_platform=None):
+    key = TARGETS[target_platform] if target_platform else (platform.system(), platform.machine())
     if key not in ARTIFACTS:
         raise SystemExit(f'No verified desktop artifact for {key}; Quest requires its own adapter.')
     archive_name, expected = ARTIFACTS[key]
     root = Path(__file__).resolve().parents[1] / '.local' / 'stockfish'
+    if target_platform:
+        root = root / target_platform
     root.mkdir(parents=True, exist_ok=True)
     archive = root / archive_name
     # Reuse a previously verified local download made during development.
@@ -85,19 +99,20 @@ def prepare(player_directory=None):
         'license': 'GPL-3.0',
     }
     (root / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+    package_files = (executable, root / 'Copying.txt', root / 'manifest.json')
     if player_directory:
         destination = Path(player_directory).expanduser().resolve() / 'Engines'
-        destination.mkdir(parents=True, exist_ok=True)
-        target = destination / executable_name
-        if target.exists() and digest(target) != manifest['binary_sha256']:
-            raise SystemExit(f'Another engine exists at {target}; preserve it before replacing.')
-        for source in (executable, root / 'Copying.txt', root / 'manifest.json'):
-            shutil.copy2(source, destination / source.name)
-        print(f'Local player engine: {target}')
+        print(f'Local player engine: {install(destination, executable, manifest["binary_sha256"], package_files)}')
+    if game_directory:
+        destination = Path(game_directory).expanduser().resolve()
+        print(f'Engine beside the game: {install(destination, executable, manifest["binary_sha256"], package_files)}')
     print(f'Editor engine: {executable}\nSHA-256: {manifest["binary_sha256"]}')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--player-directory', help='Unity persistentDataPath for a local standalone player')
-    prepare(parser.parse_args().player_directory)
+    parser.add_argument('--game-directory', help='Folder of a standalone build, beside the game executable')
+    parser.add_argument('--target', choices=sorted(TARGETS), help='Prepare the engine for another platform than this machine')
+    arguments = parser.parse_args()
+    prepare(arguments.player_directory, arguments.game_directory, arguments.target)
