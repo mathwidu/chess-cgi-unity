@@ -135,6 +135,33 @@ public sealed class ThrownPieceTests
         Assert.That(table.HeightStep, Is.EqualTo(step));
     }
 
+    [UnityTest]
+    public IEnumerator ThrownPiecesReturnOntoTheirSquares()
+    {
+        PieceView[] pieces = board.Pieces.Where(p => p.Side == ChessSide.White).ToArray();
+        for (int i = 0; i < pieces.Length; i++)
+        {
+            yield return LetGoAbove(pieces[i], GroundTop + 0.5f, Quaternion.Euler(30f + i * 17f, i * 41f, i * 7f));
+            Rigidbody thrown = pieces[i].GetComponent<Rigidbody>();
+            thrown.linearVelocity = new Vector3(1.5f, 2f, -2f);
+            thrown.angularVelocity = new Vector3(8f, i, -5f);
+        }
+
+        yield return new WaitForSeconds(4f);
+        yield return new WaitForFixedUpdate();
+
+        foreach (PieceView piece in pieces)
+        {
+            Vector3 square = board.GetPieceWorldPosition(piece.Square);
+            Rigidbody body = piece.GetComponent<Rigidbody>();
+            Assert.That(Vector3.Distance(piece.transform.position, square), Is.LessThan(0.001f),
+                $"{piece.name} came back {(piece.transform.position - square) * 1000f} mm off its square.");
+            Assert.That(Vector3.Distance(body.position, square), Is.LessThan(0.001f), $"{piece.name}'s body must rest on its square too.");
+            Assert.That(Vector3.Angle(piece.transform.up, board.transform.up), Is.LessThan(0.5f), $"{piece.name} should stand upright.");
+            Assert.That(body.isKinematic, Is.True, $"{piece.name} should be held still once back.");
+        }
+    }
+
     private PieceView Pawn() => board.Pieces.First(p => p.Square.Equals(BoardSquare.FromAlgebraic("e2")));
 
     private IEnumerator LetGoAbove(PieceView piece, float height, Quaternion rotation)

@@ -103,6 +103,8 @@ public sealed class ThrowablePiece : XRGrabInteractable
 
         transform.localPosition = restPosition;
         transform.localRotation = restRotation;
+        body.position = transform.position;
+        body.rotation = transform.rotation;
         recovery = null;
     }
 }
