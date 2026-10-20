@@ -137,6 +137,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- Controles e mãos sem rastreamento ficam desligados ao iniciar, e o
+  [raio de seleção](glossary.md) deles não aparece mais parado na altura dos
+  olhos (visto no HTC Vive). O gerenciador de modalidade era ativado antes de
+  receber as referências dos controles e das mãos, e por isso não desligava
+  os que não estavam rastreados.
+
 - O alcance próximo das mãos rastreadas inclui a camada das peças do jogo.
   Os prefabs só consultavam a camada padrão, deixando as peças fora da detecção;
   o rig agora consulta só peças e hastes nos dois lados, com raio de 6 cm,

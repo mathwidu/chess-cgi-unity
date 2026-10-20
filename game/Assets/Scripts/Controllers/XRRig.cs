@@ -208,10 +208,12 @@ public sealed class XRRig : MonoBehaviour
         BuildTrackedHandPusher(rightHandVisual, rightHand);
 
         XRInputModalityManager modalityManager = offsetObject.AddComponent<XRInputModalityManager>();
+        modalityManager.enabled = false;
         modalityManager.leftController = leftController;
         modalityManager.rightController = rightController;
         modalityManager.leftHand = leftHand;
         modalityManager.rightHand = rightHand;
+        modalityManager.enabled = true;
 
         SubsystemManager.GetSubsystems(trackingSubsystems);
         foreach (XRInputSubsystem subsystem in trackingSubsystems)
