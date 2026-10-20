@@ -72,11 +72,13 @@ a calibração com jogadores continua aberta.
 
 O executável externo é preparado localmente, com versão, SHA-256, fonte e
 licença. Não é incluído em Assets nem automaticamente redistribuído com a build.
-Windows, PC-VR e Quest exigem validações próprias. O adaptador Android ainda
-não existe. O guia operacional registra a evidência obtida nesta entrega.
+Windows, PC-VR e Quest exigem validações próprias. O
+[adaptador Android](jogar-contra-computador-quest.md) possui implementação e
+verificações locais, mas ainda aguarda o headset. O guia operacional registra
+a evidência obtida em cada plataforma.
 
 ## Open Questions
 
 - Calibrar dificuldade com jogadores.
 - Aprovar o pacote de redistribuição do motor antes de entregar o aplicativo a terceiros.
-- Medir o orçamento de desempenho e escolher o adaptador no Quest real.
+- Medir o orçamento de desempenho e validar o adaptador no Quest real.

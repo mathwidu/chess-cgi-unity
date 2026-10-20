@@ -49,11 +49,21 @@ botão de retorno restaura a perspectiva do tabuleiro.
 
 ## Modo VR
 
-O jogo renderizado para um headset e controlado com controles de movimento em
-vez de monitor, mouse e teclado. Um alvo de conversão proposto para HTC Vive e
-Meta Quest 3, ainda não construído.
+O jogo renderizado para um headset e controlado com controles de movimento ou
+mãos rastreadas. Mantém o jogador na sala virtual do jogo. A interação está
+implementada e foi exercitada no Editor; o port Android e a validação no
+Meta Quest 3 estão em andamento.
 
 - **Aliases:** VR mode, Immersive mode
+- **Status:** draft
+
+## Realidade mista
+
+Modo futuro no Quest que apresenta o tabuleiro e os personagens sobre o
+ambiente real visto por passthrough. Será uma opção adicional ao modo VR com
+a sala virtual. Ainda não implementado nem validado no aparelho.
+
+- **Aliases:** Mixed reality, MR, Realidade aumentada, Passthrough
 - **Status:** draft
 
 ## Óculos VR

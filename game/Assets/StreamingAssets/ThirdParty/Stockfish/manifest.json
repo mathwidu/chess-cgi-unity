@@ -1,0 +1,108 @@
+{
+  "architecture": "arm64-v8a",
+  "archive": "stockfish-android-armv8.tar",
+  "archive_sha256": "e2eca54b0e3189ec7de338133c2b34fa8f5cdec3d2473519b414a5cb6815e768",
+  "binary_asset": "game/Assets/Plugins/Android/Stockfish/arm64-v8a/libstockfish.so",
+  "binary_sha256": "60d57aad661e3fe2f9c7731ae63d4c9687455adfdc863e99dbff0ce3ba5b82bc",
+  "binary_size": 113750848,
+  "build": {
+    "compiler_sha256": "f3060ee130cf6f162a739dbd9cbd9f4fae552890f59bf82e8c65176eb7887e22",
+    "make_args": [
+      "-j2",
+      "build",
+      "ARCH=armv8",
+      "COMP=ndk",
+      "OS=Android",
+      "KERNEL=Linux",
+      "GIT_SHA=",
+      "GIT_DATE=",
+      "EXTRALDFLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -Wl,--build-id=sha1"
+    ],
+    "ndk_revision": "27.2.12479018",
+    "networks": {
+      "nn-37f18f62d772.nnue": "37f18f62d772f3107e1d6aaca3898c130c3c86f2ab63e6555fbbca20635a899d",
+      "nn-c288c895ea92.nnue": "c288c895ea924429ea9092e3f36b2b3c1f00f2a3a4c759ff7e57e79e3b43e4a7"
+    },
+    "recipe_sha256": "5d81e7b61d64921a645bfa3bc97952a56aefb7e29759018369177bd06d1162da",
+    "source_date_epoch": "1700000000",
+    "upstream_archive_sha256": "e2eca54b0e3189ec7de338133c2b34fa8f5cdec3d2473519b414a5cb6815e768"
+  },
+  "download": "https://github.com/official-stockfish/Stockfish/releases/download/sf_18/stockfish-android-armv8.tar",
+  "elf": {
+    "elf_class": 64,
+    "entry_point": 112870272,
+    "interpreter": "/system/bin/linker64",
+    "load_segments": [
+      {
+        "alignment": 16384,
+        "file_size": 112853884,
+        "flags": 4,
+        "memory_size": 112853884,
+        "offset": 0,
+        "virtual_address": 0
+      },
+      {
+        "alignment": 16384,
+        "file_size": 855568,
+        "flags": 5,
+        "memory_size": 855568,
+        "offset": 112853888,
+        "virtual_address": 112870272
+      },
+      {
+        "alignment": 16384,
+        "file_size": 37992,
+        "flags": 6,
+        "memory_size": 44608,
+        "offset": 113709504,
+        "virtual_address": 113742272
+      },
+      {
+        "alignment": 16384,
+        "file_size": 1284,
+        "flags": 6,
+        "memory_size": 1170936,
+        "offset": 113747496,
+        "virtual_address": 113796648
+      }
+    ],
+    "machine": 183,
+    "needed": [
+      "libc.so",
+      "libdl.so",
+      "libm.so"
+    ],
+    "type": 3
+  },
+  "engine": "Stockfish 18",
+  "execution": "ProcessBuilder (not dlopen)",
+  "license": "GPL-3.0-or-later",
+  "networks": {
+    "nn-37f18f62d772.nnue": {
+      "embedded_offset": 109098080,
+      "sha256": "37f18f62d772f3107e1d6aaca3898c130c3c86f2ab63e6555fbbca20635a899d",
+      "size": 3519630
+    },
+    "nn-c288c895ea92.nnue": {
+      "embedded_offset": 178464,
+      "sha256": "c288c895ea924429ea9092e3f36b2b3c1f00f2a3a4c759ff7e57e79e3b43e4a7",
+      "size": 108919594
+    }
+  },
+  "notices": {
+    "AUTHORS": "8a3322e37f144896d724ef6b8f4395bf30e4e996c636d38d72789ff812fb33cc",
+    "Copying.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "SOURCE.txt": "91fefff8b293df1c54486c031cffe47a2bf55d5a5a5362bd3ea74ae349da5dc7"
+  },
+  "platform": "Android",
+  "release": "sf_18",
+  "runtime_filename": "libstockfish.so",
+  "source": "https://github.com/official-stockfish/Stockfish/tree/sf_18",
+  "source_bundle": {
+    "file": "stockfish-18-android-corresponding-source.tar.gz",
+    "sha256": "5162e27b2f8387d8049456e58266e696c1331d4a283aa91b4773137720746ca6",
+    "size": 75979163
+  },
+  "source_inventory_sha256": "674ada018be229415e33b658158e912413258e949772c93079335f950c80cebb",
+  "upstream_binary_sha256": "cc3b3b74466b6d85cdc0f8cfdad4111c6a44bd0698f4eab96fea7b359a54d3d4"
+}

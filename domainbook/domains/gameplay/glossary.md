@@ -98,8 +98,10 @@ ser confirmada.
 
 Participante não humano que controla exatamente um lado de uma partida local e
 fornece uma jogada quando esse lado possui o turno. A implementação desktop usa
-um motor de xadrez externo, mas sempre devolve a jogada candidata às regras
-locais antes que a partida seja alterada.
+um motor de xadrez externo. O candidato Android inclui seu próprio executável
+ARM64 e o inicia por processo Java/UCI. Ambos devolvem a jogada candidata às
+regras locais antes que a partida seja alterada; o Android ainda aguarda
+validação no headset.
 
 - **Aliases:** Adversário de IA, Computer opponent, Computer player
 - **Status:** validated

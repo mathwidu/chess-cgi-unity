@@ -10,6 +10,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Adaptador offline Android/Quest com Stockfish 18 ARM64 PIE incluído no APK,
+  transporte UCI por Java, cancelamento sem bloqueio da thread Unity e preparo
+  reproduzível com licença/fonte correspondente. O desktop permanece no
+  transporte anterior; validação física do Quest ainda pendente. Veja
+  [a funcionalidade](features/jogar-contra-computador-quest.md).
+
 - `ChessRulesAdapter.GetCapturableSquares` lista as casas das peças adversárias
   que a peça em uma casa pode capturar, incluindo o peão tomado en passant, e
   o controlador as entrega ao tabuleiro ao selecionar uma peça. Nenhuma regra

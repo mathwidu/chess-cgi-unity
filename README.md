@@ -27,7 +27,7 @@ A pasta correta para abrir como projeto Unity e `game`.
 
 O jogo alterna automaticamente entre brancas e pretas. No modo local a camera acompanha o turno; contra a IA ela permanece no lado humano.
 
-No menu, escolha **Contra IA**, o lado e a dificuldade. O Stockfish deve ser preparado uma vez neste dispositivo com `python3 tools/setup_stockfish.py`. O download fica fora dos assets e a partida funciona offline. Veja [configuração, testes e integração com VR](docs/ai-desktop.md).
+No menu, escolha **Contra IA**, o lado e a dificuldade. No desktop, prepare o Stockfish com `python3 tools/setup_stockfish.py`; veja [configuração e testes desktop](docs/ai-desktop.md). No candidato Quest, o motor acompanha o APK e funciona sem download durante a partida; veja [preparo e limites da IA Android](docs/quest3-offline-ai.md). A execução no headset ainda aguarda validação física.
 
 ## Funcionalidades
 
@@ -72,6 +72,8 @@ As fotos usadas como referencia ficam apenas localmente e nao entram no Git. Os 
 
 ## Código e documentação
 
+- [Port para Quest 3 standalone: configuração, build e validação em aparelho](docs/quest3-standalone.md).
+- [IA offline Android: implementação, APK e teste pendente no Quest](docs/quest3-offline-ai.md).
 - [Entrega visual Feevale: escopo, controles, testes e integração com a equipe](docs/visual-feevale.md).
 - [Fontes 3D, texturas, referências e histórico visual](art/README.md).
 - [IA, organização dos fontes, testes e integração com VR](docs/ai-desktop.md).

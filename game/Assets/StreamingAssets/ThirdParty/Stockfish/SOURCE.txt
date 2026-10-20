@@ -1,0 +1,12 @@
+Stockfish 18 (sf_18); GPL-3.0-or-later.
+Unmodified source: https://github.com/official-stockfish/Stockfish/tree/sf_18
+Official release: https://github.com/official-stockfish/Stockfish/releases/download/sf_18/stockfish-android-armv8.tar
+Official archive SHA-256: e2eca54b0e3189ec7de338133c2b34fa8f5cdec3d2473519b414a5cb6815e768
+The official Android binary is ET_EXEC; this app packages a local PIE build
+from the same source and the exact default embedded NNUE networks.
+The manifest records source, network, compiler, build and executable hashes.
+The distributable local artifact must travel with its offline corresponding-source bundle:
+stockfish-18-android-corresponding-source.tar.gz
+SHA-256: 5162e27b2f8387d8049456e58266e696c1331d4a283aa91b4773137720746ca6
+The bundle includes all release source, scripts, GPL, authors, both NNUE files,
+a file hash inventory and REBUILD.txt. Keep it beside every distributed APK.

@@ -12,16 +12,13 @@ Como jogador com um headset de VR
 Quero sentar diante do tabuleiro de xadrez em realidade virtual e escolher peças com as mãos
 Para que o jogo que já tenho se torne uma partida imersiva em vez de uma de tela
 
-Isto é um plano, não um trabalho construído. É um estudo de viabilidade e uma
-rota de conversão de alto nível para levar a build atual de desktop ao modo VR
-no HTC Vive (conectado a um PC) e no Meta Quest 3 (standalone, além de PC via
-Link). Permanece no contexto de interação porque a mudança é sobretudo sobre
-como o jogador percebe e controla o jogo — os [óculos VR](../glossary.md)
-comandam a visão e o [controle de movimento](../glossary.md) substitui o mouse
-— com trabalho de suporte no pipeline de renderização da apresentação. Quando
-a rota for combinada e o framework de XR estiver escolhido, essa escolha
-ganha um registro de decisão e as regras abaixo se tornam os critérios de
-aceite para construí-la.
+O estudo abaixo originou a implementação OpenXR do rig, HUD e interação de
+mesa, com verificações no Editor descritas em cada regra. A etapa atual prepara
+o Meta Quest 3 standalone, preservando a sala virtual e os personagens. O
+[registro de preparação Android](../../../../docs/quest3-standalone.md) contém
+comandos, resultados e pendências: o APK e os testes do Editor não comprovam
+funcionamento, conforto ou desempenho no headset. O modo de realidade mista
+com passthrough será uma opção adicional futura, mantendo a sala virtual.
 
 ### Estudo de viabilidade
 
@@ -348,12 +345,12 @@ via CLI batchmode Play mode: apontar o raio do controle direito para o botão
 overlay, do mesmo raycast world-space até o mesmo evento `onClick` que o
 clique de mouse do desktop usa.
 
-## Rule: A mesma build atende HTC Vive e Meta Quest 3
+## Rule: O mesmo código de interação atende HTC Vive e Meta Quest 3
 
 ```gherkin
-Example: Uma build lê qualquer controle presente
-  Given a build lista os perfis de interação do HTC Vive e do Meta Quest Touch
-  When o jogador a executa em um Vive ou em um Quest 3
+Example: Cada build lê o controle compatível presente
+  Given as builds desktop e Android listam os perfis compatíveis com seus headsets
+  When o jogador executa a build correspondente em um Vive ou em um Quest 3
   Then o OpenXR vincula o controle do dispositivo em uso
   And a entrada funciona sem um caminho de código separado por headset
 

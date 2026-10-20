@@ -18,8 +18,13 @@ O incremento desktop está implementado; o alvo completo, incluindo Quest
 standalone e distribuição, permanece em evolução. Consulte a entrega
 [desktop](jogar-contra-computador-desktop.md) e o [guia operacional](../../../../docs/ai-desktop.md).
 
+Em 19/10/2026, foi implementado o candidato de
+[IA offline Android](jogar-contra-computador-quest.md), antecipando desenvolvimento
+local conforme solicitado. O transporte escolhido é processo UCI por Java;
+a execução e o desempenho no Quest continuam aguardando validação física.
+
 As seções de estado inicial e lacunas abaixo registram o diagnóstico anterior
-à implementação. Não representam o estado atual do desktop. Os portões de
+à implementação. Não representam o estado atual do desktop ou do candidato Android. Os portões de
 Windows PC-VR, Quest e redistribuição do binário continuam pendentes.
 
 A proposta é integrar o Stockfish 18 como [motor de xadrez](../glossary.md)

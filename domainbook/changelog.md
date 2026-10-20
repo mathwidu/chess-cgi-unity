@@ -10,4 +10,10 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Frente [Quest 3 standalone](../docs/quest3-standalone.md): preparação Android
+  e APK de desenvolvimento com o cenário atual e o
+  [adversário offline Android](../docs/quest3-offline-ai.md) incluído.
+  Build e inspeção local concluídas; execução no headset continua pendente.
+  Realidade mista foi registrada como opção futura adicional à sala virtual.
+
 - Provedor OpenXR habilitado para Standalone, com o perfil de controle do HTC Vive ativado e a renderização definida como Single Pass Instanced ([interaction ADR 0001](domains/interaction/decisions/0001-usar-openxr-e-o-xr-interaction-toolkit-para-o-modo-vr.md)).
