@@ -12,9 +12,11 @@ posição e a validação de toda candidata em `ChessRulesAdapter`. Desktop mant
 o transporte anterior. Cenário, personagens, HUD e modo local não foram alterados.
 A realidade mista permanece uma opção futura, mantendo também a sala virtual.
 
-**Execução no Quest ainda não comprovada.** O modo de desenvolvedor continua
-pendente. Testes de código, execução Java no Mac e inspeção do APK não comprovam
-a política de execução do Horizon OS, conforto ou orçamento de CPU/GPU no aparelho.
+**Atualização de 21/10/2026:** com o modo de desenvolvedor liberado, o APK abriu
+no Quest 3 e `libstockfish.so` foi observado como processo filho do jogo.
+A inicialização pelo aplicativo foi comprovada; jogada legal sem rede,
+cancelamento, pausa/reinício e orçamento de CPU/GPU ainda precisam de validação.
+Veja o [registro da sessão física](quest3-standalone.md#primeira-sessão-física-em-21102026).
 
 ## Implementação
 

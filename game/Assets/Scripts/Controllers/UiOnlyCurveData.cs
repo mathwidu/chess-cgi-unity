@@ -20,7 +20,7 @@ public sealed class UiOnlyCurveData : ICurveInteractionDataProvider
         curve = interactor;
     }
 
-    public bool isActive => HasUiHit || TryGetIdleAim(out _);
+    public bool isActive => curve.isActive && (HasUiHit || TryGetIdleAim(out _));
     public bool hasValidSelect => curve.hasValidSelect;
     public Transform curveOrigin => curve.curveOrigin;
     public NativeArray<Vector3> samplePoints => curve.samplePoints;

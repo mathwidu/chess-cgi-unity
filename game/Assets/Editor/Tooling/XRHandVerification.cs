@@ -93,8 +93,8 @@ public static class XRHandVerification
         NearFarInteractor leftHandNearFar = leftHand != null ? leftHand.GetComponentInChildren<NearFarInteractor>(true) : null;
         XRPokeInteractor leftHandPoke = leftHand != null ? leftHand.GetComponentInChildren<XRPokeInteractor>(true) : null;
 
-        GameObject leftHandVisual = cameraOffset != null ? cameraOffset.Find("LeftHandVisual")?.gameObject : null;
-        GameObject rightHandVisual = cameraOffset != null ? cameraOffset.Find("RightHandVisual")?.gameObject : null;
+        GameObject leftHandVisual = leftHand != null ? leftHand.transform.Find("LeftHandVisual")?.gameObject : null;
+        GameObject rightHandVisual = rightHand != null ? rightHand.transform.Find("RightHandVisual")?.gameObject : null;
         int leftVisualRenderers = leftHandVisual != null ? leftHandVisual.GetComponentsInChildren<Renderer>(true).Length : 0;
         int rightVisualRenderers = rightHandVisual != null ? rightHandVisual.GetComponentsInChildren<Renderer>(true).Length : 0;
         TrackedPoseDriver leftControllerPose = leftController != null ? leftController.GetComponent<TrackedPoseDriver>() : null;

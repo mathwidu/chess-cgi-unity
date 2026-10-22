@@ -68,6 +68,16 @@ public static class ChessCgiQuestBuild
         FeatureHelpers.RefreshFeatures(TargetGroup);
         OpenXRSettings openXr = GetOpenXrSettings();
         SetFeatureEnabled<MetaQuestFeature>(openXr, true);
+        SetFeatureEnabled<FoveatedRenderingFeature>(openXr, true);
+        openXr.foveatedRenderingApi = OpenXRSettings.BackendFovationApi.SRPFoveation;
+        // Meta Quest Support copies its setting into OpenXR during validation.
+        // The package exposes this choice only through a serialized Editor field.
+        var questSettings = new SerializedObject(openXr.GetFeature<MetaQuestFeature>());
+        SerializedProperty foveationApi = questSettings.FindProperty("m_foveatedRenderingApi");
+        if (foveationApi == null)
+            throw new BuildFailedException("Meta Quest Support no longer exposes its serialized foveation API; review the installed OpenXR package.");
+        foveationApi.intValue = (int)OpenXRSettings.BackendFovationApi.SRPFoveation;
+        questSettings.ApplyModifiedPropertiesWithoutUndo();
         SetFeatureEnabled<OculusTouchControllerProfile>(openXr, true);
         SetFeatureEnabled<MetaQuestTouchPlusControllerProfile>(openXr, true);
         SetFeatureEnabled<HandTracking>(openXr, true);
@@ -137,6 +147,9 @@ public static class ChessCgiQuestBuild
             Check(openXr.renderMode == OpenXRSettings.RenderMode.SinglePassInstanced,
                 "Android OpenXR render mode must be Single Pass Instanced / Multi-view.", errors);
             CheckFeatureEnabled<MetaQuestFeature>(openXr, errors);
+            CheckFeatureEnabled<FoveatedRenderingFeature>(openXr, errors);
+            Check(openXr.foveatedRenderingApi == OpenXRSettings.BackendFovationApi.SRPFoveation,
+                "Android OpenXR must use SRP Foveation for render comparisons.", errors);
             CheckFeatureEnabled<OculusTouchControllerProfile>(openXr, errors);
             CheckFeatureEnabled<MetaQuestTouchPlusControllerProfile>(openXr, errors);
             CheckFeatureEnabled<HandTracking>(openXr, errors);
@@ -182,11 +195,23 @@ public static class ChessCgiQuestBuild
     [MenuItem("Chess CGI/Build/Quest 3/Build Development APK")]
     public static void Build()
     {
+        BuildApk(true);
+    }
+
+    [MenuItem("Chess CGI/Build/Quest 3/Build Demo APK")]
+    public static void BuildDemo()
+    {
+        BuildApk(false);
+    }
+
+    private static void BuildApk(bool development)
+    {
         Validate();
         string projectRoot = Directory.GetParent(Application.dataPath).FullName;
         string repositoryRoot = Directory.GetParent(projectRoot).FullName;
         string outputDirectory = Path.Combine(repositoryRoot, "Builds", "Quest3");
-        string outputPath = Path.Combine(outputDirectory, "XadrezCGI-Quest3-dev.apk");
+        string outputPath = Path.Combine(outputDirectory,
+            development ? "XadrezCGI-Quest3-dev.apk" : "XadrezCGI-Quest3-demo.apk");
         Directory.CreateDirectory(outputDirectory);
 
         BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
@@ -195,7 +220,7 @@ public static class ChessCgiQuestBuild
             locationPathName = outputPath,
             target = BuildTarget.Android,
             targetGroup = TargetGroup,
-            options = BuildOptions.Development
+            options = development ? BuildOptions.Development : BuildOptions.None
         });
         BuildSummary summary = report.summary;
         Debug.Log($"CHESS_CGI_QUEST_BUILD_RESULT result={summary.result} path={outputPath} size={summary.totalSize} warnings={summary.totalWarnings} errors={summary.totalErrors}");

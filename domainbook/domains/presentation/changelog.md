@@ -10,6 +10,20 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Diagnóstico de renderização no APK de desenvolvimento do Quest permite
+  comparar escala, MSAA e foveation por abertura, sem regravar assets ou
+  configurações globais do aparelho. Registra destino XR e contadores
+  disponíveis para avaliar nitidez e custo no mesmo enquadramento. A
+  feature OpenXR fica habilitada; o padrão inicial de foveation era zero.
+  Sondas de distância de sombras e limite de luzes adicionais permitem isolar
+  esses custos no clone; seus padrões mantêm a iluminação salva do projeto.
+- Perfil de demonstração do Quest usa o perfil salvo e aplica foveation 0,5
+  também no APK sem diagnóstico de desenvolvimento, retomando a configuração
+  após pausa. Iluminação adicional por vértice, MSAA 2× e sombras em tempo real
+  desligadas priorizam a fluidez, preservando os modelos e as texturas. Em
+  22/10/2026 o usuário aprovou a qualidade e o funcionamento no aparelho e
+  escolheu a mesma configuração como base de trabalho e demonstração.
+
 - Botões do HUD no VR ganham área de clique maior: até 16 unidades a mais em
   cada lado, limitadas à metade da folga até o vizinho da mesma linha ou
   coluna, para que áreas de botões vizinhos nunca se toquem.
@@ -180,6 +194,18 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - Nova partida mantém as opções escolhidas.
 
 ### Changed
+
+- O texto do HUD no modo VR usa densidade 2× via `CanvasScaler` WorldSpace,
+  preservando as dimensões do painel e os tipos de texto existentes. Testes
+  conferem glifos mais densos e legendas sem corte. O perfil Mobile também
+  desliga HDR como candidato para reduzir tráfego de memória; desempenho e
+  aparência das luminárias ainda precisam de comparação no aparelho.
+
+- O perfil Mobile usado no Quest passa de escala 0,8 sem MSAA para escala
+  1,0 com MSAA 4×, após relato de baixa nitidez e confirmação de resolução
+  reduzida no log OpenXR. O primeiro candidato, com 2×, teve melhora de nitidez
+  confirmada pelo usuário. O passo para 4× exige nova comparação visual e
+  medição de desempenho; a sala e os personagens são preservados.
 
 - [Peça solta](glossary.md) rola e quica: no VR o corpo físico virou um tronco
   de cone com o peso perto da base, com material de quique leve e detecção de

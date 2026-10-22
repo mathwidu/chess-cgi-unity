@@ -314,6 +314,25 @@ demonstração não usados. Verificado manualmente no editor: em Play mode com o
 XR Interaction Simulator, a malha da mão aparece rastreada e articulada na
 Game View, sem novos erros no console.
 
+Na correção de 21/10/2026, cada visual rastreado passou a ser filho do
+interactor da mesma mão. Assim, o seletor ativa ou desativa entrada, malha e
+contatos juntos. As referências do seletor são preenchidas antes da ativação
+do grupo, para que ele reconheça também dispositivos que já estavam rastreados
+na abertura. As poses das articulações continuam relativas ao Camera Offset.
+`XRInputModalityTests` cobre abertura com controles, abertura com mãos e a
+troca/perda/retorno de tracking, incluindo desarme de contatos antes ativos.
+A confirmação visual da correção no Quest é registrada no guia standalone.
+
+O raio de seleção das mãos usa o mesmo Aim Pose efetivo do farcaster para
+desenhar a linha e selecionar o HUD. O override de origem do prefab apontava
+para um ponto de pinça sem eventos de tracking, deixando a linha perto da
+cabeça mesmo quando a seleção seguia a mão. O rig remove esse override e o
+`UiOnlyCurveData` respeita o estado ativo da interação, ocultando a linha
+quando o farcasting é desativado. Os testes com poses injetadas comparam o
+primeiro ponto renderizado com a origem real do seletor nas duas mãos,
+movendo mão e câmera independentemente. No reteste físico de 21/10/2026,
+o usuário confirmou origem correta do ponteiro e seleção por pinça no menu.
+
 ## Rule: A interface vive no mundo, não na tela
 
 ```gherkin

@@ -84,6 +84,28 @@ public sealed class VrHudPointingTests
     }
 
     [UnityTest]
+    public IEnumerator WorldSpaceTextUsesDenseGlyphsWithoutChangingPanelOrClippingLabels()
+    {
+        headset = InputSystem.AddDevice("XRHMD");
+        EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/Main.unity", new LoadSceneParameters(LoadSceneMode.Single));
+        yield return null;
+        yield return null;
+        var hud = Object.FindFirstObjectByType<GameHud>();
+        hud.RebuildInterface();
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+        Assert.That(hud.GetComponent<Canvas>().renderMode, Is.EqualTo(RenderMode.WorldSpace));
+        Assert.That(((RectTransform)hud.transform).sizeDelta, Is.EqualTo(new Vector2(1920, 1080)));
+        Text[] labels = hud.GetComponentsInChildren<Text>().Where(text => text.enabled && !string.IsNullOrEmpty(text.text)).ToArray();
+        Assert.That(labels.Length, Is.GreaterThan(0));
+        foreach (Text label in labels)
+        {
+            Assert.That(label.pixelsPerUnit, Is.GreaterThanOrEqualTo(2f), label.name + " must rasterize denser glyphs in VR");
+            Assert.That(label.preferredHeight, Is.LessThanOrEqualTo(label.rectTransform.rect.height + 1f), label.name + " must keep its logical layout");
+        }
+    }
+
+    [UnityTest]
     public IEnumerator VrHudButtonsGrowTheirHitAreaWithoutReachingTheirNeighbours()
     {
         headset = InputSystem.AddDevice("XRHMD");

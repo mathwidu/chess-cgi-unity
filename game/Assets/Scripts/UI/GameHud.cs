@@ -665,10 +665,14 @@ public sealed partial class GameHud : MonoBehaviour
         canvas.sortingOrder = 0;
 
         CanvasScaler scaler = GetComponent<CanvasScaler>();
-        if (scaler != null)
+        if (scaler == null)
         {
-            scaler.enabled = false;
+            scaler = gameObject.AddComponent<CanvasScaler>();
         }
+        // World-space glyph density is independent of the panel's metre size.
+        scaler.dynamicPixelsPerUnit = 2f;
+        scaler.referencePixelsPerUnit = 100f;
+        scaler.enabled = true;
 
         RectTransform canvasRect = (RectTransform)transform;
         canvasRect.pivot = new Vector2(0.5f, 0.5f);

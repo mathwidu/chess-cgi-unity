@@ -159,6 +159,8 @@ public sealed class XRRig : MonoBehaviour
         Origin = originObject.transform;
 
         GameObject offsetObject = new GameObject("Camera Offset");
+        // Configure modality references before OnEnable selects the tracked input.
+        offsetObject.SetActive(false);
         offsetObject.transform.SetParent(originObject.transform, false);
 
         GameObject cameraObject = new GameObject("Eye Camera");
@@ -202,16 +204,17 @@ public sealed class XRRig : MonoBehaviour
         GameObject rightController = BuildController(offsetObject.transform, "Right Controller", "RightHand", "RightControllerHand");
         GameObject leftHand = BuildHandInteractor(offsetObject.transform, "LeftHandInteractor");
         GameObject rightHand = BuildHandInteractor(offsetObject.transform, "RightHandInteractor");
-        GameObject leftHandVisual = BuildHandVisual(offsetObject.transform, "LeftHandVisual");
-        GameObject rightHandVisual = BuildHandVisual(offsetObject.transform, "RightHandVisual");
-        BuildTrackedHandPusher(leftHandVisual, leftHand);
-        BuildTrackedHandPusher(rightHandVisual, rightHand);
+        GameObject leftHandVisual = leftHand != null ? BuildHandVisual(leftHand.transform, "LeftHandVisual") : null;
+        GameObject rightHandVisual = rightHand != null ? BuildHandVisual(rightHand.transform, "RightHandVisual") : null;
+        BuildTrackedHandPusher(leftHandVisual, leftHand, offsetObject.transform);
+        BuildTrackedHandPusher(rightHandVisual, rightHand, offsetObject.transform);
 
         XRInputModalityManager modalityManager = offsetObject.AddComponent<XRInputModalityManager>();
         modalityManager.leftController = leftController;
         modalityManager.rightController = rightController;
         modalityManager.leftHand = leftHand;
         modalityManager.rightHand = rightHand;
+        offsetObject.SetActive(true);
 
         SubsystemManager.GetSubsystems(trackingSubsystems);
         foreach (XRInputSubsystem subsystem in trackingSubsystems)
@@ -265,6 +268,10 @@ public sealed class XRRig : MonoBehaviour
         CurveVisualController curveVisual = interactorObject.GetComponentInChildren<CurveVisualController>(true);
         if (curveVisual != null)
         {
+            // Use the tracked aim for both the UI hit and its visible ray. The
+            // sample's pinch-origin helper has no hand events in these prefabs.
+            curveVisual.overrideLineOrigin = false;
+            curveVisual.lineOriginTransform = null;
             curveVisual.curveInteractionDataProvider = new UiOnlyCurveData(interactor);
             KeepRayStraight(curveVisual);
         }
@@ -401,13 +408,13 @@ public sealed class XRRig : MonoBehaviour
             device.isTracked.isPressed && (device.trackingState.ReadValue() & poseTracked) == poseTracked;
     }
 
-    private void BuildTrackedHandPusher(GameObject visual, GameObject handInteractor)
+    private void BuildTrackedHandPusher(GameObject visual, GameObject handInteractor, Transform trackingSpace)
     {
         if (visual == null || handInteractor == null) return;
         XRHandSkeletonDriver skeleton = visual.GetComponentInChildren<XRHandSkeletonDriver>(true);
         if (skeleton == null || skeleton.handTrackingEvents == null || skeleton.rootTransform == null) return;
         XRPhysicalHand physicalHand = visual.AddComponent<XRPhysicalHand>();
-        physicalHand.ConfigureTrackedHand(skeleton, handInteractor, visual.transform.parent, transform, Origin);
+        physicalHand.ConfigureTrackedHand(skeleton, handInteractor, trackingSpace, transform, Origin);
         RegisterPhysicalHand(physicalHand);
     }
 

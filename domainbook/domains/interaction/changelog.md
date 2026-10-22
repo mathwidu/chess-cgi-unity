@@ -10,6 +10,9 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Aceite físico da base Quest em 22/10/2026: o usuário confirmou pegar uma
+  peça, efetuar um lance e voltar ao menu normalmente na versão de demonstração.
+
 - [Raio de seleção](glossary.md) ocioso: com a mão vazia e apontando para o
   painel do HUD, o raio aparece mais escuro até tocar um botão, quando volta
   ao brilho normal. Tabuleiro, peças e mesa barram a mira, e segurar ou
@@ -136,6 +139,21 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - Agarrar uma peça com o [controle de movimento](glossary.md) passou do grip para o gatilho do indicador, o mesmo botão do clique de UI (o raio distante só age sobre o HUD, então os dois usos não se cruzam). Enquanto segura uma peça, o modelo de mão do controle fecha na pose de pinça, e reabre ao soltar; o `ControllerHandPose` faz essa transição sobre os ossos da mão.
 
 ### Fixed
+
+- O [raio de seleção](glossary.md) das mãos usa a mesma origem rastreada da
+  seleção do menu. O ponto auxiliar de pinça dos prefabs não recebia eventos
+  e deixava a linha nascer perto da cabeça; o rig remove seu override visual.
+  A linha também respeita a desativação do farcasting durante gestos de toque.
+  Testes PlayMode reproduziram e cobrem origem, movimento independente da
+  cabeça e ocultação nas duas mãos. O usuário confirmou origem e seleção
+  por pinça funcionando no Quest 3 em 21/10/2026.
+
+- Duplicação de mãos na primeira sessão do Quest 3: o `XRRig` configura o
+  seletor de entrada antes de ativá-lo, e cada visual rastreado pertence ao
+  grupo de seu interactor. Alternar para controles oculta o visual da mão e
+  desarma seus contatos físicos. Testes PlayMode cobrem abertura com entrada
+  já rastreada e transições. O usuário confirmou um único par nos dois modos
+  no Quest 3 após reinstalar o APK em 21/10/2026.
 
 - O alcance próximo das mãos rastreadas inclui a camada das peças do jogo.
   Os prefabs só consultavam a camada padrão, deixando as peças fora da detecção;
