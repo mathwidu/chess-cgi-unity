@@ -75,6 +75,10 @@ node_modules/
 # Local engine downloads; never package them into Assets
 /.local/
 
+# Recoverable Web-only build assets; see docs/web-assets.md
+/game/Assets/__ChessWebBuildStage/
+/game/Assets/__ChessWebBuildStage.meta
+
 # Reproducible Android engine; prepare with tools/setup_stockfish_android.py
 /game/Assets/Plugins/Android/Stockfish/arm64-v8a/libstockfish.so
 

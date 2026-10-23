@@ -8,9 +8,10 @@ public sealed class ComputerTurnCoordinator : IDisposable
     private readonly IMoveChooser chooser;
     private CancellationTokenSource cancellation;
     private Task<ComputerTurnResult> pending;
+    private Task<ChessMove> playerLoopSearch;
     private PositionSnapshot requested;
 
-    public bool IsThinking => pending != null;
+    public bool IsThinking => pending != null || playerLoopSearch != null;
 
     public ComputerTurnCoordinator(IMoveChooser chooser)
     {
@@ -19,18 +20,36 @@ public sealed class ComputerTurnCoordinator : IDisposable
 
     public void Begin(PositionSnapshot position, MoveSearchSettings settings)
     {
-        if (pending != null)
+        if (IsThinking)
         {
             throw new InvalidOperationException("A computer turn is already pending.");
         }
         requested = position;
         cancellation = new CancellationTokenSource();
-        pending = SearchAsync(position, settings, cancellation.Token);
+        if (chooser is IPlayerLoopMoveChooser)
+        {
+            // Web has no managed timers/ThreadPool. Its transport owns phase
+            // deadlines and is progressed by TryTakeResult on Unity's Update.
+            try { playerLoopSearch = chooser.ChooseMoveAsync(position, settings, cancellation.Token); }
+            catch (Exception exception) { pending = Task.FromResult(Failure(exception)); }
+        }
+        else pending = SearchAsync(position, settings, cancellation.Token);
     }
 
     public bool TryTakeResult(PositionSnapshot current, out ComputerTurnResult result)
     {
         result = default;
+        if (playerLoopSearch != null)
+        {
+            ((IPlayerLoopMoveChooser)chooser).Poll();
+            if (!playerLoopSearch.IsCompleted) return false;
+            try { result = new ComputerTurnResult(playerLoopSearch.GetAwaiter().GetResult(), null); }
+            catch (Exception exception) { result = Failure(exception); }
+            playerLoopSearch = null;
+            cancellation.Dispose();
+            cancellation = null;
+            return current.Revision == requested.Revision && current.SideToMove == requested.SideToMove;
+        }
         if (pending == null || !pending.IsCompleted)
         {
             return false;
@@ -40,6 +59,13 @@ public sealed class ComputerTurnCoordinator : IDisposable
         cancellation.Dispose();
         cancellation = null;
         return current.Revision == requested.Revision && current.SideToMove == requested.SideToMove;
+    }
+
+    private static ComputerTurnResult Failure(Exception exception)
+    {
+        return new ComputerTurnResult(default, exception is OperationCanceledException
+            ? "Busca da IA interrompida."
+            : "Nao foi possivel obter a jogada da IA. " + exception.Message);
     }
 
     private async Task<ComputerTurnResult> SearchAsync(PositionSnapshot position,
@@ -97,6 +123,9 @@ public sealed class ComputerTurnCoordinator : IDisposable
     public void Cancel()
     {
         pending = null;
+        Task<ChessMove> oldSearch = playerLoopSearch;
+        playerLoopSearch = null;
+        if (oldSearch != null) _ = ObserveCompletionAsync(oldSearch);
         if (cancellation == null)
         {
             return;

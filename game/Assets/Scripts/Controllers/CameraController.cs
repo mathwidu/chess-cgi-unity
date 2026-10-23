@@ -25,6 +25,10 @@ public sealed class CameraController : MonoBehaviour
     private CursorLockMode previousCursorLock;
     private bool previousCursorVisible;
     private int suppressedPointerFrame = -1;
+    private Vector2 webFramedViewport;
+    private Rect webFramedSafeArea;
+    private float webFramedDistance;
+    private BoardView webBoard;
 
     public ChessSide CurrentPerspective { get; private set; } = ChessSide.White;
     public bool IsLookingAround { get; private set; }
@@ -44,6 +48,12 @@ public sealed class CameraController : MonoBehaviour
         {
             EndRoomView();
             return;
+        }
+
+        if (WebTouchInput.Enabled && !IsLookingAround && desktopCamera != null
+            && (WebTouchInput.ViewportSize != webFramedViewport || WebTouchInput.SafeArea != webFramedSafeArea))
+        {
+            SetPerspective(CurrentPerspective, true);
         }
 
         Keyboard keyboard = Keyboard.current;
@@ -139,6 +149,19 @@ public sealed class CameraController : MonoBehaviour
         SetPerspective(CurrentPerspective, true);
     }
 
+    public void ApplyTouchGesture(float orbitDegrees, float pinchFraction)
+    {
+        if (!WebTouchInput.Enabled || XRRig.IsHeadsetPresent || !isActiveAndEnabled || IsLookingAround
+            || (gameController != null && (gameController.IsMenuOpen || gameController.IsAwaitingPromotion))) return;
+        if (Mathf.Abs(orbitDegrees) < .001f && Mathf.Abs(pinchFraction) < .0001f) return;
+        StopPerspectiveTransition();
+        transform.RotateAround(target, Vector3.up, orbitDegrees);
+        Vector3 direction = (transform.position - target).normalized;
+        float distance = Mathf.Clamp(Vector3.Distance(transform.position, target) - pinchFraction * zoomSpeed * 4f,
+            MinimumZoomDistance, MaximumZoomDistance);
+        transform.SetPositionAndRotation(target + direction * distance, Quaternion.LookRotation(-direction, Vector3.up));
+    }
+
     private void EndRoomView()
     {
         ReleasePointer();
@@ -187,7 +210,7 @@ public sealed class CameraController : MonoBehaviour
             StopPerspectiveTransition();
             Vector3 direction = (transform.position - target).normalized;
             float distance = Vector3.Distance(transform.position, target);
-            distance = Mathf.Clamp(distance - scrollDelta * zoomSpeed, minDistance, maxDistance);
+            distance = Mathf.Clamp(distance - scrollDelta * zoomSpeed, MinimumZoomDistance, MaximumZoomDistance);
             transform.position = target + direction * distance;
             transform.rotation = Quaternion.LookRotation(target - transform.position, Vector3.up);
         }
@@ -237,7 +260,50 @@ public sealed class CameraController : MonoBehaviour
 
     private Vector3 GetPerspectivePosition(ChessSide side)
     {
+        if (WebTouchInput.Enabled && !XRRig.IsHeadsetPresent && desktopCamera != null)
+            return GetWebPerspectivePosition(side);
         float z = side == ChessSide.White ? -turnPerspectiveDistance : turnPerspectiveDistance;
         return new Vector3(0f, turnPerspectiveHeight, z);
+    }
+
+    private float MinimumZoomDistance => WebTouchInput.Enabled && webFramedDistance > 0 ? webFramedDistance * .6f : minDistance;
+    private float MaximumZoomDistance => WebTouchInput.Enabled && webFramedDistance > 0 ? webFramedDistance * 1.5f : maxDistance;
+
+    private Vector3 GetWebPerspectivePosition(ChessSide side)
+    {
+        if (webBoard == null) webBoard = Object.FindFirstObjectByType<BoardView>();
+        webFramedViewport = WebTouchInput.ViewportSize;
+        webFramedSafeArea = WebTouchInput.SafeArea;
+        if (webBoard == null) return new Vector3(0, turnPerspectiveHeight, side == ChessSide.White ? -turnPerspectiveDistance : turnPerspectiveDistance);
+        Bounds bounds = new Bounds(webBoard.transform.TransformPoint(webBoard.FrameLocalBounds.center), Vector3.zero);
+        for (int i = 0; i < 8; i++)
+        {
+            Vector3 sign = new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1);
+            bounds.Encapsulate(webBoard.transform.TransformPoint(webBoard.FrameLocalBounds.center + Vector3.Scale(webBoard.FrameLocalBounds.extents, sign)));
+        }
+        foreach (PieceView piece in webBoard.Pieces)
+        foreach (Renderer renderer in piece.GetComponentsInChildren<Renderer>())
+            if (renderer.enabled) bounds.Encapsulate(renderer.bounds);
+        target = bounds.center;
+        float radians = 55f * Mathf.Deg2Rad;
+        Vector3 direction = new Vector3(0, Mathf.Sin(radians), (side == ChessSide.White ? -1 : 1) * Mathf.Cos(radians));
+        Quaternion inverse = Quaternion.Inverse(Quaternion.LookRotation(-direction, Vector3.up));
+        Rect free = WebTouchInput.BoardViewport;
+        float horizontalMargin = Mathf.Max(.05f, 2f * Mathf.Min(.5f - free.xMin, free.xMax - .5f)) * .94f;
+        float verticalMargin = Mathf.Max(.05f, 2f * Mathf.Min(.5f - free.yMin, free.yMax - .5f)) * .94f;
+        desktopCamera.fieldOfView = 52f;
+        float tangent = Mathf.Tan(desktopCamera.fieldOfView * .5f * Mathf.Deg2Rad);
+        float aspect = webFramedViewport.x / Mathf.Max(1, webFramedViewport.y);
+        desktopCamera.aspect = aspect;
+        float distance = 1;
+        for (int i = 0; i < 8; i++)
+        {
+            Vector3 sign = new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1);
+            Vector3 corner = inverse * Vector3.Scale(bounds.extents, sign);
+            distance = Mathf.Max(distance, Mathf.Abs(corner.x) / (tangent * aspect * horizontalMargin) - corner.z,
+                Mathf.Abs(corner.y) / (tangent * verticalMargin) - corner.z);
+        }
+        webFramedDistance = distance;
+        return target + direction * distance;
     }
 }

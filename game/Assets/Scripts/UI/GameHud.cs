@@ -110,6 +110,7 @@ public sealed partial class GameHud : MonoBehaviour
         ClearExistingRoot();
 
         hudRoot = CreateRect("HudRoot", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero);
+        ConfigureWebSafeArea();
 
         BuildMatchInterface();
         BuildStartMenu();
@@ -199,7 +200,10 @@ public sealed partial class GameHud : MonoBehaviour
         bool hasController = gameController != null;
         bool awaitingPromotion = hasController && gameController.IsAwaitingPromotion;
 
+        RefreshWebLayout();
+
         RefreshGameOverDialog();
+        RefreshWebPanels();
         RefreshStartMenu();
         RefreshRoomViewControls();
         SetActive(matchInterface, !showStartScreen);
@@ -233,6 +237,7 @@ public sealed partial class GameHud : MonoBehaviour
         }
 
         RefreshSelectedPiecePanel(hasController ? gameController.SelectedPiece : null);
+        RefreshWebPanels();
         RefreshNavigationFocus();
 
         if (cancelButtonText != null)
@@ -249,6 +254,7 @@ public sealed partial class GameHud : MonoBehaviour
 
     private void StartGame()
     {
+        webHistoryOpen = webPreviewOpen = false;
         showStartScreen = false;
         showHowToPlay = false;
         if (gameController != null)
@@ -268,12 +274,14 @@ public sealed partial class GameHud : MonoBehaviour
 
     private void RestartGame()
     {
+        webHistoryOpen = webPreviewOpen = false;
         if (gameController != null) gameController.NewGame();
         RefreshInterface();
     }
 
     private void ShowMenu()
     {
+        webHistoryOpen = webPreviewOpen = false;
         if (gameController != null) gameController.ReturnToMenu();
         showStartScreen = true;
         showHowToPlay = false;
@@ -365,8 +373,9 @@ public sealed partial class GameHud : MonoBehaviour
         }
 
         bool hasSelection = selectedPiece != null;
-        SetActive(selectedPiecePanel, hasSelection && !showStartScreen);
-        if (!hasSelection)
+        bool visible = hasSelection && !showStartScreen && (!IsWebPresentation || webPreviewOpen);
+        SetActive(selectedPiecePanel, visible);
+        if (!hasSelection || (IsWebPresentation && !visible))
         {
             previewedPiece = null;
             ClearSelectedPiecePreviewClone();
@@ -430,10 +439,10 @@ public sealed partial class GameHud : MonoBehaviour
         if (selectedPiecePreviewTexture == null)
         {
             // Match the 368 × 220 display exactly; a different aspect stretches the character.
-            selectedPiecePreviewTexture = new RenderTexture(1104, 660, 24)
+            selectedPiecePreviewTexture = new RenderTexture(IsWebPresentation ? 736 : 1104, IsWebPresentation ? 440 : 660, 24)
             {
                 name = "SelectedPiecePreviewTexture",
-                antiAliasing = 4,
+                antiAliasing = IsWebPresentation ? 2 : 4,
                 useMipMap = false
             };
             selectedPiecePreviewTexture.Create();
@@ -486,6 +495,7 @@ public sealed partial class GameHud : MonoBehaviour
     private void BuildSelectedPiecePreview(PieceView selectedPiece)
     {
         EnsureSelectedPiecePreviewResources();
+        if (selectedPiecePreviewImage != null) selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
         ClearSelectedPiecePreviewClone();
 
         selectedPiecePreviewClone = Object.Instantiate(selectedPiece.gameObject, selectedPiecePreviewStage);

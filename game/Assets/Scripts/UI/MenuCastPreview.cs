@@ -119,9 +119,10 @@ public sealed class MenuCastPreview : MonoBehaviour
         white = AddFigure("CustomPieces/Queen_Marta", "WhiteProfessor", new Color32(221, 227, 214, 255), ChessSide.White);
         black = AddFigure("CustomPieces/King_Ricardo_Carioca", "BlackProfessor", new Color32(24, 32, 27, 255), ChessSide.Black);
 
-        texture = new RenderTexture(1290, 1176, 24, RenderTextureFormat.ARGB32)
+        bool web = WebTouchInput.Enabled && !XRRig.IsHeadsetPresent;
+        texture = new RenderTexture(web ? 645 : 1290, web ? 588 : 1176, 24, RenderTextureFormat.ARGB32)
         {
-            name = "MenuCastTexture", antiAliasing = 4, useMipMap = false
+            name = "MenuCastTexture", antiAliasing = web ? 2 : 4, useMipMap = false
         };
         texture.Create();
         var cameraObject = new GameObject("MenuCastCamera");

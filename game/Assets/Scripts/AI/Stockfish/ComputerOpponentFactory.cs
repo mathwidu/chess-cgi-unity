@@ -6,7 +6,9 @@ public static class ComputerOpponentFactory
 {
     public static IMoveChooser Create()
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR
+        return new WebStockfishMoveChooser();
+#elif UNITY_ANDROID && !UNITY_EDITOR
         return new AndroidStockfishMoveChooser(new AndroidStockfishSessionFactory());
 #elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
         return new StockfishUciMoveChooser(FindExecutable());

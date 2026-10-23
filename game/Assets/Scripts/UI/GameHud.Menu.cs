@@ -62,6 +62,7 @@ public sealed partial class GameHud
 
     private void PositionCastLabels()
     {
+        if (IsWebPresentation && WebCompactMenu) return;
         Vector2 whiteBase = CastBase(ChessSide.White);
         Vector2 blackBase = CastBase(ChessSide.Black);
         PositionUnderBase(whiteShadow, whiteBase, -23);
@@ -126,6 +127,8 @@ public sealed partial class GameHud
             computerErrorPanel.gameObject.activeSelf ? computerErrorPanel :
             IsResultShown ? gameOverPanel :
             promotionPanel.gameObject.activeSelf ? promotionPanel :
+            IsWebPresentation && webPreviewOverlay != null && webPreviewOverlay.gameObject.activeSelf ? webPreviewOverlay :
+            IsWebPresentation && webHistoryOverlay != null && webHistoryOverlay.gameObject.activeSelf ? webHistoryOverlay :
             showStartScreen ? menuContent : matchInterface;
         GameObject current = events.currentSelectedGameObject;
         var currentButton = current != null ? current.GetComponent<Button>() : null;
@@ -176,6 +179,7 @@ public sealed partial class GameHud
         {
             bool matchNeedsChoice = gameController != null &&
                 (gameController.IsAwaitingPromotion || gameController.HasComputerError || IsResultShown);
+            matchNeedsChoice |= IsWebPresentation && (webHistoryOpen || webPreviewOpen);
             matchControls.interactable = !showHowToPlay && !matchNeedsChoice;
         }
 
@@ -190,6 +194,11 @@ public sealed partial class GameHud
 
     private void FitMenuToCanvas()
     {
+        if (IsWebPresentation && WebCompactMenu)
+        {
+            FitWebMenu();
+            return;
+        }
         // Fit the same logical surface in the desktop Game view and the VR world-space Canvas.
         Vector2 available = startOverlay.rect.size;
         float scale = Mathf.Min((available.x - 2f) / MenuWidth, (available.y - 2f) / MenuHeight);
@@ -271,8 +280,8 @@ public sealed partial class GameHud
         choice.Title.color = selected ? textColor : mutedTextColor;
         choice.Title.font = selected ? GetHudBoldFont() : GetHudFont();
         RectTransform rect = (RectTransform)choice.Button.transform;
-        float left = selected ? 51 : 8;
-        choice.Title.rectTransform.anchoredPosition = new Vector2(left, -6);
+        float left = selected ? WebCompactMenu ? 26 : 51 : 8;
+        choice.Title.rectTransform.anchoredPosition = new Vector2(left, WebCompactMenu ? -4 : -6);
         choice.Title.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Max(1, rect.rect.width - left - 8));
         choice.Surface.color = selected ? new Color32(23, 64, 47, 255) : new Color32(19, 57, 43, 255);
         choice.Surface.SetBorder(selected ? accentColor : new Color32(49, 86, 69, 255));

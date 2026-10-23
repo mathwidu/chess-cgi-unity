@@ -1,0 +1,82 @@
+{
+  "version": "3.8",
+  "services": {
+    "web": {
+      "image": "${CHESS_WEB_IMAGE}",
+      "read_only": true,
+      "user": "101:101",
+      "cap_drop": [
+        "ALL"
+      ],
+      "tmpfs": [
+        "/tmp:size=16777216,mode=1777"
+      ],
+      "networks": [
+        "public"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "5m",
+          "max-file": "2"
+        }
+      },
+      "deploy": {
+        "replicas": 1,
+        "placement": {
+          "constraints": [
+            "node.platform.os == linux",
+            "node.platform.arch == x86_64"
+          ]
+        },
+        "resources": {
+          "limits": {
+            "cpus": "0.50",
+            "memory": "128M"
+          },
+          "reservations": {
+            "cpus": "0.05",
+            "memory": "16M"
+          }
+        },
+        "restart_policy": {
+          "condition": "on-failure",
+          "delay": "5s",
+          "max_attempts": 3,
+          "window": "120s"
+        },
+        "update_config": {
+          "parallelism": 1,
+          "order": "start-first",
+          "failure_action": "rollback",
+          "monitor": "45s"
+        },
+        "rollback_config": {
+          "parallelism": 1,
+          "order": "stop-first",
+          "monitor": "45s"
+        },
+        "labels": {
+          "com.chess-cgi.managed-by": "chess-web-release",
+          "com.chess-cgi.source-revision": "${CHESS_WEB_REVISION}",
+          "traefik.enable": "true",
+          "traefik.docker.network": "network_swarm_public",
+          "traefik.http.routers.chess-web.rule": "Host(`chess.matheusduarte.dev.br`)",
+          "traefik.http.routers.chess-web.entrypoints": "websecure",
+          "traefik.http.routers.chess-web.tls": "true",
+          "traefik.http.routers.chess-web.service": "chess-web",
+          "traefik.http.services.chess-web.loadbalancer.server.port": "8080",
+          "traefik.http.services.chess-web.loadbalancer.healthcheck.path": "/healthz",
+          "traefik.http.services.chess-web.loadbalancer.healthcheck.interval": "30s",
+          "traefik.http.services.chess-web.loadbalancer.healthcheck.timeout": "5s"
+        }
+      }
+    }
+  },
+  "networks": {
+    "public": {
+      "external": true,
+      "name": "network_swarm_public"
+    }
+  }
+}

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#08251d">
+  <title>Xadrez CGI</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #08251d; color: #fff; font: 16px system-ui, sans-serif; }
+    #game { position: fixed; inset: 0; inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+    canvas { width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+    #loading { position: fixed; inset: 0; display: grid; place-content: center; gap: 16px; padding: 24px; text-align: center; background: #08251d; }
+    h1 { margin: 0; font-size: clamp(30px, 7vw, 52px); }
+    h1 span { color: #ffdd00; }
+    p { max-width: 32em; margin: 0; color: #cae4d3; line-height: 1.5; }
+    progress { width: min(320px, 80vw); height: 12px; margin: auto; accent-color: #ffdd00; }
+    #error { display: none; position: fixed; inset: auto 16px max(16px, env(safe-area-inset-bottom)); background: #361b17; padding: 16px; border: 1px solid #eead90; border-radius: 12px; }
+    #qa { position: fixed; bottom: 4px; right: 4px; max-width: 45vw; max-height: 30vh; overflow: auto; background: #000d; font: 11px monospace; z-index: 9; }
+    #qa-state { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <main id="game"><canvas id="unity-canvas" tabindex="0" aria-label="Tabuleiro de xadrez 3D"></canvas></main>
+  <section id="loading" aria-live="polite">
+    <h1>Xadrez <span>CGI</span></h1>
+    <p id="load-status">Carregando os personagens e o tabuleiro…</p>
+    <progress id="progress" max="1" value="0" aria-label="Carregamento"></progress>
+    <p>Jogue pelo toque ou pelo mouse.</p>
+  </section>
+  <div id="error" role="alert"></div>
+  <script>
+    const canvas = document.getElementById('unity-canvas');
+    const loading = document.getElementById('loading');
+    const progress = document.getElementById('progress');
+    const diagnostic = new URLSearchParams(location.search).get('qa') === '1';
+    if (diagnostic) {
+      const panel = document.createElement('details');
+      panel.id = 'qa';
+      panel.innerHTML = '<summary>Diagnóstico</summary><pre id="qa-state">Aguardando Unity</pre>';
+      document.body.appendChild(panel);
+    }
+    function showError(message) {
+      const box = document.getElementById('error');
+      box.textContent = message;
+      box.style.display = 'block';
+    }
+    const config = {
+      dataUrl: 'Build/{{{ DATA_FILENAME }}}',
+      frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}',
+      codeUrl: 'Build/{{{ CODE_FILENAME }}}',
+      streamingAssetsUrl: 'StreamingAssets',
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 1.25),
+      matchWebGLToCanvasSize: true,
+      showBanner(message, type) {
+        if (type === 'error') {
+          console.error(message);
+          showError('Não foi possível continuar o jogo neste navegador. Recarregue a página para tentar novamente.');
+        } else console.warn(message);
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'Build/{{{ LOADER_FILENAME }}}';
+    script.onerror = () => showError('Falha ao baixar o jogo. Verifique a conexão e recarregue a página.');
+    script.onload = () => createUnityInstance(canvas, config, value => { progress.value = value; })
+      .then(instance => {
+        loading.style.display = 'none';
+        canvas.focus();
+        document.addEventListener('visibilitychange', () => {
+          instance.SendMessage('Web Runtime', 'OnWebVisibility', document.hidden ? '1' : '0');
+        });
+      })
+      .catch(error => { console.error(error); showError('O jogo não conseguiu iniciar. Use uma versão atual do Chrome, Safari, Edge ou Firefox e tente novamente.'); });
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

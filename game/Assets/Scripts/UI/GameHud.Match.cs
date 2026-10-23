@@ -27,6 +27,11 @@ public sealed partial class GameHud
 
     private void BuildMatchInterface()
     {
+        if (IsWebPresentation)
+        {
+            BuildWebMatchInterface();
+            return;
+        }
         matchInterface = CreateRect("MatchInterface", hudRoot, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Vector2.zero);
         matchControls = matchInterface.gameObject.AddComponent<CanvasGroup>();
         BuildMatchHeader();
@@ -83,9 +88,12 @@ public sealed partial class GameHud
         MenuRule(selectedPiecePanel, 20, 474, 368);
         selectedPieceProfileText = MenuLabel("SelectedPieceProfileText", selectedPiecePanel, "", 14, mutedTextColor, 20, 486, 368, 40);
         selectedPieceDescriptionText = null;
-        EnsureSelectedPiecePreviewResources();
-        selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
-        selectedPiecePreviewInput.Configure(null, selectedPiecePreviewCamera);
+        if (!IsWebPresentation)
+        {
+            EnsureSelectedPiecePreviewResources();
+            selectedPiecePreviewImage.texture = selectedPiecePreviewTexture;
+            selectedPiecePreviewInput.Configure(null, selectedPiecePreviewCamera);
+        }
     }
 
     private UnityEngine.UI.Button PreviewButton(string name, string label, float x, float y, float width, UnityEngine.Events.UnityAction action)

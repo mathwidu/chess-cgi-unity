@@ -11,7 +11,13 @@ public sealed class ChessGameController : MonoBehaviour
     [SerializeField] private float moveDuration = 0.28f;
 
     private const float ReturnDuration = 0.15f;
+#if UNITY_WEBGL && !UNITY_EDITOR
+    private const string PerformanceModeKey = "ChessCgi.Web.PerformanceMode";
+    private const int DefaultPerformanceMode = 0;
+#else
     private const string PerformanceModeKey = "ChessCgi.PerformanceMode";
+    private const int DefaultPerformanceMode = 1;
+#endif
 
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
     private readonly List<BoardSquare> legalDestinations = new List<BoardSquare>();
@@ -87,7 +93,7 @@ public sealed class ChessGameController : MonoBehaviour
 
         if (pieceFactory != null)
         {
-            pieceFactory.UsePrimitivePieces = PlayerPrefs.GetInt(PerformanceModeKey, 1) == 1;
+            pieceFactory.UsePrimitivePieces = PlayerPrefs.GetInt(PerformanceModeKey, DefaultPerformanceMode) == 1;
         }
 
         if (hud == null)
