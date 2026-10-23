@@ -29,6 +29,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- O adversário passa a usar o MadChess v3.4 embutido no jogo, no lugar do
+  processo do Stockfish, e cada dificuldade ganha um
+  [Elo de força limitada](glossary.md): Iniciante 600, Intermediário 1200,
+  Difícil 2000, com os mesmos tempos por jogada. O Iniciante fica bem abaixo do
+  mínimo do Stockfish, e a IA passa a rodar em builds IL2CPP. Ver a
+  [decisão 0002](decisions/0002-embutir-o-madchess-como-motor-de-xadrez.md).
 - Organização da IA para revisão: dificuldade e resultado em arquivos próprios; inicialização UCI, configuração e leitura da resposta em rotinas nomeadas; observação de tarefas tardias usa `Task`. Contratos, perfis e cancelamento preservados.
 - A busca do executável do Stockfish passa a olhar primeiro a pasta do jogo (onde está o `XadrezCGI.exe`), antes de `persistentDataPath/Engines` e do PATH; assim uma build de Windows roda com o `stockfish.exe` ao lado do jogo, sem instalação.
 

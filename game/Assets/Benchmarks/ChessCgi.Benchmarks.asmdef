@@ -1,0 +1,19 @@
+{
+    "name": "ChessCgi.Benchmarks",
+    "rootNamespace": "",
+    "references": [
+        "ChessCgi.Runtime",
+        "MadChess"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "CHESS_ENGINE_BENCHMARK"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System.Collections;
-using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
@@ -12,10 +11,8 @@ using UnityEngine.UI;
 public class DesktopSceneTests
 {
     [UnityTest]
-    [Category("StockfishIntegration")]
     public IEnumerator MainSceneMenuStartsARealComputerGameAndKeepsHumanPerspective()
     {
-        if (!File.Exists(ComputerOpponentFactory.FindExecutable())) Assert.Ignore("Local Stockfish required.");
         EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/Main.unity", new LoadSceneParameters(LoadSceneMode.Single));
         yield return null;
         yield return null;

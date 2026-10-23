@@ -72,9 +72,9 @@ ser confirmada.
 ## Adversário controlado pelo computador
 
 Participante não humano que controla exatamente um lado de uma partida local e
-fornece uma jogada quando esse lado possui o turno. A implementação desktop usa
-um motor de xadrez externo, mas sempre devolve a jogada candidata às regras
-locais antes que a partida seja alterada.
+fornece uma jogada quando esse lado possui o turno. A implementação usa um
+motor de xadrez embutido no jogo, mas sempre devolve a jogada candidata às
+regras locais antes que a partida seja alterada.
 
 - **Aliases:** Adversário de IA, Computer opponent, Computer player
 - **Status:** validated
@@ -87,6 +87,16 @@ legais no xadrez.
 
 - **Aliases:** Dificuldade, Perfil de dificuldade, Difficulty level
 - **Status:** validated
+
+## Elo de força limitada
+
+Número que cada nível de dificuldade entrega ao motor de xadrez para ele
+limitar a própria força: busca mais lenta, erros em toda jogada e lances
+entregues de propósito. Segue a escala do autor do motor, calibrada contra
+outros motores, e não promete o rating de um jogador humano.
+
+- **Aliases:** Elo, UCI_Elo
+- **Status:** draft
 
 ## Estado de pensamento
 

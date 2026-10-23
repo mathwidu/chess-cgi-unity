@@ -6,11 +6,7 @@ public static class ComputerOpponentFactory
 {
     public static IMoveChooser Create()
     {
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
-        return new StockfishUciMoveChooser(FindExecutable());
-#else
-        throw new PlatformNotSupportedException("O adversario de IA ainda nao esta disponivel nesta plataforma.");
-#endif
+        return new MadChessMoveChooser();
     }
 
     public static string FindExecutable()

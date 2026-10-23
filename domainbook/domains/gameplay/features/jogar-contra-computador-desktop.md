@@ -53,10 +53,10 @@ Example: busca interrompida
   Given que a IA está pensando
   When volto ao menu, desativo o controlador, suspendo a aplicação ou reinicio
   Then a busca é cancelada e sua resposta perde validade
-  And o processo filho pertencente à sessão é encerrado
+  And o motor interrompe a busca em andamento
 
 Example: falha recuperável
-  Given que falta o executável, o processo encerrou ou o prazo expirou
+  Given que o motor falhou ou o prazo expirou
   When a busca falha
   Then a posição é preservada e a entrada humana continua bloqueada nesse turno
   And posso tentar novamente com uma sessão nova ou voltar ao menu
@@ -64,19 +64,18 @@ Example: falha recuperável
 
 ### Limites da entrega
 
-O transporte usa um processo UCI persistente, com Threads=1, Hash=16 MiB e
-Ponder=false. Cada perfil usa somente Skill Level, com UCI_LimitStrength=false:
-Iniciante 0/150 ms, Intermediário 6/500 ms, Difícil 14/1200 ms. Os prazos totais
-são 6000/6500/7200 ms e incluem inicialização. Os nomes não prometem um Elo;
-a calibração com jogadores continua aberta.
+O motor é o MadChess v3.4 embutido no jogo ([decisão 0002](../decisions/0002-embutir-o-madchess-como-motor-de-xadrez.md)),
+com hash de 16 MiB e uma busca por vez. Cada perfil usa um
+[Elo de força limitada](../glossary.md) e um tempo por jogada: Iniciante
+600/150 ms, Intermediário 1200/500 ms, Difícil 2000/1200 ms. Os prazos totais
+continuam 6000/6500/7200 ms. O Elo segue a escala do autor do motor; a
+calibração com jogadores continua aberta.
 
-O executável externo é preparado localmente, com versão, SHA-256, fonte e
-licença. Não é incluído em Assets nem automaticamente redistribuído com a build.
-Windows, PC-VR e Quest exigem validações próprias. O adaptador Android ainda
-não existe. O guia operacional registra a evidência obtida nesta entrega.
+O adaptador UCI do Stockfish continua no repositório, com suas validações, mas
+a fábrica não o usa mais. Windows, PC-VR e Quest exigem validações próprias.
 
 ## Open Questions
 
 - Calibrar dificuldade com jogadores.
-- Aprovar o pacote de redistribuição do motor antes de entregar o aplicativo a terceiros.
-- Medir o orçamento de desempenho e escolher o adaptador no Quest real.
+- Incluir a licença MIT do MadChess nos créditos antes de entregar o aplicativo a terceiros.
+- Medir no Quest real o frame time, a CPU e as coletas de lixo do motor embutido.

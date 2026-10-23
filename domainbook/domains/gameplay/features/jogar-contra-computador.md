@@ -455,14 +455,14 @@ As decisões abaixo devem ser respondidas antes da fase indicada:
 
 | ID | Decisão requerida | Alternativas ou informação necessária | Recomendação atual | Bloqueia |
 | --- | --- | --- | --- | --- |
-| D-01 | Adotar Stockfish 18? | Stockfish ou outro motor UCI compatível | Adotar Stockfish 18 | Fase 3 |
+| D-01 | Adotar Stockfish 18? | Stockfish ou outro motor UCI compatível | Substituída pela [decisão 0002](../decisions/0002-embutir-o-madchess-como-motor-de-xadrez.md): MadChess embutido | Fase 3 |
 | D-02 | Aceitar as obrigações da GPLv3? | Distribuir licença e fonte correspondente ou escolher outra dependência | Aceitar somente com processo de distribuição definido | Inclusão de qualquer binário |
 | D-03 | Quantos níveis serão oferecidos? | Dois, três ou mais perfis | Iniciante, Intermediário e Difícil | Fase 4 |
 | D-04 | Qual o tempo máximo por jogada? | Limite único ou limite por dificuldade | Definir por perfil após calibração | Fase 4 |
 | D-05 | O jogador poderá escolher o lado? | Lado fixo, escolha manual ou aleatória | Permitir escolha; lado fixo no primeiro incremento é aceitável | UI da fase 4 |
 | D-06 | Qual a recuperação para falha do motor? | Tentar novamente, reiniciar, voltar ao menu ou jogada de contingência | Não aplicar jogada automática de contingência sem validação | Fase 4 |
 | D-07 | Qual o orçamento de desempenho no Quest? | Taxa de atualização, frame time, CPU, memória e temperatura | Definir em conjunto com a frente de VR | Fases 5 e 6 |
-| D-08 | Processo UCI ou plug-in nativo no Quest? | Resultado do experimento de empacotamento, desempenho e licença | Adiar a decisão até a fase 6 | Fase 7 |
+| D-08 | Processo UCI ou plug-in nativo no Quest? | Resultado do experimento de empacotamento, desempenho e licença | Nenhum dos dois: motor em C# no próprio processo ([decisão 0002](../decisions/0002-embutir-o-madchess-como-motor-de-xadrez.md)) | Fase 7 |
 | D-09 | Qual a ordem de integração entre IA e VR? | IA primeiro, VR primeiro ou contratos comuns antes do trabalho paralelo | Implementar o contrato comum e o adversário programado antes das alterações concorrentes | Início das fases de código |
 
 ### Referências
