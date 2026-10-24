@@ -29,6 +29,11 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Changed
 
+- `StartComputerGame` ganha uma versão que recebe um
+  [Elo de força limitada](glossary.md) no lugar da dificuldade; ele persiste
+  em Nova partida.
+  `MoveSearchSettings.ForElo` usa o tempo por jogada da dificuldade mais
+  próxima: abaixo de 900, 150 ms; abaixo de 1600, 500 ms; acima, 1200 ms.
 - O adversário passa a usar o MadChess v3.4 embutido no jogo, no lugar do
   processo do Stockfish, e cada dificuldade ganha um
   [Elo de força limitada](glossary.md): Iniciante 600, Intermediário 1200,

@@ -10,6 +10,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- O menu ganha a caixa Elo personalizado, logo abaixo das dificuldades e
+  construída como Modo desempenho (`MenuCheckbox`). O cartão passa a usar um
+  espaçamento único de 21 px entre seções e controles. Marcada, ela esmaece e
+  desativa Iniciante, Intermediário e Difícil e troca a descrição por um
+  controle deslizante de [Elo de força limitada](../gameplay/glossary.md)
+  (600 a 2600, de 50 em 50), que começa no Elo da dificuldade escolhida. O
+  HUD da partida mostra "ELO 1350" no lugar do nome da dificuldade.
 - Em VR, a peça ao alcance da mão (a que o gatilho do indicador agarraria)
   ganha um contorno laranja: `PieceFactory` acrescenta um `PieceGrabHighlight`
   a cada peça quando um headset está presente. Ele mostra, sobre cada malha da
@@ -89,6 +96,9 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- O foco de teclado não volta mais ao primeiro botão quando está numa caixa
+  de seleção ou no controle deslizante: `RefreshNavigationFocus` aceita
+  qualquer `Selectable`, e não só `Button`.
 - O tabuleiro de desktop voltou a aparecer emoldurado pela câmera. Ele havia
   virado um ponto minúsculo e descentralizado porque a cena guardava a escala
   e a posição de mesa do modo VR no root compartilhado do tabuleiro; agora

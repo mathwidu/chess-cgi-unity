@@ -18,10 +18,12 @@ public class ComputerGameTests
     {
         private readonly Queue<string> moves;
         public int Calls;
+        public MoveSearchSettings LastSettings;
         public ScriptedMoveChooser(params string[] moves) { this.moves = new Queue<string>(moves); }
         public Task<ChessMove> ChooseMoveAsync(PositionSnapshot p, MoveSearchSettings s, CancellationToken token)
         {
             Calls++;
+            LastSettings = s;
             if (!ChessMove.TryParseUci(moves.Dequeue(), out var move)) throw new InvalidOperationException("Bad test move");
             return Task.FromResult(move);
         }
@@ -111,6 +113,21 @@ public class ComputerGameTests
         Assert.That(controller.MoveHistory.Count, Is.EqualTo(4));
         Assert.That(controller.StatusMessage, Does.StartWith("Xeque-mate"));
         Assert.That(chooser.Calls, Is.EqualTo(2));
+    }
+
+    [UnityTest]
+    public IEnumerator CustomEloReachesTheEngineAndSurvivesARestart()
+    {
+        var chooser = new ScriptedMoveChooser("e2e4", "d2d4");
+        controller.SetMoveChooserFactory(() => chooser);
+        controller.StartComputerGame(ChessSide.Black, 1350);
+        yield return WaitFor(() => chooser.Calls == 1 && !controller.IsInputBlocked);
+        Assert.That(chooser.LastSettings.Elo, Is.EqualTo(1350));
+        Assert.That(chooser.LastSettings.MoveTimeMilliseconds, Is.EqualTo(MoveSearchSettings.ForDifficulty(ComputerDifficulty.Intermediate).MoveTimeMilliseconds));
+        controller.NewGame();
+        yield return WaitFor(() => chooser.Calls == 2 && !controller.IsInputBlocked);
+        Assert.That(chooser.LastSettings.Elo, Is.EqualTo(1350));
+        Assert.That(controller.CustomElo, Is.EqualTo(1350));
     }
 
     [UnityTest]

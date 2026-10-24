@@ -97,9 +97,9 @@ public sealed partial class GameHud
 
     private void BuildMenuConfiguration(Font display)
     {
-        RectTransform controls = MenuRect("StartCard", menuContent, MenuPanelX, 172, MenuPanelWidth, 684);
+        RectTransform controls = MenuRect("StartCard", menuContent, MenuPanelX, 172, MenuPanelWidth, 731);
         Surface(controls, new Color32(10, 48, 36, 246), new Color32(43, 86, 66, 255), 12, 2);
-        MenuLabel("MenuTitle", controls, "Nova partida", 50, textColor, MenuInset, 46, MenuInnerWidth, 72, true);
+        MenuLabel("MenuTitle", controls, "Nova partida", 50, textColor, MenuInset, 36, MenuInnerWidth, 72, true);
 
         BuildGameModeOptions(controls);
         BuildComputerOptions(controls);
@@ -109,39 +109,44 @@ public sealed partial class GameHud
 
     private void BuildGameModeOptions(RectTransform controls)
     {
-        MenuLabel("ModeHeading", controls, "Modo de jogo", 22, mutedTextColor, MenuInset, 119, MenuInnerWidth, 30);
-        RectTransform modes = ChoiceRow("ModeOptions", controls, MenuInset, 157, MenuInnerWidth, 64);
+        MenuLabel("ModeHeading", controls, "Modo de jogo", 22, mutedTextColor, MenuInset, 113, MenuInnerWidth, 30);
+        RectTransform modes = ChoiceRow("ModeOptions", controls, MenuInset, 149, MenuInnerWidth, 64);
         modeChoices.Add(CreateMenuChoice("ComputerModeButton", modes, "Contra IA", 278, 64, () => ChooseMode(true)));
         modeChoices.Add(CreateMenuChoice("LocalModeButton", modes, "Dois jogadores", 278, 64, () => ChooseMode(false)));
     }
 
     private void BuildComputerOptions(RectTransform controls)
     {
-        computerOptions = MenuRect("ComputerOptions", controls, MenuInset, 247, MenuInnerWidth, 228);
+        computerOptions = MenuRect("ComputerOptions", controls, MenuInset, 234, MenuInnerWidth, 281);
         MenuLabel("SideHeading", computerOptions, "Você joga com", 22, mutedTextColor, 0, 0, MenuInnerWidth, 30);
-        RectTransform sides = ChoiceRow("SideOptions", computerOptions, 0, 37, MenuInnerWidth, 64);
+        RectTransform sides = ChoiceRow("SideOptions", computerOptions, 0, 36, MenuInnerWidth, 64);
         sideChoices.Add(CreateMenuChoice("WhiteSideButton", sides, "Brancas", 278, 64, () => ChooseSide(ChessSide.White)));
         sideChoices.Add(CreateMenuChoice("BlackSideButton", sides, "Pretas", 278, 64, () => ChooseSide(ChessSide.Black)));
-        MenuLabel("DifficultyHeading", computerOptions, "Dificuldade da IA", 22, mutedTextColor, 0, 128, MenuInnerWidth, 30);
-        RectTransform levels = ChoiceRow("DifficultyOptions", computerOptions, 0, 164, MenuInnerWidth, 64);
+        MenuLabel("DifficultyHeading", computerOptions, "Dificuldade da IA", 22, mutedTextColor, 0, 121, MenuInnerWidth, 30);
+        RectTransform levels = ChoiceRow("DifficultyOptions", computerOptions, 0, 157, MenuInnerWidth, 64);
+        difficultyLevels = levels.gameObject.AddComponent<CanvasGroup>();
         difficultyChoices.Add(CreateMenuChoice("BeginnerDifficultyButton", levels, "Iniciante", 166, 64, () => ChooseDifficulty(ComputerDifficulty.Beginner)));
         difficultyChoices.Add(CreateMenuChoice("IntermediateDifficultyButton", levels, "Intermediário", 228, 64, () => ChooseDifficulty(ComputerDifficulty.Intermediate)));
         difficultyChoices.Add(CreateMenuChoice("HardDifficultyButton", levels, "Difícil", 160, 64, () => ChooseDifficulty(ComputerDifficulty.Hard)));
+        customEloToggle = MenuCheckbox("CustomEloToggle", computerOptions, "Elo personalizado", 0, 233, 272, out customEloFocusRing);
+        customEloToggle.isOn = chooseCustomElo;
+        customEloToggle.onValueChanged.AddListener(ChooseCustomElo);
     }
 
     private void BuildLocalOptions(RectTransform controls)
     {
-        localOptions = MenuRect("LocalOptions", controls, MenuInset, 270, MenuInnerWidth, 205);
+        localOptions = MenuRect("LocalOptions", controls, MenuInset, 257, MenuInnerWidth, 205);
         MenuLabel("LocalTitle", localOptions, "O tabuleiro é dos dois.", 30, textColor, 0, 0, MenuInnerWidth, 48, true);
         MenuLabel("LocalDescription", localOptions, "As brancas começam. Revezem os lances; a câmera acompanha cada turno.", 24, mutedTextColor, 0, 62, MenuInnerWidth, 120);
     }
 
     private void BuildMenuActions(RectTransform controls, Font display)
     {
-        menuSummary = MenuLabel("MatchSummary", controls, "", 18, mutedTextColor, MenuInset, 481, MenuInnerWidth, 48);
-        RectTransform buttonDepth = MenuRect("PlayButtonDepth", controls, MenuInset, 540, MenuInnerWidth, 68);
+        menuSummary = MenuLabel("MatchSummary", controls, "", 18, mutedTextColor, MenuInset, 527, MenuInnerWidth, 46);
+        BuildEloSlider(controls);
+        RectTransform buttonDepth = MenuRect("PlayButtonDepth", controls, MenuInset, 583, MenuInnerWidth, 68);
         Surface(buttonDepth, new Color32(175, 145, 0, 255), Color.clear, 10, 0);
-        menuPlayButton = MenuButton("StartPlayButton", controls, "Jogar", MenuInset, 535, MenuInnerWidth, 70, actionColor, StartGame);
+        menuPlayButton = MenuButton("StartPlayButton", controls, "Jogar", MenuInset, 578, MenuInnerWidth, 70, actionColor, StartGame);
         var playSurface = StyleMenuButton(menuPlayButton, actionColor, new Color32(255, 231, 77, 255), 10, 2);
         playSurface.BottomShade = 0.98f;
         var playFocus = MenuRect("FocusRing", menuPlayButton.transform, -4, -4, MenuInnerWidth + 8, 78);
@@ -153,14 +158,21 @@ public sealed partial class GameHud
         {
             playLabel.font = display;
         }
-        menuHelpButton = MenuButton("StartHowToPlayButton", controls, "Como jogar", MenuInset, 620, 270, 48, Color.clear, ToggleHowToPlay);
+        menuHelpButton = MenuButton("StartHowToPlayButton", controls, "Como jogar", MenuInset, 663, 270, 48, Color.clear, ToggleHowToPlay);
         menuHelpButton.GetComponentInChildren<Text>().fontSize = 22;
         BuildPerformanceToggle(controls);
     }
 
     private void BuildPerformanceToggle(RectTransform controls)
     {
-        RectTransform row = MenuRect("PerformanceModeToggle", controls, MenuInset + 286, 620, 272, 48);
+        performanceToggle = MenuCheckbox("PerformanceModeToggle", controls, "Modo desempenho", MenuInset + 286, 663, 272, out performanceFocusRing);
+        performanceToggle.isOn = gameController != null && gameController.PerformanceMode;
+        performanceToggle.onValueChanged.AddListener(OnPerformanceModeChanged);
+    }
+
+    private Toggle MenuCheckbox(string name, Transform parent, string title, float x, float y, float width, out GameObject focusRing)
+    {
+        RectTransform row = MenuRect(name, parent, x, y, width, 48);
         var hitArea = row.gameObject.AddComponent<Image>();
         hitArea.color = Color.clear;
         RectTransform box = MenuRect("Box", row, 0, 9, 30, 30);
@@ -169,18 +181,52 @@ public sealed partial class GameHud
         check.sprite = Resources.Load<Sprite>("UI/SelectionCheck");
         check.color = accentColor;
         check.raycastTarget = false;
-        var label = MenuLabel("Label", row, "Modo desempenho", 18, mutedTextColor, 42, 11, 230, 28);
+        var label = MenuLabel("Label", row, title, 18, mutedTextColor, 42, 11, width - 42, 28);
         label.raycastTarget = false;
-        RectTransform focus = MenuRect("FocusRing", row, -4, -4, 280, 56);
+        RectTransform focus = MenuRect("FocusRing", row, -4, -4, width + 8, 56);
         Surface(focus, Color.clear, mutedTextColor, 10, 2);
-        performanceFocusRing = focus.gameObject;
+        focusRing = focus.gameObject;
 
-        performanceToggle = row.gameObject.AddComponent<Toggle>();
-        performanceToggle.transition = Selectable.Transition.None;
-        performanceToggle.targetGraphic = hitArea;
-        performanceToggle.graphic = check;
-        performanceToggle.isOn = gameController != null && gameController.PerformanceMode;
-        performanceToggle.onValueChanged.AddListener(OnPerformanceModeChanged);
+        var toggle = row.gameObject.AddComponent<Toggle>();
+        toggle.transition = Selectable.Transition.None;
+        toggle.targetGraphic = hitArea;
+        toggle.graphic = check;
+        return toggle;
+    }
+
+    private void BuildEloSlider(RectTransform controls)
+    {
+        eloSliderRow = MenuRect("EloSlider", controls, MenuInset, 518, MenuInnerWidth, 48);
+        eloValueLabel = MenuLabel("EloValue", eloSliderRow, "", 22, textColor, 0, 9, 140, 30, true);
+        const float trackInset = 16;
+        const float handleRadius = 14;
+        float controlWidth = MenuInnerWidth - 150;
+        float trackWidth = controlWidth - 2 * trackInset;
+        RectTransform control = MenuRect("EloSliderControl", eloSliderRow, 150, 4, controlWidth, 40);
+        var hitArea = control.gameObject.AddComponent<Image>();
+        hitArea.color = Color.clear;
+        Surface(MenuRect("Track", control, trackInset, 14, trackWidth, 12), new Color32(19, 57, 43, 255), new Color32(49, 86, 69, 255), 6, 1.5f);
+        RectTransform fillArea = MenuRect("FillArea", control, trackInset, 14, trackWidth - handleRadius, 12);
+        RectTransform fill = CreateRect("Fill", fillArea, Vector2.zero, Vector2.one, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
+        Surface(fill, accentColor, Color.clear, 6, 0);
+        RectTransform handleArea = MenuRect("HandleArea", control, trackInset + handleRadius, 14, trackWidth - 2 * handleRadius, 12);
+        RectTransform handle = CreateRect("Handle", handleArea, Vector2.zero, Vector2.one, Vector2.one * 0.5f, Vector2.zero, new Vector2(2 * handleRadius, 16));
+        Surface(handle, textColor, Color.clear, handleRadius, 0);
+        RectTransform focus = MenuRect("FocusRing", control, -4, -4, controlWidth + 8, 48);
+        Surface(focus, Color.clear, mutedTextColor, 10, 2);
+        eloFocusRing = focus.gameObject;
+
+        eloSlider = control.gameObject.AddComponent<Slider>();
+        eloSlider.transition = Selectable.Transition.None;
+        eloSlider.targetGraphic = hitArea;
+        eloSlider.fillRect = fill;
+        eloSlider.handleRect = handle;
+        eloSlider.direction = Slider.Direction.LeftToRight;
+        eloSlider.wholeNumbers = true;
+        eloSlider.minValue = MoveSearchSettings.MinimumElo / EloStep;
+        eloSlider.maxValue = MoveSearchSettings.MaximumElo / EloStep;
+        eloSlider.SetValueWithoutNotify(chosenElo / EloStep);
+        eloSlider.onValueChanged.AddListener(ChooseElo);
     }
 
     private void RegisterMenuTypography()

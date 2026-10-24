@@ -64,6 +64,79 @@ public class MenuPresentationTests
     }
 
     [UnityTest]
+    public IEnumerator CustomEloDisablesThePresetsAndStartsTheSliderStrength()
+    {
+        Assert.That(GameObject.Find("EloSlider"), Is.Null);
+        yield return Click("HardDifficultyButton");
+        GameObject.Find("CustomEloToggle").GetComponent<Toggle>().isOn = true;
+        yield return null;
+        var slider = GameObject.Find("EloSliderControl").GetComponent<Slider>();
+        Assert.That(slider.value * 50, Is.EqualTo(2000));
+        Assert.That(GameObject.Find("MatchSummary"), Is.Null);
+        foreach (string name in new[] { "BeginnerDifficultyButton", "IntermediateDifficultyButton", "HardDifficultyButton" })
+        {
+            Assert.That(GameObject.Find(name).GetComponent<Button>().IsInteractable(), Is.False, name);
+            Assert.That(GameObject.Find(name).transform.Find("SelectedMarker").GetComponent<Image>().enabled, Is.False, name);
+        }
+        slider.value = 27;
+        Assert.That(GameObject.Find("EloValue").GetComponent<Text>().text, Is.EqualTo("Elo 1350"));
+        yield return Click("StartPlayButton");
+        Assert.That(controller.CustomElo, Is.EqualTo(1350));
+        yield return Click("MenuButton");
+        GameObject.Find("CustomEloToggle").GetComponent<Toggle>().isOn = false;
+        yield return null;
+        Assert.That(GameObject.Find("EloSlider"), Is.Null);
+        yield return Click("StartPlayButton");
+        Assert.That(controller.CustomElo, Is.Null);
+        Assert.That(controller.Difficulty, Is.EqualTo(ComputerDifficulty.Hard));
+        yield return Click("MenuButton");
+        GameObject.Find("CustomEloToggle").GetComponent<Toggle>().isOn = true;
+        yield return null;
+        Assert.That(GameObject.Find("EloValue").GetComponent<Text>().text, Is.EqualTo("Elo 1350"));
+    }
+
+    [UnityTest]
+    public IEnumerator KeyboardCanReachAndAdjustTheEloSlider()
+    {
+        EventSystem events = EventSystem.current;
+        events.SetSelectedGameObject(GameObject.Find("BlackSideButton"));
+        Move(events, MoveDirection.Right);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("BeginnerDifficultyButton"));
+        Move(events, MoveDirection.Down);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("CustomEloToggle"));
+        Move(events, MoveDirection.Left);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("HardDifficultyButton"));
+        Move(events, MoveDirection.Right);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("CustomEloToggle"));
+        ExecuteEvents.Execute(events.currentSelectedGameObject, new BaseEventData(events), ExecuteEvents.submitHandler);
+        yield return null;
+        Move(events, MoveDirection.Left);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("BlackSideButton"));
+        Move(events, MoveDirection.Right);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("CustomEloToggle"));
+        Move(events, MoveDirection.Down);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("EloSliderControl"));
+        Move(events, MoveDirection.Right);
+        Move(events, MoveDirection.Right);
+        yield return null;
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("EloSliderControl"));
+        Assert.That(GameObject.Find("EloValue").GetComponent<Text>().text, Is.EqualTo("Elo 700"));
+        Move(events, MoveDirection.Down);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("StartPlayButton"));
+        Move(events, MoveDirection.Up);
+        Move(events, MoveDirection.Up);
+        Move(events, MoveDirection.Up);
+        Assert.That(events.currentSelectedGameObject.name, Is.EqualTo("WhiteSideButton"));
+    }
+
+    private static void Move(EventSystem events, MoveDirection direction)
+    {
+        Vector2 vector = direction == MoveDirection.Right ? Vector2.right : direction == MoveDirection.Left ? Vector2.left :
+            direction == MoveDirection.Up ? Vector2.up : Vector2.down;
+        ExecuteEvents.Execute(events.currentSelectedGameObject, new AxisEventData(events) { moveDir = direction, moveVector = vector }, ExecuteEvents.moveHandler);
+    }
+
+    [UnityTest]
     public IEnumerator KeyboardCanConfigureAndStartALocalGame()
     {
         EventSystem events = EventSystem.current;

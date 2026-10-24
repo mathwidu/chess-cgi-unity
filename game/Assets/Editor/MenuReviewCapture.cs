@@ -52,7 +52,12 @@ public static class MenuReviewCapture
         new CaptureCase("intermediate-compact", 1024, 768,
             () => Click("ComputerMenuButton", "ComputerModeButton", "IntermediateDifficultyButton")),
         new CaptureCase("play-focus", 1672, 941,
-            () => EventSystem.current.SetSelectedGameObject(GameObject.Find("StartPlayButton")))
+            () => EventSystem.current.SetSelectedGameObject(GameObject.Find("StartPlayButton"))),
+        new CaptureCase("custom-elo", 1672, 941, PrepareCustomElo),
+        new CaptureCase("custom-elo-compact", 1024, 768),
+        new CaptureCase("custom-elo-focus", 1672, 941,
+            () => EventSystem.current.SetSelectedGameObject(GameObject.Find("EloSliderControl")), "EloSliderControl"),
+        new CaptureCase("custom-elo-match", 1920, 1080, () => Click("StartPlayButton"))
     };
 
     private static int caseIndex;
@@ -205,6 +210,12 @@ public static class MenuReviewCapture
         var controller = UnityEngine.Object.FindFirstObjectByType<ChessGameController>();
         controller.SetMoveChooserFactory(() => throw new InvalidOperationException("Visual review: unavailable engine fixture"));
         controller.StartComputerGame(ChessSide.Black, ComputerDifficulty.Beginner);
+    }
+
+    private static void PrepareCustomElo()
+    {
+        GameObject.Find("CustomEloToggle").GetComponent<Toggle>().isOn = true;
+        GameObject.Find("EloSliderControl").GetComponent<Slider>().value = 27;
     }
 
     private static void Click(params string[] names)

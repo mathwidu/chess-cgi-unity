@@ -6,6 +6,8 @@ using UnityEngine.UI;
 // Runtime choices, keyboard focus and responsive state; construction lives in GameHud.Menu.Layout.cs.
 public sealed partial class GameHud
 {
+    private const int EloStep = 50;
+
     private sealed class MenuChoice
     {
         public Button Button;
@@ -50,6 +52,13 @@ public sealed partial class GameHud
     private GameObject playFocusRing;
     private Toggle performanceToggle;
     private GameObject performanceFocusRing;
+    private Toggle customEloToggle;
+    private GameObject customEloFocusRing;
+    private CanvasGroup difficultyLevels;
+    private RectTransform eloSliderRow;
+    private Slider eloSlider;
+    private Text eloValueLabel;
+    private GameObject eloFocusRing;
 
     private void LateUpdate()
     {
@@ -89,15 +98,21 @@ public sealed partial class GameHud
     private void ConfigureMenuNavigation()
     {
         var firstSide = sideChoices[0].Button;
-        var lastLevel = difficultyChoices[2].Button;
+        Selectable afterSides = chooseCustomElo ? customEloToggle : difficultyChoices[0].Button;
+        Selectable beforeToggle = chooseCustomElo ? sideChoices[1].Button : difficultyChoices[2].Button;
+        Selectable aboveToggle = chooseCustomElo ? firstSide : difficultyChoices[0].Button;
+        Selectable belowToggle = chooseCustomElo ? eloSlider : menuPlayButton;
+        Selectable abovePlay = chooseCustomElo ? eloSlider : customEloToggle;
         MenuNavigation(modeChoices[0].Button, null, modeChoices[1].Button, null, chooseComputer ? firstSide : menuPlayButton);
         MenuNavigation(modeChoices[1].Button, modeChoices[0].Button, chooseComputer ? firstSide : menuPlayButton, null, chooseComputer ? firstSide : menuPlayButton);
-        MenuNavigation(firstSide, modeChoices[1].Button, sideChoices[1].Button, modeChoices[0].Button, difficultyChoices[0].Button);
-        MenuNavigation(sideChoices[1].Button, firstSide, difficultyChoices[0].Button, modeChoices[1].Button, difficultyChoices[0].Button);
+        MenuNavigation(firstSide, modeChoices[1].Button, sideChoices[1].Button, modeChoices[0].Button, afterSides);
+        MenuNavigation(sideChoices[1].Button, firstSide, afterSides, modeChoices[1].Button, afterSides);
         for (int i = 0; i < difficultyChoices.Count; i++)
             MenuNavigation(difficultyChoices[i].Button, i == 0 ? sideChoices[1].Button : difficultyChoices[i - 1].Button,
-                i == 2 ? menuPlayButton : difficultyChoices[i + 1].Button, firstSide, menuPlayButton);
-        MenuNavigation(menuPlayButton, chooseComputer ? lastLevel : modeChoices[1].Button, null, chooseComputer ? lastLevel : modeChoices[1].Button, menuHelpButton);
+                i == 2 ? customEloToggle : difficultyChoices[i + 1].Button, firstSide, customEloToggle);
+        MenuNavigation(customEloToggle, beforeToggle, belowToggle, aboveToggle, belowToggle);
+        MenuNavigation(eloSlider, null, null, customEloToggle, menuPlayButton);
+        MenuNavigation(menuPlayButton, chooseComputer ? abovePlay : modeChoices[1].Button, null, chooseComputer ? abovePlay : modeChoices[1].Button, menuHelpButton);
         MenuNavigation(menuHelpButton, menuPlayButton, performanceToggle, menuPlayButton, null);
         MenuNavigation(performanceToggle, menuHelpButton, null, menuPlayButton, null);
     }
@@ -127,9 +142,9 @@ public sealed partial class GameHud
             promotionPanel.gameObject.activeSelf ? promotionPanel :
             showStartScreen ? menuContent : matchInterface;
         GameObject current = events.currentSelectedGameObject;
-        var currentButton = current != null ? current.GetComponent<Button>() : null;
-        if (focusScope == scope && currentButton != null && current.activeInHierarchy &&
-            current.transform.IsChildOf(scope) && currentButton.IsInteractable()) return;
+        var currentSelectable = current != null ? current.GetComponent<Selectable>() : null;
+        if (focusScope == scope && currentSelectable != null && current.activeInHierarchy &&
+            current.transform.IsChildOf(scope) && currentSelectable.IsInteractable()) return;
 
         focusScope = scope;
         foreach (var button in scope.GetComponentsInChildren<Button>())
@@ -161,6 +176,30 @@ public sealed partial class GameHud
     {
         chosenDifficulty = difficulty;
         RefreshInterface();
+    }
+
+    private void ChooseCustomElo(bool custom)
+    {
+        chooseCustomElo = custom;
+        if (custom && !eloAdjusted)
+        {
+            chosenElo = MoveSearchSettings.ForDifficulty(chosenDifficulty).Elo;
+            eloSlider.SetValueWithoutNotify(chosenElo / EloStep);
+        }
+        ConfigureMenuNavigation();
+        RefreshInterface();
+    }
+
+    private void ChooseElo(float steps)
+    {
+        chosenElo = Mathf.RoundToInt(steps) * EloStep;
+        eloAdjusted = true;
+        RefreshEloLabel();
+    }
+
+    private void RefreshEloLabel()
+    {
+        eloValueLabel.text = "Elo " + chosenElo;
     }
 
     private void RefreshStartMenu()
@@ -216,11 +255,19 @@ public sealed partial class GameHud
     {
         SelectMenuChoice(modeChoices, chooseComputer ? 0 : 1);
         SelectMenuChoice(sideChoices, chosenSide == ChessSide.White ? 0 : 1);
-        SelectMenuChoice(difficultyChoices, (int)chosenDifficulty);
+        SelectMenuChoice(difficultyChoices, chooseCustomElo ? -1 : (int)chosenDifficulty);
+        difficultyLevels.interactable = !chooseCustomElo;
+        difficultyLevels.alpha = chooseCustomElo ? 0.4f : 1f;
+        RefreshEloLabel();
         playFocusRing.SetActive(IsNavigationFocused(menuPlayButton));
         performanceFocusRing.SetActive(IsNavigationFocused(performanceToggle));
+        customEloFocusRing.SetActive(IsNavigationFocused(customEloToggle));
+        eloFocusRing.SetActive(IsNavigationFocused(eloSlider));
         SetActive(computerOptions, chooseComputer);
         SetActive(localOptions, !chooseComputer);
+        bool showEloSlider = chooseComputer && chooseCustomElo;
+        SetActive(eloSliderRow, showEloSlider);
+        SetActive(menuSummary.rectTransform, !showEloSlider);
     }
 
     private void SelectMenuChoice(List<MenuChoice> choices, int selectedIndex)

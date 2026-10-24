@@ -32,6 +32,7 @@ public sealed class ChessGameController : MonoBehaviour
     public bool IsAgainstComputer => againstComputer;
     public ChessSide HumanSide { get; private set; } = ChessSide.White;
     public ComputerDifficulty Difficulty { get; private set; } = ComputerDifficulty.Beginner;
+    public int? CustomElo { get; private set; }
     public bool IsComputerTurn => againstComputer && CurrentTurn != HumanSide && !gameOver;
     public bool IsComputerThinking => computerTurn != null && computerTurn.IsThinking;
     public bool HasComputerError { get; private set; }
@@ -144,8 +145,20 @@ public sealed class ChessGameController : MonoBehaviour
 
     public void StartComputerGame(ChessSide humanSide, ComputerDifficulty difficulty)
     {
-        HumanSide = humanSide;
         Difficulty = difficulty;
+        CustomElo = null;
+        StartAgainstComputer(humanSide);
+    }
+
+    public void StartComputerGame(ChessSide humanSide, int elo)
+    {
+        CustomElo = elo;
+        StartAgainstComputer(humanSide);
+    }
+
+    private void StartAgainstComputer(ChessSide humanSide)
+    {
+        HumanSide = humanSide;
         againstComputer = true;
         NewGame();
     }
@@ -217,7 +230,9 @@ public sealed class ChessGameController : MonoBehaviour
             {
                 computerTurn = new ComputerTurnCoordinator(moveChooserFactory());
             }
-            computerTurn.Begin(rules.GetSnapshot(), MoveSearchSettings.ForDifficulty(Difficulty));
+            computerTurn.Begin(rules.GetSnapshot(), CustomElo.HasValue
+                ? MoveSearchSettings.ForElo(CustomElo.Value)
+                : MoveSearchSettings.ForDifficulty(Difficulty));
             StatusMessage = "IA pensando...";
         }
         catch (System.Exception exception)

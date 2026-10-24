@@ -24,6 +24,17 @@ Example: Escolher dificuldade e lado contra a IA
   Then o controlador recebe o lado e a dificuldade escolhidos
   And a IA faz o primeiro lance
 
+Example: Escolher um Elo personalizado
+  Given o menu está aberto no modo Contra IA com Difícil escolhido
+  When o jogador marca Elo personalizado
+  Then Iniciante, Intermediário e Difícil ficam esmaecidos e indisponíveis
+  And um controle deslizante aparece no lugar da descrição, começando em Elo 2000
+  When ele ajusta o controle para Elo 1350 e inicia a partida
+  Then o controlador recebe o lado e o Elo 1350
+  And o HUD identifica a partida como Elo 1350
+  When ele volta ao menu e desmarca Elo personalizado
+  Then a dificuldade Difícil volta a valer
+
 Example: Escolher dois jogadores
   Given o jogador configurou uma partida contra IA
   When ele escolhe Dois jogadores
@@ -70,6 +81,12 @@ Example: Iniciar sem usar o mouse
   When o jogador usa as setas e Enter para escolher Dois jogadores e Jogar
   Then a partida local começa
   And o foco passa para as ações da partida
+
+Example: Ajustar o Elo pelo teclado
+  Given Elo personalizado está marcado
+  When o jogador desce até o controle deslizante
+  Then as setas laterais mudam o Elo de 50 em 50, entre 600 e 2600
+  And o foco permanece no controle até ele descer para Jogar
 
 Example: Uma escolha obrigatória interrompe as ações comuns
   Given a partida pede promoção ou apresenta falha da IA

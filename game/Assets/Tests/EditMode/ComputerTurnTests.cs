@@ -14,6 +14,19 @@ public class ComputerTurnTests
         public void Dispose() { }
     }
 
+    [TestCase(600, 150)]
+    [TestCase(899, 150)]
+    [TestCase(900, 500)]
+    [TestCase(1599, 500)]
+    [TestCase(1600, 1200)]
+    [TestCase(2600, 1200)]
+    public void CustomEloKeepsItsValueAndBorrowsTheNearestPresetTime(int elo, int moveTime)
+    {
+        MoveSearchSettings settings = MoveSearchSettings.ForElo(elo);
+        Assert.That(settings.Elo, Is.EqualTo(elo));
+        Assert.That(settings.MoveTimeMilliseconds, Is.EqualTo(moveTime));
+    }
+
     [Test]
     public async Task TimeoutPreservesPositionAndCancelsEvenAnUncooperativeProvider()
     {

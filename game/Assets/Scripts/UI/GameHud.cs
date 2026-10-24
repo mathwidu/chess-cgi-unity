@@ -30,6 +30,9 @@ public sealed partial class GameHud : MonoBehaviour
     private bool chooseComputer = true;
     private ChessSide chosenSide = ChessSide.White;
     private ComputerDifficulty chosenDifficulty = ComputerDifficulty.Beginner;
+    private bool chooseCustomElo;
+    private int chosenElo = 1200;
+    private bool eloAdjusted;
     private RectTransform computerErrorPanel;
     private Font hudFont;
     private Font hudBoldFont;
@@ -126,7 +129,7 @@ public sealed partial class GameHud : MonoBehaviour
         SetActive(promotionPanel, awaitingPromotion && !showStartScreen);
         if (matchSummaryText != null && hasController)
             matchSummaryText.text = gameController.IsAgainstComputer
-                ? "CONTRA IA  /  " + DifficultyName(gameController.Difficulty).ToUpperInvariant() + "  /  " + SideName(gameController.HumanSide).ToUpperInvariant()
+                ? "CONTRA IA  /  " + StrengthName(gameController).ToUpperInvariant() + "  /  " + SideName(gameController.HumanSide).ToUpperInvariant()
                 : "DOIS JOGADORES  /  PARTIDA LOCAL";
 
         if (turnText != null)
@@ -162,11 +165,17 @@ public sealed partial class GameHud : MonoBehaviour
         showHowToPlay = false;
         if (gameController != null)
         {
-            if (chooseComputer) gameController.StartComputerGame(chosenSide, chosenDifficulty);
-            else gameController.StartLocalGame();
+            if (!chooseComputer) gameController.StartLocalGame();
+            else if (chooseCustomElo) gameController.StartComputerGame(chosenSide, chosenElo);
+            else gameController.StartComputerGame(chosenSide, chosenDifficulty);
         }
 
         RefreshInterface();
+    }
+
+    private static string StrengthName(ChessGameController controller)
+    {
+        return controller.CustomElo.HasValue ? "Elo " + controller.CustomElo.Value : DifficultyName(controller.Difficulty);
     }
 
     private static string DifficultyName(ComputerDifficulty difficulty)
