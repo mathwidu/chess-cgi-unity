@@ -7,7 +7,7 @@ const { test } = require('node:test');
 const source = fs.readFileSync(path.resolve(__dirname, '../../game/Assets/Plugins/WebGL/Stockfish.jslib'), 'utf8');
 const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-function load(WorkerClass) {
+function load(WorkerClass, assetBaseUrl) {
   const workers = [];
   class FakeWorker {
     constructor(url) { this.url = url; this.sent = []; workers.push(this); }
@@ -19,6 +19,7 @@ function load(WorkerClass) {
   const context = vm.createContext({
     LibraryManager: { library }, mergeInto: Object.assign,
     Worker: WorkerClass || FakeWorker, URL, document: { baseURI: 'http://localhost:8765/chess/index.html' },
+    window: assetBaseUrl ? { CiCoChessRuntime: { assetBaseUrl } } : {},
     UTF8ToString: value => value, lengthBytesUTF8: value => Buffer.byteLength(value),
     _malloc: () => 1, stringToUTF8: value => { context.lastMessage = value; }
   });
@@ -56,6 +57,15 @@ test('startup handshake precedes search and preserves history and difficulty', (
   api.ChessStockfish_Begin(id, 43, startFen, '', 0, 150);
   assert.equal(workers.length, 1, 'Keep the initialized worker between turns.');
   assert.equal(worker.sent.at(-2), 'setoption name Skill Level value 0');
+  api.ChessStockfish_Dispose(id);
+});
+
+test('site launcher resolves AI beside the versioned Unity runtime', () => {
+  const base = 'http://localhost:8765/jogar/runtime/abc123/';
+  const { api, workers } = load(undefined, base);
+  const id = api.ChessStockfish_Create();
+  api.ChessStockfish_Begin(id, 1, startFen, '', 0, 150);
+  assert.equal(workers[0].url, base + 'stockfish/stockfish-18-lite-single.js');
   api.ChessStockfish_Dispose(id);
 });
 

@@ -142,3 +142,14 @@ de outra revisão não podem alterar a partida.
 
 - **Aliases:** PositionSnapshot
 - **Status:** validated
+
+## Partida salva
+
+Registro local versionado do modo de jogo, lado humano, dificuldade e todas
+as jogadas UCI desde a posição inicial padrão. Retomar significa repetir e
+validar essas jogadas em regras separadas antes de substituir a partida viva;
+o tabuleiro final, as capturas e o resultado não são confiados ao arquivo.
+Uma jogada aceita já pertence à partida salva mesmo durante sua animação.
+
+- **Aliases:** Saved match, ChessMatchSession, Retomada
+- **Status:** draft

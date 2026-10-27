@@ -10,6 +10,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Partida salva no navegador](features/retomar-partida-no-navegador.md): schema
+  local versionado com replay integral validado antes de trocar a partida,
+  gravação na aceitação lógica da jogada e cancelamento da busca anterior ao
+  retomar. Boot preserva o save; falhas de storage não bloqueiam a partida.
+  Testes adicionados, com execução Unity pendente da integração pelo principal.
+
 - Adaptador offline Android/Quest com Stockfish 18 ARM64 PIE incluído no APK,
   transporte UCI por Java, cancelamento sem bloqueio da thread Unity e preparo
   reproduzível com licença/fonte correspondente. O desktop permanece no

@@ -252,6 +252,16 @@ public sealed partial class GameHud : MonoBehaviour
 
     }
 
+    public void ShowResumedMatch()
+    {
+        webHistoryOpen = webPreviewOpen = false;
+        showStartScreen = false;
+        showHowToPlay = false;
+        resultDismissed = false;
+        resultRevealAt = -1f;
+        RefreshInterface();
+    }
+
     private void StartGame()
     {
         webHistoryOpen = webPreviewOpen = false;

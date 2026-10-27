@@ -69,7 +69,8 @@ mergeInto(LibraryManager.library, {
       try {
         if (!channel.worker) {
           // Resolve against the hosting page, not Unity's Build/ framework URL.
-          var url = new URL("stockfish/stockfish-18-lite-single.js", document.baseURI);
+          var assetBase = typeof window !== 'undefined' && window.CiCoChessRuntime && window.CiCoChessRuntime.assetBaseUrl;
+          var url = new URL("stockfish/stockfish-18-lite-single.js", assetBase || document.baseURI);
           var worker = new Worker(url.href);
           channel.worker = worker;
           var generation = channel.generation;

@@ -44,6 +44,20 @@ public sealed class CapturedPiecesView : MonoBehaviour
     public int FarCount { get; private set; }
     public string BalanceText => balanceLabel != null && balanceLabel.gameObject.activeSelf ? balanceText.text : string.Empty;
 
+    public void RefreshRestoredMatch(ChessGameController controller, PieceFactory pieceFactory)
+    {
+        if (piecesRoot == null || controller == null || pieceFactory == null) return;
+        game = controller;
+        factory = pieceFactory;
+        cameraController = Object.FindFirstObjectByType<CameraController>();
+        viewerOnBlackSide = XRRig.IsHeadsetPresent ? XRRig.SeatedAsBlack :
+            cameraController != null && cameraController.CurrentPerspective == ChessSide.Black;
+        transform.localRotation = Quaternion.Euler(0f, viewerOnBlackSide ? 180f : 0f, 0f);
+        // Counts/material can match another game's captures. Replace that cache
+        // explicitly, and never fly a historical capture in from its old square.
+        Rebuild(false);
+    }
+
     public void Build(BoardView boardView)
     {
         board = boardView;

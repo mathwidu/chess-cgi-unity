@@ -19,7 +19,7 @@ public sealed class ChessGameController : MonoBehaviour
     private const int DefaultPerformanceMode = 1;
 #endif
 
-    private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
+    private ChessRulesAdapter rules = new ChessRulesAdapter();
     private readonly List<BoardSquare> legalDestinations = new List<BoardSquare>();
     private readonly List<string> moveHistory = new List<string>();
     private readonly List<VisualPieceState> capturedPieces = new List<VisualPieceState>();
@@ -31,6 +31,8 @@ public sealed class ChessGameController : MonoBehaviour
     private bool againstComputer;
     private bool matchStarted;
     private bool suspended;
+    private bool automaticInitialization;
+    private bool hasPersistableSession;
     private MoveResult? animatingMove;
     private MoveResult? interruptedMove;
     private bool restoreBoardOnEnable;
@@ -64,6 +66,10 @@ public sealed class ChessGameController : MonoBehaviour
     public BoardSquare? CheckedKing { get; private set; }
     // Raised once per move, after it lands and the match state (turn, check, outcome) is updated.
     public event System.Action<MoveResult> MoveApplied;
+    // The rules have accepted a complete move, even if its visual animation has
+    // not landed yet. Persistence must use this boundary, not MoveApplied.
+    public event System.Action SessionChanged;
+    public bool HasPersistableSession => hasPersistableSession;
     public string StatusMessage { get; private set; } = "Turno: Brancas";
 
     public void Configure(BoardView board, PieceFactory factory, GameHud gameHud, CameraController camera = null)
@@ -116,11 +122,16 @@ public sealed class ChessGameController : MonoBehaviour
     {
         if (!matchStarted)
         {
-            StartLocalGame();
-            if (hud != null)
+            automaticInitialization = true;
+            try
             {
-                ReturnToMenu();
+                StartLocalGame();
+                if (hud != null)
+                {
+                    ReturnToMenu();
+                }
             }
+            finally { automaticInitialization = false; }
         }
     }
 
@@ -195,6 +206,63 @@ public sealed class ChessGameController : MonoBehaviour
         boardView.SyncPieces(rules.GetPieces(), pieceFactory);
         SetStatusForTurn();
         UpdateCameraForTurn(true);
+        hasPersistableSession = !automaticInitialization;
+        if (hasPersistableSession) SessionChanged?.Invoke();
+    }
+
+    public bool TrySaveSession(out string json, out string reason)
+    {
+        json = null;
+        reason = "no-active-session";
+        return hasPersistableSession && ChessMatchSession.TrySerialize(rules.GetSnapshot(),
+            againstComputer, HumanSide, Difficulty, out json, out reason);
+    }
+
+    public bool TryResumeSession(string json, out string reason)
+    {
+        if (!ChessMatchSession.TryReplay(json, out ChessMatchSession.Replay replay, out reason)) return false;
+        if (boardView == null || pieceFactory == null) { reason = "scene-unavailable"; return false; }
+
+        // Validation above cannot cancel or partially replace the current match.
+        // A valid replay owns a fresh adapter; dispose the old search before the
+        // swap so a coincident revision number can never admit an old response.
+        StopAllCoroutines();
+        StopComputerTurn();
+        ClearSelection();
+        rules = replay.Rules;
+        againstComputer = replay.AgainstComputer;
+        HumanSide = replay.HumanSide;
+        Difficulty = replay.Difficulty;
+        animatingMove = null;
+        interruptedMove = null;
+        restoreBoardOnEnable = false;
+        inputBlocked = false;
+        awaitingPromotion = false;
+        matchStarted = true;
+        hasPersistableSession = true;
+        Outcome = MatchOutcome.InProgress;
+        Winner = null;
+        LastMove = null;
+        CheckedKing = null;
+        moveHistory.Clear();
+        capturedPieces.Clear();
+        foreach (ChessMatchSession.ReplayedMove move in replay.Moves)
+        {
+            moveHistory.Add(BuildMoveNotation(move.Side, move.Move.From, move.Move.To, move.Result, move.Move.Promotion));
+            if (move.Result.Captured.HasValue) capturedPieces.Add(move.Result.Captured.Value);
+        }
+        MaterialBalance = rules.GetMaterialBalance();
+        boardView.BuildBoard();
+        boardView.SyncPieces(rules.GetPieces(), pieceFactory);
+        if (replay.Moves.Count > 0) UpdateAfterMove(replay.Moves[replay.Moves.Count - 1].Result);
+        else SetStatusForTurn();
+        UpdateCameraForTurn(true);
+        boardView.CapturedPieces?.RefreshRestoredMatch(this, pieceFactory);
+        if (hud != null) hud.ShowResumedMatch();
+        // Update starts a single fresh computer search when appropriate. A
+        // historical move is neither animated nor re-emitted as MoveApplied.
+        reason = "";
+        return true;
     }
 
     public void SetPerformanceMode(bool enabled)
@@ -500,7 +568,7 @@ public sealed class ChessGameController : MonoBehaviour
             return false;
         }
 
-        string moveNotation = BuildMoveNotation(movingPiece, move.From, move.To, moveResult, move.Promotion);
+        string moveNotation = BuildMoveNotation(movingPiece.Side, move.From, move.To, moveResult, move.Promotion);
         moveHistory.Add(moveNotation);
         if (moveResult.Captured.HasValue)
         {
@@ -509,6 +577,8 @@ public sealed class ChessGameController : MonoBehaviour
 
         MaterialBalance = rules.GetMaterialBalance();
         ClearSelection();
+        hasPersistableSession = true;
+        SessionChanged?.Invoke();
 
         if (Application.isPlaying && moveDuration > 0f)
         {
@@ -615,7 +685,7 @@ public sealed class ChessGameController : MonoBehaviour
     }
 
     private static string BuildMoveNotation(
-        PieceView movingPiece,
+        ChessSide movingSide,
         BoardSquare origin,
         BoardSquare destination,
         MoveResult moveResult,
@@ -624,7 +694,7 @@ public sealed class ChessGameController : MonoBehaviour
         string separator = moveResult.IsCapture ? "x" : "-";
         string promotionSuffix = promotion.HasValue ? $"={char.ToUpperInvariant(promotion.Value)}" : string.Empty;
         string stateSuffix = moveResult.IsCheckmate ? "#" : moveResult.IsCheck ? "+" : string.Empty;
-        return $"{SideName(movingPiece.Side)}: {origin.ToAlgebraic()}{separator}{destination.ToAlgebraic()}{promotionSuffix}{stateSuffix}";
+        return $"{SideName(movingSide)}: {origin.ToAlgebraic()}{separator}{destination.ToAlgebraic()}{promotionSuffix}{stateSuffix}";
     }
 
     private static string SideName(ChessSide side)
