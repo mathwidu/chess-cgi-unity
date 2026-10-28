@@ -7,7 +7,9 @@
     "Unity.XR.Hands",
     "Unity.XR.OpenXR",
     "Unity.Collections",
-    "Unity.XR.CoreUtils"
+    "Unity.XR.CoreUtils",
+    "Unity.XR.CompositionLayers",
+    "Unity.RenderPipelines.Universal.Runtime"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"

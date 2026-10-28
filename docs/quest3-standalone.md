@@ -1,12 +1,29 @@
 # Quest 3 standalone
 
+## Comparação instalada — escala 0,65
+
+Por solicitação do usuário, em 26/10/2026 às 19h46 foi instalada uma
+comparação com escala **0,65**, mantendo MSAA **4×**, foveation 0,5 e o
+mesmo código e geometria da versão estável. Rodapé:
+**v0.1.3 (4) · 26/10/2026 19:44:54 Brasília (UTC-3)**. A hora identifica
+esta compilação; a versão/código Android continuam iguais para permitir
+restaurar o APK aprovado com `adb install -r`, sem limpar dados.
+
+Hash do APK instalado conferido:
+`4d96b00eef2223983f2ce470c5b3a93fa87321c29b926b22f06194559961ab95`.
+São cerca de 34% menos pixels que em 0,80. Isso não comprova ganho
+proporcional de FPS. O usuário confirmou **fluidez e imagem aceitável**;
+0,65 permanece como perfil de trabalho instalado. As duas tentativas de
+medição foram interrompidas e não comprovam FPS sustentado. Cópia e recuperação em
+`Builds/Quest3/comparison-20261026-scale065/`. A estável abaixo permanece
+preservada, e `quest3-stable.json` continua apontando para o APK aceito.
+
 ## Versão estável para entrega — 0.1.3 (4)
 
 O usuário aprovou esta compilação e a escolheu para a exposição em
-26/10/2026. Ela permanece instalada como **Xadrez CGI**, pacote
-`com.mathwidu.chesscgi`, com uma única instalação do jogo. Rodapé:
-**v0.1.3 (4) · 26/10/2026 17:39:37 Brasília (UTC-3)**. SHA-256 do APK
-instalado e preservado:
+26/10/2026. Ela foi instalada como **Xadrez CGI**, pacote
+`com.mathwidu.chesscgi`, e está preservada para restauração. Rodapé:
+**v0.1.3 (4) · 26/10/2026 17:39:37 Brasília (UTC-3)**. SHA-256 do APK aceito:
 `541bf61c8f198f504778035a0d0c4b62be4690709c6030a387bace9aed08532e`.
 
 Mantém escala 0,80, MSAA 4× e foveation 0,5. As peças personalizadas usam

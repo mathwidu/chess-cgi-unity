@@ -124,6 +124,10 @@ public sealed partial class GameHud : MonoBehaviour
             WidenButtonHitAreas(hudRoot);
         }
 
+        var composition = GetComponent<QuestHudComposition>();
+        if (hudCanvas.renderMode == RenderMode.WorldSpace && composition == null)
+            composition = gameObject.AddComponent<QuestHudComposition>();
+        if (composition != null) composition.Configure(hudCanvas);
         RefreshInterface();
     }
 

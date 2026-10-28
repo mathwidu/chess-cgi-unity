@@ -4,9 +4,27 @@ Abra **Xadrez CGI** na grade de aplicativos do Quest, no filtro
 **Fontes desconhecidas / Unknown Sources**. O jogo instalado funciona sem
 cabo e sem o Mac. A versão **0.1.3 (4)** foi escolhida pelo usuário como estável para
 a exposição, após aprovar aparência, movimento e jogabilidade. O mesmo
-APK aceito permanece instalado, com o nome e identificador do jogo anterior.
+APK aceito está preservado para recuperação, com o nome e identificador
+do jogo anterior.
 
-## Identificação e uso no headset
+## Comparação atual no aparelho
+
+Depois do aceite, o usuário pediu reduzir a resolução para **65%**. A
+comparação foi instalada às 19h46, mantendo MSAA 4× e o código da estável.
+Rodapé **v0.1.3 (4) · 26/10/2026 19:44:54 Brasília (UTC-3)**, SHA-256
+`4d96b00eef2223983f2ce470c5b3a93fa87321c29b926b22f06194559961ab95`.
+O hash instalado é igual ao APK verificado. O usuário avaliou esta
+compilação e confirmou **fluidez e imagem aceitável**, portanto o perfil
+de 65% permanece instalado e salvo no projeto. As duas coletas foram
+interrompidas; ainda não há medida comparável de FPS sustentado. Ela
+substitui o mesmo pacote, sem criar outro ícone do jogo.
+
+O APK aprovado de **80%**, das **17:39:37**, continua em
+`Builds/Quest3/stable-20261026-v0.1.3/`; a comparação fica em
+`Builds/Quest3/comparison-20261026-scale065/`. Ambas usam código Android 4,
+permitindo restaurar a estável com `adb install -r`, conservando os dados.
+
+## Identificação e uso da versão estável de 80%
 
 | Ação | Resultado esperado |
 | --- | --- |

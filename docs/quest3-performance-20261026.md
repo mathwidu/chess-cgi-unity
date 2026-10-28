@@ -111,8 +111,63 @@ Ainda **não passou** o critério de 72 Hz. O usuário aprovou a aparência no
 tabuleiro e de perto, relatou movimento fluido e jogo normal, e solicitou
 explicitamente fixar **esta versão** como estável para a entrega.
 
-O mesmo APK aceito permanece no Quest e está preservado com os fontes em
-`Builds/Quest3/stable-20261026-v0.1.3/`. Nenhuma otimização adicional foi
-aplicada depois do aceite. Evidências em
+O APK aceito está preservado com os fontes em
+`Builds/Quest3/stable-20261026-v0.1.3/`. Evidências do aceite em
 `.local/quest3/performance-detail-20261026/`, incluindo
 `adaptive-detail-board.json`, `physical-acceptance.json` e o checkpoint.
+
+## Comparação posterior ao aceite: escala 0,65
+
+O usuário pediu reduzir a resolução novamente e escolheu explicitamente
+**65%**. A mudança de 0,80 para 0,65 reduz aproximadamente **34% dos pixels**,
+mantendo MSAA 4×, foveation 0,5, HDR/sombras desligados e todos os personagens.
+Os 131 fontes C# e as 12 geometrias são idênticos aos da estável. Somente o
+perfil e a identidade gerada do build mudaram. Os relatórios anteriores de
+278/278 PlayMode e 70/70 EditMode foram vinculados por hash; as suítes não
+foram reexecutadas nesta alteração de dados.
+
+Build Android normal aprovado, com assinatura, manifesto, alinhamento de
+16 KiB, Stockfish e recursos dos personagens conferidos. Instalado e
+iniciado às 19h46, com hash remoto igual ao APK:
+`4d96b00eef2223983f2ce470c5b3a93fa87321c29b926b22f06194559961ab95`.
+Rodapé **v0.1.3 (4) · 26/10/2026 19:44:54 Brasília (UTC-3)**. Após o Quest
+ativar a sessão XR, o log confirmou escala **0,65**, alvo de **1092×1144
+por olho**, MSAA solicitado/swapchain **4×** e foveation **0,5**. A captura
+de abertura e a conferência às 19h47 não mostraram erro gerenciado/fatal.
+Isso confirma o perfil aplicado, sem medir desempenho. O usuário confirmou
+fluidez e imagem aceitável em seguida; as tentativas de coleta descritas
+abaixo não permitem afirmar FPS sustentado.
+
+Evidências em `.local/quest3/performance-scale065-20261026/`; APK e overlay
+de fontes em `Builds/Quest3/comparison-20261026-scale065/`. Esse overlay deve
+ser aplicado sobre uma cópia separada do checkpoint estável. O APK estável,
+seu snapshot completo e `docs/quest3-stable.json` foram preservados.
+
+A primeira tentativa de coleta, de **19h50m40s a 19h51m10s**, foi
+**inconclusiva**: 16 amostras com 10–13 camadas e nenhuma com a camada única
+usada nas comparações anteriores. Às 19h50m56s a sessão XR foi encerrada;
+o Android registrou a saída do processo 25788 como `LOW_MEMORY`, já em
+estado de cache (`importance=400`). O buffer de crash desse processo
+estava vazio, e outro processo do jogo foi observado. Isso não comprova
+crash em primeiro plano nem permite declarar FPS da partida. O log foi
+preservado e foi solicitada uma nova coleta com o tabuleiro em primeiro
+plano, sem painel Meta. Ver `scale065-first-attempt-review.json` na pasta de
+evidências.
+
+A segunda tentativa, de **19h52m32s a 19h53m02s**, teve só duas amostras
+antes de a sessão mudar de `FOCUSED` para `VISIBLE` e ser pausada às
+19h52m34s. O processo 29600 continuou existindo. Não há amostra suficiente
+para comparar desempenho sustentado. O usuário confirmou que retirou o
+headset ou abriu o menu Meta nessa última tentativa, comportamento
+compatível com a perda de foco e a pausa registradas. Ele não relatou que
+o jogo parou sozinho durante a partida. Essa confirmação se refere à
+segunda coleta e não altera o resultado inconclusivo das medições. Ver
+`capture-interruption-clarification.json`.
+
+O usuário confirmou **“Ficou fluido e a imagem continua aceitável”** para a
+compilação de 65%, além de informar que via os personagens sem painel Meta.
+O mesmo APK permaneceu instalado e seu hash foi conferido novamente após
+esse retorno. O perfil de trabalho é 0,65; o APK estável de 0,80 permanece
+guardado para restauração. O feedback positivo não transforma as coletas
+inconclusivas em uma medição de 72 FPS. Evidências: `physical-acceptance.json`,
+`scale065-board-retry.json` e `scale065-retry-review.json`.

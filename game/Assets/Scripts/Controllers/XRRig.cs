@@ -165,6 +165,7 @@ public sealed class XRRig : MonoBehaviour
         offsetObject.transform.SetParent(originObject.transform, false);
 
         GameObject cameraObject = new GameObject("Eye Camera");
+        cameraObject.tag = "MainCamera";
         cameraObject.transform.SetParent(offsetObject.transform, false);
 
         eyeCamera = cameraObject.AddComponent<Camera>();
@@ -272,8 +273,11 @@ public sealed class XRRig : MonoBehaviour
             caster.physicsLayerMask = (1 << PieceView.PhysicsLayer) | (1 << BoardScaleHandles.PhysicsLayer);
             caster.castRadius = GrabRadius;
         }
+        // Hand prefabs originally include only Default/UI; keep the independently
+        // captured HUD reachable without adding physical proxies to the ray.
         foreach (CurveInteractionCaster caster in interactorObject.GetComponentsInChildren<CurveInteractionCaster>(true))
-            caster.raycastMask &= ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer) | (1 << BoardScaleHandles.PhysicsLayer));
+            caster.raycastMask = (caster.raycastMask | (1 << QuestHudComposition.CaptureLayer)) &
+                ~((1 << PieceView.PhysicsLayer) | (1 << XRPhysicsPusher.PhysicsLayer) | (1 << BoardScaleHandles.PhysicsLayer));
 
         NearFarInteractor interactor = interactorObject.GetComponentInChildren<NearFarInteractor>(true);
         if (interactor == null)

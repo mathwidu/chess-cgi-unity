@@ -206,6 +206,17 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.xr.compositionlayers": {
+      "version": "2.6.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.inputsystem": "1.6.3",
+        "com.unity.xr.core-utils": "2.2.2",
+        "com.unity.xr.management": "4.0.1"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.xr.core-utils": {
       "version": "2.6.0",
       "depth": 1,

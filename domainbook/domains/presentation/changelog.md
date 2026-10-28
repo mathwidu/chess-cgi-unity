@@ -10,9 +10,27 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Candidato local com menu e painéis em camada de composição XR, capturados
+  em 2048 × 1152 independentemente do cenário em 0,65. Conserva o Canvas e
+  os eventos de pinça originais; os raios das mãos incluem a camada dedicada
+  e a superfície visual respeita a profundidade. O primeiro candidato revelou
+  alternância de escala XR causada pela câmera Preview; a correção usa câmera
+  Game com ajuste local do alvo no RenderGraph e guarda da escala XR.
+  A versão aceita permanece
+  arquivada. Teste físico de nitidez, interação e desempenho é necessário
+  antes de promover o candidato. Ver [registro](../../../docs/quest3-ui-composition-20261026.md).
+
+- Após o aceite da estável, o usuário solicitou comparação em escala
+  **0,65**, com MSAA 4× e foveation 0,5 mantidos. Instalada a compilação
+  **0.1.3 (4)** de **26/10/2026 19:44:54**, com hash conferido e os mesmos
+  fontes C# e geometrias da estável. O usuário aprovou fluidez e imagem,
+  mantendo 0,65 como perfil de trabalho. As duas coletas foram interrompidas
+  e não comprovam FPS sustentado. A estável de escala 0,80 permanece
+  arquivada para restauração. Ver [comparação](../../../docs/quest3-performance-20261026.md).
+
 - Compilação **0.1.3 (4)** de 26/10/2026 17:39:37 foi aprovada pelo usuário
   para a exposição: aparência distante/próxima e jogo normal com mãos.
-  O mesmo APK permanece instalado e arquivado, sem rebuild após o aceite.
+  O mesmo APK foi arquivado, sem recompilar o binário aceito.
   Mediana medida: 65,5 FPS, ainda abaixo de 72 Hz. Perfil: escala 0,80,
   MSAA 4× e foveation 0,5; 278 PlayMode e 70 EditMode aprovados.
   Identificação e limite registrados em

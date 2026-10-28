@@ -6,7 +6,9 @@
     "Unity.RenderPipelines.Universal.Runtime",
         "Unity.XR.CoreUtils",
         "Unity.XR.Hands",
-        "Unity.XR.Interaction.Toolkit"
+        "Unity.XR.Interaction.Toolkit",
+        "Unity.XR.CompositionLayers",
+        "Unity.XR.OpenXR"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

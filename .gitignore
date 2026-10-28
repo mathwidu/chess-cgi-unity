@@ -6,6 +6,11 @@
 [Bb]uilds/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
+# Composition Layers stores player runtime configuration under this name too.
+!/game/Assets/CompositionLayers/UserSettings/
+/game/Assets/CompositionLayers/UserSettings/*
+!/game/Assets/CompositionLayers/UserSettings/Resources/
+!/game/Assets/CompositionLayers/UserSettings/Resources.meta
 [Mm]emoryCaptures/
 /game/.utmp/
 

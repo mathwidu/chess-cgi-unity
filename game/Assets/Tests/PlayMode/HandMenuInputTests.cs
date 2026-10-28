@@ -96,6 +96,14 @@ public sealed class HandMenuInputTests
         => StartLocalGameThroughMenu(false);
 
     [UnityTest]
+    public IEnumerator LeftHandPinchesStartTheGameWithTheHudCapturedSeparately()
+        => StartLocalGameThroughMenu(true, true);
+
+    [UnityTest]
+    public IEnumerator RightHandPinchesStartTheGameWithTheHudCapturedSeparately()
+        => StartLocalGameThroughMenu(false, true);
+
+    [UnityTest]
     public IEnumerator RelaxingAHeldPinchDoesNotClickUntilTheFingersOpen()
     {
         yield return LoadHand(true);
@@ -178,9 +186,20 @@ public sealed class HandMenuInputTests
         Assert.That(clicks, Is.EqualTo(1), "A fresh valid pinch after opening must click normally.");
     }
 
-    private IEnumerator StartLocalGameThroughMenu(bool useLeft)
+    private IEnumerator StartLocalGameThroughMenu(bool useLeft, bool separateCapture = false)
     {
         yield return LoadHand(useLeft);
+        if (separateCapture)
+        {
+            var capture = hud.GetComponent<QuestHudComposition>();
+            Assert.That(capture, Is.Not.Null);
+            typeof(QuestHudComposition).GetMethod("Activate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                .Invoke(capture, new object[] { XRRig.EyeCamera, false });
+            yield return Frames(3);
+            Assert.That(capture.IsActive, Is.True);
+            Assert.That(hud.GetComponent<Canvas>().worldCamera, Is.EqualTo(XRRig.EyeCamera));
+            Assert.That(((XRUIInputModule)UnityEngine.EventSystems.EventSystem.current.currentInputModule).uiCamera, Is.EqualTo(XRRig.EyeCamera));
+        }
         Button mode = ButtonNamed("LocalModeButton");
         int clicks = 0;
         mode.onClick.AddListener(() => clicks++);

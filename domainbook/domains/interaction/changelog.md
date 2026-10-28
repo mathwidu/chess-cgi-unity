@@ -10,6 +10,12 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- No candidato com HUD em camada de composição XR, o raio de seleção das
+  mãos inclui a camada dedicada do Canvas. Menu e painéis conservam seus
+  eventos de pinça e alvos de interação enquanto a captura visual usa
+  resolução independente. A aceitação física do candidato continua pendente;
+  ver [registro](../../../docs/quest3-ui-composition-20261026.md).
+
 - Atualização 0.1.1: solturas lentas sobre a casa verde não são recusadas
   apenas pela altura. A observação inclui o tempo estimado de queda, com
   prazo máximo de 2 s, mantendo pouso real, mesma casa, abertura deliberada

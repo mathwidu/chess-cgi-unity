@@ -12,10 +12,12 @@ using UnityEditor.XR.OpenXR;
 using UnityEditor.XR.OpenXR.Features;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Hands.OpenXR;
 using UnityEngine.XR.Management;
 using UnityEngine.XR.OpenXR;
 using UnityEngine.XR.OpenXR.Features;
+using UnityEngine.XR.OpenXR.Features.CompositionLayers;
 using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
 
@@ -24,7 +26,8 @@ public static class ChessCgiQuestBuild
     private const BuildTargetGroup TargetGroup = BuildTargetGroup.Android;
     private const string MainScene = "Assets/Scenes/Main.unity";
     private const string ApplicationIdentifier = "com.mathwidu.chesscgi";
-    private const string VersionName = "0.1.3";
+    // Local UI candidate: keep versionCode so the accepted APK can be restored with install -r.
+    private const string VersionName = "0.1.4-ui.2";
     private const int VersionCode = 4;
     private const string OpenXrLoaderTypeName = "UnityEngine.XR.OpenXR.OpenXRLoader";
     private const string MockRuntimeFeatureId = "com.unity.openxr.feature.mockruntime";
@@ -71,6 +74,7 @@ public static class ChessCgiQuestBuild
         OpenXRSettings openXr = GetOpenXrSettings();
         SetFeatureEnabled<MetaQuestFeature>(openXr, true);
         SetFeatureEnabled<FoveatedRenderingFeature>(openXr, true);
+        SetFeatureEnabled<OpenXRCompositionLayersFeature>(openXr, true);
         openXr.foveatedRenderingApi = OpenXRSettings.BackendFovationApi.SRPFoveation;
         // Meta Quest Support copies its setting into OpenXR during validation.
         // The package exposes this choice only through a serialized Editor field.
@@ -109,6 +113,9 @@ public static class ChessCgiQuestBuild
         EditorUserBuildSettings.buildAppBundle = false;
         EditorUserBuildSettings.exportAsGoogleAndroidProject = false;
 
+        EnsureHudCaptureFeature("Assets/Settings/Mobile_Renderer.asset");
+        EnsureHudCaptureFeature("Assets/Settings/PC_Renderer.asset");
+
         AssetDatabase.SaveAssets();
         Validate();
         Debug.Log("CHESS_CGI_QUEST_PREPARE result=prepared target=Android architecture=ARM64 backend=IL2CPP minSdk=29 targetSdk=35 graphics=Vulkan");
@@ -132,6 +139,12 @@ public static class ChessCgiQuestBuild
             "Android graphics API must be explicitly Vulkan only.", errors);
         Check(!EditorUserBuildSettings.buildAppBundle && !EditorUserBuildSettings.exportAsGoogleAndroidProject,
             "Android output must be an APK, without Gradle project export.", errors);
+        var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/Mobile_Renderer.asset");
+        Check(renderer != null && renderer.rendererFeatures.OfType<QuestHudCaptureFeature>().Any(feature => feature.isActive),
+            "Mobile renderer requires QuestHudCaptureFeature for the independent HUD target.", errors);
+        var graph = GraphicsSettings.GetRenderPipelineSettings<RenderGraphSettings>();
+        Check(graph != null && !graph.enableRenderCompatibilityMode,
+            "Quest HUD capture requires RenderGraph; compatibility mode is not supported.", errors);
 
         XRGeneralSettings general = XRGeneralSettingsPerBuildTarget.XRGeneralSettingsForBuildTarget(TargetGroup);
         XRManagerSettings manager = general != null ? general.Manager : null;
@@ -151,6 +164,7 @@ public static class ChessCgiQuestBuild
                 "Android OpenXR render mode must be Single Pass Instanced / Multi-view.", errors);
             CheckFeatureEnabled<MetaQuestFeature>(openXr, errors);
             CheckFeatureEnabled<FoveatedRenderingFeature>(openXr, errors);
+            CheckFeatureEnabled<OpenXRCompositionLayersFeature>(openXr, errors);
             Check(openXr.foveatedRenderingApi == OpenXRSettings.BackendFovationApi.SRPFoveation,
                 "Android OpenXR must use SRP Foveation for render comparisons.", errors);
             CheckFeatureEnabled<OculusTouchControllerProfile>(openXr, errors);
@@ -193,6 +207,24 @@ public static class ChessCgiQuestBuild
         Debug.Log($"CHESS_CGI_QUEST_VALIDATION result={(errors.Count == 0 ? "passed" : "failed")} target=Android errors={errors.Count} xrIssues={loggedIssues.Count}");
         if (errors.Count > 0)
             throw new BuildFailedException($"Quest validation failed with {errors.Count} blocking issue(s). See CHESS_CGI_QUEST_VALIDATION_ERROR in the Editor log.");
+    }
+
+    private static void EnsureHudCaptureFeature(string path)
+    {
+        var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(path);
+        if (renderer == null) throw new BuildFailedException($"Renderer not found: {path}");
+        var feature = renderer.rendererFeatures.OfType<QuestHudCaptureFeature>().FirstOrDefault();
+        if (feature == null)
+        {
+            feature = ScriptableObject.CreateInstance<QuestHudCaptureFeature>();
+            feature.name = "Quest HUD full-resolution capture";
+            AssetDatabase.AddObjectToAsset(feature, renderer);
+            renderer.rendererFeatures.Add(feature);
+        }
+        feature.SetActive(true);
+        renderer.SetDirty();
+        EditorUtility.SetDirty(feature);
+        EditorUtility.SetDirty(renderer);
     }
 
     [MenuItem("Chess CGI/Build/Quest 3/Build Development APK")]
