@@ -83,7 +83,9 @@ public sealed class ChessRulesAdapter
         revision++;
         bool isCheck = game.IsInCheck(game.WhoseTurn);
         bool isCheckmate = game.IsCheckmated(game.WhoseTurn);
-        bool isDraw = game.IsDraw() || game.IsStalemated(game.WhoseTurn);
+        bool isStalemate = game.IsStalemated(game.WhoseTurn);
+        bool isDraw = game.IsDraw() || isStalemate;
+        MatchOutcome outcome = ToOutcome(isCheckmate, isStalemate, isDraw);
 
         return new MoveResult(
             true,
@@ -93,7 +95,8 @@ public sealed class ChessRulesAdapter
             isCheck,
             isCheckmate,
             isDraw,
-            BuildMessage(moveType, isCheck, isCheckmate, isDraw));
+            BuildMessage(moveType, isCheck, outcome),
+            outcome);
     }
 
     public VisualPieceState? GetPieceAt(BoardSquare square)
@@ -107,16 +110,38 @@ public sealed class ChessRulesAdapter
         return new VisualPieceState(square, ToSide(piece.Owner), ToKind(piece));
     }
 
-    private static string BuildMessage(MoveType moveType, bool isCheck, bool isCheckmate, bool isDraw)
+    private MatchOutcome ToOutcome(bool isCheckmate, bool isStalemate, bool isDraw)
     {
         if (isCheckmate)
         {
-            return "Xeque-mate.";
+            return MatchOutcome.Checkmate;
         }
 
-        if (isDraw)
+        if (isStalemate)
         {
-            return "Empate.";
+            return MatchOutcome.Stalemate;
+        }
+
+        if (!isDraw)
+        {
+            return MatchOutcome.InProgress;
+        }
+
+        return game.IsInsufficientMaterial() ? MatchOutcome.InsufficientMaterial : MatchOutcome.Draw;
+    }
+
+    private static string BuildMessage(MoveType moveType, bool isCheck, MatchOutcome outcome)
+    {
+        switch (outcome)
+        {
+            case MatchOutcome.Checkmate:
+                return "Xeque-mate.";
+            case MatchOutcome.Stalemate:
+                return "Empate por afogamento.";
+            case MatchOutcome.InsufficientMaterial:
+                return "Empate por material insuficiente.";
+            case MatchOutcome.Draw:
+                return "Empate.";
         }
 
         if (isCheck)

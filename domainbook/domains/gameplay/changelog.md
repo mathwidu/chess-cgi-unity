@@ -26,6 +26,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   para voltar às peças personalizadas.
 - Adversário offline no desktop, com escolha de lado, três dificuldades e validação local de toda candidata.
 - Cancelamento e timeout de busca, descarte de respostas antigas e recuperação por nova tentativa ou menu.
+- [Resultado da partida](glossary.md): `ChessRulesAdapter` classifica a
+  jogada que encerra a partida em `MatchOutcome` (xeque-mate, afogamento,
+  material insuficiente ou outro empate) e o devolve em `MoveResult.Outcome`.
+  `ChessGameController` expõe `Outcome` e `Winner` (o lado que deu o
+  xeque-mate; nulo no empate), e `IsGameOver` passa a derivar de `Outcome`.
+  Uma nova partida volta a `InProgress` sem vencedor. O status do empate nomeia
+  o motivo ("Empate por afogamento.", "Empate por material insuficiente.").
+  Nenhuma regra de xadrez mudou.
 
 ### Changed
 

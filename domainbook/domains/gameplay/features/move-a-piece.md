@@ -3,7 +3,7 @@ id: move-a-piece
 name: Mover uma peça
 status: ready
 owners: [mathwidu]
-terms: [jogada, destino-legal, captura, turno, xeque, xeque-mate, empate]
+terms: [jogada, destino-legal, captura, turno, xeque, xeque-mate, empate, resultado-da-partida]
 decisions: [gameplay/ADR-0001]
 ---
 
@@ -58,12 +58,28 @@ Example: Xeque-mate encerra a partida a favor do outro lado
   Given uma jogada que deixa o adversário em xeque-mate
   When ela é jogada
   Then o status informa que o lado que deu mate venceu
+  And o resultado da partida é xeque-mate, com esse lado como vencedor
   And nenhuma outra jogada é aceita
 
 Example: Uma jogada de empate encerra a partida sem vencedor
   Given uma jogada que deixa a posição empatada ou afogada
   When ela é jogada
   Then o status informa que a partida é um empate
+  And o resultado da partida não tem vencedor
+
+Example: O resultado nomeia o motivo do empate
+  Given uma jogada que deixa o lado a jogar sem lance legal e fora de xeque
+  When ela é jogada
+  Then o resultado da partida é empate por afogamento
+  Given uma captura que deixa apenas os dois reis no tabuleiro
+  When ela é jogada
+  Then o resultado da partida é empate por material insuficiente
+
+Example: Uma nova partida volta a aceitar jogadas
+  Given uma partida terminou em xeque-mate
+  When o jogador inicia uma nova partida
+  Then o resultado da partida volta a estar em andamento
+  And não há vencedor
 
 Example: Uma jogada de xeque nomeia o xeque e continua
   Given uma jogada que deixa o adversário em xeque, mas não em xeque-mate

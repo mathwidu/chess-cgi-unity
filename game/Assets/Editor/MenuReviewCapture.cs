@@ -49,8 +49,9 @@ public static class MenuReviewCapture
         new CaptureCase("selection", 1920, 1080, PrepareSelection),
         new CaptureCase("promotion", 1920, 1080, PreparePromotion, "PromoteQueenButton"),
         new CaptureCase("error", 1920, 1080, PrepareEngineFailure, "RetryComputerButton"),
+        new CaptureCase("game-over", 1920, 1080, PrepareCheckmate, "PlayAgainButton"),
         new CaptureCase("intermediate-compact", 1024, 768,
-            () => Click("ComputerMenuButton", "ComputerModeButton", "IntermediateDifficultyButton")),
+            () => Click("GameOverMenuButton", "ComputerModeButton", "IntermediateDifficultyButton")),
         new CaptureCase("play-focus", 1672, 941,
             () => EventSystem.current.SetSelectedGameObject(GameObject.Find("StartPlayButton")))
     };
@@ -198,6 +199,20 @@ public static class MenuReviewCapture
         board.SyncPieces(rules.GetPieces(), UnityEngine.Object.FindFirstObjectByType<PieceFactory>());
         controller.SelectPiece(board.Pieces.First(piece => piece.Square.Equals(new BoardSquare(0, 7))));
         controller.SelectDestination(new BoardSquare(0, 8));
+    }
+
+    private static void PrepareCheckmate()
+    {
+        var controller = UnityEngine.Object.FindFirstObjectByType<ChessGameController>();
+        var board = UnityEngine.Object.FindFirstObjectByType<BoardView>();
+        controller.StartLocalGame();
+        // Same test-only access as the promotion fixture: one move before the fool's mate.
+        var field = typeof(ChessGameController).GetField("rules", BindingFlags.NonPublic | BindingFlags.Instance);
+        var rules = (ChessRulesAdapter)field.GetValue(controller);
+        rules.Reset("rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2");
+        board.SyncPieces(rules.GetPieces(), UnityEngine.Object.FindFirstObjectByType<PieceFactory>());
+        controller.SelectPiece(board.Pieces.First(piece => piece.Square.Equals(BoardSquare.FromAlgebraic("d8"))));
+        controller.SelectDestination(BoardSquare.FromAlgebraic("h4"));
     }
 
     private static void PrepareEngineFailure()

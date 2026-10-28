@@ -118,6 +118,7 @@ public sealed partial class GameHud : MonoBehaviour
         bool hasController = gameController != null;
         bool awaitingPromotion = hasController && gameController.IsAwaitingPromotion;
 
+        RefreshGameOverDialog();
         RefreshStartMenu();
         SetActive(matchInterface, !showStartScreen);
         SetActive(computerErrorPanel, hasController && gameController.HasComputerError && !showStartScreen);
@@ -131,12 +132,15 @@ public sealed partial class GameHud : MonoBehaviour
 
         if (turnText != null)
         {
-            turnText.text = !hasController || gameController.CurrentTurn == ChessSide.White ? "Brancas jogam" : "Pretas jogam";
+            turnText.text = hasController && gameController.IsGameOver ? ResultHeadline()
+                : !hasController || gameController.CurrentTurn == ChessSide.White ? "Brancas jogam" : "Pretas jogam";
         }
 
         if (statusText != null)
         {
-            string status = hasController ? CompactStatus(gameController.StatusMessage) : "Escolha uma peça para mover.";
+            string status = !hasController ? "Escolha uma peça para mover."
+                : gameController.Outcome == MatchOutcome.Checkmate ? "Xeque-mate. Partida encerrada."
+                : CompactStatus(gameController.StatusMessage);
             statusText.text = status;
             statusText.color = status.StartsWith("Movimento invalido") ? new Color(0.95f, 0.45f, 0.36f, 1f) : textColor;
         }
@@ -148,6 +152,11 @@ public sealed partial class GameHud : MonoBehaviour
 
         RefreshSelectedPiecePanel(hasController ? gameController.SelectedPiece : null);
         RefreshNavigationFocus();
+
+        if (cancelButtonText != null)
+        {
+            cancelButtonText.text = hasController && gameController.IsGameOver ? "Resultado" : "Cancelar";
+        }
 
         if (howToPlayButtonText != null)
         {
@@ -191,6 +200,12 @@ public sealed partial class GameHud : MonoBehaviour
 
     private void CancelSelection()
     {
+        if (gameController != null && gameController.IsGameOver)
+        {
+            ShowResult();
+            return;
+        }
+
         if (gameController != null)
         {
             gameController.CancelSelection();

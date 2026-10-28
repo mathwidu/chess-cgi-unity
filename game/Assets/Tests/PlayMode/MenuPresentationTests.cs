@@ -1,6 +1,8 @@
 #if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -176,6 +178,107 @@ public class MenuPresentationTests
         }
         yield return null;
     }
+
+    [UnityTest]
+    public IEnumerator CheckmateShowsTheResultWithRestartReviewAndMenu()
+    {
+        yield return Click("LocalModeButton");
+        yield return Click("StartPlayButton");
+        yield return PlayMoves("f2f3", "e7e5", "g2g4", "d8h4");
+        Assert.That(GameObject.Find("GameOverPanel"), Is.Null, "The final move must land before the result covers it.");
+        yield return WaitForResult();
+        Assert.That(Label("GameOverKicker"), Is.EqualTo("XEQUE-MATE"));
+        Assert.That(Label("GameOverTitle"), Is.EqualTo("Pretas vencem"));
+        Assert.That(Label("GameOverDetails"), Is.EqualTo("4 lances  /  Lance final: Pretas d8-h4#"));
+        Assert.That(Label("TurnText"), Is.EqualTo("Pretas vencem"));
+        Assert.That(Label("StatusText"), Is.EqualTo("Xeque-mate. Partida encerrada."));
+        Assert.That(EventSystem.current.currentSelectedGameObject.name, Is.EqualTo("PlayAgainButton"));
+        Assert.That(GameObject.Find("NewGameButton").GetComponent<Button>().IsInteractable(), Is.False);
+
+        yield return Click("ReviewBoardButton");
+        Assert.That(GameObject.Find("GameOverPanel"), Is.Null);
+        Assert.That(ButtonLabel("CancelButton"), Is.EqualTo("Resultado"));
+        yield return Click("CancelButton");
+        Assert.That(GameObject.Find("GameOverPanel"), Is.Not.Null);
+
+        yield return Click("PlayAgainButton");
+        Assert.That(controller.IsGameOver, Is.False);
+        Assert.That(controller.IsAgainstComputer, Is.False);
+        Assert.That(controller.MoveHistory.Count, Is.Zero);
+        Assert.That(GameObject.Find("GameOverPanel"), Is.Null);
+        Assert.That(ButtonLabel("CancelButton"), Is.EqualTo("Cancelar"));
+
+        yield return PlayMoves("f2f3", "e7e5", "g2g4", "d8h4");
+        yield return WaitForResult();
+        yield return Click("GameOverMenuButton");
+        Assert.That(controller.IsMenuOpen, Is.True);
+        Assert.That(GameObject.Find("GameOverPanel"), Is.Null);
+        Assert.That(GameObject.Find("StartPlayButton"), Is.Not.Null);
+    }
+
+    [UnityTest]
+    public IEnumerator BeatingTheComputerCongratulatesThePlayer()
+    {
+        controller.SetMoveChooserFactory(() => new ScriptedMoveChooser("f7f6", "g7g5"));
+        yield return Click("ComputerModeButton");
+        yield return Click("WhiteSideButton");
+        yield return Click("IntermediateDifficultyButton");
+        yield return Click("StartPlayButton");
+        yield return PlayMoves("e2e4", "d2d4", "d1h5");
+        yield return WaitForResult();
+        Assert.That(controller.Winner, Is.EqualTo(ChessSide.White));
+        Assert.That(Label("GameOverTitle"), Is.EqualTo("Você venceu!"));
+        Assert.That(Label("GameOverMessage"), Does.Contain("Intermediário"));
+        Assert.That(GameObject.Find("GameOverKicker").GetComponent<Text>().color, Is.EqualTo(GameObject.Find("TurnText").GetComponent<Text>().color));
+    }
+
+    private sealed class ScriptedMoveChooser : IMoveChooser
+    {
+        private readonly Queue<string> moves;
+        public ScriptedMoveChooser(params string[] moves) { this.moves = new Queue<string>(moves); }
+        public Task<ChessMove> ChooseMoveAsync(PositionSnapshot p, MoveSearchSettings s, CancellationToken token)
+        {
+            ChessMove.TryParseUci(moves.Dequeue(), out ChessMove move);
+            return Task.FromResult(move);
+        }
+        public void Dispose() { }
+    }
+
+    // Plays through the controller, waiting out animations and computer replies between moves.
+    private IEnumerator PlayMoves(params string[] moves)
+    {
+        var board = Object.FindFirstObjectByType<BoardView>();
+        foreach (string uci in moves)
+        {
+            yield return WaitFor(() => !controller.IsInputBlocked);
+            Assert.That(ChessMove.TryParseUci(uci, out ChessMove move), Is.True, uci);
+            PieceView piece = null;
+            foreach (PieceView candidate in board.Pieces)
+                if (candidate.Square.Equals(move.From)) piece = candidate;
+            Assert.That(piece, Is.Not.Null, uci);
+            controller.SelectPiece(piece);
+            controller.SelectDestination(move.To);
+        }
+        yield return WaitFor(() => !controller.IsInputBlocked);
+    }
+
+    private IEnumerator WaitForResult()
+    {
+        yield return WaitFor(() => GameObject.Find("GameOverPanel") != null);
+        // Newly enabled Graphics enter the Canvas raycast registry on the next frame.
+        yield return null;
+    }
+
+    private static IEnumerator WaitFor(System.Func<bool> condition)
+    {
+        float deadline = Time.realtimeSinceStartup + 5f;
+        while (!condition() && Time.realtimeSinceStartup < deadline) yield return null;
+        Assert.That(condition(), Is.True, "The match did not reach its expected state.");
+    }
+
+    private static string Label(string name) => GameObject.Find(name).GetComponent<Text>().text;
+
+    private static string ButtonLabel(string name) => GameObject.Find(name).GetComponentInChildren<Text>().text;
 
     private IEnumerator Click(string name)
     {

@@ -1,10 +1,23 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public sealed partial class GameHud
 {
+    // Let the final move land on the board before the result covers it.
+    private const float ResultRevealDelay = 0.8f;
+
     private RectTransform matchInterface;
     private Text matchSummaryText;
+    private Text cancelButtonText;
+    private RectTransform gameOverPanel;
+    private Image gameOverAccent;
+    private Text gameOverKicker;
+    private Text gameOverTitle;
+    private Text gameOverMessage;
+    private Text gameOverDetails;
+    private bool resultDismissed;
+    private float resultRevealAt = -1f;
 
     private void BuildMatchInterface()
     {
@@ -16,6 +29,7 @@ public sealed partial class GameHud
         BuildMatchActions();
         BuildPromotionDialog();
         BuildComputerErrorDialog();
+        BuildGameOverDialog();
     }
 
     private void BuildMatchHeader()
@@ -59,7 +73,7 @@ public sealed partial class GameHud
     {
         RectTransform actions = CreatePanel("ActionBar", matchInterface, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(24, 24), new Vector2(708, 82), panelColor);
         MenuButton("NewGameButton", actions, "Nova partida", 16, 16, 194, 50, actionColor, RestartGame);
-        MenuButton("CancelButton", actions, "Cancelar", 222, 16, 148, 50, neutralButtonColor, CancelSelection);
+        cancelButtonText = MenuButton("CancelButton", actions, "Cancelar", 222, 16, 148, 50, neutralButtonColor, CancelSelection).GetComponentInChildren<Text>();
         howToPlayButtonText = MenuButton("HowToPlayButton", actions, "Como jogar", 382, 16, 166, 50, neutralButtonColor, ToggleHowToPlay).GetComponentInChildren<Text>();
         MenuButton("MenuButton", actions, "Menu", 560, 16, 132, 50, neutralButtonColor, ShowMenu);
     }
@@ -84,6 +98,130 @@ public sealed partial class GameHud
         MenuLabel("ComputerErrorHelp", error, "Sua partida foi preservada. Tente novamente\nou volte ao menu para começar outra partida.", 22, mutedTextColor, 36, 100, 728, 64);
         MenuButton("RetryComputerButton", error, "Tentar novamente", 36, 186, 358, 54, actionColor, () => gameController.RetryComputerTurn());
         MenuButton("ComputerMenuButton", error, "Voltar ao menu", 410, 186, 354, 54, neutralButtonColor, ShowMenu);
+    }
+
+    private void BuildGameOverDialog()
+    {
+        gameOverPanel = ModalOverlay("GameOverPanel");
+        RectTransform result = ModalCard("GameOverCard", gameOverPanel, 800, 372);
+        gameOverAccent = MenuRect("GameOverAccent", result, 0, 0, 800, 8).gameObject.AddComponent<Image>();
+        gameOverAccent.raycastTarget = false;
+        gameOverKicker = MenuLabel("GameOverKicker", result, "", 16, accentColor, 36, 40, 728, 24, true);
+        gameOverTitle = MenuLabel("GameOverTitle", result, "", 50, textColor, 36, 70, 728, 66, true);
+        gameOverMessage = MenuLabel("GameOverMessage", result, "", 22, mutedTextColor, 36, 146, 728, 60);
+        MenuRule(result, 36, 222, 728);
+        gameOverDetails = MenuLabel("GameOverDetails", result, "", 18, mutedTextColor, 36, 240, 728, 28);
+        MenuButton("PlayAgainButton", result, "Jogar novamente", 36, 290, 280, 56, actionColor, RestartGame);
+        MenuButton("ReviewBoardButton", result, "Ver tabuleiro", 326, 290, 214, 56, neutralButtonColor, HideResult);
+        MenuButton("GameOverMenuButton", result, "Voltar ao menu", 550, 290, 214, 56, neutralButtonColor, ShowMenu);
+    }
+
+    // The result follows the controller; the player may hide it to study the final position.
+    private void RefreshGameOverDialog()
+    {
+        bool finished = gameController != null && gameController.IsGameOver && !showStartScreen;
+        if (!finished)
+        {
+            resultDismissed = false;
+            resultRevealAt = -1f;
+            SetActive(gameOverPanel, false);
+            return;
+        }
+
+        if (resultRevealAt < 0f)
+        {
+            resultRevealAt = Time.unscaledTime + ResultRevealDelay;
+        }
+
+        SetActive(gameOverPanel, !resultDismissed && Time.unscaledTime >= resultRevealAt);
+        bool playerWon = gameController.Outcome == MatchOutcome.Checkmate &&
+            (!gameController.IsAgainstComputer || gameController.Winner == gameController.HumanSide);
+        gameOverAccent.color = playerWon ? accentColor : mutedTextColor;
+        gameOverKicker.color = playerWon ? accentColor : mutedTextColor;
+        gameOverKicker.text = OutcomeName(gameController.Outcome);
+        gameOverTitle.text = ResultHeadline();
+        gameOverMessage.text = ResultMessage();
+        gameOverDetails.text = ResultDetails(gameController.MoveHistory);
+    }
+
+    private bool IsResultShown => gameOverPanel != null && gameOverPanel.gameObject.activeSelf;
+
+    private void HideResult()
+    {
+        resultDismissed = true;
+        RefreshInterface();
+    }
+
+    private void ShowResult()
+    {
+        resultDismissed = false;
+        RefreshInterface();
+    }
+
+    private string ResultHeadline()
+    {
+        if (gameController.Outcome != MatchOutcome.Checkmate || !gameController.Winner.HasValue)
+        {
+            return "Empate";
+        }
+
+        ChessSide winner = gameController.Winner.Value;
+        if (gameController.IsAgainstComputer)
+        {
+            return winner == gameController.HumanSide ? "Você venceu!" : "A IA venceu";
+        }
+
+        return $"{SideName(winner)} vencem";
+    }
+
+    private string ResultMessage()
+    {
+        switch (gameController.Outcome)
+        {
+            case MatchOutcome.Checkmate:
+                ChessSide winner = gameController.Winner.GetValueOrDefault();
+                if (!gameController.IsAgainstComputer)
+                {
+                    return $"As {SideName(winner).ToLowerInvariant()} deram xeque-mate. Boa partida!";
+                }
+
+                return winner == gameController.HumanSide
+                    ? $"Seu xeque-mate derrotou a IA no nível {DifficultyName(gameController.Difficulty)}."
+                    : "A IA encontrou o xeque-mate. Jogue de novo ou escolha outra dificuldade no menu.";
+            case MatchOutcome.Stalemate:
+                return "O lado a jogar não está em xeque, mas não tem nenhum lance legal.";
+            case MatchOutcome.InsufficientMaterial:
+                return "Não restam peças suficientes para nenhum lado dar xeque-mate.";
+            default:
+                return "As regras reconhecem esta posição como empate.";
+        }
+    }
+
+    private static string ResultDetails(IReadOnlyList<string> moveHistory)
+    {
+        if (moveHistory.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        string finalMove = moveHistory[moveHistory.Count - 1].Replace(": ", " ");
+        string count = moveHistory.Count == 1 ? "1 lance" : $"{moveHistory.Count} lances";
+        return $"{count}  /  Lance final: {finalMove}";
+    }
+
+    private static string OutcomeName(MatchOutcome outcome)
+    {
+        switch (outcome)
+        {
+            case MatchOutcome.Checkmate:
+                return "XEQUE-MATE";
+            case MatchOutcome.Stalemate:
+                return "EMPATE POR AFOGAMENTO";
+            case MatchOutcome.InsufficientMaterial:
+                return "EMPATE POR MATERIAL INSUFICIENTE";
+            default:
+                return "EMPATE";
+        }
     }
 
     private RectTransform ModalOverlay(string name)

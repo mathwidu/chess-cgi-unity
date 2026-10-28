@@ -8,6 +8,7 @@ public readonly struct MoveResult
     public bool IsCheckmate { get; }
     public bool IsDraw { get; }
     public string Message { get; }
+    public MatchOutcome Outcome { get; }
 
     public MoveResult(
         bool success,
@@ -17,7 +18,8 @@ public readonly struct MoveResult
         bool isCheck,
         bool isCheckmate,
         bool isDraw,
-        string message)
+        string message,
+        MatchOutcome outcome = MatchOutcome.InProgress)
     {
         Success = success;
         From = from;
@@ -27,6 +29,7 @@ public readonly struct MoveResult
         IsCheckmate = isCheckmate;
         IsDraw = isDraw;
         Message = message;
+        Outcome = outcome;
     }
 
     public static MoveResult Failed(BoardSquare from, BoardSquare to, string message)

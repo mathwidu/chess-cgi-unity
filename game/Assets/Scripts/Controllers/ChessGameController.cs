@@ -19,7 +19,6 @@ public sealed class ChessGameController : MonoBehaviour
 
     private PieceView selectedPiece;
     private bool inputBlocked;
-    private bool gameOver;
     private bool awaitingPromotion;
     private BoardSquare pendingPromotionTo;
     private bool againstComputer;
@@ -32,10 +31,12 @@ public sealed class ChessGameController : MonoBehaviour
     public bool IsAgainstComputer => againstComputer;
     public ChessSide HumanSide { get; private set; } = ChessSide.White;
     public ComputerDifficulty Difficulty { get; private set; } = ComputerDifficulty.Beginner;
-    public bool IsComputerTurn => againstComputer && CurrentTurn != HumanSide && !gameOver;
+    public bool IsComputerTurn => againstComputer && CurrentTurn != HumanSide && !IsGameOver;
     public bool IsComputerThinking => computerTurn != null && computerTurn.IsThinking;
     public bool HasComputerError { get; private set; }
-    public bool IsGameOver => gameOver;
+    public bool IsGameOver => Outcome != MatchOutcome.InProgress;
+    public MatchOutcome Outcome { get; private set; }
+    public ChessSide? Winner { get; private set; }
     public bool IsMenuOpen => !matchStarted;
 
     public PieceView SelectedPiece => selectedPiece;
@@ -157,7 +158,8 @@ public sealed class ChessGameController : MonoBehaviour
         rules.Reset();
         animatingMove = null;
         matchStarted = true;
-        gameOver = false;
+        Outcome = MatchOutcome.InProgress;
+        Winner = null;
         inputBlocked = false;
         awaitingPromotion = false;
         selectedPiece = null;
@@ -261,7 +263,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     private void OnEnable()
     {
-        if (matchStarted && !gameOver)
+        if (matchStarted && !IsGameOver)
         {
             SetStatusForTurn();
         }
@@ -274,7 +276,7 @@ public sealed class ChessGameController : MonoBehaviour
         {
             StopComputerTurn();
         }
-        else if (matchStarted && !gameOver)
+        else if (matchStarted && !IsGameOver)
         {
             SetStatusForTurn();
         }
@@ -284,7 +286,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     public void SelectPiece(PieceView piece)
     {
-        if (piece == null || IsInputBlocked || gameOver)
+        if (piece == null || IsInputBlocked || IsGameOver)
         {
             return;
         }
@@ -308,7 +310,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     public bool CanGrabPiece(PieceView piece)
     {
-        return piece != null && !IsInputBlocked && !gameOver && piece.Side == CurrentTurn;
+        return piece != null && !IsInputBlocked && !IsGameOver && piece.Side == CurrentTurn;
     }
 
     public void GrabPiece(PieceView piece)
@@ -367,7 +369,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     public void SelectDestination(BoardSquare destination)
     {
-        if (selectedPiece == null || IsInputBlocked || gameOver)
+        if (selectedPiece == null || IsInputBlocked || IsGameOver)
         {
             return;
         }
@@ -402,7 +404,7 @@ public sealed class ChessGameController : MonoBehaviour
 
     public void CancelSelection()
     {
-        if (!isActiveAndEnabled || !matchStarted || suspended || inputBlocked || IsComputerTurn || gameOver)
+        if (!isActiveAndEnabled || !matchStarted || suspended || inputBlocked || IsComputerTurn || IsGameOver)
         {
             return;
         }
@@ -493,21 +495,9 @@ public sealed class ChessGameController : MonoBehaviour
     private void ApplyMoveResult(MoveResult moveResult)
     {
         // The provider survives human turns, but each completed search is consumed once.
-        if (moveResult.IsCheckmate)
+        if (moveResult.Outcome != MatchOutcome.InProgress)
         {
-            gameOver = true;
-            StopComputerTurn();
-            ChessSide winner = CurrentTurn == ChessSide.White ? ChessSide.Black : ChessSide.White;
-            StatusMessage = $"Xeque-mate. {SideName(winner)} vencem.";
-            UpdateCameraForTurn(false);
-            return;
-        }
-
-        if (moveResult.IsDraw)
-        {
-            gameOver = true;
-            StopComputerTurn();
-            StatusMessage = "Empate.";
+            EndMatch(moveResult);
             UpdateCameraForTurn(false);
             return;
         }
@@ -521,6 +511,22 @@ public sealed class ChessGameController : MonoBehaviour
 
         SetStatusForTurn();
         UpdateCameraForTurn(false);
+    }
+
+    private void EndMatch(MoveResult moveResult)
+    {
+        StopComputerTurn();
+        Outcome = moveResult.Outcome;
+        if (Outcome == MatchOutcome.Checkmate)
+        {
+            // The side to move is the one that was mated.
+            Winner = CurrentTurn == ChessSide.White ? ChessSide.Black : ChessSide.White;
+            StatusMessage = $"Xeque-mate. {SideName(Winner.Value)} vencem.";
+            return;
+        }
+
+        Winner = null;
+        StatusMessage = moveResult.Message;
     }
 
     private void ClearSelection()

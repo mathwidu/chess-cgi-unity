@@ -60,6 +60,18 @@ empate que as regras reconheçam.
 - **Aliases:** Draw
 - **Status:** validated
 
+## Resultado da partida
+
+Como uma partida terminou: em xeque-mate, que tem um vencedor, ou em empate —
+por afogamento, por material insuficiente ou por outra posição de empate que
+as regras reconheçam. Enquanto a partida aceita jogadas, ela está em
+andamento. O vencedor é sempre o lado que deu o xeque-mate.
+
+- **Aliases:** Match outcome, MatchOutcome, Vencedor, Winner
+- **Status:** validated
+- **Example:** depois de 1. f3 e5 2. g4 Dh4#, o resultado é xeque-mate e o
+  vencedor é Pretas.
+
 ## Promoção
 
 Um peão que chega à última linha se transformando em outro tipo de peça. A

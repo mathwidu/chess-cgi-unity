@@ -57,3 +57,14 @@ inicial e o painel da peça selecionada.
 
 - **Aliases:** Interface, Canvas UI
 - **Status:** validated
+
+## Tela de resultado
+
+O diálogo do HUD que anuncia o [resultado da partida](../gameplay/glossary.md)
+quando ela termina: quem venceu, ou o motivo do empate, a quantidade de lances
+e o lance final. Oferece jogar de novo com a mesma configuração, ver o
+tabuleiro final ou voltar ao menu. Ocultá-la para ver o tabuleiro não
+reinicia nada; o botão Resultado da barra de ações a traz de volta.
+
+- **Aliases:** Result dialog, GameOverPanel, Tela de vitória
+- **Status:** validated

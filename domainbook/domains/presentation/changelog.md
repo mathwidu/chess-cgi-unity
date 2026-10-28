@@ -10,6 +10,18 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Tela de resultado](glossary.md) ao fim da partida
+  ([feature](features/mostrar-o-resultado-da-partida.md)): um diálogo modal no
+  estilo dos diálogos de promoção e de falha da IA, que aparece 0,8 s depois do
+  fim da partida para o lance final pousar no tabuleiro. Mostra o tipo de
+  resultado, quem venceu ("Você venceu!", "A IA venceu", "Brancas vencem",
+  "Pretas vencem" ou "Empate"), uma mensagem, a quantidade de lances e o lance
+  final, com uma faixa amarela quando o jogador vence. Oferece Jogar novamente
+  (mesma configuração), Ver tabuleiro e Voltar ao menu, recebe o foco e
+  bloqueia a barra de ações enquanto está aberta. Com a tela oculta, o painel
+  de turno mostra o resultado e o botão Cancelar vira Resultado para reabri-la.
+  `MenuReviewCapture` ganhou o estado `game-over`.
+
 - Em VR, a peça ao alcance da mão (a que o gatilho do indicador agarraria)
   ganha um contorno laranja: `PieceFactory` acrescenta um `PieceGrabHighlight`
   a cada peça quando um headset está presente. Ele mostra, sobre cada malha da
