@@ -16,6 +16,7 @@ public sealed class ChessGameController : MonoBehaviour
     private readonly ChessRulesAdapter rules = new ChessRulesAdapter();
     private readonly List<BoardSquare> legalDestinations = new List<BoardSquare>();
     private readonly List<string> moveHistory = new List<string>();
+    private readonly List<VisualPieceState> capturedPieces = new List<VisualPieceState>();
 
     private PieceView selectedPiece;
     private bool inputBlocked;
@@ -45,6 +46,11 @@ public sealed class ChessGameController : MonoBehaviour
     public ChessSide CurrentTurn => rules.CurrentTurn;
     public bool PerformanceMode => pieceFactory != null && pieceFactory.UsePrimitivePieces;
     public IReadOnlyList<string> MoveHistory => moveHistory;
+    // Pieces taken so far, in capture order, each on the square it was taken from.
+    public IReadOnlyList<VisualPieceState> CapturedPieces => capturedPieces;
+    // Material on the board, White minus Black.
+    public int MaterialBalance { get; private set; }
+    public bool IsAnimatingMove => animatingMove.HasValue;
     public string StatusMessage { get; private set; } = "Turno: Brancas";
 
     public void Configure(BoardView board, PieceFactory factory, GameHud gameHud, CameraController camera = null)
@@ -165,6 +171,8 @@ public sealed class ChessGameController : MonoBehaviour
         selectedPiece = null;
         legalDestinations.Clear();
         moveHistory.Clear();
+        capturedPieces.Clear();
+        MaterialBalance = rules.GetMaterialBalance();
 
         boardView.BuildBoard();
         boardView.SyncPieces(rules.GetPieces(), pieceFactory);
@@ -467,6 +475,12 @@ public sealed class ChessGameController : MonoBehaviour
 
         string moveNotation = BuildMoveNotation(movingPiece, move.From, move.To, moveResult, move.Promotion);
         moveHistory.Add(moveNotation);
+        if (moveResult.Captured.HasValue)
+        {
+            capturedPieces.Add(moveResult.Captured.Value);
+        }
+
+        MaterialBalance = rules.GetMaterialBalance();
         ClearSelection();
 
         if (Application.isPlaying && moveDuration > 0f)

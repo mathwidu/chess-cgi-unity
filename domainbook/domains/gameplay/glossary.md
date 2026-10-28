@@ -24,10 +24,23 @@ controlador só oferece esse conjunto, e o tabuleiro o destaca.
 ## Captura
 
 Uma jogada que termina em uma casa ocupada por uma peça adversária, removendo-a
-do tabuleiro. Escrita com um `x` entre origem e destino.
+do tabuleiro. Escrita com um `x` entre origem e destino. No en passant, a peça
+tomada é o peão ao lado, não o da casa de destino. A partida guarda cada peça
+capturada, na ordem das capturas, com a casa de onde saiu.
 
-- **Aliases:** Capture
+- **Aliases:** Capture, Peça capturada, Captured piece
 - **Status:** validated
+
+## Vantagem de material
+
+A diferença de material entre os lados no tabuleiro, pelos valores
+convencionais: peão 1, cavalo e bispo 3, torre 5, dama 9 e rei 0. É calculada
+sobre as peças em jogo, então um peão promovido vale a peça em que se tornou.
+
+- **Aliases:** Material balance, MaterialBalance, ChessPieceValue
+- **Status:** validated
+- **Example:** as brancas tomaram a dama e um peão, e perderam dois peões: +8
+  para as brancas.
 
 ## Turno
 

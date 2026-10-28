@@ -51,7 +51,9 @@ Example: Fora da partida não há sinal de turno
 A luz e a etiqueta são montadas pelo `BoardView` em unidades locais do
 tabuleiro. Por isso sobem e descem com a mesa e têm a mesma proporção no
 desktop e no VR. A etiqueta fica de pé para quem está sentado: o assento VR,
-ou a câmera desktop. Ela não tem raycaster e não pega o raio.
+ou a câmera desktop. Ela não tem raycaster e não pega o raio. A etiqueta
+aparece só no VR; no desktop, o painel de turno do HUD já nomeia a vez, e só a
+luz aparece, mais fina.
 
 ## Open Questions
 

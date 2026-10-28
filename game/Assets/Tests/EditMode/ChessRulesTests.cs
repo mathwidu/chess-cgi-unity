@@ -97,6 +97,40 @@ public class ChessRulesTests
     }
 
     [Test]
+    public void CaptureReportsTheTakenPieceAndTheMaterialSwing()
+    {
+        var rules = new ChessRulesAdapter();
+        Assert.That(rules.TryMove(Move("e2e4")).Captured, Is.Null);
+        rules.TryMove(Move("d7d5"));
+        MoveResult capture = rules.TryMove(Move("e4d5"));
+        Assert.That(capture.IsCapture, Is.True);
+        Assert.That(capture.Captured.HasValue, Is.True);
+        Assert.That(capture.Captured.Value.Kind, Is.EqualTo(ChessPieceKind.Pawn));
+        Assert.That(capture.Captured.Value.Side, Is.EqualTo(ChessSide.Black));
+        Assert.That(capture.Captured.Value.Square, Is.EqualTo(BoardSquare.FromAlgebraic("d5")));
+        Assert.That(rules.GetMaterialBalance(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public void EnPassantReportsThePawnOnItsOwnSquare()
+    {
+        var rules = new ChessRulesAdapter("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1");
+        MoveResult capture = rules.TryMove(Move("e5d6"));
+        Assert.That(capture.Captured.HasValue, Is.True);
+        Assert.That(capture.Captured.Value.Square, Is.EqualTo(BoardSquare.FromAlgebraic("d5")));
+        Assert.That(rules.GetPieceAt(BoardSquare.FromAlgebraic("d5")), Is.Null);
+    }
+
+    [Test]
+    public void PromotionCountsAsThePieceItBecomes()
+    {
+        var rules = new ChessRulesAdapter("7k/P7/8/8/8/8/8/7K w - - 0 1");
+        Assert.That(rules.GetMaterialBalance(), Is.EqualTo(1));
+        rules.TryMove(Move("a7a8q"));
+        Assert.That(rules.GetMaterialBalance(), Is.EqualTo(9));
+    }
+
+    [Test]
     public void CapturingTheLastPieceIsADrawByInsufficientMaterial()
     {
         var rules = new ChessRulesAdapter("7k/8/8/8/8/8/6r1/7K w - - 0 1");
