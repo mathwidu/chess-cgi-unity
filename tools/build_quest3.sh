@@ -2,8 +2,8 @@
 set -euo pipefail
 
 usage() {
-  echo "Uso: bash tools/build_quest3.sh [prepare|validate|build|demo]"
-  echo "Com o Editor fechado, prepara/valida Android ou gera APK de desenvolvimento/demonstração."
+  echo "Uso: bash tools/build_quest3.sh [prepare|validate|build|demo|work|delivery]"
+  echo "Com o Editor fechado, prepara/valida Android ou gera APK de desenvolvimento/demonstração/trabalho."
   echo "UNITY_EDITOR pode apontar para o executável do Unity da versão do projeto."
   echo "O comando não instala o APK no headset."
 }
@@ -15,6 +15,8 @@ case "$action" in
   validate) method="ChessCgiQuestBuild.Validate" ;;
   build) method="ChessCgiQuestBuild.Build" ;;
   demo) method="ChessCgiQuestBuild.BuildDemo" ;;
+  work) method="ChessCgiQuestBuild.BuildWorking" ;;
+  delivery) method="ChessCgiQuestBuild.BuildDeliveryCandidate" ;;
   -h|--help) usage; exit 0 ;;
   *) usage >&2; exit 2 ;;
 esac
@@ -49,9 +51,11 @@ else
   exit "$result"
 fi
 
-if [ "$action" = build ] || [ "$action" = demo ]; then
+if [ "$action" = build ] || [ "$action" = demo ] || [ "$action" = work ] || [ "$action" = delivery ]; then
   apk="$repo_root/Builds/Quest3/XadrezCGI-Quest3-dev.apk"
   if [ "$action" = demo ]; then apk="$repo_root/Builds/Quest3/XadrezCGI-Quest3-demo.apk"; fi
+  if [ "$action" = work ]; then apk="$repo_root/Builds/Quest3/XadrezCGI-Quest3-work.apk"; fi
+  if [ "$action" = delivery ]; then apk="$repo_root/Builds/Quest3/XadrezCGI-Quest3-delivery-candidate.apk"; fi
   if [ ! -s "$apk" ] || ! grep -Fq 'CHESS_CGI_QUEST_BUILD_RESULT result=Succeeded' "$log"; then
     echo "O Unity não confirmou um novo APK bem-sucedido. Confira $log." >&2
     exit 1

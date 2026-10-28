@@ -21,6 +21,7 @@ public sealed class ChessGameController : MonoBehaviour
     private PieceView selectedPiece;
     private bool inputBlocked;
     private bool awaitingPromotion;
+    private bool pendingPhysicalPlacement;
     private BoardSquare pendingPromotionTo;
     private bool againstComputer;
     private bool matchStarted;
@@ -179,6 +180,7 @@ public sealed class ChessGameController : MonoBehaviour
         CheckedKing = null;
         inputBlocked = false;
         awaitingPromotion = false;
+        pendingPhysicalPlacement = false;
         selectedPiece = null;
         legalDestinations.Clear();
         moveHistory.Clear();
@@ -352,6 +354,13 @@ public sealed class ChessGameController : MonoBehaviour
         }
     }
 
+    public bool CanStartMoveWithDrop(PieceView piece, Vector3 worldPosition)
+    {
+        return piece != null && piece == selectedPiece &&
+            boardView.TryGetSquareAt(worldPosition, out BoardSquare destination) &&
+            !destination.Equals(piece.Square) && legalDestinations.Contains(destination);
+    }
+
     // Returns false when the drop was refused (off the board or not a legal destination).
     // moveStarted is true only when the drop began a move; otherwise the piece is left where it fell.
     public bool ReleasePiece(PieceView piece, Vector3 worldPosition, out bool moveStarted)
@@ -381,14 +390,13 @@ public sealed class ChessGameController : MonoBehaviour
             return false;
         }
 
-        moveStarted = true;
-        SelectDestination(destination);
-        if (awaitingPromotion)
+        moveStarted = TrySelectDestination(destination, true);
+        if (moveStarted && awaitingPromotion)
         {
-            piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(destination), ReturnDuration));
+            piece.StartCoroutine(piece.MoveTo(boardView.GetPieceWorldPosition(destination), ReturnDuration, false));
         }
 
-        return true;
+        return moveStarted;
     }
 
     public void SelectSquare(SquareView square)
@@ -401,28 +409,31 @@ public sealed class ChessGameController : MonoBehaviour
         SelectDestination(square.Square);
     }
 
-    public void SelectDestination(BoardSquare destination)
+    public void SelectDestination(BoardSquare destination) => TrySelectDestination(destination, false);
+
+    private bool TrySelectDestination(BoardSquare destination, bool physicalPlacement)
     {
         if (selectedPiece == null || IsInputBlocked || IsGameOver)
         {
-            return;
+            return false;
         }
 
         if (!legalDestinations.Contains(destination))
         {
             StatusMessage = "Movimento invalido.";
-            return;
+            return false;
         }
 
         if (RequiresPromotion(selectedPiece, destination))
         {
             pendingPromotionTo = destination;
+            pendingPhysicalPlacement = physicalPlacement;
             awaitingPromotion = true;
             StatusMessage = "Escolha a promocao.";
-            return;
+            return true;
         }
 
-        ExecuteSelectedMove(destination, null);
+        return ExecuteSelectedMove(destination, null, physicalPlacement);
     }
 
     public void ChoosePromotion(char promotion)
@@ -432,19 +443,36 @@ public sealed class ChessGameController : MonoBehaviour
             return;
         }
 
+        bool physicalPlacement = pendingPhysicalPlacement;
         awaitingPromotion = false;
-        ExecuteSelectedMove(pendingPromotionTo, char.ToUpperInvariant(promotion));
+        pendingPhysicalPlacement = false;
+        ExecuteSelectedMove(pendingPromotionTo, char.ToUpperInvariant(promotion), physicalPlacement);
     }
 
     public void CancelSelection()
     {
-        if (!isActiveAndEnabled || !matchStarted || suspended || inputBlocked || IsComputerTurn || IsGameOver)
+        // A physical release or app interruption must also clear a pending
+        // selection while suspended; starting moves remains blocked separately.
+        if (!isActiveAndEnabled || !matchStarted || inputBlocked || IsComputerTurn || IsGameOver)
         {
             return;
         }
+        PieceView uncommittedPlacement = pendingPhysicalPlacement ? selectedPiece : null;
         awaitingPromotion = false;
         ClearSelection();
         SetStatusForTurn();
+        if (uncommittedPlacement != null)
+            StartCoroutine(ReturnUncommittedPlacement(uncommittedPlacement));
+    }
+
+    private IEnumerator ReturnUncommittedPlacement(PieceView piece)
+    {
+        inputBlocked = true;
+        yield return piece.MoveTo(boardView.GetPieceWorldPosition(piece.Square), ReturnDuration, false);
+        // Switching models can replace the pawn while this short return runs.
+        if (piece != null && piece.isActiveAndEnabled && piece.TryGetComponent(out ThrowablePiece physical))
+            physical.SetRest(piece.transform.localPosition);
+        inputBlocked = false;
     }
 
     private void SelectOwnPiece(PieceView piece)
@@ -466,12 +494,12 @@ public sealed class ChessGameController : MonoBehaviour
         }
     }
 
-    private void ExecuteSelectedMove(BoardSquare destination, char? promotion)
+    private bool ExecuteSelectedMove(BoardSquare destination, char? promotion, bool physicalPlacement = false)
     {
-        ExecuteMove(new ChessMove(selectedPiece.Square, destination, promotion));
+        return ExecuteMove(new ChessMove(selectedPiece.Square, destination, promotion), physicalPlacement);
     }
 
-    private bool ExecuteMove(ChessMove move)
+    private bool ExecuteMove(ChessMove move, bool physicalPlacement = false)
     {
         PieceView movingPiece = null;
         foreach (PieceView piece in boardView.Pieces)
@@ -503,25 +531,30 @@ public sealed class ChessGameController : MonoBehaviour
 
         MaterialBalance = rules.GetMaterialBalance();
         ClearSelection();
+        movingPiece.SetSquare(move.To);
 
         if (Application.isPlaying && moveDuration > 0f)
         {
             animatingMove = moveResult;
-            StartCoroutine(AnimateMoveThenSync(movingPiece, move.To, moveResult));
+            StartCoroutine(AnimateMoveThenSync(movingPiece, move.To, moveResult, physicalPlacement));
         }
         else
         {
-            boardView.SyncPieces(rules.GetPieces(), pieceFactory);
+            movingPiece.transform.position = boardView.GetPieceWorldPosition(move.To);
+            if (movingPiece.TryGetComponent(out ThrowablePiece physical)) physical.SetRest(movingPiece.transform.localPosition);
+            boardView.SyncPieces(rules.GetPieces(), pieceFactory, true);
             ApplyMoveResult(moveResult);
         }
         return true;
     }
 
-    private IEnumerator AnimateMoveThenSync(PieceView movingPiece, BoardSquare destination, MoveResult moveResult)
+    private IEnumerator AnimateMoveThenSync(PieceView movingPiece, BoardSquare destination, MoveResult moveResult, bool physicalPlacement)
     {
         inputBlocked = true;
-        yield return movingPiece.MoveTo(boardView.GetPieceWorldPosition(destination), moveDuration);
-        boardView.SyncPieces(rules.GetPieces(), pieceFactory);
+        float duration = physicalPlacement ? Mathf.Min(moveDuration, .1f) : moveDuration;
+        yield return movingPiece.MoveTo(boardView.GetPieceWorldPosition(destination), duration, !physicalPlacement);
+        if (movingPiece.TryGetComponent(out ThrowablePiece physical)) physical.SetRest(movingPiece.transform.localPosition);
+        boardView.SyncPieces(rules.GetPieces(), pieceFactory, true);
         inputBlocked = false;
         animatingMove = null;
         ApplyMoveResult(moveResult);
@@ -584,6 +617,7 @@ public sealed class ChessGameController : MonoBehaviour
         }
 
         selectedPiece = null;
+        pendingPhysicalPlacement = false;
         legalDestinations.Clear();
         boardView.ClearHighlights();
     }

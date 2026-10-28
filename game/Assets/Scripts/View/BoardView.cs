@@ -170,6 +170,8 @@ public sealed class BoardView : MonoBehaviour
     public void BuildBoard()
     {
         ConfigureBoardTransformForMode();
+        if (XRRig.IsHeadsetPresent && !TryGetComponent(out BoardPlacementPreview _))
+            gameObject.AddComponent<BoardPlacementPreview>();
         EnsureRoots();
         ClearChildren(boardFrameRoot);
         ClearChildren(squaresRoot);
@@ -214,19 +216,49 @@ public sealed class BoardView : MonoBehaviour
         BoardScaleHandles.Build(this);
     }
 
-    public void SyncPieces(IEnumerable<VisualPieceState> states, PieceFactory factory)
+    public void SyncPieces(IEnumerable<VisualPieceState> states, PieceFactory factory, bool preserveExisting = false)
     {
         EnsureRoots();
-        ClearChildren(piecesRoot);
+        var previous = preserveExisting ? new List<PieceView>(pieces) : null;
+        if (!preserveExisting)
+        {
+            // XRI temporarily unparents held objects. A rebuild must remove
+            // those identities too, rather than losing them outside this root.
+            foreach (PieceView piece in pieces)
+                if (piece != null && !piece.transform.IsChildOf(piecesRoot)) RemovePiece(piece);
+            ClearChildren(piecesRoot);
+        }
         pieces.Clear();
 
         foreach (VisualPieceState state in states)
         {
-            PieceView piece = factory.CreatePiece(state, GetPieceWorldPosition(state.Square), piecesRoot);
+            PieceView piece = null;
+            if (previous != null)
+            {
+                int match = previous.FindIndex(candidate => candidate != null && candidate.Square.Equals(state.Square) &&
+                    candidate.Side == state.Side && candidate.Kind == state.Kind);
+                if (match >= 0)
+                {
+                    piece = previous[match];
+                    previous.RemoveAt(match);
+                }
+            }
+            if (piece == null) piece = factory.CreatePiece(state, GetPieceWorldPosition(state.Square), piecesRoot);
             pieces.Add(piece);
         }
 
+        if (previous != null)
+            foreach (PieceView removed in previous)
+                if (removed != null) RemovePiece(removed);
+
         RefreshCheckAura();
+    }
+
+    private static void RemovePiece(PieceView piece)
+    {
+        piece.gameObject.SetActive(false);
+        if (Application.isPlaying) Destroy(piece.gameObject);
+        else DestroyImmediate(piece.gameObject);
     }
 
     public void HighlightSquares(IEnumerable<BoardSquare> highlightedSquares, IEnumerable<BoardSquare> capturableSquares)
@@ -451,6 +483,11 @@ public sealed class BoardView : MonoBehaviour
             transform.localPosition = desktopBoardPosition + Vector3.up * surfaceOffset;
             transform.localScale = desktopBoardScale;
         }
+        // Moving/resizing static board colliders wakes nearby bodies. Untouched
+        // pieces keep their logical rest pose; loose and held pieces stay free.
+        Physics.SyncTransforms();
+        foreach (PieceView piece in pieces)
+            if (piece != null && piece.TryGetComponent(out ThrowablePiece physical)) physical.RefreshRestingPhysics();
     }
 
     private void MeasureFrameBounds()

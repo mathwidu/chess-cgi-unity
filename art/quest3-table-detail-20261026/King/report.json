@@ -1,0 +1,115 @@
+{
+  "kind": "King",
+  "source": "game/Assets/Art/Characters/Direction02/King/Model.glb",
+  "source_sha256": "baa41951b0b0eb7f791072942a151ebd8156f8f3d828c98220f194c6dcc739d7",
+  "blender": "5.2.1 LTS",
+  "profile": "table",
+  "parts": [
+    {
+      "node": "Mesh_BrushedBrass",
+      "mesh": "Torus.022",
+      "original_triangles": 4712,
+      "optimized_triangles": 470,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "BrushedBrass"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.003206328023225069,
+      "sampled_surface_error_mm_at_13cm": 0.29148436428979047
+    },
+    {
+      "node": "Mesh_FeevalePatch_White",
+      "mesh": "King_Feevale.001",
+      "original_triangles": 768,
+      "optimized_triangles": 152,
+      "ratio_requested": 0.2,
+      "uv_layers": 1,
+      "materials": [
+        "FeevalePatch_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0002465009456500411,
+      "sampled_surface_error_mm_at_13cm": 0.022409176765190504
+    },
+    {
+      "node": "Mesh_GripLeather",
+      "mesh": "Cylinder.036",
+      "original_triangles": 2036,
+      "optimized_triangles": 202,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "GripLeather"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.002701631048694253,
+      "sampled_surface_error_mm_at_13cm": 0.2456028213801151
+    },
+    {
+      "node": "Mesh_King_Body_White",
+      "mesh": "tripo_mesh_cb717586-d2af-4dec-9fe1-7107b819e88f.001",
+      "original_triangles": 27432,
+      "optimized_triangles": 2194,
+      "ratio_requested": 0.08,
+      "uv_layers": 1,
+      "materials": [
+        "King_Body_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.010483987629413605,
+      "sampled_surface_error_mm_at_13cm": 0.9530897797249924
+    },
+    {
+      "node": "Mesh_King_HandSkin",
+      "mesh": "King_Finger_0.001",
+      "original_triangles": 2772,
+      "optimized_triangles": 693,
+      "ratio_requested": 0.25,
+      "uv_layers": 1,
+      "materials": [
+        "King_HandSkin"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.001078160130418837,
+      "sampled_surface_error_mm_at_13cm": 0.0980145568205553
+    },
+    {
+      "node": "Mesh_Side_Inlay_White",
+      "mesh": "ClassicRole_King.002",
+      "original_triangles": 11888,
+      "optimized_triangles": 594,
+      "ratio_requested": 0.05,
+      "uv_layers": 1,
+      "materials": [
+        "Side_Inlay_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.001148936222307384,
+      "sampled_surface_error_mm_at_13cm": 0.10444874696005893
+    },
+    {
+      "node": "Mesh_Side_Surface_White",
+      "mesh": "SatinPlinth.011",
+      "original_triangles": 1148,
+      "optimized_triangles": 1148,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "Side_Surface_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    }
+  ],
+  "source_height": 1.4300000071525574,
+  "original_triangles": 50756,
+  "optimized_triangles": 5453,
+  "tangent_repairs": {
+    "zero": 0,
+    "orthogonalized": 4462
+  },
+  "geometry_sha256": "50a2e0e076f9fff1713334667282d55df1059ebbaff88fb3ae6cd522a211ecff"
+}

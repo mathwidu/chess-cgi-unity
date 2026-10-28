@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.XR;
 
 // The standalone demo uses the saved Mobile pipeline. Foveation is a display
@@ -38,7 +39,25 @@ public sealed class QuestRenderProfile : MonoBehaviour
         display.foveatedRenderingFlags = XRDisplaySubsystem.FoveatedRenderingFlags.None;
         display.foveatedRenderingLevel = DefaultFoveation;
         configuredDisplay = display;
-        Debug.Log(FormattableString.Invariant($"CHESS_CGI_QUEST_PROFILE foveationRequested={DefaultFoveation:F2} foveationReported={display.foveatedRenderingLevel:F2} caps={SystemInfo.foveatedRenderingCaps}"));
+        LogDisplayProfile(display);
+    }
+
+    private static void LogDisplayProfile(XRDisplaySubsystem display)
+    {
+        var pipeline = (QualitySettings.renderPipeline != null
+            ? QualitySettings.renderPipeline : GraphicsSettings.defaultRenderPipeline) as UniversalRenderPipelineAsset;
+        if (pipeline == null) return;
+        display.GetRenderPass(0, out XRDisplaySubsystem.XRRenderPass pass);
+        RenderTextureDescriptor target = pass.renderTargetDesc;
+        RenderTextureDescriptor requested = target;
+        requested.msaaSamples = pipeline.msaaSampleCount;
+        int supported = SystemInfo.GetRenderTextureSupportedMSAASampleCount(requested);
+        RenderTextureDescriptor eightSamples = target;
+        eightSamples.msaaSamples = 8;
+        int supportedForEight = SystemInfo.GetRenderTextureSupportedMSAASampleCount(eightSamples);
+        // A swapchain may be resolved from an intermediate target. Keep its
+        // samples separate from the requested profile and descriptor capability.
+        Debug.Log(FormattableString.Invariant($"CHESS_CGI_QUEST_PROFILE scale={pipeline.renderScale:F2} msaaRequested={pipeline.msaaSampleCount} supportedForRequested={supported} supportedFor8x={supportedForEight} swapchainSamples={target.msaaSamples} xrTarget={target.width}x{target.height} color={target.graphicsFormat} depth={target.depthStencilFormat} dimension={target.dimension} slices={target.volumeDepth} hdr={pipeline.supportsHDR} foveationRequested={DefaultFoveation:F2} foveationReported={display.foveatedRenderingLevel:F2} caps={SystemInfo.foveatedRenderingCaps}"));
     }
 
     private void OnApplicationPause(bool paused)

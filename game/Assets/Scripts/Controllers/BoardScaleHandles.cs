@@ -192,8 +192,8 @@ public sealed class BoardScaleHandles : MonoBehaviour
             InteractorHandedness rightIdentity = InteractorHandedness.None;
             // XRI can publish Region.None for the frame in which selection starts.
             // Physical proximity and the select filter already prove a near grab.
-            bool valid = left != right && left.selectionRegion.Value != NearFarInteractor.Region.Far &&
-                right.selectionRegion.Value != NearFarInteractor.Region.Far &&
+            bool valid = left != right && (left.selectionRegion.Value != NearFarInteractor.Region.Far || IsHandGrasp(left, LeftHandle)) &&
+                (right.selectionRegion.Value != NearFarInteractor.Region.Far || IsHandGrasp(right, RightHandle)) &&
                 TryPose(left, out leftPoint, out leftIdentity) &&
                 TryPose(right, out rightPoint, out rightIdentity) &&
                 leftIdentity != rightIdentity &&
@@ -238,7 +238,7 @@ public sealed class BoardScaleHandles : MonoBehaviour
     internal bool CanSelect(BoardScaleHandle handle, IXRSelectInteractor candidate)
     {
         if (requiresRelease || Blocked() || !(candidate is NearFarInteractor near) ||
-            !near.enableNearCasting || near.selectionRegion.Value == NearFarInteractor.Region.Far)
+            !near.enableNearCasting || (near.selectionRegion.Value == NearFarInteractor.Region.Far && !IsHandGrasp(near, handle)))
             return false;
         if (!TryPose(near, out Vector3 position, out InteractorHandedness identity)) return false;
         BoardScaleHandle other = handle == LeftHandle ? RightHandle : LeftHandle;
@@ -252,6 +252,9 @@ public sealed class BoardScaleHandles : MonoBehaviour
     {
         gesture.End();
         if (!(selector is NearFarInteractor near)) return;
+        // XRI's logical input may still describe the previous update while this
+        // early reader releases. A real opening must not look like a forced exit.
+        if (near.GetComponentInParent<BoardScaleHandInput>()?.IsEndingNaturally == true) return;
         ButtonControl button = sources.TryGetValue(near, out GripSource grip) ? grip.SelectionButton : null;
         if (button == null) button = near.selectInput.inputActionPerformed?.activeControl as ButtonControl;
         // ManagerSelectExit from a vetoed filter is not necessarily isCanceled.
@@ -285,6 +288,9 @@ public sealed class BoardScaleHandles : MonoBehaviour
         }
         return source.Read(this, out position, out identity);
     }
+
+    private static bool IsHandGrasp(NearFarInteractor interactor, BoardScaleHandle handle)
+        => interactor.GetComponentInParent<BoardScaleHandInput>()?.Controls(handle) == true;
 
     private void ObserveOrigin()
     {
@@ -409,18 +415,24 @@ public sealed class BoardScaleHandles : MonoBehaviour
         private readonly Transform point;
         private readonly TrackedPoseDriver driver;
         public ButtonControl SelectionButton { get; private set; }
+        public BoardScaleHandInput HandGrasp { get; }
 
         public GripSource(NearFarInteractor selected)
         {
             interactor = selected;
             point = selected.nearInteractionCaster?.castOrigin ?? selected.transform;
             driver = point.GetComponentInParent<TrackedPoseDriver>();
+            HandGrasp = selected.GetComponentInParent<BoardScaleHandInput>();
         }
 
         public bool Read(BoardScaleHandles owner, out Vector3 position, out InteractorHandedness identity)
         {
             position = default;
             identity = InteractorHandedness.None;
+            // A fist has its own palm/joint pose. Its thumb and the pinch-grab
+            // TPD may be occluded even while the grasp remains well tracked.
+            if (HandGrasp != null && HandGrasp.IsControllingGrip)
+                return HandGrasp.TryGetGripPose(out position, out identity);
             if (interactor == null || !interactor.isActiveAndEnabled || point == null ||
                 !point.gameObject.activeInHierarchy || driver == null || !driver.isActiveAndEnabled) return false;
             var device = driver.positionInput.action?.activeControl?.device as TrackedDevice;
@@ -477,6 +489,7 @@ public sealed class BoardScaleHandles : MonoBehaviour
             // Do not mistake a modality switch for releasing a held controller.
             if (physicalButton != null && physicalButton.device is XRController)
                 return !physicalButton.device.added || !physicalButton.isPressed;
+            if (source.HandGrasp != null) return source.HandGrasp.IsReleased;
             // Hand pinch readers may be disabled with the hand. Wait for current
             // tracking before trusting a non-performed value from those readers.
             if (!source.Read(owner, out _, out _)) return false;

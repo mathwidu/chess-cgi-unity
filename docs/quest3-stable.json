@@ -1,0 +1,32 @@
+{
+  "status": "stable_for_exhibition",
+  "version": "0.1.3",
+  "androidVersionCode": 4,
+  "menuLabel": "v0.1.3 (4) · 26/10/2026 17:39:37 Brasília (UTC-3)",
+  "package": "com.mathwidu.chesscgi",
+  "apk": "Builds/Quest3/stable-20261026-v0.1.3/XadrezCGI-Quest3-stable.apk",
+  "apkSha256": "541bf61c8f198f504778035a0d0c4b62be4690709c6030a387bace9aed08532e",
+  "sourceCheckpoint": "Builds/Quest3/stable-20261026-v0.1.3/source-changes.tar.gz",
+  "profile": {
+    "renderScale": 0.8,
+    "msaa": 4,
+    "foveation": 0.5
+  },
+  "tests": {
+    "PlayMode": 278,
+    "EditMode": 70,
+    "failures": 0,
+    "skips": 0
+  },
+  "userAccepted": true,
+  "performance": {
+    "median_fps": 65.5,
+    "min_fps": 63,
+    "max_fps": 68,
+    "target_fps": 72,
+    "technical_gate": "FAIL_72HZ",
+    "accepted_for_exhibition": true
+  },
+  "acceptedAt": "2026-10-26T20:49:20.633492+00:00",
+  "rebuildAfterAcceptance": false
+}

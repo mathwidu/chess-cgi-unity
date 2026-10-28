@@ -93,6 +93,10 @@ public sealed partial class GameHud
     {
         MenuRule(menuContent, 73, 885, 1367);
         MenuLabel("ProjectCredit", menuContent, "Projeto de Computação Gráfica I", 16, mutedTextColor, 73, 896, 760, 26);
+        UnityEngine.UI.Text buildIdentity = MenuLabel("BuildIdentity", menuContent,
+            ChessCgiBuildIdentity.MenuLabel, 18, mutedTextColor, 833, 896, 774, 30);
+        buildIdentity.alignment = TextAnchor.UpperRight;
+        buildIdentity.raycastTarget = false;
     }
 
     private void BuildMenuConfiguration(Font display)

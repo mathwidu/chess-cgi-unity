@@ -1,0 +1,101 @@
+{
+  "kind": "Rook",
+  "source": "game/Assets/Art/Characters/Direction02/Rook/Model.glb",
+  "source_sha256": "e27466ce5410514c3ada6fe0a24ff94d046b736582a143a4e94ff873ca1fa19e",
+  "blender": "5.2.1 LTS",
+  "profile": "table",
+  "parts": [
+    {
+      "node": "Mesh_BrushedBrass",
+      "mesh": "Torus.006",
+      "original_triangles": 3072,
+      "optimized_triangles": 306,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "BrushedBrass"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.004491973668336868,
+      "sampled_surface_error_mm_at_13cm": 0.44576835820697225
+    },
+    {
+      "node": "Mesh_FeevalePatch_White",
+      "mesh": "Rook_Feevale.001",
+      "original_triangles": 768,
+      "optimized_triangles": 153,
+      "ratio_requested": 0.2,
+      "uv_layers": 1,
+      "materials": [
+        "FeevalePatch_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.00010307277261745185,
+      "sampled_surface_error_mm_at_13cm": 0.010228595271916092
+    },
+    {
+      "node": "Mesh_GripLeather",
+      "mesh": "Cylinder.007",
+      "original_triangles": 1532,
+      "optimized_triangles": 152,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "GripLeather"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.00234991149045527,
+      "sampled_surface_error_mm_at_13cm": 0.2331973124454629
+    },
+    {
+      "node": "Mesh_Rook_Body_White",
+      "mesh": "tripo_mesh_13b20d3c-01ea-4338-8728-752922d211e0.001",
+      "original_triangles": 29076,
+      "optimized_triangles": 2320,
+      "ratio_requested": 0.08,
+      "uv_layers": 1,
+      "materials": [
+        "Rook_Body_White"
+      ],
+      "validation_repaired": true,
+      "sampled_surface_error_max": 0.01705341599881649,
+      "sampled_surface_error_mm_at_13cm": 1.6923236449931145
+    },
+    {
+      "node": "Mesh_Side_Inlay_White",
+      "mesh": "ClassicRole_Rook.002",
+      "original_triangles": 1184,
+      "optimized_triangles": 59,
+      "ratio_requested": 0.05,
+      "uv_layers": 1,
+      "materials": [
+        "Side_Inlay_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.009328998625278473,
+      "sampled_surface_error_mm_at_13cm": 0.9257784457238766
+    },
+    {
+      "node": "Mesh_Side_Surface_White",
+      "mesh": "SatinPlinth.003",
+      "original_triangles": 1148,
+      "optimized_triangles": 1148,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "Side_Surface_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    }
+  ],
+  "source_height": 1.3100000619888306,
+  "original_triangles": 36780,
+  "optimized_triangles": 4138,
+  "tangent_repairs": {
+    "zero": 0,
+    "orthogonalized": 3332
+  },
+  "geometry_sha256": "ddf8bc858fbb3de7e2528cf16343ff50bb66b4fcee0f2091a7995e3b08d86ce6"
+}

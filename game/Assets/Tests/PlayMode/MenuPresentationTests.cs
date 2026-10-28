@@ -198,6 +198,15 @@ public class MenuPresentationTests
     [UnityTest]
     public IEnumerator MenuFitsDesktopAndWorldCanvasSizesWithoutClippedLabels()
     {
+        var buildIdentity = GameObject.Find("BuildIdentity").GetComponent<UnityEngine.UI.Text>();
+        Assert.That(buildIdentity.text, Is.EqualTo(ChessCgiBuildIdentity.MenuLabel));
+        Assert.That(buildIdentity.raycastTarget, Is.False);
+        // Exercise the packaged label rather than the deliberately shorter Editor label.
+        buildIdentity.text = ChessCgiBuildIdentity.FormatMenuLabel(new ChessCgiBuildIdentity
+        {
+            versionName = "0.1.1", androidVersionCode = 2, buildTarget = "Android",
+            builtAtUtc = "2026-10-26T19:04:00.0000000+00:00"
+        }, "0.1.1", true);
         var canvas = hud.GetComponent<Canvas>();
         var scaler = hud.GetComponent<CanvasScaler>();
         scaler.enabled = false;
@@ -223,6 +232,8 @@ public class MenuPresentationTests
                 if (string.IsNullOrEmpty(label.text) || !label.enabled) continue;
                 Assert.That(label.preferredHeight, Is.LessThanOrEqualTo(label.rectTransform.rect.height + 1), $"Clipped label {label.name}: {label.text}");
             }
+            Assert.That(buildIdentity.preferredWidth, Is.LessThanOrEqualTo(buildIdentity.rectTransform.rect.width + 1),
+                $"Build identity wraps in canvas {size}");
         }
         yield return null;
     }

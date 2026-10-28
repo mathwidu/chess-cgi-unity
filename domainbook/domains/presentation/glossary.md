@@ -50,6 +50,17 @@ selecionada.
 - **Aliases:** Highlight
 - **Status:** validated
 
+## Destino de colocação
+
+Contorno da casa identificada sob a base da peça fisicamente segurada.
+Verde indica destino legal, amarelo a casa de origem e vermelho uma casa
+ilegal. É uma indicação da projeção da peça; a soltura ainda precisa
+atender às regras de colocação. Some ao soltar ou cancelar a seleção e
+não possui collider.
+
+- **Aliases:** Placement target, BoardPlacementPreview
+- **Status:** draft
+
 ## Aura de captura
 
 Um cilindro verde translúcido, como o marcador do GTA San Andreas, ao redor de cada peça adversária que a peça
@@ -147,16 +158,23 @@ peças mais valiosas vêm primeiro. Um "+N" marca o lado à frente na
 
 ## Peça solta
 
-Peça que o jogador largou no VR sem fazer um lance: cai, quica e pode ser
+Peça que o jogador largou ou deslocou pelo toque no VR sem fazer um lance:
+cai, quica e pode ser
 arremessada pela física da cena, batendo na mesa, no chão, nas paredes e nos
 móveis da sala. Seu corpo físico é um tronco de cone (base larga, topo
 estreito) com o peso perto da base: em pé ela se apoia na base, deitada rola
 em arco como uma peça de verdade, e quica de leve ao cair. Ela passa pelos
 botões da mesa e pelas hastes de tamanho sem acioná-los. Só existe no VR; no
-desktop a peça mantém a caixa usada pelo clique. Depois de 3 segundos solta,
-mesmo que ainda esteja rolando, ela desliza de
+desktop a peça mantém a caixa usada pelo clique. A palma e os dedos podem
+sustentá-la e transportá-la por contato e atrito, sem prendê-la à hierarquia
+da mão. Esse contato das duas mãos fica suspenso enquanto qualquer peça
+está agarrada; após a última soltura, pares livres voltam a colidir e pares
+sobrepostos aguardam separação. Enquanto existe contato válido com uma mão rastreada, a
+contagem para voltar à origem fica suspensa. Depois de 3 segundos sem esse
+contato, mesmo que ainda esteja rolando, ela desliza de
 volta ao lugar de origem (a casa, ou o lugar na faixa das
-[peças capturadas](#peças-capturadas)). Agarrá-la de novo cancela a volta.
+[peças capturadas](#peças-capturadas)). Agarrá-la de novo cancela a volta. Em repouso, o corpo dinâmico dorme até o próximo
+contato; um lance de outra peça preserva sua interação física.
 
 - **Aliases:** Loose piece, ThrowablePiece, Peça arremessada
 - **Status:** draft

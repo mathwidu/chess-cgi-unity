@@ -10,6 +10,93 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Compilação **0.1.3 (4)** de 26/10/2026 17:39:37 foi aprovada pelo usuário
+  para a exposição: aparência distante/próxima e jogo normal com mãos.
+  O mesmo APK permanece instalado e arquivado, sem rebuild após o aceite.
+  Mediana medida: 65,5 FPS, ainda abaixo de 72 Hz. Perfil: escala 0,80,
+  MSAA 4× e foveation 0,5; 278 PlayMode e 70 EditMode aprovados.
+  Identificação e limite registrados em
+  [versão estável](../../../docs/quest3-standalone.md).
+
+- No Android, as peças personalizadas alternam entre geometria de inspeção
+  e geometria para distância: 150.720 triângulos no tabuleiro completo
+  distante. A decisão considera tamanho e distância da câmera, com histerese;
+  hover e pega usam mais detalhe. A troca conserva os mesmos renderers,
+  materiais, limites autorais e colliders. O contorno acompanha a malha sem
+  duplicar partes. O preview força inspeção e desliga a adaptação só no clone.
+  Se a derivação de distância estiver ausente ou incompatível, a peça inteira
+  conserva a geometria de inspeção. Ver
+  [assets e comparação](../../../art/quest3-table-detail-20261026/README.md).
+
+- As [peças personalizadas](glossary.md#peça-personalizada) usam no Android
+  malhas derivadas com 389.424 triângulos para os 32 personagens, contra
+  1.345.592 dos originais. A fábrica preserva o ajuste, os colliders, os
+  limites dos renderers e os materiais dos dois times. Peças capturadas
+  também usam a derivação; desktop e peças clássicas mantêm seu fluxo.
+  Fontes originais e Blender editável preservados. A medição do candidato
+  e a aceitação visual no Quest são distintas da redução de geometria;
+  ver [evidências](../../../docs/quest3-performance-20261026.md).
+
+- O [preview da peça selecionada](glossary.md#preview-da-peça-selecionada)
+  reutiliza a textura enquanto modelo, câmera e luz permanecem iguais, no
+  desktop e no VR. Zoom, giro, deslocamento, troca ou recriação da seleção e
+  perda da textura atualizam a imagem. O clone tem física, interpolação e
+  interação desativadas, preservando a peça original; o anterior é ocultado
+  antes de renderizar seu substituto. Resolução 1104×660 e MSAA 4× mantidos.
+  Testes do preview verificam os renders reais e o isolamento. O efeito em
+  FPS e a nitidez ainda dependem de medição e leitura no Quest.
+
+- A peça solta conserva a proteção contra outras peças durante a observação
+  de uma colocação intencional. Isso permite uma captura solta mais acima
+  sem empilhar a peça na adversária; confirmação, cancelamento e desativação
+  encerram essa proteção, respeitando a separação antes de restaurar contato.
+
+- O [HUD](glossary.md#hud) do menu inicial mostra a versão, o código Android e
+  a data/hora da compilação em Brasília (UTC-3), inclusive segundos. O fluxo
+  Quest configura `0.1.1` / código `2` pelas APIs do Editor. Cada build de
+  Player regenera um JSON em Resources antes do empacotamento, sem consultar
+  o relógio na abertura do aplicativo; metadados ausentes ou de outra versão
+  recebem indicação explícita. No Editor, o rótulo identifica a sessão como
+  Editor. O texto informativo não recebe raycasts. O APK instalado em 26/10
+  às 16h17 teve versão/código e recurso empacotado conferidos; a data mostrada
+  é 26/10/2026 16:11:30. A leitura visual no Quest ainda precisa de conferência.
+
+- Candidato de entrega de 26/10 usa MSAA 4× e escala 0,90, preservando HDR
+  desligado, sombras a distância zero e foveation 0,5. A consulta Vulkan do
+  Quest conectado informou máscaras de samples 7 (1/2/4×) para cor,
+  profundidade e stencil; 8× não está disponível nesse framebuffer.
+  O APK normal registra uma vez por sessão XR o perfil solicitado, a
+  capacidade do descritor e os samples do swapchain separadamente. O novo
+  perfil ainda depende de comparação visual e de fluidez no aparelho.
+
+- O usuário confirmou o contorno e a colocação funcionando no Quest com
+  `4751f26e…` em 23/10. Esse aceite não inclui uma nova comparação de fluidez.
+  A limpeza remove o modo temporário de desenho nativo da mão e preserva
+  o apoio visual e o perfil gráfico aprovado.
+
+- [Destino de colocação](glossary.md#destino-de-colocação) acompanha a casa
+  sob a base da peça segurada: verde para destino legal, amarelo para origem
+  e vermelho para destino ilegal. Não altera a escolha da casa nem registra
+  lances. A seleção física deixa de redimensionar a raiz e o collider da peça
+  durante a troca de parent feita pelo XRI; o destaque do desktop é mantido.
+
+- Enquanto qualquer peça está fisicamente agarrada, as duas mãos suspendem
+  colisões com peças; o último término de pega restaura somente pares livres.
+  Apoio visual passa a acompanhar também a rotação interpolada da palma,
+  com composição por ponto na face dos botões. Uma pequena margem na palma
+  corrige a penetração estática reproduzida com a malha real do peão.
+
+- Durante uma pega VR, a peça suspende colisões com vizinhas e as restaura
+  somente após liberar todo o seu volume. Apoio em mão valida a permissão de
+  cada par para descartar contatos suprimidos. A representação da mão recebe
+  compensação temporal limitada durante apoio, preservando as poses cruas.
+
+- [Peça solta](glossary.md#peça-solta) pode ser empurrada, derrubada e apoiada
+  na mão, mantendo a casa lógica. As peças repousam como corpos dinâmicos
+  adormecidos; contato da palma ou dos dedos suspende sua recuperação por três
+  segundos. Um lance reaproveita as peças que continuam em jogo e preserva
+  interações físicas de outras peças. O perfil gráfico aprovado é mantido.
+
 - Diagnóstico de renderização no APK de desenvolvimento do Quest permite
   comparar escala, MSAA e foveation por abertura, sem regravar assets ou
   configurações globais do aparelho. Registra destino XR e contadores

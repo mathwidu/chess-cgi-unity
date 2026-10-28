@@ -340,14 +340,16 @@ public sealed class XRPhysicsPusher : MonoBehaviour
 
     // The renderer follows the actual cap face, while the physical target may
     // advance as far as the cap's full stroke to supply the force to its spring.
-    public bool TryGetVisualOffset(out Vector3 offset)
+    public bool TryGetVisualOffset(out Vector3 offset) => TryGetVisualOffset(Vector3.zero, out offset);
+
+    public bool TryGetVisualOffset(Vector3 existingOffset, out Vector3 offset)
     {
         offset = Vector3.zero;
         if (contactButton == null || !ButtonIsAvailable(contactButton) || OriginMoved() ||
             !TryReadPose(out Pose pose) || PoseJumped(pose.position, pose.rotation) ||
-            !FaceSupport(contactButton, pose.position, touchCollider.radius, out float support)) return false;
+            !FaceSupport(contactButton, pose.position + existingOffset, touchCollider.radius, out float support)) return false;
         Vector3 direction = contactButton.PressDirection;
-        float penetration = Vector3.Dot(pose.position - contactButton.FaceCenter, direction) + support;
+        float penetration = Vector3.Dot(pose.position + existingOffset - contactButton.FaceCenter, direction) + support;
         if (penetration <= 0f) return false;
         offset = -direction * penetration;
         return true;

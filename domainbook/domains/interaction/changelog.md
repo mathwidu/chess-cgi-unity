@@ -10,6 +10,78 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Atualização 0.1.1: solturas lentas sobre a casa verde não são recusadas
+  apenas pela altura. A observação inclui o tempo estimado de queda, com
+  prazo máximo de 2 s, mantendo pouso real, mesma casa, abertura deliberada
+  e cancelamentos. A proteção entre peças continua durante essa tentativa
+  para uma captura não empilhar a peça sobre a adversária.
+
+- Hastes de ajuste aceitam mão fechada pelos quatro dedos, além da pinça,
+  com pose da palma independente do sinal Meta Aim e do polegar. O sinal
+  adicional só seleciona a haste próxima; peças e HUD mantêm o leitor de
+  pinça original. Saída do menu, pausa, foco, rastreamento e modalidade
+  cancelam sem soltura duplicada. Os nove replays das hastes passaram na
+  rodada conjunta de 51 testes; o gesto físico no Quest aguarda o reteste.
+
+- Candidato de entrega de 26/10: solturas lentas com mãos até 10 cm acima de
+  um destino legal observam o pouso por até 600 ms. Replays de 5/9 cm e de
+  retirada de dedo em 320 ms reproduziram a recusa anterior. O lance ainda
+  exige contato real, mesma casa legal e ausência de apoio da mão; arremesso,
+  perda de rastreamento, foco e pausa continuam cancelando a tentativa.
+
+- No reteste de 23/10 do candidato `4751f26e…`, o usuário confirmou acesso ao
+  menu por pinça e destino/colocação do peão funcionando. A captura parcial
+  também reteve clique em Jogar e dois lances iniciados. As sondas temporárias
+  foram arquivadas e removidas, preservando a lógica funcional. Tremor e
+  fluidez permanecem fora do aceite deste teste. A suíte completa da versão
+  normal passou 218/218 PlayMode e 64/64 EditMode após a limpeza.
+
+- A pinça do menu passa a usar o mesmo sinal da pega (0,75/0,55), com
+  cancelamento do ponteiro quando há perda de rastreamento, foco, pausa ou
+  troca de modalidade. O replay do menu real falhou nas duas mãos com força
+  0,85 e passou após a correção. A rodada conjunta passou 64/64 casos,
+  incluindo começo de partida pelo menu, interrupções no mesmo frame,
+  colocação, apoio na palma e proteção das duas mãos. Reteste no Quest pendente.
+
+- Destino de colocação mostra a casa sob a base da peça segurada, indicando
+  legalidade ou retorno à origem. Os replays de colocação, captura e promoção
+  reproduziram o arco visual de 18 cm após uma soltura aceita. O caminho
+  físico passa a concluir com encaixe curto; um novo movimento cancela a
+  animação anterior da mesma peça. A escala da raiz física permanece estável
+  durante a pega. O desvio intermitente observado no Quest ainda exige a
+  captura de aquisição e poses imediatamente anteriores à soltura.
+
+- No teste físico de `7ff45c0…`, o usuário confirmou proteção das duas mãos
+  e apoio sem afundamento visível. A colocação ainda recusa o lance após
+  soltar, e há tremor inclusive no ar longe das peças. A revisão permanece
+  parcialmente aceita; captura dirigida no aparelho deve separar as causas.
+
+- Reteste do candidato `7765154…`: a soltura funciona, mas o usuário pediu
+  proteger também a mão livre e relatou recusa de colocação e pequeno
+  afundamento na palma. Qualquer pega física agora protege as duas mãos até
+  terminar a última. Colocação lenta observa por até 250 ms o pouso real na
+  mesma casa legal, com assistência de velocidade restrita a essa intenção.
+  O apoio visual corrige translação e rotação; a palma ganha 0,5 mm por face.
+  Aceite no aparelho permanece necessário.
+
+- Revisão da pega no Quest em 23/10: leitura exclusiva da pinça evita que o
+  gesto de agarrar de outro provider mantenha a peça presa. A mão ocupada e
+  sua peça deixam de derrubar vizinhas, com restauração após separação.
+  Colocação com mãos usa a base real e movimento recente, preservando
+  arremessos, casas legais e controles. Apoio visual acompanha a translação
+  física interpolada; restrição dos botões é resolvida após essa correção.
+  Reteste físico permanece necessário.
+
+- [Agarrar e apoiar peças com as mãos](features/agarrar-e-apoiar-pecas-com-as-maos.md):
+  pinça iniciada antes de alcançar a peça passa a adquirir o alvo próximo;
+  a primeira mão conserva a posse até abrir. Palma e dedos têm um corpo
+  composto para sustentar peças soltas, com rearme após perda de rastreamento
+  e sem transformar o simples contato em lance. A sensação no Quest ainda
+  exige validação física desta nova interação. A revisão de 23/10 acrescenta
+  pinça analógica com histerese, abertura obrigatória após perda de foco/pausa
+  ou rastreamento, contato que derruba peças sem lance e distinção entre
+  arremessar no ar e colocar devagar sobre uma casa.
+
 - Aceite físico da base Quest em 22/10/2026: o usuário confirmou pegar uma
   peça, efetuar um lance e voltar ao menu normalmente na versão de demonstração.
 

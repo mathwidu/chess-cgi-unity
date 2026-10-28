@@ -1,0 +1,94 @@
+{
+  "kind": "Rook",
+  "source": "game/Assets/Art/Characters/Direction02/Rook/Model.glb",
+  "source_sha256": "e27466ce5410514c3ada6fe0a24ff94d046b736582a143a4e94ff873ca1fa19e",
+  "blender": "5.2.1 LTS",
+  "parts": [
+    {
+      "node": "Mesh_BrushedBrass",
+      "mesh": "Torus.006",
+      "original_triangles": 3072,
+      "optimized_triangles": 768,
+      "ratio_requested": 0.25,
+      "uv_layers": 1,
+      "materials": [
+        "BrushedBrass"
+      ],
+      "sampled_surface_error_max": 0.0015488311182707548,
+      "sampled_surface_error_mm_at_13cm": 0.15370079072325638
+    },
+    {
+      "node": "Mesh_FeevalePatch_White",
+      "mesh": "Rook_Feevale.001",
+      "original_triangles": 768,
+      "optimized_triangles": 383,
+      "ratio_requested": 0.5,
+      "uv_layers": 1,
+      "materials": [
+        "FeevalePatch_White"
+      ],
+      "sampled_surface_error_max": 1.1150072168675251e-05,
+      "sampled_surface_error_mm_at_13cm": 0.0011064956590361914
+    },
+    {
+      "node": "Mesh_GripLeather",
+      "mesh": "Cylinder.007",
+      "original_triangles": 1532,
+      "optimized_triangles": 382,
+      "ratio_requested": 0.25,
+      "uv_layers": 1,
+      "materials": [
+        "GripLeather"
+      ],
+      "sampled_surface_error_max": 0.0011603219900280237,
+      "sampled_surface_error_mm_at_13cm": 0.11514645157698414
+    },
+    {
+      "node": "Mesh_Rook_Body_White",
+      "mesh": "tripo_mesh_13b20d3c-01ea-4338-8728-752922d211e0.001",
+      "original_triangles": 29076,
+      "optimized_triangles": 8140,
+      "ratio_requested": 0.28,
+      "uv_layers": 1,
+      "materials": [
+        "Rook_Body_White"
+      ],
+      "sampled_surface_error_max": 0.0035992360208183527,
+      "sampled_surface_error_mm_at_13cm": 0.3571760767675256
+    },
+    {
+      "node": "Mesh_Side_Inlay_White",
+      "mesh": "ClassicRole_Rook.002",
+      "original_triangles": 1184,
+      "optimized_triangles": 189,
+      "ratio_requested": 0.16,
+      "uv_layers": 1,
+      "materials": [
+        "Side_Inlay_White"
+      ],
+      "sampled_surface_error_max": 0.0029863815288990736,
+      "sampled_surface_error_mm_at_13cm": 0.29635845830989715
+    },
+    {
+      "node": "Mesh_Side_Surface_White",
+      "mesh": "SatinPlinth.003",
+      "original_triangles": 1148,
+      "optimized_triangles": 1148,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "Side_Surface_White"
+      ],
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    }
+  ],
+  "source_height": 1.3100000619888306,
+  "original_triangles": 36780,
+  "optimized_triangles": 11010,
+  "geometry_sha256": "a5f9cea4cbdfe346e35dddd47b1b2f08125f3fc00ada39b7bc31ae0c4200a278",
+  "tangent_repairs": {
+    "zero": 0,
+    "orthogonalized": 10157
+  }
+}

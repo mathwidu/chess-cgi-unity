@@ -60,6 +60,10 @@ public sealed partial class GameHud : MonoBehaviour
     private Transform selectedPiecePreviewStage;
     private GameObject selectedPiecePreviewClone;
     private Vector3 selectedPiecePreviewFocusPoint;
+    private bool selectedPiecePreviewHasImage;
+    private PreviewRenderState selectedPiecePreviewRenderState;
+    private Renderer[] selectedPiecePreviewRenderers;
+    private PreviewRendererState[] selectedPiecePreviewRendererStates;
     private PieceView previewedPiece;
     private Canvas hudCanvas;
     private bool panelSeatedAsBlack;
@@ -421,8 +425,90 @@ public sealed partial class GameHud : MonoBehaviour
                 previewZoomOutButton.interactable = selectedPiecePreviewInput.CanZoomOut;
             }
 
-            selectedPiecePreviewCamera.Render();
+            RenderSelectedPiecePreviewIfChanged();
         }
+    }
+
+    private void RenderSelectedPiecePreviewIfChanged()
+    {
+        if (!selectedPiecePanel.gameObject.activeInHierarchy)
+        {
+            selectedPiecePreviewHasImage = false;
+            return;
+        }
+
+        if (!selectedPiecePreviewTexture.IsCreated())
+        {
+            selectedPiecePreviewTexture.Create();
+            selectedPiecePreviewHasImage = false;
+        }
+
+        bool changed = !selectedPiecePreviewHasImage ||
+            !selectedPiecePreviewRenderState.Matches(selectedPiecePreviewCamera, selectedPiecePreviewLight);
+        for (int i = 0; i < selectedPiecePreviewRenderers.Length && !changed; i++)
+            changed = !selectedPiecePreviewRendererStates[i].Matches(selectedPiecePreviewRenderers[i]);
+        if (!changed) return;
+
+        selectedPiecePreviewCamera.Render();
+        selectedPiecePreviewRenderState = new PreviewRenderState(selectedPiecePreviewCamera, selectedPiecePreviewLight);
+        for (int i = 0; i < selectedPiecePreviewRenderers.Length; i++)
+            selectedPiecePreviewRendererStates[i] = new PreviewRendererState(selectedPiecePreviewRenderers[i]);
+        selectedPiecePreviewHasImage = true;
+    }
+
+    // The current character previews use static meshes and materials. Compare only
+    // their visual state, without allocating or consuming Transform.hasChanged.
+    private struct PreviewRendererState
+    {
+        private Matrix4x4 localToWorld;
+        private bool visible;
+        private int layer;
+
+        public PreviewRendererState(Renderer renderer)
+        {
+            visible = renderer != null && renderer.enabled && renderer.gameObject.activeInHierarchy;
+            localToWorld = visible ? renderer.localToWorldMatrix : Matrix4x4.identity;
+            layer = renderer != null ? renderer.gameObject.layer : 0;
+        }
+
+        public bool Matches(Renderer renderer)
+        {
+            bool currentVisible = renderer != null && renderer.enabled && renderer.gameObject.activeInHierarchy;
+            return visible == currentVisible && (!visible ||
+                (localToWorld == renderer.localToWorldMatrix && layer == renderer.gameObject.layer));
+        }
+    }
+
+    private struct PreviewRenderState
+    {
+        private Matrix4x4 view, projection, lightToWorld;
+        private Color background, lightColor;
+        private CameraClearFlags clearFlags;
+        private int cameraMask, lightMask;
+        private float lightIntensity, lightRange;
+        private bool lightEnabled;
+
+        public PreviewRenderState(Camera camera, Light light)
+        {
+            view = camera.worldToCameraMatrix;
+            projection = camera.projectionMatrix;
+            background = camera.backgroundColor;
+            clearFlags = camera.clearFlags;
+            cameraMask = camera.cullingMask;
+            lightToWorld = light.transform.localToWorldMatrix;
+            lightColor = light.color;
+            lightIntensity = light.intensity;
+            lightRange = light.range;
+            lightEnabled = light.isActiveAndEnabled;
+            lightMask = light.cullingMask;
+        }
+
+        public bool Matches(Camera camera, Light light) =>
+            view == camera.worldToCameraMatrix && projection == camera.projectionMatrix &&
+            background == camera.backgroundColor && clearFlags == camera.clearFlags && cameraMask == camera.cullingMask &&
+            lightToWorld == light.transform.localToWorldMatrix && lightColor == light.color &&
+            lightIntensity == light.intensity && lightRange == light.range && lightEnabled == light.isActiveAndEnabled &&
+            lightMask == light.cullingMask;
     }
 
     private void EnsureSelectedPiecePreviewResources()
@@ -505,13 +591,21 @@ public sealed partial class GameHud : MonoBehaviour
             selectedPiecePreviewInput.Configure(selectedPiecePreviewClone.transform, selectedPiecePreviewCamera, selectedPiecePreviewFocusPoint);
             selectedPiecePreviewInput.NormalizeCameraDistance();
         }
+        selectedPiecePreviewRenderers = selectedPiecePreviewClone.GetComponentsInChildren<Renderer>(true);
+        selectedPiecePreviewRendererStates = new PreviewRendererState[selectedPiecePreviewRenderers.Length];
     }
 
     private void ClearSelectedPiecePreviewClone()
     {
+        selectedPiecePreviewHasImage = false;
+        selectedPiecePreviewRenderers = null;
+        selectedPiecePreviewRendererStates = null;
         if (selectedPiecePreviewInput != null) selectedPiecePreviewInput.Configure(null, null);
         if (selectedPiecePreviewClone != null)
         {
+            // Destroy is deferred in Play mode. Hide it before a replacement image
+            // is rendered, otherwise the cached texture would contain both pieces.
+            selectedPiecePreviewClone.SetActive(false);
             DestroyUnityObject(selectedPiecePreviewClone);
             selectedPiecePreviewClone = null;
         }
@@ -519,10 +613,28 @@ public sealed partial class GameHud : MonoBehaviour
 
     private static void DisablePreviewInteractionComponents(GameObject clone)
     {
+        foreach (QuestCharacterDetail detail in clone.GetComponentsInChildren<QuestCharacterDetail>(true))
+            detail.ForceInspectionDetail();
         PieceView clonePieceView = clone.GetComponent<PieceView>();
         if (clonePieceView != null)
         {
             clonePieceView.enabled = false;
+        }
+
+        // Unsubscribe presentation-independent handlers before unregistering XRI.
+        // Only this clone is isolated; the board piece keeps its original physics.
+        foreach (VrSelectionBridge bridge in clone.GetComponentsInChildren<VrSelectionBridge>(true))
+            bridge.enabled = false;
+        foreach (PieceGrabHighlight highlight in clone.GetComponentsInChildren<PieceGrabHighlight>(true))
+            highlight.enabled = false;
+        foreach (UnityEngine.XR.Interaction.Toolkit.Interactables.XRBaseInteractable interactable in
+            clone.GetComponentsInChildren<UnityEngine.XR.Interaction.Toolkit.Interactables.XRBaseInteractable>(true))
+            interactable.enabled = false;
+        foreach (Rigidbody body in clone.GetComponentsInChildren<Rigidbody>(true))
+        {
+            body.isKinematic = true;
+            body.useGravity = false;
+            body.interpolation = RigidbodyInterpolation.None;
         }
 
         Collider[] colliders = clone.GetComponentsInChildren<Collider>();

@@ -28,6 +28,14 @@ public sealed class PieceFactory : MonoBehaviour
     [Header("Performance")]
     [Tooltip("Swap the custom model pieces for lightweight primitive pieces.")]
     [SerializeField] private bool usePrimitivePieces;
+    private bool? useQuestCharacterGeometry;
+
+    // The override also allows the Android geometry to be inspected in the Editor.
+    public bool UseQuestCharacterGeometry
+    {
+        get => useQuestCharacterGeometry ?? Application.platform == RuntimePlatform.Android;
+        set => useQuestCharacterGeometry = value;
+    }
 
     public bool UsePrimitivePieces
     {
@@ -90,6 +98,7 @@ public sealed class PieceFactory : MonoBehaviour
             AddCollider(root);
         }
 
+        ApplyQuestGeometry(root, state.Kind);
         return pieceView;
     }
 
@@ -112,7 +121,19 @@ public sealed class PieceFactory : MonoBehaviour
             AddGrabInteractable(root);
         }
 
+        ApplyQuestGeometry(root, kind);
         return root;
+    }
+
+    private void ApplyQuestGeometry(GameObject root, ChessPieceKind kind)
+    {
+        // Fit and colliders must use the authored bounds, before replacing only the visible meshes.
+        if (UseQuestCharacterGeometry && !usePrimitivePieces)
+        {
+            Transform visual = root.transform.Find("CustomVisual");
+            if (visual != null && visual.GetComponentInChildren<CustomPieceAppearance>() != null)
+                QuestCharacterGeometry.TryApply(kind, visual);
+        }
     }
 
     private void BuildShape(Transform root, ChessPieceKind kind, ChessSide side)
@@ -130,6 +151,7 @@ public sealed class PieceFactory : MonoBehaviour
         body.isKinematic = true;
         body.useGravity = false;
         body.angularDamping = AngularDamping;
+        body.mass = .05f;
         body.interpolation = RigidbodyInterpolation.Interpolate;
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         Physics.IgnoreLayerCollision(PieceView.PhysicsLayer, PhysicalTableButton.PhysicsLayer);

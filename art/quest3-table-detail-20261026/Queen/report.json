@@ -1,0 +1,101 @@
+{
+  "kind": "Queen",
+  "source": "game/Assets/Art/Characters/Direction02/Queen/Model.glb",
+  "source_sha256": "a6b5a577cb23b613aaa193633d2d4a351d1d6629b81dc69decb5fa0f8330a5a3",
+  "blender": "5.2.1 LTS",
+  "profile": "table",
+  "parts": [
+    {
+      "node": "Mesh_BrushedBrass",
+      "mesh": "Torus.018",
+      "original_triangles": 3072,
+      "optimized_triangles": 306,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "BrushedBrass"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.004491973668336868,
+      "sampled_surface_error_mm_at_13cm": 0.4083612575546806
+    },
+    {
+      "node": "Mesh_FeevalePatch_White",
+      "mesh": "Queen_Feevale.001",
+      "original_triangles": 768,
+      "optimized_triangles": 153,
+      "ratio_requested": 0.2,
+      "uv_layers": 1,
+      "materials": [
+        "FeevalePatch_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.00039556703995913267,
+      "sampled_surface_error_mm_at_13cm": 0.03596064131531325
+    },
+    {
+      "node": "Mesh_GripLeather",
+      "mesh": "Cylinder.027",
+      "original_triangles": 1532,
+      "optimized_triangles": 152,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "GripLeather"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.00234991149045527,
+      "sampled_surface_error_mm_at_13cm": 0.2136283251499557
+    },
+    {
+      "node": "Mesh_Queen_Body_White",
+      "mesh": "tripo_mesh_b99395c3-17ab-41d0-9afb-e73dacb02d55.001",
+      "original_triangles": 28548,
+      "optimized_triangles": 2280,
+      "ratio_requested": 0.08,
+      "uv_layers": 1,
+      "materials": [
+        "Queen_Body_White"
+      ],
+      "validation_repaired": true,
+      "sampled_surface_error_max": 0.004998892080038786,
+      "sampled_surface_error_mm_at_13cm": 0.4544447512179147
+    },
+    {
+      "node": "Mesh_Side_Inlay_White",
+      "mesh": "ClassicRole_Queen.002",
+      "original_triangles": 17384,
+      "optimized_triangles": 868,
+      "ratio_requested": 0.05,
+      "uv_layers": 1,
+      "materials": [
+        "Side_Inlay_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0006682677194476128,
+      "sampled_surface_error_mm_at_13cm": 0.060751613087229775
+    },
+    {
+      "node": "Mesh_Side_Surface_White",
+      "mesh": "SatinPlinth.009",
+      "original_triangles": 1148,
+      "optimized_triangles": 1148,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "Side_Surface_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    }
+  ],
+  "source_height": 1.4299999475479126,
+  "original_triangles": 52452,
+  "optimized_triangles": 4907,
+  "tangent_repairs": {
+    "zero": 0,
+    "orthogonalized": 4305
+  },
+  "geometry_sha256": "1f84d516cab9f03bcf00bcbfec906f3ea516290dbb7858911e8a7ba7e37f793b"
+}

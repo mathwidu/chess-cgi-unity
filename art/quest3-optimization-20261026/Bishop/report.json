@@ -1,0 +1,107 @@
+{
+  "kind": "Bishop",
+  "source": "game/Assets/Art/Characters/Direction02/Bishop/Model.glb",
+  "source_sha256": "e57ab7812c4e5b528d2b2b080b2709550bad951a6fcfd7c439c2a08f54d1633b",
+  "blender": "5.2.1 LTS",
+  "parts": [
+    {
+      "node": "Mesh_Bishop_Body_White",
+      "mesh": "tripo_mesh_719a1010-f7b9-45c7-9979-b695d3198f0a.001",
+      "original_triangles": 26406,
+      "optimized_triangles": 7393,
+      "ratio_requested": 0.28,
+      "uv_layers": 1,
+      "materials": [
+        "Bishop_Body_White"
+      ],
+      "sampled_surface_error_max": 0.0030744418036192656,
+      "sampled_surface_error_mm_at_13cm": 0.30509724990280124
+    },
+    {
+      "node": "Mesh_Bishop_HandSkin",
+      "mesh": "Bishop_Finger_0.001",
+      "original_triangles": 2772,
+      "optimized_triangles": 1386,
+      "ratio_requested": 0.5,
+      "uv_layers": 1,
+      "materials": [
+        "Bishop_HandSkin"
+      ],
+      "sampled_surface_error_max": 0.00040256985812447965,
+      "sampled_surface_error_mm_at_13cm": 0.039949676869131534
+    },
+    {
+      "node": "Mesh_BrushedBrass",
+      "mesh": "Bishop_Crozier.001",
+      "original_triangles": 4976,
+      "optimized_triangles": 1244,
+      "ratio_requested": 0.25,
+      "uv_layers": 1,
+      "materials": [
+        "BrushedBrass"
+      ],
+      "sampled_surface_error_max": 0.0014565151650458574,
+      "sampled_surface_error_mm_at_13cm": 0.14453965945105493
+    },
+    {
+      "node": "Mesh_FeevalePatch_White",
+      "mesh": "Bishop_Feevale.001",
+      "original_triangles": 768,
+      "optimized_triangles": 383,
+      "ratio_requested": 0.5,
+      "uv_layers": 1,
+      "materials": [
+        "FeevalePatch_White"
+      ],
+      "sampled_surface_error_max": 0.000143761484650895,
+      "sampled_surface_error_mm_at_13cm": 0.014266405549553067
+    },
+    {
+      "node": "Mesh_GripLeather",
+      "mesh": "Cylinder.018",
+      "original_triangles": 2036,
+      "optimized_triangles": 508,
+      "ratio_requested": 0.25,
+      "uv_layers": 1,
+      "materials": [
+        "GripLeather"
+      ],
+      "sampled_surface_error_max": 0.0010496426839381456,
+      "sampled_surface_error_mm_at_13cm": 0.10416300476825738
+    },
+    {
+      "node": "Mesh_Side_Inlay_White",
+      "mesh": "ClassicRole_Bishop.002",
+      "original_triangles": 7504,
+      "optimized_triangles": 1200,
+      "ratio_requested": 0.16,
+      "uv_layers": 1,
+      "materials": [
+        "Side_Inlay_White"
+      ],
+      "sampled_surface_error_max": 0.00033336522756144404,
+      "sampled_surface_error_mm_at_13cm": 0.033082042412539855
+    },
+    {
+      "node": "Mesh_Side_Surface_White",
+      "mesh": "SatinPlinth.007",
+      "original_triangles": 1148,
+      "optimized_triangles": 1148,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "Side_Surface_White"
+      ],
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    }
+  ],
+  "source_height": 1.3100001215934753,
+  "original_triangles": 45610,
+  "optimized_triangles": 13262,
+  "geometry_sha256": "2a0dea4e40603d326cd0c99fdf483b92a457b07f52e21b2d8c9e5613a03edaa5",
+  "tangent_repairs": {
+    "zero": 0,
+    "orthogonalized": 11412
+  }
+}

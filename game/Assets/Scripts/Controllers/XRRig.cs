@@ -6,6 +6,7 @@ using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Interaction.Toolkit.Attachment;
+using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
@@ -233,6 +234,27 @@ public sealed class XRRig : MonoBehaviour
         GameObject instance = Object.Instantiate(prefab, parent);
         instance.name = resourceName;
         RestrictRayToUi(instance);
+
+        NearFarInteractor handInteractor = instance.GetComponentInChildren<NearFarInteractor>(true);
+        if (handInteractor != null)
+        {
+            // A pinch may start just before the fingertips reach the piece.
+            handInteractor.selectActionTrigger = XRBaseInputInteractor.InputTriggerType.State;
+            // Keep the first hand in control until it opens; a waiting pinch can then take over.
+            handInteractor.selectFilters.Add(new XRSelectFilterDelegate((interactor, interactable) =>
+                !interactable.isSelected || interactor.IsSelecting(interactable)));
+            XRHandGrabInput grabInput = instance.AddComponent<XRHandGrabInput>();
+            grabInput.Configure(handInteractor.selectInput, handInteractor.handedness);
+            var selectInput = new XRInputButtonReader("Hand near grab")
+            {
+                inputSourceMode = XRInputButtonReader.InputSourceMode.ObjectReference,
+            };
+            BoardScaleHandInput scaleInput = instance.AddComponent<BoardScaleHandInput>();
+            scaleInput.Configure(grabInput, handInteractor);
+            selectInput.SetObjectReference(scaleInput);
+            handInteractor.selectInput = selectInput;
+            instance.AddComponent<XRHandMenuInput>().Configure(grabInput, handInteractor);
+        }
 
         TrackedPoseDriver aimPoseDriver = instance.transform.Find("Aim Pose")?.GetComponent<TrackedPoseDriver>();
         aimPoseDriver?.positionInput.action?.actionMap?.asset?.Enable();

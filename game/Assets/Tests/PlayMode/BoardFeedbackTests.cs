@@ -69,6 +69,42 @@ public class BoardFeedbackTests
         board.Squares.First(s => s.Square.Equals(BoardSquare.FromAlgebraic(square))).GetComponent<Renderer>();
 
     [UnityTest]
+    public IEnumerator AClickedMoveKeepsItsVisualArc()
+    {
+        controller.StartLocalGame();
+        PieceView pawn = board.Pieces.First(piece => piece.Square.Equals(BoardSquare.FromAlgebraic("e2")));
+        float startHeight = pawn.transform.position.y;
+        float maximumHeight = startHeight;
+        controller.SelectPiece(pawn);
+        controller.SelectDestination(BoardSquare.FromAlgebraic("e4"));
+        while (controller.IsAnimatingMove)
+        {
+            maximumHeight = Mathf.Max(maximumHeight, pawn.transform.position.y);
+            yield return null;
+        }
+        Assert.That(maximumHeight - startHeight, Is.GreaterThan(.1f),
+            "The physical placement change must preserve the animation of moves made by clicking.");
+        Assert.That(controller.MoveHistory.Count, Is.EqualTo(1));
+    }
+
+    [UnityTest]
+    public IEnumerator APhysicalDropWhileSuspendedCannotReportAMoveStarted()
+    {
+        controller.StartLocalGame();
+        PieceView pawn = board.Pieces.First(piece => piece.Square.Equals(BoardSquare.FromAlgebraic("e2")));
+        controller.GrabPiece(pawn);
+        controller.SendMessage("OnApplicationPause", true, SendMessageOptions.RequireReceiver);
+        Assert.That(controller.IsInputBlocked, Is.True);
+        bool accepted = controller.ReleasePiece(pawn, board.GetPieceWorldPosition(BoardSquare.FromAlgebraic("e4")), out bool started);
+        Assert.That(accepted, Is.False, "An interrupted placement cannot claim that its move was accepted.");
+        Assert.That(started, Is.False);
+        Assert.That(controller.MoveHistory, Is.Empty);
+        controller.SendMessage("OnApplicationPause", false, SendMessageOptions.RequireReceiver);
+        yield return null;
+        Assert.That(controller.MoveHistory, Is.Empty);
+    }
+
+    [UnityTest]
     public IEnumerator TheLastMoveIsTintedOnItsTwoSquares()
     {
         controller.StartLocalGame();

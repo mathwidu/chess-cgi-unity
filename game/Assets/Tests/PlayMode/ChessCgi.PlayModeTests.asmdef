@@ -5,6 +5,7 @@
     "Unity.InputSystem",
     "Unity.XR.Interaction.Toolkit",
     "Unity.XR.Hands",
+    "Unity.XR.OpenXR",
     "Unity.Collections",
     "Unity.XR.CoreUtils"
   ],

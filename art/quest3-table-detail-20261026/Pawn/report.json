@@ -1,0 +1,129 @@
+{
+  "kind": "Pawn",
+  "source": "game/Assets/Art/Characters/Direction02/Pawn/Model.glb",
+  "source_sha256": "58712eaef808743ca690e2d8d7a0ae82ad32b542f06ec07f90c992de2a9c98a6",
+  "blender": "5.2.1 LTS",
+  "profile": "table",
+  "parts": [
+    {
+      "node": "Mesh_BrushedBrass",
+      "mesh": "Torus.002",
+      "original_triangles": 3764,
+      "optimized_triangles": 376,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "BrushedBrass"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.003766316222026944,
+      "sampled_surface_error_mm_at_13cm": 0.4257574727280252
+    },
+    {
+      "node": "Mesh_FeevalePatch_White",
+      "mesh": "Pawn_Feevale.001",
+      "original_triangles": 768,
+      "optimized_triangles": 152,
+      "ratio_requested": 0.2,
+      "uv_layers": 1,
+      "materials": [
+        "FeevalePatch_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.00017843580280896276,
+      "sampled_surface_error_mm_at_13cm": 0.02017100316851641
+    },
+    {
+      "node": "Mesh_GripLeather",
+      "mesh": "Cylinder.003",
+      "original_triangles": 1784,
+      "optimized_triangles": 178,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "GripLeather"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0034106229431927204,
+      "sampled_surface_error_mm_at_13cm": 0.38554866854500763
+    },
+    {
+      "node": "Mesh_Pawn_Body_White",
+      "mesh": "tripo_mesh_a2fab25c-4f7a-4c46-97de-bfe11ecd7664.001",
+      "original_triangles": 23796,
+      "optimized_triangles": 1888,
+      "ratio_requested": 0.08,
+      "uv_layers": 1,
+      "materials": [
+        "Pawn_Body_White"
+      ],
+      "validation_repaired": true,
+      "sampled_surface_error_max": 0.004069599788635969,
+      "sampled_surface_error_mm_at_13cm": 0.460041700930698
+    },
+    {
+      "node": "Mesh_Pawn_HandSkin",
+      "mesh": "Pawn_Finger_0.001",
+      "original_triangles": 2520,
+      "optimized_triangles": 629,
+      "ratio_requested": 0.25,
+      "uv_layers": 1,
+      "materials": [
+        "Pawn_HandSkin"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0009229896240867674,
+      "sampled_surface_error_mm_at_13cm": 0.10433795426075108
+    },
+    {
+      "node": "Mesh_Side_Inlay_White",
+      "mesh": "ClassicRole_Pawn.002",
+      "original_triangles": 5632,
+      "optimized_triangles": 281,
+      "ratio_requested": 0.05,
+      "uv_layers": 1,
+      "materials": [
+        "Side_Inlay_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0012310397578403354,
+      "sampled_surface_error_mm_at_13cm": 0.13916101177605045
+    },
+    {
+      "node": "Mesh_Side_Surface_White",
+      "mesh": "SatinPlinth.001",
+      "original_triangles": 1148,
+      "optimized_triangles": 1148,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "Side_Surface_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    },
+    {
+      "node": "Mesh_SwordSteel",
+      "mesh": "SwordBlade.001",
+      "original_triangles": 12,
+      "optimized_triangles": 12,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "SwordSteel"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    }
+  ],
+  "source_height": 1.1500000357627869,
+  "original_triangles": 39424,
+  "optimized_triangles": 4664,
+  "tangent_repairs": {
+    "zero": 0,
+    "orthogonalized": 3665
+  },
+  "geometry_sha256": "4f243cb44509c8140557ecf96e5873ad165240f511f094d5241de261f828858c"
+}

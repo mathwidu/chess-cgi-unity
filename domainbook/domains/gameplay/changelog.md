@@ -10,6 +10,17 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Cancelar a seleção também funciona durante a suspensão do aplicativo.
+  Isso limpa destinos de uma colocação interrompida ao tirar o headset, sem
+  liberar novas pegas ou lances durante a pausa. A animação de lance e a vez
+  da IA continuam protegidas pelas guardas existentes.
+
+- A sincronização após um lance conserva os objetos das peças que continuam
+  na mesma casa e o objeto da peça movida quando seu tipo permanece igual.
+  Isso preserva a física de peças soltas durante outro lance; captura,
+  promoção, roque, reinício e troca de modelos mantêm a posição julgada pelas
+  regras. A interação de toque não altera casa lógica, turno ou histórico.
+
 - Adaptador offline Android/Quest com Stockfish 18 ARM64 PIE incluído no APK,
   transporte UCI por Java, cancelamento sem bloqueio da thread Unity e preparo
   reproduzível com licença/fonte correspondente. O desktop permanece no
@@ -75,6 +86,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 - A busca do executável do Stockfish passa a olhar primeiro a pasta do jogo (onde está o `XadrezCGI.exe`), antes de `persistentDataPath/Engines` e do PATH; assim uma build de Windows roda com o `stockfish.exe` ao lado do jogo, sem instalação.
 
 ### Fixed
+
+- Uma soltura física só informa lance iniciado quando o destino foi aceito
+  pela partida. O teste de suspensão reproduziu o retorno incorreto de
+  sucesso, embora nenhum lance tivesse sido aplicado. Colocação física
+  confirmada usa encaixe curto sem o arco de movimentos por clique ou IA;
+  promoção conserva essa origem até a escolha e registra uma única jogada.
+  Cancelar uma promoção física devolve o peão à casa lógica sem lance ou
+  captura e restaura o corpo após o retorno, encerrando a animação anterior.
 
 - Soltar o rei sobre a própria torre faz o roque sem capturar a torre: `ChessRulesAdapter.TryMove` não informa mais captura quando a peça tomada é do mesmo lado de quem joga, e `GetCapturableSquares` só lista peças adversárias. A torre deixa de ir para a bandeja de capturadas, de contar no saldo de material e de tocar o som de captura.
 - Desativar o controlador cancela tarefas e adia a reconstrução das peças e a conclusão de uma animação interrompida para a reativação. Fechar a cena VR deixa de recriar o gerenciador de interação XR durante a destruição; retomar preserva a posição das regras e uma notificação por jogada.

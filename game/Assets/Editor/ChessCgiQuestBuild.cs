@@ -24,6 +24,8 @@ public static class ChessCgiQuestBuild
     private const BuildTargetGroup TargetGroup = BuildTargetGroup.Android;
     private const string MainScene = "Assets/Scenes/Main.unity";
     private const string ApplicationIdentifier = "com.mathwidu.chesscgi";
+    private const string VersionName = "0.1.3";
+    private const int VersionCode = 4;
     private const string OpenXrLoaderTypeName = "UnityEngine.XR.OpenXR.OpenXRLoader";
     private const string MockRuntimeFeatureId = "com.unity.openxr.feature.mockruntime";
 
@@ -97,6 +99,7 @@ public static class ChessCgiQuestBuild
         FeatureHelpers.RefreshFeatures(TargetGroup);
 
         PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, ApplicationIdentifier);
+        ApplyBuildVersion();
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
@@ -204,14 +207,28 @@ public static class ChessCgiQuestBuild
         BuildApk(false);
     }
 
-    private static void BuildApk(bool development)
+    [MenuItem("Chess CGI/Build/Quest 3/Build Working APK")]
+    public static void BuildWorking()
     {
+        BuildApk(false, "XadrezCGI-Quest3-work.apk");
+    }
+
+    [MenuItem("Chess CGI/Build/Quest 3/Build Delivery Candidate APK")]
+    public static void BuildDeliveryCandidate()
+    {
+        BuildApk(false, "XadrezCGI-Quest3-delivery-candidate.apk");
+    }
+
+    private static void BuildApk(bool development, string fileName = null)
+    {
+        RequireAndroidEditor();
+        ApplyBuildVersion();
         Validate();
         string projectRoot = Directory.GetParent(Application.dataPath).FullName;
         string repositoryRoot = Directory.GetParent(projectRoot).FullName;
         string outputDirectory = Path.Combine(repositoryRoot, "Builds", "Quest3");
         string outputPath = Path.Combine(outputDirectory,
-            development ? "XadrezCGI-Quest3-dev.apk" : "XadrezCGI-Quest3-demo.apk");
+            fileName ?? (development ? "XadrezCGI-Quest3-dev.apk" : "XadrezCGI-Quest3-demo.apk"));
         Directory.CreateDirectory(outputDirectory);
 
         BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
@@ -226,6 +243,18 @@ public static class ChessCgiQuestBuild
         Debug.Log($"CHESS_CGI_QUEST_BUILD_RESULT result={summary.result} path={outputPath} size={summary.totalSize} warnings={summary.totalWarnings} errors={summary.totalErrors}");
         if (summary.result != BuildResult.Succeeded)
             throw new BuildFailedException($"Quest APK build failed with result {summary.result} and {summary.totalErrors} errors.");
+    }
+
+    internal static void ApplyBuildVersion()
+    {
+        PlayerSettings.bundleVersion = VersionName;
+        PlayerSettings.Android.bundleVersionCode = VersionCode;
+    }
+
+    internal static void ValidateBuildVersion()
+    {
+        if (PlayerSettings.bundleVersion != VersionName || PlayerSettings.Android.bundleVersionCode != VersionCode)
+            throw new BuildFailedException($"Quest version must be {VersionName} ({VersionCode}). Run Chess CGI/Build/Quest 3/Prepare Android or use a Quest build menu item.");
     }
 
     private static void RequireAndroidEditor()

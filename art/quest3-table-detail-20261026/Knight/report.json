@@ -1,0 +1,101 @@
+{
+  "kind": "Knight",
+  "source": "game/Assets/Art/Characters/Direction02/Knight/Model.glb",
+  "source_sha256": "9643d870f87e4c61f10a98f5bd51ba8633a9689f313fa602d69da183717c6d53",
+  "blender": "5.2.1 LTS",
+  "profile": "table",
+  "parts": [
+    {
+      "node": "Mesh_BrushedBrass",
+      "mesh": "Torus.010",
+      "original_triangles": 3072,
+      "optimized_triangles": 306,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "BrushedBrass"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.004491973668336868,
+      "sampled_surface_error_mm_at_13cm": 0.44576835820697225
+    },
+    {
+      "node": "Mesh_FeevalePatch_White",
+      "mesh": "Knight_Feevale.001",
+      "original_triangles": 768,
+      "optimized_triangles": 153,
+      "ratio_requested": 0.2,
+      "uv_layers": 1,
+      "materials": [
+        "FeevalePatch_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.00019162881653755903,
+      "sampled_surface_error_mm_at_13cm": 0.01901659921455414
+    },
+    {
+      "node": "Mesh_GripLeather",
+      "mesh": "Cylinder.009",
+      "original_triangles": 1532,
+      "optimized_triangles": 152,
+      "ratio_requested": 0.1,
+      "uv_layers": 1,
+      "materials": [
+        "GripLeather"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.00234991149045527,
+      "sampled_surface_error_mm_at_13cm": 0.2331973124454629
+    },
+    {
+      "node": "Mesh_Knight_Body_White",
+      "mesh": "tripo_mesh_3395c30c-9326-4d54-a23c-1cc9dab0efc9.001",
+      "original_triangles": 28884,
+      "optimized_triangles": 2308,
+      "ratio_requested": 0.08,
+      "uv_layers": 1,
+      "materials": [
+        "Knight_Body_White"
+      ],
+      "validation_repaired": true,
+      "sampled_surface_error_max": 0.009368441998958588,
+      "sampled_surface_error_mm_at_13cm": 0.9296926734611105
+    },
+    {
+      "node": "Mesh_Side_Inlay_White",
+      "mesh": "ClassicRole_Knight.002",
+      "original_triangles": 9304,
+      "optimized_triangles": 464,
+      "ratio_requested": 0.05,
+      "uv_layers": 1,
+      "materials": [
+        "Side_Inlay_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.000764745578635484,
+      "sampled_surface_error_mm_at_13cm": 0.07589077902155136
+    },
+    {
+      "node": "Mesh_Side_Surface_White",
+      "mesh": "SatinPlinth.005",
+      "original_triangles": 1148,
+      "optimized_triangles": 1148,
+      "ratio_requested": 1,
+      "uv_layers": 0,
+      "materials": [
+        "Side_Surface_White"
+      ],
+      "validation_repaired": false,
+      "sampled_surface_error_max": 0.0,
+      "sampled_surface_error_mm_at_13cm": 0.0
+    }
+  ],
+  "source_height": 1.3100000619888306,
+  "original_triangles": 44708,
+  "optimized_triangles": 4531,
+  "tangent_repairs": {
+    "zero": 0,
+    "orthogonalized": 3730
+  },
+  "geometry_sha256": "b6bffd36c49ed32dcfe3d84cedef5c107c44eb4e4bb3c6bfe7cdfd8b4835cfb2"
+}

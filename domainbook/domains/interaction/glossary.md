@@ -9,6 +9,10 @@ Duas hastes metálicas presas aos lados do tabuleiro no modo VR. Segurar uma
 com cada mão e afastar ou aproximar as mãos ajusta o tamanho em tempo real.
 Uma haste sozinha e o raio do HUD não redimensionam o jogo; soltar uma mão
 mantém o tamanho escolhido.
+Com mãos rastreadas, a pega aceita pinça ou fechamento dos quatro dedos
+sobre a haste. O fechamento usa a palma e só seleciona hastes; peças e HUD
+continuam usando a pinça. Interromper o rastreamento exige abrir antes de
+agarrar novamente.
 
 - **Aliases:** BoardScaleHandles, Hastes laterais, Ajuste com duas mãos
 - **Status:** draft
@@ -85,8 +89,12 @@ agarrar peças e apontar para o HUD no lugar do mouse.
 
 ## Raio de seleção
 
-Um raio que um controle de movimento projeta e que só aparece ao apontar
-para o painel do HUD, para clicar seus botões com o gatilho. Sobre um botão
+Um raio que um controle de movimento ou uma mão rastreada projeta e que só
+aparece ao apontar para o painel do HUD. Os controles clicam com o gatilho;
+as mãos usam a pinça de indicador e polegar, com o mesmo limiar da pega.
+Abrir a pinça sobre o botão conclui o clique. Perda de rastreamento, foco,
+pausa ou troca de modalidade cancelam a pressão pendente e exigem abrir
+antes de uma nova pinça. Sobre um botão
 ele aparece com brilho normal; com a mão vazia e apontando para o painel (com
 uma folga de 150 unidades em volta), aparece mais escuro, para orientar a
 mira. Não escolhe peças: elas são [agarradas e soltas](#agarrar-e-soltar) com
@@ -100,13 +108,33 @@ aciona o HUD que fica atrás nem mostra o raio ocioso.
 
 Escolher e jogar uma peça no modo VR com a mão, em vez de apontar. Segurar o
 gatilho do indicador perto de uma peça da vez a agarra (e seleciona, mostrando seus destinos
-legais); soltá-la sobre um destino legal faz a jogada. Soltar em qualquer
+legais); soltá-la devagar sobre um destino legal inicia uma colocação. Com
+mãos rastreadas, o lance é confirmado ao pousar nessa casa, mesmo quando a
+pinça abre mais acima. Arremessar mantém a peça sob a física sem lance. Soltar em qualquer
 outro lugar, inclusive fora do tabuleiro, é jogada inválida; soltar na própria
 casa apenas desfaz a seleção. Nesses dois casos a peça fica solta: cai, quica
 e pode ser arremessada como uma [peça solta](../presentation/glossary.md), e
-só volta à casa de origem depois de 3 segundos soltas. O controle
+só volta à casa de origem depois de 3 segundos sem contato da mão. O controle
 vibra de leve ao agarrar e ao soltar num lance aceito, e vibra mais forte e
 mais longo quando a jogada é recusada.
+
+Com mãos rastreadas, fechar a pinça um pouco antes de alcançar a peça também
+permite agarrá-la ao entrar no alcance próximo. A pinça usa somente o sinal
+de indicador e polegar, para os outros dedos fechados não prenderem a peça.
+A existência de qualquer pega física suspende o contato das duas mãos com
+peças; a peça segurada também atravessa as vizinhas sem derrubá-las. Após a
+última soltura, pares livres voltam a colidir e pares sobrepostos aguardam
+separação. Uma colocação lenta observa brevemente o pouso real na mesma casa
+legal, sem aceitar apoio persistente na palma ou atrair uma casa vizinha.
+Sem pega ativa, a mão aberta pode empurrar e derrubar peças;
+esse contato não escolhe uma peça nem faz um lance. A casa lógica permanece
+igual, mesmo quando a peça se desloca fisicamente. Uma segunda mão pinçada
+aguarda a primeira soltar, sem disputar a peça. O alvo mais próximo é
+preservado: uma peça proibida pela vez não atrai outra peça vizinha.
+Uma peça solta pode repousar e ser transportada na palma aberta; enquanto
+estiver em contato com a mão, a recuperação de três segundos aguarda sua
+saída. Perda de rastreamento, foco e pausa desarmam a pinça e exigem abrir
+a mão antes de agarrar novamente; não confirmam lance.
 
 - **Aliases:** Grab and release, Pegar e soltar
 - **Status:** draft

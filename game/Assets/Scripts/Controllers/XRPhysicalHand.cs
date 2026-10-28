@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Hands;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 // Contact poses are raw tracking/model-local data. Only the rendered skeleton
 // receives the contact offset; aiming, near casting and attach poses stay raw.
@@ -87,6 +88,7 @@ public sealed class XRPhysicalHand : MonoBehaviour
     private int clearSteps;
     private Pose rawSkeletonRoot;
     private bool hasSkeletonRoot;
+    private XRHandContactBody pieceContacts;
 
     public IReadOnlyList<XRPhysicsPusher> Contacts => contacts;
     public Vector3 VisualOffset { get; private set; }
@@ -114,6 +116,17 @@ public sealed class XRPhysicalHand : MonoBehaviour
             pusher.RearmAllowed = HandCanRearm;
             pusher.RearmRequired += ContactRearmRequired;
             contacts.Add(pusher);
+        }
+        var pieceBody = new GameObject(modelRoot.name + " Piece Contacts");
+        pieceBody.transform.SetParent(physicsParent, false);
+        pieceContacts = pieceBody.AddComponent<XRHandContactBody>();
+        pieceContacts.Configure(this, origin);
+        Transform selectionRoot = handInteractor != null ? handInteractor.transform : modelRoot.parent;
+        if (selectionRoot != null)
+        {
+            XRBaseInteractor selector = selectionRoot.GetComponentInChildren<NearFarInteractor>(true);
+            if (selector == null) selector = selectionRoot.GetComponentInChildren<XRDirectInteractor>(true);
+            pieceContacts.BindSelection(selector);
         }
     }
 
@@ -253,33 +266,56 @@ public sealed class XRPhysicalHand : MonoBehaviour
     private void UpdateVisual()
     {
         if (!configured || visualRoot == null) return;
-        Vector3 offset = Vector3.zero;
-        // Button faces on this panel are parallel. The greatest correction also
-        // keeps the other contact samples outside their actual cap faces.
+        Pose rawPalm = Pose.identity, drawnPalm = Pose.identity;
+        // A failed query returns no correction, including after focus/tracking
+        // loss or whenever a grab makes both hands neutral.
+        if (pieceContacts == null || !pieceContacts.TryGetSupportVisualPose(out rawPalm, out drawnPalm))
+            rawPalm = drawnPalm = Pose.identity;
+        Quaternion rotation = drawnPalm.rotation * Quaternion.Inverse(rawPalm.rotation);
+        Vector3 buttonOffset = Vector3.zero;
+        // Resolve the visible cap faces after the support candidate, so carrying
+        // a piece cannot undo the finger's stop at a physical button.
         for (int i = 0; i < contacts.Count; i++)
-            if (contacts[i] != null && contacts[i].TryGetVisualOffset(out Vector3 candidate) &&
-                candidate.sqrMagnitude > offset.sqrMagnitude) offset = candidate;
-        ApplyVisualOffset(offset);
+        {
+            XRPhysicsPusher contact = contacts[i];
+            if (contact == null || contact.ContactButton == null || !contact.TryReadPose(out Pose point)) continue;
+            Vector3 transformed = drawnPalm.position + rotation * (point.position - rawPalm.position);
+            Vector3 existing = transformed - point.position + buttonOffset;
+            if (contact.TryGetVisualOffset(existing, out Vector3 candidate)) buttonOffset += candidate;
+        }
+        ApplyVisualPose(rawPalm, drawnPalm, rotation, buttonOffset);
     }
 
     private void ApplyVisualOffset(Vector3 offset)
+        => ApplyVisualPose(Pose.identity, Pose.identity, Quaternion.identity, offset);
+
+    private void ApplyVisualPose(Pose rawPalm, Pose drawnPalm, Quaternion rotation, Vector3 buttonOffset)
     {
+        Transform renderedRoot = skeleton != null ? skeleton.rootTransform : visualRoot;
+        if (renderedRoot == null) return;
+        if (skeleton != null && !hasSkeletonRoot)
+        {
+            VisualOffset = Vector3.zero;
+            skeleton.ResetRootPoseOffset();
+            return;
+        }
+        Transform parent = renderedRoot.parent;
+        Vector3 localPosition = skeleton != null ? rawSkeletonRoot.position : baseLocalPosition;
+        Quaternion localRotation = skeleton != null ? rawSkeletonRoot.rotation : baseLocalRotation;
+        Vector3 rawPosition = parent != null ? parent.TransformPoint(localPosition) : localPosition;
+        Quaternion rawRotation = parent != null ? parent.rotation * localRotation : localRotation;
+        Vector3 target = drawnPalm.position + rotation * (rawPosition - rawPalm.position) + buttonOffset;
+        Vector3 offset = target - rawPosition;
         VisualOffset = offset;
         if (skeleton != null && skeleton.rootTransform != null)
         {
             if (offset.sqrMagnitude > 0f) skeleton.ApplyRootPoseOffset(offset);
             else skeleton.ResetRootPoseOffset();
-            if (hasSkeletonRoot)
-            {
-                Transform parent = skeleton.rootTransform.parent;
-                Vector3 localOffset = parent != null ? parent.InverseTransformVector(offset) : offset;
-                skeleton.rootTransform.localPosition = rawSkeletonRoot.position + localOffset;
-            }
+            renderedRoot.SetPositionAndRotation(target, rotation * rawRotation);
         }
         else if (visualRoot != null)
         {
-            Transform parent = visualRoot.parent;
-            visualRoot.localPosition = baseLocalPosition + (parent != null ? parent.InverseTransformVector(offset) : offset);
+            visualRoot.SetPositionAndRotation(target, rotation * rawRotation);
         }
     }
 
@@ -296,6 +332,7 @@ public sealed class XRPhysicalHand : MonoBehaviour
         resettingContacts = true;
         try
         {
+            if (pieceContacts != null) pieceContacts.RequireRearm();
             for (int i = 0; i < contacts.Count; i++)
                 if (contacts[i] != null) contacts[i].DisarmForHand(retainVisualContact);
         }
@@ -316,6 +353,7 @@ public sealed class XRPhysicalHand : MonoBehaviour
     private void OnDestroy()
     {
         UnsubscribeHandEvents();
+        if (pieceContacts != null) Destroy(pieceContacts.gameObject);
         for (int i = 0; i < contacts.Count; i++)
             if (contacts[i] != null)
             {

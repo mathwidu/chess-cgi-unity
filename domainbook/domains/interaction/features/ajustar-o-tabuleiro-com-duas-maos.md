@@ -27,6 +27,18 @@ Example: Uma mão sozinha não altera o tamanho
   When o jogador puxa essa haste
   Then o tamanho continua igual
 
+Example: Mão fechada também segura uma haste próxima
+  Given as mãos rastreadas estão abertas e perto das hastes
+  When o jogador fecha os quatro dedos de uma mão sobre uma haste
+  Then essa haste é agarrada mesmo sem pinça de indicador e polegar
+  And somente fechar a outra mão sobre a outra haste permite redimensionar
+
+Example: Fechar os outros dedos não agarra peças nem pressiona o menu
+  Given uma mão rastreada está com a pinça aberta
+  When o jogador fecha a mão perto de uma peça ou aponta para um botão do HUD
+  Then a mão fechada não seleciona a peça nem pressiona o botão
+  And as peças e o menu continuam usando somente a pinça de indicador e polegar
+
 Example: Mover as duas mãos juntas não desloca o jogo
   Given ambas as hastes estão agarradas
   When as mãos se deslocam sem alterar sua distância lateral
@@ -36,6 +48,15 @@ Example: Mover as duas mãos juntas não desloca o jogo
 As hastes usam seleção de proximidade. O raio do HUD não as seleciona. Duas
 entradas do mesmo lado, mesmo que uma seja controle e a outra mão rastreada,
 não contam como duas mãos.
+
+Com mãos rastreadas, as hastes aceitam pinça ou mão fechada. O fechamento usa
+a menor curvatura total entre indicador, médio, anelar e mínimo: todos devem
+estar fechados para iniciar. A palma determina a posição da mão nessa pega,
+sem exigir a pose de pinça nem o rastreamento do polegar. Uma pinça já segura
+na haste pode passar a mão fechada preservando seu ponto de pega. Abrir a
+pinça e desfazer o fechamento solta a haste. Esse gesto adicional só pode
+selecionar a própria haste de ajuste; o leitor de pinça das peças e do menu
+permanece o mesmo.
 
 ## Rule: Soltar ou interromper o rastreamento encerra o gesto
 
@@ -51,6 +72,13 @@ Example: Uma pose inválida não causa um salto de escala
   When há perda de rastreamento, pausa, perda de foco ou recentralização
   Then o ajuste para sem mudar o tamanho para uma pose inválida
   And o jogador precisa soltar e agarrar novamente para continuar
+
+Example: Voltar para mãos rastreadas com o punho fechado não retoma o ajuste
+  Given uma mão fechada estava segurando a haste
+  When o rastreamento, foco, pausa ou modalidade de entrada interrompe a pega
+  Then o tamanho atual é mantido
+  And voltar com a mão ainda fechada não readquire a haste
+  And abrir as mãos rastreadas permite uma nova pega
 ```
 
 Menu, promoção, jogadas em animação, turno da IA e uma peça selecionada ou
@@ -72,4 +100,5 @@ Veja os limites e o contato com a mesa em
 
 ## Open Questions
 
-Conforto, alcance e estabilidade ainda precisam de uma sessão com headset real.
+Conforto, alcance, o limiar de fechamento dos quatro dedos e estabilidade
+ainda precisam de uma sessão com headset real.
