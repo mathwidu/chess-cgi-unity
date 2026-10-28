@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -24,6 +25,8 @@ public static class XRHudVerification
         HoldButton,
         ReleaseButton,
         VerifyClick,
+        CheckUnblockedRay,
+        CheckBlockedRay,
     }
 
     private static Stage stage;
@@ -32,6 +35,11 @@ public static class XRHudVerification
     private static NearFarInteractor interactor;
     private static GameObject startPlayButton;
     private static GameObject startOverlay;
+    private static GameObject newGameButton;
+    private static GameObject rayBlocker;
+    private static int stageStartFrame;
+    // Above the board, so only the test blocker can stand between the hand and the HUD.
+    private static readonly Vector3 HighAimOrigin = new Vector3(0.25f, 1.3f, -0.5f);
     private static readonly XRVerificationResult result = new XRVerificationResult();
 
     static XRHudVerification()
@@ -129,6 +137,36 @@ public static class XRHudVerification
                     return;
                 }
 
+                VerifyStartClick();
+                BeginRayGuardCheck();
+                return;
+
+            case Stage.CheckUnblockedRay:
+                if (Time.frameCount - stageStartFrame < HoldSimFrames)
+                {
+                    return;
+                }
+
+                CheckRayHitsNewGame(true);
+                // A collider between the hand and the HUD must stop the ray, like the board and table do.
+                rayBlocker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                rayBlocker.name = "HudRayBlocker";
+                rayBlocker.transform.position = Vector3.Lerp(HighAimOrigin, GetRectWorldCenter((RectTransform)newGameButton.transform), 0.3f);
+                rayBlocker.transform.localScale = Vector3.one * 0.3f;
+                // Batch frames can outrun the physics step; register the moved collider now.
+                Physics.SyncTransforms();
+                stageStartFrame = Time.frameCount;
+                stage = Stage.CheckBlockedRay;
+                return;
+
+            case Stage.CheckBlockedRay:
+                if (Time.frameCount - stageStartFrame < HoldSimFrames)
+                {
+                    return;
+                }
+
+                CheckRayHitsNewGame(false);
+                Object.Destroy(rayBlocker);
                 ReportAndStop();
                 return;
         }
@@ -240,14 +278,69 @@ public static class XRHudVerification
         }
     }
 
-    private static void ReportAndStop()
+    private static void VerifyStartClick()
     {
         LogUiModel("afterRelease");
         bool startOverlayHiddenAfterClick = startOverlay != null && !startOverlay.activeSelf;
         Debug.Log("CHESS_CGI_XR_HUD_CHECK " +
             $"startOverlayHiddenAfterClick={startOverlayHiddenAfterClick}");
         result.Check(startOverlayHiddenAfterClick, "the start overlay should hide after the button click completes");
+    }
 
+    // The HUD hangs behind the board: decorative panels must not catch the ray, and board,
+    // pieces and table must block it before it reaches a HUD button.
+    private static void BeginRayGuardCheck()
+    {
+        GameHud hud = Object.FindFirstObjectByType<GameHud>();
+        TrackedDeviceGraphicRaycaster raycaster = hud.GetComponent<TrackedDeviceGraphicRaycaster>();
+        Transform turnPanel = hud.transform.Find("HudRoot/MatchInterface/TurnPanel");
+        Transform tabletop = Object.FindFirstObjectByType<TableView>()?.transform.Find("Top/Tabletop");
+        newGameButton = GameObject.Find("NewGameButton");
+        bool occludes = raycaster != null && raycaster.checkFor3DOcclusion && raycaster.blockingMask.value == ~0;
+        bool panelIgnoresRay = turnPanel != null && !turnPanel.GetComponent<Image>().raycastTarget;
+        bool buttonTakesRay = newGameButton != null && newGameButton.GetComponent<Image>().raycastTarget;
+        bool tableBlocks = tabletop != null && tabletop.GetComponent<Collider>() != null;
+        Debug.Log("CHESS_CGI_XR_HUD_CHECK rayGuard " +
+            $"occlusion={occludes} panelIgnoresRay={panelIgnoresRay} buttonTakesRay={buttonTakesRay} tableBlocks={tableBlocks}");
+        result.Check(occludes, "the HUD raycaster should check 3D occlusion against every layer");
+        result.Check(panelIgnoresRay, "decorative HUD panels should not catch the VR ray");
+        result.Check(buttonTakesRay, "HUD buttons should still take the VR ray");
+        result.Check(tableBlocks, "the tabletop should have a collider that blocks the ray");
+
+        if (newGameButton == null)
+        {
+            ReportAndStop();
+            return;
+        }
+
+        AimControllerAt(GetRectWorldCenter((RectTransform)newGameButton.transform), HighAimOrigin);
+        stageStartFrame = Time.frameCount;
+        stage = Stage.CheckUnblockedRay;
+    }
+
+    private static void CheckRayHitsNewGame(bool expectHit)
+    {
+        // Cast straight through the HUD raycaster: the UI module only recasts a device that moved,
+        // so a still, scripted controller would report a stale result.
+        TrackedDeviceGraphicRaycaster raycaster = Object.FindFirstObjectByType<GameHud>().GetComponent<TrackedDeviceGraphicRaycaster>();
+        Vector3 target = GetRectWorldCenter((RectTransform)newGameButton.transform);
+        var eventData = new TrackedDeviceEventData(EventSystem.current)
+        {
+            rayPoints = new List<Vector3> { HighAimOrigin, HighAimOrigin + (target - HighAimOrigin) * 1.5f },
+            layerMask = ~0
+        };
+        var hits = new List<RaycastResult>();
+        raycaster.Raycast(eventData, hits);
+        GameObject hit = hits.Count > 0 ? hits[0].gameObject : null;
+        bool hitsButton = hits.Exists(result => result.gameObject == newGameButton);
+        Debug.Log($"CHESS_CGI_XR_HUD_CHECK rayToNewGame blocker={!expectHit} hit={(hit != null ? hit.name : "none")}");
+        result.Check(hitsButton == expectHit, expectHit
+            ? "an unobstructed ray should reach the Nova partida button"
+            : "a collider in front of the HUD should stop the ray before the Nova partida button");
+    }
+
+    private static void ReportAndStop()
+    {
         result.LogSummary("CHESS_CGI_XR_HUD_CHECK");
         SessionState.SetInt(ExitCodeKey, result.Passed ? 0 : 1);
         EditorApplication.update -= Tick;
@@ -258,6 +351,11 @@ public static class XRHudVerification
     }
 
     private static void AimControllerAt(Vector3 worldTarget)
+    {
+        AimControllerAt(worldTarget, XRRig.SeatEyePosition + new Vector3(0.25f, -0.2f, 0.1f));
+    }
+
+    private static void AimControllerAt(Vector3 worldTarget, Vector3 aimOrigin)
     {
         GameObject controllerObject = GameObject.Find("Right Controller");
         if (controllerObject == null)
@@ -271,7 +369,6 @@ public static class XRHudVerification
             poseDriver.enabled = false;
         }
 
-        Vector3 aimOrigin = XRRig.SeatEyePosition + new Vector3(0.25f, -0.2f, 0.1f);
         controllerObject.transform.SetPositionAndRotation(
             aimOrigin,
             Quaternion.LookRotation((worldTarget - aimOrigin).normalized, Vector3.up));
@@ -297,6 +394,8 @@ public static class XRHudVerification
 
         EditorApplication.update -= WaitForEditModeThenExit;
         SessionState.SetBool(DoneKey, false);
+        // A batch run exits here without a domain reload; restore the simulator setting now.
+        XRSimulatorSetup.SetAutomaticInstantiate(false);
         EditorApplication.Exit(SessionState.GetInt(ExitCodeKey, 1));
     }
 }

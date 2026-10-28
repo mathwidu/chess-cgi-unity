@@ -74,8 +74,9 @@ public sealed class TableView : MonoBehaviour
 
         top = new GameObject("Top").transform;
         top.SetParent(transform, false);
+        // The top keeps its collider so it blocks the VR ray from reaching the HUD behind it.
         ScenePolish.CreateCube(top, "Tabletop", new Vector3(0f, -TopThickness * 0.5f, 0f),
-            new Vector3(TopSize, TopThickness, TopSize), topMaterial, false);
+            new Vector3(TopSize, TopThickness, TopSize), topMaterial, true);
         // A recessed band under the top reads as a shadow line, so the top looks thin and crisp.
         ScenePolish.CreateCube(top, "EdgeReveal", new Vector3(0f, -TopThickness - RevealThickness * 0.5f, 0f),
             new Vector3(TopSize - 0.04f, RevealThickness, TopSize - 0.04f), frameMaterial, false);

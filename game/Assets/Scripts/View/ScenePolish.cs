@@ -8,8 +8,11 @@ public sealed class ScenePolish : MonoBehaviour
 
     [SerializeField] private bool applyOnAwake = true;
 
+    private bool builtForHeadset;
+
     public void ApplyPolish()
     {
+        builtForHeadset = XRRig.IsHeadsetPresent;
         Transform collegeTheme = EnsureChildRoot(CollegeThemeName);
         Transform lightingRig = EnsureChildRoot(LightingRigName);
 
@@ -27,6 +30,16 @@ public sealed class ScenePolish : MonoBehaviour
         if (applyOnAwake)
         {
             ApplyPolish();
+        }
+    }
+
+    private void Update()
+    {
+        // XR can come up after Awake (the XR simulator does); refit the room to the mode in use.
+        if (Application.isPlaying && XRRig.IsHeadsetPresent != builtForHeadset)
+        {
+            builtForHeadset = XRRig.IsHeadsetPresent;
+            BuildCollegeTheme(EnsureChildRoot(CollegeThemeName));
         }
     }
 

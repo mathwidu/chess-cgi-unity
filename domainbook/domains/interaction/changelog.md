@@ -90,6 +90,13 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- O [raio de seleção](glossary.md) não gruda mais no HUD do fundo em VR.
+  Antes, o raio atravessava o tabuleiro e a mesa e pegava os painéis do HUD
+  a 4 m; às vezes acionava Nova partida ou Menu ao mirar numa peça. Agora só
+  os botões do HUD recebem o raio, e tabuleiro, peças e mesa o barram. A
+  correção está no HUD e na mesa (ver o changelog de
+  [apresentação](../presentation/changelog.md)).
+
 - O [raio de seleção](glossary.md) dos controles voltou a ser desenhado. Ele
   passou a usar um `CurveVisualController` (com `LineRenderer`) em vez de um
   `XRInteractorLineVisual`, que exigia um componente `ILineRenderable` que o

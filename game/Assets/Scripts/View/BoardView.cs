@@ -22,6 +22,7 @@ public sealed class BoardView : MonoBehaviour
     private readonly List<SquareView> squares = new List<SquareView>();
     private readonly List<PieceView> pieces = new List<PieceView>();
     private float surfaceOffset;
+    private TurnIndicatorView turnIndicator;
 
     public float SquareSize => squareSize;
     public float PieceBaseHeight => pieceBaseHeight;
@@ -29,6 +30,7 @@ public sealed class BoardView : MonoBehaviour
     public IReadOnlyList<PieceView> Pieces => pieces;
     public int HighlightCount => highlightsRoot == null ? 0 : highlightsRoot.childCount;
     public Transform BoardFrameRoot => boardFrameRoot;
+    public TurnIndicatorView TurnIndicator => turnIndicator;
 
     public void Configure(
         Transform squaresParent,
@@ -112,6 +114,7 @@ public sealed class BoardView : MonoBehaviour
         squares.Clear();
 
         BuildBoardFrame();
+        EnsureTurnIndicator();
 
         for (int rank = 1; rank <= 8; rank++)
         {
@@ -203,6 +206,22 @@ public sealed class BoardView : MonoBehaviour
         squaresRoot = EnsureChildRoot(squaresRoot, "Squares");
         piecesRoot = EnsureChildRoot(piecesRoot, "Pieces");
         highlightsRoot = EnsureChildRoot(highlightsRoot, "Highlights");
+    }
+
+    private void EnsureTurnIndicator()
+    {
+        if (turnIndicator != null)
+        {
+            return;
+        }
+
+        Transform root = EnsureChildRoot(null, "TurnIndicator");
+        turnIndicator = root.GetComponent<TurnIndicatorView>();
+        if (turnIndicator == null)
+        {
+            turnIndicator = root.gameObject.AddComponent<TurnIndicatorView>();
+            turnIndicator.Build(squareSize);
+        }
     }
 
     private void BuildBoardFrame()

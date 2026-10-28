@@ -69,6 +69,17 @@ máximo, e a escolha é persistida. A câmera nunca acompanha a mesa.
 - **Aliases:** Table, TableView, Altura da mesa, Table height
 - **Status:** validated
 
+## Indicador de turno
+
+Um sinal discreto, junto do tabuleiro, de quem joga agora. É uma luz fina que
+corre uma vez pela borda do tabuleiro do lado a jogar, amarela quando a vez é
+do jogador e clara e neutra quando a IA pensa. Uma etiqueta curta no tampo
+("Sua vez", "Vez das brancas", "IA pensando...") aparece e some sozinha. Fica
+oculto no menu e no fim da partida.
+
+- **Aliases:** Turn indicator, TurnIndicatorView, Luz de turno
+- **Status:** validated
+
 ## Tela de resultado
 
 O diálogo do HUD que anuncia o [resultado da partida](../gameplay/glossary.md)
