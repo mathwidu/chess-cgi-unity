@@ -1,6 +1,16 @@
 # Quest 3 standalone
 
-## Comparação instalada — escala 0,65
+## Estado dos fontes em 28/10/2026
+
+A branch de trabalho é `codex/quest3-standalone-offline-ai`. Ela contém o
+candidato **v0.1.4-ui.2**, com cenário a 65% e HUD independente; a aceitação
+física desse candidato permanece pendente. A estável de exposição e o
+perfil de 65% aprovado têm tags próprias. Consulte o
+[registro de integração e recuperação](quest3-git-checkpoints-20261028.md)
+para os commits, APKs e diferenças de aceite. As seções abaixo preservam o
+histórico dos testes e das instalações.
+
+## Perfil de trabalho aprovado — escala 0,65
 
 Por solicitação do usuário, em 26/10/2026 às 19h46 foi instalada uma
 comparação com escala **0,65**, mantendo MSAA **4×**, foveation 0,5 e o
@@ -13,7 +23,7 @@ Hash do APK instalado conferido:
 `4d96b00eef2223983f2ce470c5b3a93fa87321c29b926b22f06194559961ab95`.
 São cerca de 34% menos pixels que em 0,80. Isso não comprova ganho
 proporcional de FPS. O usuário confirmou **fluidez e imagem aceitável**;
-0,65 permanece como perfil de trabalho instalado. As duas tentativas de
+0,65 permanece como perfil de trabalho. As duas tentativas de
 medição foram interrompidas e não comprovam FPS sustentado. Cópia e recuperação em
 `Builds/Quest3/comparison-20261026-scale065/`. A estável abaixo permanece
 preservada, e `quest3-stable.json` continua apontando para o APK aceito.

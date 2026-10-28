@@ -135,6 +135,27 @@ public sealed class VrHudPointingTests
         }
     }
 
+    [UnityTest]
+    public IEnumerator UntrackedControllersAndHandsDrawNoRayFromTheRig()
+    {
+        headset = InputSystem.AddDevice("XRHMD");
+        EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/Main.unity", new LoadSceneParameters(LoadSceneMode.Single));
+        yield return null;
+        if (Object.FindFirstObjectByType<XRRig>() == null)
+            new GameObject("Untracked rig test bootstrap").AddComponent<XRRig>();
+        yield return null;
+        yield return null;
+
+        Assert.That(XRRig.Origin, Is.Not.Null);
+        Transform offset = XRRig.Origin.Find("Camera Offset");
+        foreach (string name in new[] { "Left Controller", "Right Controller", "LeftHandInteractor", "RightHandInteractor" })
+        {
+            Transform interactor = offset.Find(name);
+            Assert.That(interactor, Is.Not.Null, name);
+            Assert.That(interactor.gameObject.activeSelf, Is.False, $"{name} and its ray stay off until it is tracked.");
+        }
+    }
+
     [UnityTearDown]
     public IEnumerator TearDownScene()
     {

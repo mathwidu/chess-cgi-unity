@@ -414,6 +414,16 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Fixed
 
+- Uma peça arremessada longe volta para a casa com a base sobre o tabuleiro:
+  ao fim da volta, o `ThrowablePiece` também grava a pose no `Rigidbody`. Com
+  interpolação ligada, a Unity podia ignorar a última escrita no transform e
+  deixar a peça presa pouco antes da casa, afundada até a mesa (visto no HTC
+  Vive com um cavalo). O defeito não se reproduziu nos testes do editor.
+  Na integração Quest de 28/10, essa correção conserva o corpo dinâmico em
+  repouso, disponível para novo contato das mãos. O teste incorporado confere
+  pose visual e física, orientação, repouso e ausência de jogada; não exige
+  tornar a peça cinemática após o retorno.
+
 - No VR, o raio do controle não gruda mais nos botões (como Descer): o
   `XRUIInputModule` não tinha câmera (`uiCamera`), e no VR não há
   `Camera.main`. Sem câmera, o módulo descartava o resultado "nenhum acerto" e

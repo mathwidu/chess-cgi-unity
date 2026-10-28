@@ -233,6 +233,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
   já rastreada e transições. O usuário confirmou um único par nos dois modos
   no Quest 3 após reinstalar o APK em 21/10/2026.
 
+- Controles e mãos sem rastreamento ficam desligados ao iniciar, e o
+  [raio de seleção](glossary.md) deles não aparece mais parado na altura dos
+  olhos (visto no HTC Vive). O gerenciador de modalidade era ativado antes de
+  receber as referências dos controles e das mãos, e por isso não desligava
+  os que não estavam rastreados. Na integração Quest de 28/10, a raiz
+  `Camera Offset` continua inativa até configurar todas as referências;
+  o teste remoto de ausência de raios foi incorporado a essa inicialização.
+
 - O alcance próximo das mãos rastreadas inclui a camada das peças do jogo.
   Os prefabs só consultavam a camada padrão, deixando as peças fora da detecção;
   o rig agora consulta só peças e hastes nos dois lados, com raio de 6 cm,
