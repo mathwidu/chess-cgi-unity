@@ -45,6 +45,21 @@
       box.textContent = message;
       box.style.display = 'block';
     }
+    // Match the site's dense-screen policy; keep the buffer bounded on large screens.
+    // Unity's automatic sizing is disabled so rotation/fullscreen can update both axes.
+    function resizeCanvas() {
+      const { width, height } = canvas.getBoundingClientRect();
+      if (width <= 0 || height <= 0) return 1;
+      const density = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(3_000_000 / (width * height)));
+      const pixelsWide = Math.max(1, Math.floor(width * density));
+      const pixelsHigh = Math.max(1, Math.floor(height * density));
+      if (canvas.width !== pixelsWide) canvas.width = pixelsWide;
+      if (canvas.height !== pixelsHigh) canvas.height = pixelsHigh;
+      return density;
+    }
+    const density = resizeCanvas();
+    new ResizeObserver(resizeCanvas).observe(canvas);
+    window.addEventListener('resize', resizeCanvas);
     const config = {
       dataUrl: 'Build/{{{ DATA_FILENAME }}}',
       frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}',
@@ -53,8 +68,8 @@
       companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
       productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
       productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
-      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 1.25),
-      matchWebGLToCanvasSize: true,
+      devicePixelRatio: density,
+      matchWebGLToCanvasSize: false,
       showBanner(message, type) {
         if (type === 'error') {
           console.error(message);

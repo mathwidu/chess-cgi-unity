@@ -16,7 +16,6 @@ public sealed class WebRuntimeProfile : MonoBehaviour
     private double sampleStart;
     private int frames;
     private bool diagnostics;
-    private int slowSamples;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")] private static extern void ChessWebPublishState(string json);
@@ -34,7 +33,7 @@ public sealed class WebRuntimeProfile : MonoBehaviour
         {
             pipeline = Instantiate(source);
             pipeline.name = "Web runtime profile";
-            pipeline.renderScale = Application.isMobilePlatform ? .85f : 1;
+            pipeline.renderScale = 1;
             QualitySettings.renderPipeline = pipeline;
         }
         Application.targetFrameRate = Application.isMobilePlatform ? 30 : 60;
@@ -53,17 +52,14 @@ public sealed class WebRuntimeProfile : MonoBehaviour
         sampleStart = now;
         frames = 0;
         nextSample = now + 1;
-        // Sustained slow frames lower pixel cost only; keep the characters and gameplay.
-        if (pipeline != null && elapsed > .5 && Application.isFocused)
-        {
-            slowSamples = fps < 26 ? slowSamples + 1 : 0;
-            if (slowSamples >= 4)
-            {
-                pipeline.renderScale = Mathf.Max(.65f, pipeline.renderScale - .1f);
-                slowSamples = 0;
-            }
-        }
-        if (diagnostics && controller != null && board != null) Publish(fps);
+        RecordFrameSample(fps, elapsed, Application.isFocused);
+    }
+
+    private void RecordFrameSample(float fps, double elapsed, bool focused)
+    {
+        // FPS alone does not identify GPU pressure. Keep character detail stable;
+        // the player's existing performance mode remains an explicit choice.
+        if (diagnostics && controller != null && board != null) Publish(fps, elapsed, focused);
     }
 
     public void OnWebVisibility(string hidden)
@@ -71,10 +67,9 @@ public sealed class WebRuntimeProfile : MonoBehaviour
         if (controller != null) controller.SendMessage("OnApplicationPause", hidden == "1", SendMessageOptions.DontRequireReceiver);
         sampleStart = Time.realtimeSinceStartupAsDouble;
         frames = 0;
-        slowSamples = 0;
     }
 
-    private void Publish(float fps)
+    private void Publish(float fps, double elapsed, bool focused)
     {
         var state = new State
         {
@@ -83,7 +78,7 @@ public sealed class WebRuntimeProfile : MonoBehaviour
             promotion = controller.IsAwaitingPromotion, classic = controller.PerformanceMode,
             moves = controller.MoveHistory.Count, status = controller.StatusMessage,
             selected = controller.SelectedPiece == null ? "" : controller.SelectedPiece.Square.ToAlgebraic(),
-            turn = controller.CurrentTurn.ToString(), fps = fps,
+            turn = controller.CurrentTurn.ToString(), fps = fps, sampleSeconds = (float)elapsed, focused = focused,
             renderScale = pipeline == null ? 1 : pipeline.renderScale,
             width = Screen.width, height = Screen.height, pieces = board.Pieces.Count,
             heapBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong()
@@ -127,10 +122,10 @@ public sealed class WebRuntimeProfile : MonoBehaviour
     [Serializable] private sealed class Point { public string name, label; public float x, y; }
     [Serializable] private sealed class State
     {
-        public bool menu, thinking, error, blocked, promotion, classic;
+        public bool menu, thinking, error, blocked, promotion, classic, focused;
         public int moves, width, height, pieces;
         public string status, selected, turn;
-        public float fps, renderScale;
+        public float fps, renderScale, sampleSeconds;
         public long heapBytes;
         public List<Point> cells = new List<Point>();
         public List<Point> targets = new List<Point>();
