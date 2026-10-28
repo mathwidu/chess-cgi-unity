@@ -109,6 +109,19 @@ public sealed class ChessRulesAdapter
             captured);
     }
 
+    public BoardSquare? FindKing(ChessSide side)
+    {
+        foreach (VisualPieceState piece in GetPieces())
+        {
+            if (piece.Kind == ChessPieceKind.King && piece.Side == side)
+            {
+                return piece.Square;
+            }
+        }
+
+        return null;
+    }
+
     // Material on the board, White minus Black; promotions count as the piece they became.
     public int GetMaterialBalance()
     {

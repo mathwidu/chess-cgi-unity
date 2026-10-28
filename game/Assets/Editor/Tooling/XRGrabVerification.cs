@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Interactors.Casters;
@@ -248,6 +249,12 @@ public static class XRGrabVerification
             result.Check(selectPath.EndsWith("triggerButton"), $"{controllerName} should select with the index trigger, got {selectPath}");
             result.Check((far.raycastMask.value & (1 << PieceView.PhysicsLayer)) == 0 && far.raycastMask.value != 0, $"{controllerName} far ray should skip the pieces layer but still reach the HUD");
             result.Check(visual.curveInteractionDataProvider is UiOnlyCurveData, $"{controllerName} ray should only show over the HUD");
+            HapticImpulsePlayer haptics = controller.GetComponent<HapticImpulsePlayer>();
+            string hapticPath = haptics != null && haptics.hapticOutput.inputAction != null && haptics.hapticOutput.inputAction.bindings.Count > 0
+                ? haptics.hapticOutput.inputAction.bindings[0].path : "none";
+            result.Check(haptics != null && haptics.hapticOutput.inputSourceMode == XRInputHapticImpulseProvider.InputSourceMode.InputAction,
+                $"{controllerName} should vibrate through a bound haptic action");
+            result.Check(hapticPath.EndsWith("{Haptic}"), $"{controllerName} haptics should target the controller's haptic output, got {hapticPath}");
         }
 
         foreach (string handName in new[] { "LeftHandInteractor", "RightHandInteractor" })

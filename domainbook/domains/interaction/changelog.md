@@ -10,6 +10,14 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- Vibração no [agarrar e soltar](glossary.md): o `XRRig` põe um
+  `HapticImpulsePlayer` em cada controle, ligado direto à saída de vibração
+  do OpenXR (`<XRController>{mão}/{Haptic}`), porque o rig é montado em
+  código sem asset de input. O `VrSelectionBridge` vibra de leve ao agarrar
+  (0,3 × 40 ms) e ao soltar num lance aceito (0,5 × 70 ms), e forte e longo
+  quando a jogada é recusada (0,85 × 200 ms). O `XRGrabVerification` confere
+  essa ligação nos dois controles.
+
 - Pacotes de XR (XR Plugin Management, OpenXR Plugin, XR Interaction Toolkit)
   resolvidos no projeto para a fase de conversão para VR no HTC Vive; veja
   [ADR-0001](decisions/0001-usar-openxr-e-o-xr-interaction-toolkit-para-o-modo-vr.md).

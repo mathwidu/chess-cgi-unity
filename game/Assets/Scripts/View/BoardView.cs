@@ -3,6 +3,13 @@ using UnityEngine;
 
 public sealed class BoardView : MonoBehaviour
 {
+    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+    // Tints blended into the square's own color, so light and dark squares stay readable.
+    private static readonly Color LastMoveTint = new Color32(255, 221, 0, 255);
+    private const float LastMoveWeight = 0.35f;
+    private static readonly Color CheckTint = new Color(0.92f, 0.12f, 0.08f);
+    private const float CheckWeight = 0.65f;
+
     [SerializeField] private float squareSize = 1.25f;
     [SerializeField] private float pieceBaseHeight = 0.08f;
     [Header("Desktop")]
@@ -24,6 +31,10 @@ public sealed class BoardView : MonoBehaviour
     private float surfaceOffset;
     private TurnIndicatorView turnIndicator;
     private CapturedPiecesView capturedPieces;
+    private BoardSounds sounds;
+    private BoardSquare? lastMoveFrom;
+    private BoardSquare? lastMoveTo;
+    private BoardSquare? checkSquare;
 
     public float SquareSize => squareSize;
     public float PieceBaseHeight => pieceBaseHeight;
@@ -33,6 +44,10 @@ public sealed class BoardView : MonoBehaviour
     public Transform BoardFrameRoot => boardFrameRoot;
     public TurnIndicatorView TurnIndicator => turnIndicator;
     public CapturedPiecesView CapturedPieces => capturedPieces;
+    public BoardSounds Sounds => sounds;
+    public BoardSquare? LastMoveFrom => lastMoveFrom;
+    public BoardSquare? LastMoveTo => lastMoveTo;
+    public BoardSquare? CheckSquare => checkSquare;
 
     public void Configure(
         Transform squaresParent,
@@ -114,10 +129,14 @@ public sealed class BoardView : MonoBehaviour
         ClearChildren(squaresRoot);
         ClearChildren(highlightsRoot);
         squares.Clear();
+        lastMoveFrom = null;
+        lastMoveTo = null;
+        checkSquare = null;
 
         BuildBoardFrame();
         EnsureTurnIndicator();
         EnsureCapturedPieces();
+        EnsureSounds();
 
         for (int rank = 1; rank <= 8; rank++)
         {
@@ -183,6 +202,44 @@ public sealed class BoardView : MonoBehaviour
         }
     }
 
+    public void MarkLastMove(BoardSquare from, BoardSquare to)
+    {
+        lastMoveFrom = from;
+        lastMoveTo = to;
+        RefreshSquareTints();
+    }
+
+    public void MarkCheck(BoardSquare? king)
+    {
+        checkSquare = king;
+        RefreshSquareTints();
+    }
+
+    private void RefreshSquareTints()
+    {
+        var properties = new MaterialPropertyBlock();
+        foreach (SquareView squareView in squares)
+        {
+            BoardSquare square = squareView.Square;
+            Renderer renderer = squareView.GetComponent<Renderer>();
+            bool inCheck = checkSquare.HasValue && checkSquare.Value.Equals(square);
+            bool lastMove = (lastMoveFrom.HasValue && lastMoveFrom.Value.Equals(square)) ||
+                (lastMoveTo.HasValue && lastMoveTo.Value.Equals(square));
+            if (!inCheck && !lastMove)
+            {
+                renderer.SetPropertyBlock(null);
+                continue;
+            }
+
+            Material material = renderer.sharedMaterial;
+            Color baseColor = material != null && material.HasProperty(BaseColorId) ? material.GetColor(BaseColorId) : Color.white;
+            // The king in check wins over the last-move tint on the same square.
+            Color tinted = inCheck ? Color.Lerp(baseColor, CheckTint, CheckWeight) : Color.Lerp(baseColor, LastMoveTint, LastMoveWeight);
+            properties.SetColor(BaseColorId, tinted);
+            renderer.SetPropertyBlock(properties);
+        }
+    }
+
     public void ClearHighlights()
     {
         EnsureRoots();
@@ -240,6 +297,21 @@ public sealed class BoardView : MonoBehaviour
         {
             capturedPieces = root.gameObject.AddComponent<CapturedPiecesView>();
             capturedPieces.Build(this);
+        }
+    }
+
+    private void EnsureSounds()
+    {
+        if (sounds != null)
+        {
+            return;
+        }
+
+        Transform root = EnsureChildRoot(null, "Sounds");
+        sounds = root.GetComponent<BoardSounds>();
+        if (sounds == null)
+        {
+            sounds = root.gameObject.AddComponent<BoardSounds>();
         }
     }
 
