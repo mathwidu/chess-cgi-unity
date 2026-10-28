@@ -192,6 +192,11 @@ public static class ChessCgiWebBuild
         PlayerSettings.WebGL.memoryGrowthMode = WebGLMemoryGrowthMode.Geometric;
         PlayerSettings.WebGL.threadsSupport = false;
         PlayerSettings.WebGL.wasm2023 = false;
+#if UNITY_WEBGL
+        // Pin the shipping policy instead of inheriting the Editor's BuildTimes default.
+        UnityEditor.WebGL.UserBuildSettings.codeOptimization = UnityEditor.WebGL.WasmCodeOptimization.DiskSizeLTO;
+        Debug.Log("CHESS_WEB_CODE_OPTIMIZATION " + UnityEditor.WebGL.UserBuildSettings.codeOptimization);
+#endif
         PlayerSettings.SetManagedStrippingLevel(NamedBuildTarget.WebGL, ManagedStrippingLevel.Medium);
         PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.WebGL, false);
         PlayerSettings.SetGraphicsAPIs(BuildTarget.WebGL, new[] { GraphicsDeviceType.OpenGLES3 });
