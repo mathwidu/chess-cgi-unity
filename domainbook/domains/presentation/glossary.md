@@ -58,6 +58,17 @@ inicial e o painel da peça selecionada.
 - **Aliases:** Interface, Canvas UI
 - **Status:** validated
 
+## Mesa
+
+A mesa de madeira sobre a qual o tabuleiro fica: tampo, friso, saia, quatro
+pés e ponteiras metálicas, modelada em metros do VR e escalada para o desktop.
+Uma placa de controle no tampo, à esquerda do jogador, regula a altura: a
+mesa sobe ou desce com o tabuleiro em cima, entre um limite mínimo e um
+máximo, e a escolha é persistida. A câmera nunca acompanha a mesa.
+
+- **Aliases:** Table, TableView, Altura da mesa, Table height
+- **Status:** validated
+
 ## Tela de resultado
 
 O diálogo do HUD que anuncia o [resultado da partida](../gameplay/glossary.md)

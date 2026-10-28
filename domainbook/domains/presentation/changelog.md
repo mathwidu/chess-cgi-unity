@@ -10,6 +10,24 @@ Fixed ou Security como H3s, cada um deles uma lista de itens.
 
 ### Added
 
+- [Mesa](glossary.md) de verdade sob o tabuleiro, no lugar do cubo, com altura
+  regulável ([feature](features/regular-a-altura-da-mesa.md),
+  [ADR-0002](decisions/0002-modelar-a-sala-em-metros-do-vr-e-escalar-para-o-desktop.md)).
+  - `TableView` monta um tampo de nogueira com friso, a saia, quatro pés e
+    ponteiras metálicas.
+  - Uma placa inclinada no tampo, à esquerda do jogador, tem Subir e Descer,
+    um indicador de nível e a altura em centímetros.
+  - A mesa sobe ou desce um passo com o tabuleiro em cima: os pés ficam no
+    chão, as pernas crescem e a câmera não se move. Há limite mínimo e
+    máximo, e a escolha fica em `PlayerPrefs`.
+  - A placa acompanha o lado de quem joga e responde ao mouse e ao raio do
+    controle.
+  - `BoardView.SetSurfaceOffset` move o tabuleiro com a mesa, e
+    `BoardView.FitVrRoomToMode` escala a sala, modelada em metros do VR, para
+    o desktop.
+  - O harness `XRDesktopVerification` passou a considerar a altura atual da
+    mesa.
+
 - [Tela de resultado](glossary.md) ao fim da partida
   ([feature](features/mostrar-o-resultado-da-partida.md)): um diálogo modal no
   estilo dos diálogos de promoção e de falha da IA, que aparece 0,8 s depois do
