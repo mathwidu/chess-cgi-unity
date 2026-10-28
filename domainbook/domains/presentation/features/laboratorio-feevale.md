@@ -48,6 +48,15 @@ síncrono do preview. Uma comparação da sala com a luz do estúdio desligada
 encontrou 51.123 pixels alterados antes da correção; uma máscara de camada
 sozinha não isolava essa luz direcional no URP.
 
+A comparação de pixels em `ClassroomEnvironmentTests` inicializa a mesma
+vista offscreen antes de comparar os estados da luz e aguarda, com prazo
+limitado, as variantes de shader solicitadas pelo render. As capturas usam
+compilação síncrona e restauram a configuração anterior no fim. Isso evita
+comparar os placeholders magenta do primeiro render do Editor com os
+materiais prontos, mantendo o limite de menos de 8 pixels alterados. O teste
+também exige que todas as luzes do estúdio estejam desligadas entre renders
+do preview. Não muda a iluminação do jogo.
+
 A luz principal usa bias de profundidade 1,0 e normal 0,5 quando o tabuleiro
 está na escala pequena, eliminando faixas de auto-sombra sobre a mesa. No
 desktop ela volta aos valores do pipeline. Não há alteração dos assets de

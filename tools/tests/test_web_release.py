@@ -29,6 +29,9 @@ class WebReleaseTests(unittest.TestCase):
         self.write(self.root / "tracked.txt", b"reviewed source\n")
         self.write(self.root / "deploy/web/Dockerfile", b"FROM scratch\nCOPY web/ /srv/chess-web/\n")
         self.write(self.root / "deploy/web/nginx.conf", b"events {}\nhttp {}\n")
+        for recipe in RELEASE.RECIPES:
+            if recipe.startswith("tools/"):
+                self.write(self.root / recipe, (Path(__file__).resolve().parents[2] / recipe).read_bytes())
         self.write(self.root / "game/ProjectSettings/ProjectVersion.txt", b"m_EditorVersion: 6000.3.16f1\n")
         self.git("init", "--quiet")
         commit = "3" * 40
@@ -88,8 +91,12 @@ class WebReleaseTests(unittest.TestCase):
     def git(self, *args):
         return subprocess.check_output(["git", "-C", str(self.root), *args], text=True, stderr=subprocess.DEVNULL)
 
-    def pack(self, output=None):
-        return RELEASE.pack(self.build, output or self.output, self.revision, repo_root=self.root)
+    def pack(self, output=None, **kwargs):
+        return RELEASE.pack(self.build, output or self.output, self.revision, repo_root=self.root, **kwargs)
+
+    def runtime_root(self):
+        manifest = json.loads((self.output / "context/manifest.json").read_text())
+        return self.output / "context/web/jogar/runtime" / manifest["build_id"]
 
     def verify(self, context=None, revision=None):
         return RELEASE.verify(context or self.output / "context", revision or self.revision, repo_root=self.root)
@@ -119,20 +126,21 @@ class WebReleaseTests(unittest.TestCase):
         archive, checksum, manifest = self.pack()
         self.assertEqual(checksum, RELEASE.sha256(archive))
         self.assertEqual(archive.name, f"chess-web-{self.revision[:12]}.tar.gz")
-        public = json.loads((self.output / "context/web/release.json").read_text())
+        public = json.loads((self.output / "context/web/jogar/runtime/release.json").read_text())
         self.assertEqual(set(public), RELEASE.PUBLIC_KEYS)
         self.assertEqual(public["source_revision"], self.revision)
         self.assertEqual(public["unity_version"], "6000.3.16f1")
-        self.assertEqual(public["initial_download_bytes"], sum((self.build / name).stat().st_size for name in RELEASE.RUNTIME_FILES))
+        self.assertEqual(public["initial_download_bytes"], RELEASE.launch_manifest(manifest["build_id"], manifest["runtimes"][manifest["build_id"]])["initialBytes"])
+        self.assertEqual(public["retained_build_ids"], [manifest["build_id"]])
         self.assertNotIn(str(self.root), json.dumps(manifest))
-        self.assertEqual(len(manifest["files"]), 18)
+        self.assertEqual(len(manifest["files"]), len(RELEASE.context_files(manifest)) - 1)
         self.assertEqual(set(manifest["recipes"]), set(RELEASE.RECIPES))
         self.assertEqual(self.verify(), manifest)
         target = self.root / ".local/unpacked"
         self.assertEqual(RELEASE.unpack(archive, checksum, target, self.revision, repo_root=self.root), target)
         self.assertEqual(self.verify(target), manifest)
         with tarfile.open(archive, "r:gz") as bundle:
-            self.assertEqual(set(bundle.getnames()), RELEASE.CONTEXT_FILES)
+            self.assertEqual(set(bundle.getnames()), RELEASE.context_files(manifest))
             self.assertTrue(all(member.isfile() and member.uid == 0 and member.mtime == 0 for member in bundle))
 
     def test_archives_are_reproducible_without_local_timestamps_or_paths(self):
@@ -236,7 +244,7 @@ class WebReleaseTests(unittest.TestCase):
 
     def test_verify_rejects_runtime_tampering_and_manifest_revision_change(self):
         self.pack()
-        loader = self.output / "context/web/Build/Web.loader.js"
+        loader = self.runtime_root() / "Build/Web.loader.js"
         original = loader.read_bytes()
         loader.write_bytes(original + b"tampering")
         with self.assertRaisesRegex(RELEASE.ReleaseError, "metadata|Manifest"):
@@ -258,7 +266,7 @@ class WebReleaseTests(unittest.TestCase):
         manifest = json.loads(manifest_path.read_text())
         manifest["recipes"]["deploy/web/Dockerfile"] = RELEASE.file_record(recipe)
         manifest_path.write_bytes(RELEASE.canonical_json(manifest))
-        with self.assertRaisesRegex(RELEASE.ReleaseError, "recipe differs"):
+        with self.assertRaisesRegex(RELEASE.ReleaseError, "recipe differs|Manifest differs"):
             self.verify()
 
     def test_verify_rejects_extra_missing_symlink_and_private_public_metadata(self):
@@ -269,7 +277,7 @@ class WebReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(RELEASE.ReleaseError, "Unexpected file"):
             self.verify()
         extra.unlink()
-        loader = context / "web/Build/Web.loader.js"
+        loader = self.runtime_root() / "Build/Web.loader.js"
         original = loader.read_bytes()
         loader.unlink()
         with self.assertRaisesRegex(RELEASE.ReleaseError, "Missing files"):
@@ -279,11 +287,11 @@ class WebReleaseTests(unittest.TestCase):
             self.verify()
         loader.unlink()
         loader.write_bytes(original)
-        public_path = context / "web/release.json"
+        public_path = context / "web/jogar/runtime/release.json"
         public = json.loads(public_path.read_text())
         public["private_local_path"] = str(self.root)
         public_path.write_bytes(RELEASE.canonical_json(public))
-        with self.assertRaisesRegex(RELEASE.ReleaseError, "Public release metadata"):
+        with self.assertRaisesRegex(RELEASE.ReleaseError, "Manifest|Public release metadata"):
             self.verify()
 
     def test_duplicate_json_keys_and_boolean_schema_version_are_rejected(self):
@@ -310,17 +318,17 @@ class WebReleaseTests(unittest.TestCase):
     def test_archive_path_traversal_absolute_path_and_unknown_file_are_rejected(self):
         for name in ("../escaped.txt", "/tmp/escaped.txt", "web/../manifest.json", "web/.env", "web//index.html"):
             with self.subTest(name=name):
-                self.reject_archive([self.member(name)], "unsafe|unexpected")
+                self.reject_archive([self.member(name)], "unsafe|unexpected|exact release file set")
         self.assertFalse((self.root / "escaped.txt").exists())
 
     def test_archive_symlinks_hardlinks_special_files_and_duplicates_are_rejected(self):
         for kind in (tarfile.SYMTYPE, tarfile.LNKTYPE, tarfile.FIFOTYPE):
             with self.subTest(kind=kind):
-                info = tarfile.TarInfo("web/index.html")
+                info = tarfile.TarInfo("web/jogar/runtime/" + "a" * 64 + "/Build/Web.loader.js")
                 info.type = kind
                 info.linkname = "../../outside"
                 self.reject_archive([(info, None)], "links/special")
-        self.reject_archive([self.member("web/index.html"), self.member("web/index.html")], "duplicate")
+        self.reject_archive([self.member("web/jogar/runtime/" + "a" * 64 + "/Build/Web.loader.js"), self.member("web/jogar/runtime/" + "a" * 64 + "/Build/Web.loader.js")], "duplicate")
 
     def test_archive_directories_cannot_hide_oversized_data(self):
         info = tarfile.TarInfo("web")
@@ -329,9 +337,9 @@ class WebReleaseTests(unittest.TestCase):
         self.reject_archive([(info, b"data")], "zero size")
 
     def test_archive_size_limits_and_missing_members_are_rejected(self):
-        self.reject_archive([self.member("web/index.html")], "exact release file set")
+        self.reject_archive([self.member("web/jogar/runtime/" + "a" * 64 + "/Build/Web.loader.js")], "exact release file set")
         with patch.object(RELEASE, "MAX_CONTEXT_BYTES", 2):
-            self.reject_archive([self.member("web/index.html")], "unpacked limit")
+            self.reject_archive([self.member("web/jogar/runtime/" + "a" * 64 + "/Build/Web.loader.js")], "unpacked limit")
         archive, checksum, _ = self.pack()
         with patch.object(RELEASE, "MAX_ARCHIVE_BYTES", 2):
             with self.assertRaisesRegex(RELEASE.ReleaseError, "compressed limit"):
@@ -348,6 +356,101 @@ class WebReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(RELEASE.ReleaseError, "already exists"):
             RELEASE.unpack(archive, checksum, target, self.revision, repo_root=self.root)
         self.assertEqual(sentinel.read_text(), "preserve")
+
+    def test_brotli_roundtrip_and_original_input_inventory_are_recorded(self):
+        _, _, manifest = self.pack()
+        runtime = manifest["runtimes"][manifest["build_id"]]
+        self.assertRegex(manifest["build_id"], r"^[0-9a-f]{64}$")
+        self.assertEqual(runtime["source_revision"], self.revision)
+        self.assertEqual(runtime["compression"], {"encoding": "br", "quality": 9, "roundtrip_verified": True})
+        for source, name in RELEASE.RUNTIME_MAP.items():
+            with self.subTest(name=name):
+                raw = (self.build / source).read_bytes()
+                decoded = gzip.decompress(raw) if source.startswith("Build/") and source.endswith(".gz") else raw
+                self.assertEqual(runtime["source_files"][source], RELEASE.file_record(self.build / source))
+                self.assertEqual(runtime["files"][name]["decoded"], {
+                    "bytes": len(decoded), "sha256": hashlib.sha256(decoded).hexdigest()})
+                if name in RELEASE.BROTLI_FILES:
+                    self.assertEqual(runtime["files"][name]["encoding"], "br")
+        self.assertEqual(runtime["files"]["Build/Web.wasm.br"]["content_type"], "application/wasm")
+        self.assertEqual(runtime["files"]["stockfish/stockfish.js-18.0.0-source.tar.gz"]["encoding"], "identity")
+
+    def test_namespace_commits_to_encoded_bytes_and_headers(self):
+        _, _, manifest = self.pack()
+        runtime = manifest["runtimes"][manifest["build_id"]]
+        item = runtime["files"]["Build/Web.loader.js"]
+        for key, changed in (("encoding", "identity"), ("content_type", "text/plain"), ("sha256", "0" * 64)):
+            original = item[key]
+            item[key] = changed
+            self.assertNotEqual(RELEASE.runtime_id(runtime), manifest["build_id"])
+            item[key] = original
+
+    def test_previous_requires_authenticated_manifest_and_valid_payload(self):
+        self.pack()
+        previous = self.output / "context"
+        digest = RELEASE.sha256(previous / "manifest.json")
+        for kwargs, error in (({"previous_context": previous}, "provided together"),
+                              ({"previous_sha256": digest}, "provided together"),
+                              ({"previous_context": previous, "previous_sha256": "0" * 64}, "SHA256 mismatch")):
+            with self.assertRaisesRegex(RELEASE.ReleaseError, error):
+                self.pack(self.root / ".local/second", **kwargs)
+        (self.runtime_root() / "Build/Web.wasm.br").write_bytes(b"mutated previous")
+        with self.assertRaisesRegex(RELEASE.ReleaseError, "Manifest differs"):
+            self.pack(self.root / ".local/second", previous_context=previous, previous_sha256=digest)
+
+    def test_retention_keeps_only_active_previous_and_supports_old_source_revision(self):
+        _, _, first = self.pack()
+        first_context = self.output / "context"
+        self.write(self.build / "Build/Web.loader.js", b"function createUnityInstance() { return 2; }\n")
+        (self.root / "tracked.txt").write_text("next reviewed revision\n")
+        self.git("add", "tracked.txt")
+        self.git("-c", "user.name=Release Fixture", "-c", "user.email=release-fixture@localhost",
+                 "commit", "--quiet", "-m", "Second source revision")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        second_output = self.root / ".local/second"
+        _, _, second = self.pack(second_output, previous_context=first_context,
+            previous_sha256=RELEASE.sha256(first_context / "manifest.json"))
+        self.assertEqual(set(second["runtimes"]), {first["build_id"], second["build_id"]})
+        self.assertNotEqual(first["source_revision"], second["source_revision"])
+        self.write(self.build / "Build/Web.loader.js", b"function createUnityInstance() { return 3; }\n")
+        third_output = self.root / ".local/third"
+        _, _, third = self.pack(third_output, previous_context=second_output / "context",
+            previous_sha256=RELEASE.sha256(second_output / "context/manifest.json"))
+        self.assertEqual(set(third["runtimes"]), {second["build_id"], third["build_id"]})
+        self.assertNotIn(first["build_id"], third["runtimes"])
+        self.assertEqual(self.verify(third_output / "context"), third)
+
+    def test_identical_runtime_is_deduplicated_when_reusing_previous(self):
+        _, _, first = self.pack()
+        _, _, second = self.pack(self.root / ".local/second", previous_context=self.output / "context",
+            previous_sha256=RELEASE.sha256(self.output / "context/manifest.json"))
+        self.assertEqual(first["build_id"], second["build_id"])
+        self.assertEqual(len(second["runtimes"]), 1)
+
+    def test_generated_whitelist_cannot_be_replaced_even_with_updated_file_record(self):
+        _, _, manifest = self.pack()
+        context = self.output / "context"
+        path = context / RELEASE.GENERATED_RECIPE
+        path.write_bytes(path.read_bytes() + b"location / { try_files $uri /index.html; }\n")
+        manifest["files"][RELEASE.GENERATED_RECIPE] = RELEASE.file_record(path)
+        (context / "manifest.json").write_bytes(RELEASE.canonical_json(manifest))
+        with self.assertRaisesRegex(RELEASE.ReleaseError, "whitelist"):
+            self.verify()
+
+    def test_runtime_hash_or_decoded_digest_tampering_is_rejected(self):
+        _, _, manifest = self.pack()
+        context = self.output / "context"
+        runtime = manifest["runtimes"][manifest["build_id"]]
+        runtime["files"]["Build/Web.wasm.br"]["decoded"]["sha256"] = "0" * 64
+        (context / "manifest.json").write_bytes(RELEASE.canonical_json(manifest))
+        with self.assertRaisesRegex(RELEASE.ReleaseError, "decoded/roundtrip mismatch"):
+            self.verify()
+
+    def test_brotli_decode_limit_is_bounded(self):
+        self.pack()
+        with patch.object(RELEASE, "MAX_GZIP_BYTES", 4):
+            with self.assertRaisesRegex(RELEASE.ReleaseError, "Brotli inspect/roundtrip"):
+                RELEASE.brotli("inspect", self.runtime_root() / "Build/Web.loader.js", repo_root=self.root)
 
 
 if __name__ == "__main__":

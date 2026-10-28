@@ -23,10 +23,11 @@ jobs:
         run: |
           python3 -m unittest discover -s tools/tests -p 'test_web_*.py'
           python3 -m unittest discover -s tools/tests -p 'test_setup_stockfish_web.py'
-          python3 -m py_compile tools/web_release.py tools/deploy_web.py deploy/web/*.py
+          python3 -m unittest tools.tests.test_site_pilot
+          python3 -m py_compile tools/web_release.py tools/deploy_web.py
       - name: Real pinned Stockfish WASM
         run: |
           python3 tools/setup_stockfish_web.py
-          node --test tools/tests/stockfish_web_bridge.test.cjs
-      - name: Render the stack without deploying
-        run: python3 tools/deploy_web.py plan --image "ghcr.io/mathwidu/chess-cgi-unity-web@sha256:$(printf '%064d' 0)" --revision "$GITHUB_SHA"
+          node --test tools/tests/stockfish_web_bridge.test.cjs tools/tests/session_web_bridge.test.cjs
+      - name: Validate the runtime integration plan without deploying
+        run: python3 tools/deploy_web.py plan --image "ghcr.io/mathwidu/chess-cgi-unity-web@sha256:$(printf '%064d' 0)" --revision "$GITHUB_SHA" --build-id "$(printf '%064d' 0)"

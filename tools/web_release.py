@@ -12,6 +12,7 @@ import shutil
 import stat
 import subprocess
 import tarfile
+import tempfile
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -19,7 +20,8 @@ CHUNK = 1024 * 1024
 MAX_GZIP_BYTES = 1024 * 1024 * 1024
 MAX_ARCHIVE_BYTES = 256 * 1024 * 1024
 MAX_CONTEXT_BYTES = 512 * 1024 * 1024
-RECIPES = ("deploy/web/Dockerfile", "deploy/web/nginx.conf")
+RECIPES = ("deploy/web/Dockerfile", "deploy/web/nginx.conf", "tools/web_release.py",
+           "tools/web_brotli.cjs", "tools/setup_stockfish_web.py")
 RUNTIME_FILES = (
     "index.html", "Build/Web.loader.js", "Build/Web.data.gz",
     "Build/Web.framework.js.gz", "Build/Web.wasm.gz",
@@ -32,9 +34,16 @@ NOTICES = ("Copying.txt", "AUTHORS", "SOURCE.txt", "manifest.json")
 BUILD_FILES = frozenset(RUNTIME_FILES) | {
     "stockfish/" + name for name in (*STOCKFISH_FILES, "SOURCE.txt", "manifest.json")
 } | {"StreamingAssets/ThirdParty/Stockfish/" + name for name in NOTICES}
-WEB_FILES = BUILD_FILES | {"release.json"}
-CONTEXT_FILES = {"web/" + name for name in WEB_FILES} | set(RECIPES) | {"manifest.json"}
-PUBLIC_KEYS = {"source_revision", "build_id", "initial_download_bytes", "unity_version"}
+PREFIX = "/jogar/runtime/"
+IMMUTABLE = "public, max-age=31536000, immutable"
+GENERATED_RECIPE = "deploy/web/runtime-assets.conf"
+RUNTIME_MAP = {name: name[:-3] + ".br" if name.endswith(".gz") and name.startswith("Build/") else name
+               for name in BUILD_FILES if name != "index.html"}
+BROTLI_FILES = frozenset(name for name in RUNTIME_MAP.values()
+                        if name.endswith((".br", ".js", ".wasm")))
+RUNTIME_ASSETS = frozenset(RUNTIME_MAP.values())
+PUBLIC_KEYS = {"source_revision", "build_id", "initial_download_bytes", "ai_download_bytes",
+               "unity_version", "retained_build_ids", "manifest_sha256"}
 SECRET_PATTERN = re.compile(
     rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|"
     rb"\bAKIA[0-9A-Z]{16}\b|\bgh[pousr]_[A-Za-z0-9]{36,}\b|"
@@ -201,7 +210,7 @@ def validate_gzip(path, *, wasm=False, unity_data=False, scan_credentials=False)
 
 
 def validate_payload(root, repo_root, *, release=False):
-    inventory(root, WEB_FILES if release else BUILD_FILES)
+    inventory(root, BUILD_FILES)
     if (root / "index.html").stat().st_size > CHUNK:
         raise ReleaseError("index.html exceeds the 1 MiB text limit")
     index = (root / "index.html").read_bytes()
@@ -275,46 +284,218 @@ def unity_version(repo_root):
     return match.group(1)
 
 
-def metadata_for(root, repo_root, revision, recipes):
-    records = {name: file_record(root / name) for name in sorted(BUILD_FILES)}
-    fingerprint = hashlib.sha256(canonical_json({"files": records, "recipes": recipes})).hexdigest()[:12]
-    return {
-        "source_revision": revision,
-        "build_id": f"{revision[:12]}-{fingerprint}",
-        "initial_download_bytes": sum(records[name]["bytes"] for name in RUNTIME_FILES),
-        "unity_version": unity_version(repo_root),
-    }
+def content_type(name):
+    base = name[:-3] if name.endswith((".br", ".gz")) else name
+    return ("application/wasm" if base.endswith(".wasm") else
+            "application/javascript" if base.endswith(".js") else
+            "application/gzip" if name.endswith(".tar.gz") or name.endswith(".data.gz") else
+            "application/json" if base.endswith(".json") else
+            "application/octet-stream" if base.endswith(".data") else "text/plain")
+
+
+def brotli(operation, path, *, repo_root=REPO_ROOT, output=None, gzip_input=False):
+    helper = repo_path("tools/web_brotli.cjs", Path(repo_root))
+    command = ["node", str(helper), operation, str(path)]
+    if operation == "encode":
+        command += [str(output), "gzip" if gzip_input else "identity", str(MAX_GZIP_BYTES)]
+    else:
+        command += [str(MAX_GZIP_BYTES)]
+    try:
+        result = subprocess.run(command, check=True, text=True, capture_output=True, timeout=300)
+        return json.loads(result.stdout)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, json.JSONDecodeError) as error:
+        raise ReleaseError(f"Brotli {operation}/roundtrip failed: {Path(path).name}") from error
+
+
+def contract_files(runtime):
+    return {name: {key: item[key] for key in ("bytes", "sha256", "encoding", "content_type")}
+            for name, item in sorted(runtime["files"].items())}
+
+
+def runtime_id(runtime):
+    # The namespace commits to transferred bytes AND their decoding/MIME contract.
+    return hashlib.sha256(canonical_json({"files": contract_files(runtime), "cache_control": IMMUTABLE})).hexdigest()
+
+
+def launch_manifest(build_id, runtime):
+    entries = {"loader": "Build/Web.loader.js", "data": "Build/Web.data.br",
+               "framework": "Build/Web.framework.js.br", "code": "Build/Web.wasm.br"}
+    return {"schema": 1, "buildId": build_id, "assetBase": f"{PREFIX}{build_id}/", **entries,
+            "initialBytes": sum(runtime["files"][name]["bytes"] for name in entries.values()),
+            "aiBytes": sum(item["bytes"] for name, item in runtime["files"].items()
+                           if name.startswith("stockfish/") and name.endswith((".js", ".wasm")))}
+
+
+def public_metadata(manifest):
+    active = manifest["runtimes"][manifest["build_id"]]
+    launch = launch_manifest(manifest["build_id"], active)
+    return {"source_revision": manifest["source_revision"], "build_id": manifest["build_id"],
+            "initial_download_bytes": launch["initialBytes"], "ai_download_bytes": launch["aiBytes"],
+            "unity_version": active["unity_version"],
+            "retained_build_ids": [manifest["build_id"], *sorted(set(manifest["runtimes"]) - {manifest["build_id"]})],
+            "manifest_sha256": hashlib.sha256(canonical_json(launch)).hexdigest()}
+
+
+def context_files(manifest):
+    return set(RECIPES) | {"manifest.json", GENERATED_RECIPE,
+        "web" + PREFIX + "manifest.json", "web" + PREFIX + "release.json"} | {
+        "web" + PREFIX + build_id + "/" + name
+        for build_id in manifest["runtimes"] for name in RUNTIME_ASSETS}
+
+
+def nginx_assets(manifest):
+    lines = ["# Generated and verified by tools/web_release.py; exact immutable whitelist."]
+    for build_id, runtime in sorted(manifest["runtimes"].items()):
+        for name, item in sorted(runtime["files"].items()):
+            lines += [f"location = {PREFIX}{build_id}/{name} {{",
+                      "    proxy_pass http://127.0.0.1:8081;",
+                      "    add_header Cache-Control $runtime_cache always;",
+                      '    add_header X-Content-Type-Options "nosniff" always;']
+            if item["encoding"] != "identity":
+                # Without always: never label 4xx/5xx HTML error bodies as compressed.
+                lines += [f"    add_header Content-Encoding {item['encoding']};"]
+            lines += ["}"]
+    return ("\n".join(lines) + "\n").encode()
+
+
+def validate_record(record):
+    return (isinstance(record, dict) and set(record) == {"bytes", "sha256"}
+            and type(record["bytes"]) is int and 0 < record["bytes"] <= MAX_GZIP_BYTES
+            and isinstance(record["sha256"], str) and re.fullmatch(r"[0-9a-f]{64}", record["sha256"]))
+
+
+def validate_manifest_shape(manifest):
+    expected = {"schema_version", "source_revision", "build_id", "runtimes", "recipes", "files"}
+    if not isinstance(manifest, dict) or set(manifest) != expected or type(manifest["schema_version"]) is not int or manifest["schema_version"] != 2:
+        raise ReleaseError("Manifest has an unsupported schema or fields")
+    validate_revision(manifest["source_revision"])
+    runtimes = manifest["runtimes"]
+    if not isinstance(runtimes, dict) or not 1 <= len(runtimes) <= 2 or manifest["build_id"] not in runtimes:
+        raise ReleaseError("Manifest must retain only the current and at most one previous runtime")
+    for build_id, runtime in runtimes.items():
+        if not re.fullmatch(r"[0-9a-f]{64}", build_id):
+            raise ReleaseError("Manifest runtime ID must be a SHA256")
+        if not isinstance(runtime, dict) or set(runtime) != {"source_revision", "unity_version", "source_files", "files", "compression"}:
+            raise ReleaseError("Manifest runtime metadata differs from the allowlist")
+        validate_revision(runtime["source_revision"])
+        if not isinstance(runtime["unity_version"], str) or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+[a-z][0-9]+", runtime["unity_version"]):
+            raise ReleaseError("Manifest Unity version is invalid")
+        if runtime["compression"] != {"encoding": "br", "quality": 9, "roundtrip_verified": True} or type(runtime["compression"].get("quality")) is not int:
+            raise ReleaseError("Manifest compression must attest Brotli q9 and byte roundtrip")
+        source = runtime["source_files"]
+        if not isinstance(source, dict) or set(source) != BUILD_FILES or not all(validate_record(item) for item in source.values()):
+            raise ReleaseError("Manifest input inventory differs from the allowlist")
+        if not isinstance(runtime["files"], dict) or set(runtime["files"]) != RUNTIME_ASSETS:
+            raise ReleaseError("Manifest runtime file list differs from the allowlist")
+        for name, item in runtime["files"].items():
+            if (not isinstance(item, dict) or set(item) != {"bytes", "sha256", "decoded", "encoding", "content_type"}
+                    or not validate_record({key: item[key] for key in ("bytes", "sha256")})
+                    or not validate_record(item["decoded"])
+                    or item["encoding"] != ("br" if name in BROTLI_FILES else "identity")
+                    or item["content_type"] != content_type(name)):
+                raise ReleaseError("Manifest runtime decoding/header contract is invalid")
+        if runtime_id(runtime) != build_id:
+            raise ReleaseError("Manifest runtime ID differs from encoded bytes/header contract")
+    active = runtimes[manifest["build_id"]]
+    if active["source_revision"] != manifest["source_revision"]:
+        raise ReleaseError("Manifest active source revision differs")
+    if (not isinstance(manifest["recipes"], dict) or set(manifest["recipes"]) != set(RECIPES)
+            or not all(validate_record(item) for item in manifest["recipes"].values())):
+        raise ReleaseError("Manifest recipe inventory differs")
+    expected_files = context_files(manifest) - {"manifest.json"}
+    if (not isinstance(manifest["files"], dict) or set(manifest["files"]) != expected_files
+            or not all(validate_record(item) for item in manifest["files"].values())):
+        raise ReleaseError("Manifest context file inventory differs")
+
+
+def verify_runtime(root, runtime, repo_root, *, current):
+    pins, _, _ = stockfish_pins(repo_root)
+    for source, name in sorted(RUNTIME_MAP.items()):
+        path = root / name
+        item = runtime["files"][name]
+        if file_record(path) != {key: item[key] for key in ("bytes", "sha256")}:
+            raise ReleaseError(f"Manifest runtime bytes differ: {name}")
+        if item["encoding"] == "br":
+            decoded = brotli("inspect", path, repo_root=repo_root)
+            beginning = bytes.fromhex(decoded.pop("beginning"))
+        else:
+            decoded = file_record(path)
+            with path.open("rb") as stream:
+                beginning = stream.read(32)
+            if not name.endswith(".tar.gz"):
+                scan_text(path)
+        if decoded != item["decoded"]:
+            raise ReleaseError(f"Manifest decoded/roundtrip mismatch: {name}")
+        if not source.endswith(".gz") or not source.startswith("Build/"):
+            if decoded != runtime["source_files"][source]:
+                raise ReleaseError(f"Manifest input and decoded bytes differ: {name}")
+        if name.endswith((".wasm", ".wasm.br")) and not beginning.startswith(b"\0asm\x01\0\0\0"):
+            raise ReleaseError(f"Invalid WebAssembly magic/version: {name}")
+        if name.endswith(".data.br") and not beginning.startswith(b"UnityWebData"):
+            raise ReleaseError("Invalid Unity data header")
+        if name.startswith("stockfish/") and name.split("/")[-1] in pins:
+            if decoded["sha256"] != pins[name.split("/")[-1]][1]:
+                raise ReleaseError(f"Stockfish pinned checksum mismatch: {name}")
+        if current and name.startswith("StreamingAssets/"):
+            tracked = repo_path("game/Assets/" + name, repo_root)
+            if sha256(tracked) != decoded["sha256"]:
+                raise ReleaseError(f"Stockfish notice differs from this checkout: {name}")
+    metadata = read_json(root / "stockfish/manifest.json")
+    for name, (url, digest) in pins.items():
+        expected = {**runtime["files"]["stockfish/" + name]["decoded"], "url": url}
+        if metadata.get("files", {}).get(name) != expected or expected["sha256"] != digest:
+            raise ReleaseError("Stockfish manifest does not match decoded pinned files")
+    validate_gzip(root / "stockfish/stockfish.js-18.0.0-source.tar.gz")
+
+
+def verify_context(context, *, repo_root=REPO_ROOT, revision=None):
+    context = Path(context).expanduser().absolute()
+    if context.is_symlink() or not context.is_dir() or (context / "manifest.json").is_symlink():
+        raise ReleaseError("Payload/context and manifest must not be symbolic links")
+    manifest = read_json(context / "manifest.json")
+    validate_manifest_shape(manifest)
+    inventory(context, context_files(manifest))
+    for name, expected in manifest["files"].items():
+        if file_record(context / name) != expected:
+            raise ReleaseError(f"Manifest differs from file bytes: {name}")
+    for name, record in manifest["recipes"].items():
+        if file_record(context / name) != record:
+            raise ReleaseError("Manifest recipe differs from bundled files")
+    if revision is not None:
+        if revision != manifest["source_revision"]:
+            raise ReleaseError("Manifest source_revision does not match requested revision")
+        local_recipes = {name: file_record(repo_path(name, repo_root)) for name in RECIPES}
+        if manifest["recipes"] != local_recipes:
+            raise ReleaseError("Container/packaging recipe differs from this checkout")
+        if manifest["runtimes"][manifest["build_id"]]["unity_version"] != unity_version(repo_root):
+            raise ReleaseError("Unity version differs from this checkout")
+    for build_id, runtime in manifest["runtimes"].items():
+        verify_runtime(context / ("web" + PREFIX + build_id), runtime, repo_root,
+                       current=revision is not None and build_id == manifest["build_id"])
+    # A retained context is authenticated by the caller's accepted manifest hash.
+    # Its recipe files are hash-checked above but never executed or imported:
+    # older releases may use an earlier generator. The new/current context must
+    # always reproduce its whitelist with the checked-out generator.
+    if revision is not None and (context / GENERATED_RECIPE).read_bytes() != nginx_assets(manifest):
+        raise ReleaseError("Generated Nginx whitelist differs from verified runtimes")
+    launch = launch_manifest(manifest["build_id"], manifest["runtimes"][manifest["build_id"]])
+    if canonical_json(read_json(context / ("web" + PREFIX + "manifest.json"))) != canonical_json(launch):
+        raise ReleaseError("Public launcher manifest differs from the verified runtime")
+    if canonical_json(read_json(context / ("web" + PREFIX + "release.json"))) != canonical_json(public_metadata(manifest)):
+        raise ReleaseError("Public release metadata differs from verified runtime")
+    return manifest
 
 
 def verify(context, revision, *, repo_root=REPO_ROOT):
     repo_root = Path(repo_root).resolve()
     checkout_guard(repo_root, revision)
-    context = Path(context).expanduser().absolute()
-    inventory(context, CONTEXT_FILES)
-    validate_payload(context / "web", repo_root, release=True)
-    local_recipes = {name: file_record(repo_path(name, repo_root)) for name in RECIPES}
-    bundled_recipes = {name: file_record(context / name) for name in RECIPES}
-    if bundled_recipes != local_recipes:
-        raise ReleaseError("Container recipe differs from this checkout")
-    public = metadata_for(context / "web", repo_root, revision, local_recipes)
-    release = read_json(context / "web/release.json")
-    if not isinstance(release, dict) or set(release) != PUBLIC_KEYS or canonical_json(release) != canonical_json(public):
-        raise ReleaseError("Public release metadata differs from the verified payload/revision")
-    expected = {
-        "schema_version": 1, **public,
-        "files": {name: file_record(context / "web" / name) for name in sorted(WEB_FILES)},
-        "recipes": local_recipes,
-    }
-    if canonical_json(read_json(context / "manifest.json")) != canonical_json(expected):
-        raise ReleaseError("Manifest differs from files, recipes, or requested revision")
-    return expected
+    return verify_context(context, repo_root=repo_root, revision=revision)
 
 
 def new_output(path):
     path = Path(path).expanduser().absolute()
     if os.path.lexists(path):
         raise ReleaseError("Output directory already exists; choose a new directory")
-    # Resolve existing ancestors before creation, without following an output symlink.
     path = path.parent.resolve() / path.name
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -324,7 +505,8 @@ def new_output(path):
     return path
 
 
-def pack(build_dir, output_dir, revision, *, repo_root=REPO_ROOT):
+def pack(build_dir, output_dir, revision, *, repo_root=REPO_ROOT,
+         previous_context=None, previous_sha256=None):
     repo_root = Path(repo_root).resolve()
     checkout_guard(repo_root, revision)
     build = repo_path(build_dir, repo_root)
@@ -332,32 +514,71 @@ def pack(build_dir, output_dir, revision, *, repo_root=REPO_ROOT):
     if target == build or build in target.parents:
         raise ReleaseError("Output directory must be outside the input build directory")
     validate_payload(build, repo_root)
+    previous = None
+    if bool(previous_context) != bool(previous_sha256):
+        raise ReleaseError("--previous-context and --previous-sha256 must be provided together")
+    if previous_context:
+        previous_context = Path(previous_context).expanduser().absolute()
+        if not re.fullmatch(r"[0-9a-f]{64}", previous_sha256) or sha256(previous_context / "manifest.json") != previous_sha256:
+            raise ReleaseError("Previous context manifest SHA256 mismatch")
+        previous = verify_context(previous_context, repo_root=repo_root)
     recipes = {name: file_record(repo_path(name, repo_root)) for name in RECIPES}
-    public = metadata_for(build, repo_root, revision, recipes)
     output = new_output(output_dir)
     context = output / "context"
-    (context / "web").mkdir(parents=True)
-    for name in sorted(BUILD_FILES):
-        destination = context / "web" / name
+    context.mkdir()
+    runtime = {"source_revision": revision, "unity_version": unity_version(repo_root),
+               "compression": {"encoding": "br", "quality": 9, "roundtrip_verified": True},
+               "source_files": {name: file_record(build / name) for name in sorted(BUILD_FILES)}, "files": {}}
+    staging = output / ".runtime-staging"
+    staging.mkdir()
+    for source, name in sorted(RUNTIME_MAP.items()):
+        destination = staging / name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(build / name, destination)
+        encoding = "br" if name in BROTLI_FILES else "identity"
+        if encoding == "br":
+            decoded = brotli("encode", build / source, repo_root=repo_root, output=destination,
+                             gzip_input=source.endswith(".gz"))
+        else:
+            shutil.copyfile(build / source, destination)
+            decoded = file_record(destination)
+        runtime["files"][name] = {**file_record(destination), "decoded": decoded,
+                                  "encoding": encoding, "content_type": content_type(name)}
+    # Refuse input or recipe mutations during compression; clean HEAD alone is insufficient.
+    validate_payload(build, repo_root)
+    if runtime["source_files"] != {name: file_record(build / name) for name in sorted(BUILD_FILES)}:
+        raise ReleaseError("Input build changed during packaging; partial output preserved")
+    checkout_guard(repo_root, revision)
+    if recipes != {name: file_record(repo_path(name, repo_root)) for name in RECIPES}:
+        raise ReleaseError("Recipes changed during packaging; partial output preserved")
+    build_id = runtime_id(runtime)
+    root = context / ("web" + PREFIX)
+    root.mkdir(parents=True)
+    staging.rename(root / build_id)
+    manifest = {"schema_version": 2, "source_revision": revision, "build_id": build_id,
+                "runtimes": {build_id: runtime}, "recipes": recipes, "files": {}}
+    if previous:
+        # Check every prior namespace, even the one that would be pruned.
+        if build_id in previous["runtimes"] and contract_files(previous["runtimes"][build_id]) != contract_files(runtime):
+            raise ReleaseError("Refusing to reuse a runtime ID for different bytes/headers")
+        previous_id = previous["build_id"]
+        if previous_id != build_id:
+            manifest["runtimes"][previous_id] = previous["runtimes"][previous_id]
+            shutil.copytree(previous_context / ("web" + PREFIX + previous_id), root / previous_id)
     for name in RECIPES:
         destination = context / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(repo_root / name, destination)
-    (context / "web/release.json").write_bytes(canonical_json(public))
-    manifest = {
-        "schema_version": 1, **public,
-        "files": {name: file_record(context / "web" / name) for name in sorted(WEB_FILES)},
-        "recipes": recipes,
-    }
+    (context / GENERATED_RECIPE).write_bytes(nginx_assets(manifest))
+    (root / "manifest.json").write_bytes(canonical_json(launch_manifest(build_id, runtime)))
+    (root / "release.json").write_bytes(canonical_json(public_metadata(manifest)))
+    manifest["files"] = {name: file_record(context / name) for name in sorted(context_files(manifest) - {"manifest.json"})}
     (context / "manifest.json").write_bytes(canonical_json(manifest))
     verify(context, revision, repo_root=repo_root)
     archive = output / f"chess-web-{revision[:12]}.tar.gz"
     with archive.open("xb") as raw:
         with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as compressed:
             with tarfile.open(fileobj=compressed, mode="w|", format=tarfile.USTAR_FORMAT) as bundle:
-                for name in sorted(CONTEXT_FILES):
+                for name in sorted(context_files(manifest)):
                     path = context / name
                     info = tarfile.TarInfo(name)
                     info.size = path.stat().st_size
@@ -371,13 +592,14 @@ def pack(build_dir, output_dir, revision, *, repo_root=REPO_ROOT):
 
 
 def archive_members(bundle):
-    directories = allowed_directories(CONTEXT_FILES)
-    seen = set()
-    total = 0
-    members = []
+    # Read a bounded manifest without extracting anything; its dynamic whitelist is
+    # then checked against every archive entry before creating the output directory.
+    members, seen, total, manifest = [], set(), 0, None
+    max_members = 2 * len(RUNTIME_ASSETS) + len(RECIPES) + 32
     for member in bundle:
         name = member.name.rstrip("/") if member.isdir() else member.name
-        if not name or "\\" in name or name != PurePosixPath(name).as_posix() or ".." in PurePosixPath(name).parts:
+        if (not name or "\\" in name or name.startswith("/") or name != PurePosixPath(name).as_posix()
+                or ".." in PurePosixPath(name).parts):
             raise ReleaseError("Archive contains an unsafe/non-canonical path")
         if name in seen:
             raise ReleaseError(f"Archive contains a duplicate path: {name}")
@@ -385,25 +607,39 @@ def archive_members(bundle):
         if member.pax_headers:
             raise ReleaseError("Archive extended headers are not allowed")
         if member.isdir():
-            if name not in directories:
-                raise ReleaseError(f"Archive contains an unexpected directory: {name}")
             if member.size != 0:
                 raise ReleaseError("Archive directory headers must have zero size")
         elif member.type in (tarfile.REGTYPE, tarfile.AREGTYPE):
-            if name not in CONTEXT_FILES:
-                raise ReleaseError(f"Archive contains an unexpected file: {name}")
             if member.size <= 0:
                 raise ReleaseError(f"Archive contains an empty file: {name}")
             total += member.size
             if total > MAX_CONTEXT_BYTES:
                 raise ReleaseError("Archive exceeds the 512 MiB unpacked limit")
+            if name == "manifest.json":
+                if member.size > CHUNK:
+                    raise ReleaseError("Archive manifest exceeds 1 MiB")
+                try:
+                    with tempfile.TemporaryDirectory() as temp:
+                        path = Path(temp) / "manifest.json"
+                        path.write_bytes(bundle.extractfile(member).read(CHUNK + 1))
+                        manifest = read_json(path)
+                        validate_manifest_shape(manifest)
+                except (UnicodeError, json.JSONDecodeError) as error:
+                    raise ReleaseError("Invalid archive manifest") from error
         else:
             raise ReleaseError(f"Archive links/special files are not allowed: {name}")
         members.append(member)
-        if len(members) > len(CONTEXT_FILES) + len(directories):
+        if len(members) > max_members:
             raise ReleaseError("Archive has too many members")
-    present = {member.name for member in members if member.isfile()}
-    if present != CONTEXT_FILES:
+    if manifest is None:
+        raise ReleaseError("Archive does not contain the exact release file set (manifest missing)")
+    expected = context_files(manifest)
+    directories = allowed_directories(expected)
+    for member in members:
+        name = member.name.rstrip("/") if member.isdir() else member.name
+        if name not in (directories if member.isdir() else expected):
+            raise ReleaseError(f"Archive contains an unexpected file/directory: {name}")
+    if {member.name for member in members if member.isfile()} != expected:
         raise ReleaseError("Archive does not contain the exact release file set")
     return members
 
@@ -417,7 +653,6 @@ def unpack(archive, checksum, output_dir, revision, *, repo_root=REPO_ROOT):
         raise ReleaseError("Archive must be a regular file, not a symbolic link")
     if archive.stat().st_size > MAX_ARCHIVE_BYTES:
         raise ReleaseError("Archive exceeds the 256 MiB compressed limit")
-    # Authenticate the entire archive before inspecting or extracting any member.
     if sha256(archive) != checksum:
         raise ReleaseError("Archive SHA256 mismatch; nothing was extracted")
     checkout_guard(Path(repo_root).resolve(), revision)
@@ -443,11 +678,13 @@ def unpack(archive, checksum, output_dir, revision, *, repo_root=REPO_ROOT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    pack_parser = commands.add_parser("pack", help="Package a local Unity Web build from a clean HEAD")
+    pack_parser = commands.add_parser("pack", help="Package local Unity Web assets from clean HEAD with Brotli q9")
     pack_parser.add_argument("--build-dir", type=Path, required=True)
     pack_parser.add_argument("--output-dir", type=Path, required=True)
     pack_parser.add_argument("--revision", required=True)
-    verify_parser = commands.add_parser("verify", help="Verify an existing release context against this checkout")
+    pack_parser.add_argument("--previous-context", type=Path, help="Previously verified schema-2 context; retain its active runtime")
+    pack_parser.add_argument("--previous-sha256", help="SHA256 of that context's manifest.json, recorded at its acceptance")
+    verify_parser = commands.add_parser("verify", help="Verify an existing context against the clean checkout")
     verify_parser.add_argument("--context", type=Path, required=True)
     verify_parser.add_argument("--revision", required=True)
     unpack_parser = commands.add_parser("unpack", help="Authenticate, safely unpack and verify a release context")
@@ -458,7 +695,8 @@ def main():
     args = parser.parse_args()
     try:
         if args.command == "pack":
-            archive, checksum, manifest = pack(args.build_dir, args.output_dir, args.revision)
+            archive, checksum, manifest = pack(args.build_dir, args.output_dir, args.revision,
+                previous_context=args.previous_context, previous_sha256=args.previous_sha256)
             print(f"context={archive.parent / 'context'}")
             print(f"archive={archive}")
             print(f"sha256={checksum}")
@@ -467,8 +705,7 @@ def main():
             manifest = verify(args.context, args.revision)
             print(f"verified={manifest['build_id']}")
         else:
-            output = unpack(args.archive, args.sha256, args.output_dir, args.revision)
-            print(f"context={output}")
+            print(f"context={unpack(args.archive, args.sha256, args.output_dir, args.revision)}")
     except (ReleaseError, OSError, UnicodeError, KeyError, TypeError) as error:
         parser.exit(1, f"web-release: {error}\n")
 

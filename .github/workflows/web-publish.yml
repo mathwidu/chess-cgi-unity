@@ -51,7 +51,8 @@ jobs:
           python3 -m unittest discover -s tools/tests -p 'test_web_*.py'
           python3 -m unittest discover -s tools/tests -p 'test_setup_stockfish_web.py'
           python3 tools/setup_stockfish_web.py
-          node --test tools/tests/stockfish_web_bridge.test.cjs
+          python3 -m unittest tools.tests.test_site_pilot
+          node --test tools/tests/stockfish_web_bridge.test.cjs tools/tests/session_web_bridge.test.cjs
       - name: Download and verify the approved local Unity build
         env:
           GH_TOKEN: ${{ github.token }}
@@ -77,12 +78,20 @@ jobs:
           GHCR_TOKEN: ${{ github.token }}
         run: |
           printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          python3 - <<'PY'
+          import os, subprocess
+          image = os.environ['IMAGE_NAME'] + ':sha-' + os.environ['SOURCE_REVISION']
+          result = subprocess.run(['docker', 'manifest', 'inspect', image], capture_output=True, text=True, timeout=30)
+          assert result.returncode != 0, 'Tag already exists; do not replace the reviewed artifact'
+          assert any(term in result.stderr.lower() for term in ('no such manifest', 'not found', 'manifest unknown', '404')), 'Tag absence not proven'
+          PY
           docker push "$IMAGE_NAME:sha-$SOURCE_REVISION"
           image_ref="$(docker image inspect "$IMAGE_NAME:sha-$SOURCE_REVISION" --format '{{index .RepoDigests 0}}')"
           [[ "$image_ref" =~ ^ghcr.io/mathwidu/chess-cgi-unity-web@sha256:[0-9a-f]{64}$ ]]
           {
             printf 'Source: %s\n\nBundle: %s\n\nImage: %s\n\n' "$SOURCE_REVISION" "$BUNDLE_SHA256" "$image_ref"
-            printf 'The VPS was not modified by this workflow. Apply this digest through tools/deploy_web.py after the release approval.\n'
+            python3 -c "import json,os; p=json.load(open(os.environ['RUNNER_TEMP']+'/context/web/jogar/runtime/release.json')); print('Build ID: '+p['build_id'])"
+            printf 'The VPS was not modified. Supply this SHA, digest and build ID to the coordinated cicochess-site release after approval.\n'
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Remove temporary registry login
         if: always()

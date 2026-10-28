@@ -19,9 +19,9 @@ No worktree Web, com o engine preparado conforme `docs/web-prototype.md`:
 
 ```bash
 mkdir -p .local/pilot
-unity test ./game --mode EditMode --output "$PWD/.local/pilot/editmode.xml" --timeout 1200 -- -logFile "$PWD/.local/pilot/editmode.log"
-unity test ./game --mode PlayMode --output "$PWD/.local/pilot/playmode.xml" --timeout 1200 -- -logFile "$PWD/.local/pilot/playmode.log"
-unity run ./game --timeout 1800 -- -buildTarget WebGL -executeMethod ChessCgiWebBuild.Build -logFile "$PWD/.local/pilot/build.log"
+unity test "$PWD/game" --mode EditMode --output "$PWD/.local/pilot/editmode.xml" --timeout 1200 -- -logFile "$PWD/.local/pilot/editmode.log"
+unity test "$PWD/game" --mode PlayMode --output "$PWD/.local/pilot/playmode.xml" --timeout 1200 -- -logFile "$PWD/.local/pilot/playmode.log"
+unity run "$PWD/game" --timeout 1800 -- -buildTarget WebGL -executeMethod ChessCgiWebBuild.Build -logFile "$PWD/.local/pilot/build.log"
 python3 -m unittest tools.tests.test_site_pilot
 node --test tools/tests/stockfish_web_bridge.test.cjs tools/tests/session_web_bridge.test.cjs
 python3 tools/serve_site_pilot.py --site http://127.0.0.1:4321 --port 8090
@@ -163,3 +163,16 @@ conter referência a fonte ausente/de outro checkout; a integração foi conferi
 nos fontes atuais, sem tratar aquele grafo como evidência.
 
 Não houve publicação, push, GHCR, mudança de VPS ou DNS.
+
+## Preparação de produção em 28/10/2026
+
+O pacote integrado e o fluxo coordenado estão em [web-deployment.md](web-deployment.md).
+Brotli foi aplicado ao empacotamento sem mudar bytes descomprimidos ou perfil visual.
+A falha de iluminação foi isolada no primeiro render offscreen do teste Editor,
+com materiais magenta: sem mudar luz, primeira→segunda captura mudou 8.841 pixels;
+segunda→terceira, zero. O teste agora inicializa a vista e aguarda shaders com prazo,
+preserva limite menor que 8 pixels e verifica luzes do estúdio apagadas. Controle
+positivo com a luz ligada alterou 44.305 pixels. A variante específica não foi
+rastreada; não houve correção de iluminação runtime. Resultado final: 160/160
+PlayMode desktop, 7/7 laboratório WebGL e 1/1 isolado WebGL em nova instância.
+Evidências em `.local/release-prep/lighting/`, fora do Git.

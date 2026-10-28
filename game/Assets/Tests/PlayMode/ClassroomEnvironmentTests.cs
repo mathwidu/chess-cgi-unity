@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Linq;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -85,23 +86,34 @@ public sealed class ClassroomEnvironmentTests
     public IEnumerator MenuStudioLightCannotRelightTheClassroom()
     {
         Camera camera = Camera.main;
-        camera.transform.position = room.TransformPoint(new Vector3(0, 1.2f, -.6f));
-        camera.transform.LookAt(room.TransformPoint(new Vector3(0, 1.4f, 4)));
         Light studio = GameObject.Find("StudioKey").GetComponent<Light>();
         bool studioEnabled = studio.enabled;
         var target = new RenderTexture(320, 180, 24);
         target.Create();
         var pixels = new Texture2D(320, 180, TextureFormat.RGB24, false);
         RenderTexture previous = RenderTexture.active;
+        bool asyncCompilation = ShaderUtil.allowAsyncCompilation;
         try
         {
+            ShaderUtil.allowAsyncCompilation = false;
             Color32[] Capture()
             {
+                camera.transform.position = room.TransformPoint(new Vector3(0, 1.2f, -.6f));
+                camera.transform.LookAt(room.TransformPoint(new Vector3(0, 1.4f, 4)));
                 RenderPipeline.SubmitRenderRequest(camera, new RenderPipeline.StandardRequest { destination = target });
                 RenderTexture.active = target;
                 pixels.ReadPixels(new Rect(0, 0, 320, 180), 0, 0); pixels.Apply();
                 return pixels.GetPixels32();
             }
+            // Initialize this offscreen view before comparing light states. Its first
+            // render can contain magenta placeholders even with async compilation off.
+            Capture();
+            float shaderDeadline = Time.realtimeSinceStartup + 30f;
+            while (ShaderUtil.anythingCompiling && Time.realtimeSinceStartup < shaderDeadline)
+                yield return null;
+            Assert.That(ShaderUtil.anythingCompiling, Is.False, "Shader compilation did not settle before the lighting comparison.");
+            Assert.That(studio.transform.parent.GetComponentsInChildren<Light>().All(light => !light.enabled),
+                Is.True, "The menu studio lights must be off between preview renders.");
             Color32[] before = Capture();
             studio.enabled = false;
             Color32[] after = Capture();
@@ -110,6 +122,7 @@ public sealed class ClassroomEnvironmentTests
         }
         finally
         {
+            ShaderUtil.allowAsyncCompilation = asyncCompilation;
             studio.enabled = studioEnabled; RenderTexture.active = previous;
             target.Release(); Object.DestroyImmediate(target); Object.DestroyImmediate(pixels);
         }

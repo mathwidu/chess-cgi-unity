@@ -1,167 +1,95 @@
-# Publicação do protótipo Web
+# Publicação integrada em cicochess.dev/jogar/
 
-Preparação local em 2026-10-23. Domínio escolhido pelo usuário:
-`chess.matheusduarte.dev.br`. Esta documentação descreve a receita; não é
-evidência de publicação. Nenhum push, release, imagem ou serviço remoto foi
-criado nesta etapa. O plano com SHA e hash do pacote fica em
-`.local/web-release/PLAN.md`, depois do commit e empacotamento.
+Preparação local de 28/10/2026. A receita antiga para o subdomínio chess foi
+substituída por uma release coordenada com `mathwidu/cicochess-site`. O Unity
+continua sendo a única fonte do jogo. Este documento não autoriza publicação.
 
-## Destino e isolamento
+## Responsabilidades
 
-O protótipo fica em `codex/unity-web-prototype`, no worktree
-`/Users/mathwidu/.codex/worktrees/chess-web-prototype/chess-cgi-unity`.
-O checkout original e suas alterações de desktop/Quest não participam do deploy.
-Não mesclar a branch inteira do protótipo em `main` para publicar esta versão.
+- `chess-cgi-unity`: fonte Unity, build Web, pacote auditável e imagem Nginx
+  `ghcr.io/mathwidu/chess-cgi-unity-web`.
+- `cicochess-site`: launcher `/jogar/`, imagem Astro, registro dos dois digests,
+  executor e workflows de produção.
+- Stack existente `cicochess-site`: serviço `web` mantém o site/feedback;
+  novo serviço `game` entrega somente `/jogar/runtime/` no mesmo domínio.
+- Não há outro repositório Unity, novo DNS, banco ou volume do jogo.
+  Os saves continuam locais por origem/navegador, sem sincronização entre aparelhos.
 
-Destino observado via inspeção limitada: alias SSH `vps-pessoal-nova`, usuário
-`mathwidu`, host `srv1397065`, IPv4 `187.77.47.96`, Docker Swarm e Traefik 2.11.
-O serviço novo será `chess-web_web`, na rede existente `network_swarm_public`.
-Não há banco, volume persistente, secret novo, porta publicada no host nem
-mudança no serviço compartilhado do Traefik. NGINX entrega arquivos estáticos;
-o jogo e o Stockfish executam no navegador do visitante.
+O runtime usa Nginx sem root, raiz somente leitura, 128 MiB, 0,50 CPU e tmpfs de
+16 MiB. O Traefik existente encaminha `/jogar/runtime/` com prioridade 200,
+sem remover prefixo ou aplicar a compressão do site. TLS termina no Traefik.
 
-A imagem Linux amd64 usa NGINX oficial sem root, fixado por digest no Dockerfile.
-Limites do serviço: 128 MiB e 0,50 CPU; reserva de 16 MiB e 0,05 CPU; raiz somente
-leitura, capabilities removidas e `/tmp` de 16 MiB. Esses limites pertencem ao
-servidor de arquivos e não representam consumo de memória do jogo no celular.
+## Compilação e pacote local
 
-## Fluxo de release
-
-1. Revisar e fazer commit local do protótipo, ferramentas e documentação.
-2. Empacotar o build Unity já verificado, com checkout limpo e SHA completo:
-
-   ```bash
-   revision="$(git rev-parse HEAD)"
-   python3 tools/web_release.py pack --build-dir Builds/Web --output-dir .local/web-release --revision "$revision"
-   python3 tools/web_release.py verify --context .local/web-release/context --revision "$revision"
-   ```
-
-3. Validar localmente o contêiner, o pacote, a IA e os workflows. Registrar SHA,
-   hash SHA256 do TAR, receita, destino, efeito e retorno no plano revisável.
-4. Obter autorização explícita desse plano antes de qualquer alteração externa,
-   conforme a skill pessoal `publicar-vps-pessoal`.
-5. Publicar a branch do protótipo. No primeiro uso, incorporar somente
-   `.github/workflows/web-publish.yml` em `main`, por uma branch/PR independente
-   criada sobre o `main` atual. O GitHub exige o workflow manual na branch padrão.
-   Não integrar código Unity dessa branch de bootstrap.
-6. Criar release de prévia no commit aprovado, tag `web-<SHA12>`, com
-   `chess-web-<SHA12>.tar.gz`. Não substituir assets de uma release existente.
-7. Disparar manualmente `web-publish.yml` com `source_revision` completo e
-   `bundle_sha256` aprovado. Ele testa as ferramentas e o Stockfish real, baixa
-   o TAR, verifica cada hash e receita, constrói a imagem amd64 e executa o smoke
-   HTTP nessa mesma imagem antes do push ao GHCR. Push comum não faz deploy.
-8. Tornar público somente o pacote do jogo
-   `ghcr.io/mathwidu/chess-cgi-unity-web`, se necessário, dentro do plano aprovado.
-   Pacotes novos no GHCR podem iniciar privados. Confirmar pull na VPS antes
-   de modificar o serviço. Não copiar a chave SSH do Mac para o Actions nem
-   criar PAT como atalho. A publicação usa `GITHUB_TOKEN` temporário do job.
-9. Capturar o digest produzido pelo job e fixá-lo na aplicação pelo Mac:
-
-   ```bash
-   python3 tools/deploy_web.py plan --image ghcr.io/mathwidu/chess-cgi-unity-web@sha256:DIGEST --revision SHA_COMPLETO
-   python3 tools/deploy_web.py apply --image ghcr.io/mathwidu/chess-cgi-unity-web@sha256:DIGEST --revision SHA_COMPLETO
-   ```
-
-10. Conferir imagem efetiva, health e réplicas da VPS. Registrar run, SHA,
-    digest e diretório remoto. Depois do DNS, conferir HTTPS e a partida pública.
-
-### O que os hashes comprovam
-
-O TAR contém somente a lista permitida de 18 arquivos públicos (17 do build e
-`release.json`), duas receitas do contêiner e o manifesto. Inclui avisos,
-licenças e fonte correspondente do Stockfish. A extração rejeita links, caminhos
-escapando do destino, duplicatas, membros extras e tamanhos excessivos. Cada
-arquivo é conferido por SHA256; as receitas também devem coincidir com o checkout.
-
-`source_revision` identifica o checkout limpo selecionado no empacotamento e a
-receita revisada. Este primeiro build foi compilado e testado localmente antes
-do commit; não contém um carimbo de proveniência gerado pelo compilador. O elo
-entre código e binário é atestação da sessão de build, não prova criptográfica.
-O CI não recompila Unity. O hash do TAR identifica exatamente os bytes aprovados;
-o digest identifica a imagem publicada. Não reutilizar um build antigo depois
-de mudar código: recompilar e repetir a verificação funcional.
-
-## DNS: única configuração do usuário após o deploy
-
-Criar no provedor de `matheusduarte.dev.br`:
-
-| Campo | Valor |
-| --- | --- |
-| Tipo | `A` |
-| Nome | `chess` |
-| Destino | `187.77.47.96` |
-| TTL | `300` ou automático |
-| Proxy/CDN, se existir | Somente DNS durante a ativação |
-
-Não criar um registro AAAA para esse nome: IPv6 não faz parte desta receita.
-Na inspeção inicial, A e AAAA retornaram NXDOMAIN. A criação/alteração de DNS
-continua exclusivamente com o usuário.
-
-O deploy inicia um processo limitado a 72 horas que consulta o DNS a cada
-minuto. Ele só ativa o resolver de certificado da rota do jogo se todos os
-endereços resolvidos forem o IPv4 acima e a imagem/revisão ainda forem as suas.
-O lock de deploy impede que uma atualização provisória interrompa o ativador
-de uma versão que venha a ser restaurada por rollback.
-
-Ao confirmar DNS, ele adiciona a label `letsencryptresolver` somente ao serviço
-do jogo, salva o estado de retorno e testa HTTPS com confiança de certificado
-normal: `/healthz`, `/release.json` e cabeçalhos de WASM/data/Stockfish.
-Há uma única ativação e até seis minutos de verificação. Nenhum DNS é alterado.
-Isso usa o resolver HTTP-01 já existente; não reinicia/configura o Traefik.
-
-Estado e log ficam no diretório informado pelo deploy:
-`~/.local/share/chess-web/releases/<SHA12>-<DIGEST12>/activation.json` e
-`activation.log`. Estados possíveis: `waiting_dns`, `dns_timeout`,
-`waiting_https`, `https_verified`, `https_failed` e `stopped`.
-O processo não sobrevive a reinício da VPS. Se expirado, parado ou com HTTPS
-falho, inspecionar a causa antes de reativá-lo; não repetir ordens ACME às cegas.
-Certificado válido e smoke técnico não substituem uma partida no navegador.
-
-## Falha e retorno
-
-Antes da mutação, o aplicador confirma host/usuário, manager, rede, propriedade
-do serviço, colisões de domínio, arquitetura e label de revisão da imagem.
-O lock cobre inventário, baseline de retorno, mudança e decisão de saúde.
-Um serviço preexistente sem `current-stack.json` faz a ferramenta parar.
-
-Se a imagem não ficar saudável em três minutos, a primeira instalação remove
-somente a stack `chess-web` e verifica a ausência do serviço. Em atualização,
-restaura `previous-stack.json` e verifica a imagem anterior saudável. Se o
-retorno também falhar, reporta falha de convergência e exige inspeção limitada.
-Não há prune, remoção de dados ou alteração de outras stacks.
-
-Para retorno manual de uma instalação saudável, após autorização específica:
+Usar sempre o caminho ABSOLUTO do projeto com Unity CLI: há dois checkouts
+registrados com o mesmo nome `game`. Não executar duas instâncias no worktree.
 
 ```bash
-# Primeira instalação: remove somente o jogo. O ativador encerrará ao detectar ausência.
-docker stack rm chess-web
-# Atualização: usar o previous-stack.json preservado naquela release.
-docker stack deploy --resolve-image never --with-registry-auth --compose-file CAMINHO/previous-stack.json chess-web
+unity run "$PWD/game" --timeout 1800 -- -buildTarget WebGL -executeMethod ChessCgiWebBuild.Build -logFile "$PWD/.local/release-prep/build.log"
 ```
 
-Não executar esses exemplos sem confirmar o diretório/revisão e a autorização.
-Após retorno manual, conferir imagem/saúde e sincronizar `current-stack.json`
-com a stack restaurada antes de uma nova atualização.
+Os fontes precisam estar revisados, commitados e limpos para empacotar. Arquivos
+incidentais do Editor são comparados com cópia anterior, nunca restaurados em
+massa sobre mudanças do usuário. O checkout original Quest não é usado.
 
-## Evidência local e limites
+```bash
+revision="$(git rev-parse HEAD)"
+python3 tools/web_release.py pack --build-dir Builds/Web --output-dir .local/release-candidate --revision "$revision"
+python3 tools/web_release.py verify --context .local/release-candidate/context --revision "$revision"
+```
 
-- Pacote inicial Unity: 36.670.918 bytes; IA JS/WASM sob demanda: 7.316.081 bytes.
-- NGINX amd64 exercitado com os limites acima e raiz somente leitura.
-  Smoke HTTP verifica bytes, MIME, gzip, cache, ranges, licenças e 404 reais.
-- Partida no navegador servida pelo contêiner: 32 peças, lance humano e resposta
-  da IA, `moves=2`, turno White, sem erro de runtime nem erro no console.
-  Captura local: `Builds/WebQA/container-deployment.jpg`.
-- Testes do empacotamento/extrator, guards de deploy e locks são locais;
-  Docker/SSH dos testes de rollback são simulados. Nenhuma falha foi provocada
-  em serviço da VPS.
-- `actionlint` e `docker stack config` passaram localmente. O resultado do
-  GitHub Actions e do deploy deve ser registrado após execução autorizada.
-- Android/iPhone físicos ainda precisam de avaliação. A emulação já realizada
-  verifica fluxo/toque/layout; não prova memória, temperatura ou FPS nesses aparelhos.
+O pacote schema 2 preserva fontes/licença Stockfish, inclui receitas verificadas
+e um inventário estrito. O build_id compromete bytes servidos e MIME/codificação.
+Brotli qualidade 9 descomprime o gzip original antes de comprimir; cada arquivo
+passa por roundtrip e comparação byte a byte. Node 22/zlib, sem dependências novas.
+O manifesto público do launcher fica em `/jogar/runtime/manifest.json`; metadados
+em `/jogar/runtime/release.json`, ambos no-store. Assets da versão são imutáveis.
 
-Referências oficiais: [Unity e NGINX](https://docs.unity3d.com/6000.3/Documentation/Manual/web-server-config-nginx.html),
-[NGINX sem root](https://github.com/nginx/docker-nginx-unprivileged),
-[workflows manuais](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow),
-[GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry),
-[Docker stack deploy](https://docs.docker.com/reference/cli/docker/stack/deploy/),
-[Traefik 2.11 ACME](https://doc.traefik.io/traefik/v2.11/https/acme/).
+Para a release seguinte, importar somente o runtime ativo do contexto aceito:
+
+```bash
+python3 tools/web_release.py pack --build-dir Builds/Web --output-dir .local/release-next --revision "$revision" --previous-context CONTEXTO_ACEITO --previous-sha256 HASH_DO_MANIFEST_PRIVADO
+```
+
+Esse checksum identifica `CONTEXTO_ACEITO/manifest.json`, não o manifesto público.
+Cada pacote guarda o runtime atual e no máximo um anterior. O executor do site
+recusa upgrade que elimine o build atualmente publicado. Contextos standalone
+schema 1 não são aceitos como anterior; a primeira publicação integrada não tem
+runtime anterior na VPS. Nunca substituir bytes sob uma URL já publicada.
+
+## Verificar e publicar somente após autorização
+
+1. Testar pacote, imagem amd64, site+runtime via proxy local, IA e retomada;
+   preservar evidência visual e conferir em dispositivo físico.
+2. Registrar SHA Unity, SHA site, checksum do TAR, receita, domínio, serviços,
+   atualização do executor, rollback e limitações no plano final.
+3. Com aprovação, disponibilizar o workflow manual na branch padrão do Unity
+   sem mesclar indiscriminadamente todo o trabalho Quest/Web. Publicar a revisão
+   aprovada e seu TAR na release `web-<SHA12>`, sem substituir assets existentes.
+4. Executar `web-publish.yml` com SHA/checksum exatos. O CI verifica pacote,
+   receitas, testes e o mesmo container antes de publicar a imagem no GHCR.
+   Capturar digest e build_id; não tornar o pacote público por conveniência.
+5. Conferir acesso da credencial dedicada de leitura à imagem privada do jogo.
+   No site, publicar a revisão aprovada e executar o fluxo coordenado com
+   `game_source_sha`, `game_image_digest`, `game_build_id` e SHA do site.
+6. O executor do site disponibiliza/verifica o runtime antes de atualizar o
+   launcher e registra ambos. Nenhuma etapa instala Unity na VPS.
+
+`tools/deploy_web.py` agora aceita apenas `plan`; `apply` foi retirado, assim
+como o executor antigo e o ativador de DNS. O deploy pertence ao site.
+
+## Retorno e limites
+
+O registro da release vincula site e runtime. Antes de mudar serviços, o
+executor guarda a operação pendente com baseline e alvo. Falha parcial pode
+ser recuperada por rollback explicitamente autorizado à baseline conhecida.
+No retorno à primeira versão do site (`61fcf35`), só o serviço game gerenciado
+é removido; o site e o volume de feedbacks são preservados. Rollback não reverte
+nem apaga localStorage. Uma aba da versão retirada pode precisar recarregar.
+
+Hash do pacote identifica os bytes aprovados, digest identifica a imagem;
+a associação entre fonte e compilação requer registro da sessão de build.
+CI de publicação verifica o build fornecido, mas não recompila Unity.
+Testes locais não comprovam HTTPS público, acesso GHCR na VPS ou aceite mobile.
+Logs Unity podem conter autenticação temporária: manter locais e nunca anexar
+seu conteúdo integral a Git/Actions/relatórios.
